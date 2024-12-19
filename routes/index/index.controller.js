@@ -1,5 +1,5 @@
 const getAdminPage = (req, res) => {
-  res.render("pages/admin/index/index");
+  res.render("pages/index/index");
 };
 
 module.exports = {

@@ -1,21 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-  {% include "includes/admin/head.njk" %}
+  {% include "includes/head.njk" %}
   <body class="sb-nav-fixed">
-    {% include "components/admin/navbar.njk" %}
+    {% include "components/navbar.njk" %}
     <div id="layoutSidenav">
-      <div id="layoutSidenav_nav">
-        {% include "components/admin/sidebar.njk" %}
-      </div>
+      <div id="layoutSidenav_nav">{% include "components/sidebar.njk" %}</div>
       <div id="layoutSidenav_content">
         <main>{% block content %} {% endblock %}</main>
-        {% include "components/admin/footer.njk" %}
+        {% include "components/footer.njk" %}
       </div>
     </div>
     <script
       src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
       crossorigin="anonymous"
     ></script>
-    {% include "includes/admin/script.njk" %} {% block scripts %} {% endblock %}
+    {% include "includes/script.njk" %} {% block scripts %} {% endblock %}
   </body>
 </html>

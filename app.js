@@ -30,7 +30,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const adminRouter = require("./routes/admin/index/index.router");
+const adminRouter = require("./routes/index/index.router");
 
 app.use("/", adminRouter);
 
