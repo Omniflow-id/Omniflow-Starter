@@ -1,0 +1,29 @@
+{% extends "layout/masterLayout.njk" %}
+
+{% block content %}
+<div class="container">
+ <h1 class="mt-4">Gambaran Umum User</h1>
+  <div class="row">
+   <!-- Total Users Card -->
+   <div class="col-md-3 mb-4">
+     <div class="card bg-primary text-white h-100">
+       <div class="card-body">
+         <h5 class="card-title">Total Users</h5>
+         <h2 class="display-4">{{ totalUsers }}</h2>
+       </div>
+     </div>
+   </div>
+    <!-- Role Cards -->
+   {% for stat in roleStats %}
+     <div class="col-md-3 mb-4">
+       <div class="card h-100 {% if stat.role == 'admin' %}bg-danger{% elif stat.role == 'manager' %}bg-success{% else %}bg-info{% endif %} text-white">
+         <div class="card-body">
+           <h5 class="card-title">Total {{ stat.role | title }}</h5>
+           <h2 class="display-4">{{ stat.count }}</h2>
+         </div>
+       </div>
+     </div>
+   {% endfor %}
+ </div> 
+</div>
+{% endblock %}

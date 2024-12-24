@@ -6,7 +6,12 @@
     <div id="layoutSidenav">
       <div id="layoutSidenav_nav">{% include "components/sidebar.njk" %}</div>
       <div id="layoutSidenav_content">
-        <main>{% block content %} {% endblock %}</main>
+        <main>
+          <div class="container mt-2">
+            {% include "components/alert_flash_message.njk" %}
+          </div>
+          {% block content %} {% endblock %}
+        </main>
         {% include "components/footer.njk" %}
       </div>
     </div>

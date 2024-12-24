@@ -2,34 +2,47 @@
   <div class="sb-sidenav-menu">
     <div class="nav">
       <a class="nav-link" href="/"> Beranda </a>
-      <a
-        class="nav-link collapsed {% if url.includes('/admin') %}show{% endif %}"
-        href="#"
-        data-bs-toggle="collapse"
-        data-bs-target="#collapseLayouts"
-        aria-expanded="{% if url.includes('/admin') %}true{% else %}false{% endif %}"
-        aria-controls="collapseLayouts"
-      >
+      <a class="nav-link collapsed {% if url.includes('/admin') %}show{% endif %}" href="#" data-bs-toggle="collapse"
+        data-bs-target="#collapseLayouts" aria-expanded="{% if url.includes('/admin') %}true{% else %}false{% endif %}"
+        aria-controls="collapseLayouts">
         Modul
         <div class="sb-sidenav-collapse-arrow">
           <i class="fas fa-angle-down"></i>
         </div>
       </a>
-      <div
-        class="collapse {% if url.includes('/admin') %}show{% endif %}"
-        id="collapseLayouts"
-        aria-labelledby="headingOne"
-        data-bs-parent="#sidenavAccordion"
-      >
+      <div class="collapse {% if url.includes('/admin') %}show{% endif %}" id="collapseLayouts"
+        aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
         <nav class="sb-sidenav-menu-nested nav">
           <a class="nav-link" href="/admin/overview">Gambaran Umum</a>
           <a class="nav-link" href="/admin/submodule">Sub Modul</a>
         </nav>
       </div>
+      {% if user.role in ['Admin', 'Manager'] %}
+      <!-- User -->
+      <a class="nav-link collapsed {% if url.includes('/user') %}show{% endif %}" href="#" data-bs-toggle="collapse"
+        data-bs-target="#collapseLayoutsUser"
+        aria-expanded="{% if url.includes('/user') %}true{% else %}false{% endif %}"
+        aria-controls="collapseLayoutsUser">
+        User
+        <div class="sb-sidenav-collapse-arrow">
+          <i class="fas fa-angle-down"></i>
+        </div>
+      </a>
+      <div class="collapse {% if url.includes('/user') %}show{% endif %}" id="collapseLayoutsUser"
+        aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+        <nav class="sb-sidenav-menu-nested nav">
+          <a class="nav-link" href="/user/overview">Gambaran Umum</a>
+          <a class="nav-link" href="/user/index">User</a>
+        </nav>
+      </div>
+
+      <!-- Log -->
+      <a class="nav-link" href="/log/index"> Log </a>
+      {% endif %}
     </div>
   </div>
   <div class="sb-sidenav-footer">
     <div class="small">Masuk Sebagai:</div>
-    Admin
+    <span class="fw-bold">{{ user.username }}</span>
   </div>
 </nav>

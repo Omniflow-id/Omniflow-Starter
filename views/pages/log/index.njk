@@ -1,0 +1,76 @@
+{% extends "layout/masterLayout.njk" %} {% block content %}
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Halaman Log</h1>
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <div
+                        class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2">
+                        <span class="mb-2 mb-sm-0">Daftar Log</span>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-info btn-sm text-white" id="btnDownloadData">
+                                <i class="fas fa-file-excel me-1"></i>
+                                <span class="d-none d-sm-inline">Download Data</span>
+                                <span class="d-inline d-sm-none">Data</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <table id="datatablesSimple" class="table table-striped" style="width: 100%">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User ID</th>
+                                <th>Waktu</th>
+                                <th>Aktivitas</th>
+                                <th>IP Address</th>
+                                <th>Jenis Device</th>
+                                <th>Browser</th>
+                                <th>Platform</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in logs %}
+                            <tr>
+                                <td>{{ log.id }}</td>
+                                <td>{{ log.user_id }}</td>
+                                <td>{{ log.created_at }}</td>
+                                <td>{{ log.activity }}</td>
+                                <td>{{ log.ip_address }}</td>
+                                <td>{{ log.device_type }}</td>
+                                <td>{{ log.browser }}</td>
+                                <td>{{ log.platform }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script>
+    document.getElementById("btnDownloadData").addEventListener("click", () => {
+        window.location.href = "/log/download";
+        Toastify({
+            text: "Download berhasil! Silakan cek folder download Anda.",
+            duration: 5000,
+            close: true,
+            gravity: "top", // `top` or `bottom`
+            position: "right", // `left`, `center` or `right`
+            stopOnFocus: true, // Prevents dismissing of toast on hover
+            style: {
+                background: "linear-gradient(to right, #00b09b, #96c93d)",
+                marginTop: "50px",
+            },
+            onClick: function () { }, // Callback after click
+        }).showToast();
+    });
+</script>
+
+{% endblock %} {% block script %} {% endblock %}
