@@ -60,4 +60,7 @@ app.use("/", isLoggedIn, adminRouter);
 app.use("/", isLoggedIn, userRouter);
 app.use("/", isLoggedIn, logRouter);
 
+const errorHandler = require("./middlewares/errorHandler")
+app.use(errorHandler)
+
 module.exports = app;
