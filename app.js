@@ -4,12 +4,10 @@ const morgan = require("morgan");
 const nunjucks = require("nunjucks");
 const bodyParser = require("body-parser");
 const session = require("express-session");
-const useragent = require("express-useragent");
 const flash = require("connect-flash");
 const helmet = require("helmet");
 
 const app = express();
-app.use(morgan("dev"));
 app.use(
   helmet({
     contentSecurityPolicy: {
@@ -44,7 +42,6 @@ app.use(
     xssFilter: true,
   })
 );
-app.use(useragent.express());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "./public")));
@@ -56,7 +53,7 @@ app.set("view engine", "njk");
 app.use(morgan("combined"));
 app.use(
   session({
-    secret: "your-secret-key",
+    secret: process.env.SESSION_KEY,
     resave: false,
     saveUninitialized: false,
     cookie: {
