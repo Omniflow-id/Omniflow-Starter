@@ -6,9 +6,44 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const useragent = require("express-useragent");
 const flash = require("connect-flash");
+const helmet = require("helmet");
 
 const app = express();
 app.use(morgan("dev"));
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: [
+          "'self'",
+          "'unsafe-inline'",
+          "cdn.jsdelivr.net",
+          "use.fontawesome.com",
+        ],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
+    },
+    crossOriginEmbedderPolicy: true,
+    crossOriginOpenerPolicy: { policy: "same-origin" },
+    crossOriginResourcePolicy: { policy: "same-origin" },
+    dnsPrefetchControl: { allow: false },
+    expectCt: { maxAge: 86400, enforce: true },
+    frameguard: { action: "deny" },
+    hidePoweredBy: true,
+    hsts: {
+      maxAge: 63072000,
+      includeSubDomains: true,
+      preload: true,
+    },
+    ieNoOpen: true,
+    noSniff: true,
+    permittedCrossDomainPolicies: { policy: "none" },
+    referrerPolicy: { policy: "no-referrer" },
+    xssFilter: true,
+  })
+);
 app.use(useragent.express());
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -60,7 +95,7 @@ app.use("/", isLoggedIn, adminRouter);
 app.use("/", isLoggedIn, userRouter);
 app.use("/", isLoggedIn, logRouter);
 
-const errorHandler = require("./middlewares/errorHandler")
-app.use(errorHandler)
+const errorHandler = require("./middlewares/errorHandler");
+app.use(errorHandler);
 
 module.exports = app;
