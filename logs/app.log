@@ -10,3 +10,15 @@
 [25-12-2024 01:48:07] [INFO] [User: admin] [IP: 127.0.0.1] [Device: Desktop] [Browser: Chrome 131.0.0.0] [Platform: Windows 10] User admin - Admin logged IN
 [03-01-2025 14:29:41] [INFO] [User: admin] [IP: 127.0.0.1] [Device: Desktop] [Browser: Chrome 131.0.0.0] [Platform: Windows 10] User admin - Admin logged IN
 [06-01-2025 10:00:17] [ERROR] [User: Unknown User] [IP: 127.0.0.1] [Device: Mobile] [Browser: Chrome 131.0.0.0] [Platform: macOS 10.15.7] Login system error: 
+[12-01-2025 18:24:37] [INFO] [User: admin] [IP: 127.0.0.1] [Device: Desktop] [Browser: Chrome 131.0.0.0] [Platform: Windows 10] User admin - Admin logged IN
+[12-01-2025 18:25:29] [INFO] [User: admin] [IP: 127.0.0.1] [Device: Desktop] [Browser: Chrome 131.0.0.0] [Platform: Windows 10] admin DOWNLOADED USER data
+[12-01-2025 18:26:41] [INFO] [User: admin] [IP: 127.0.0.1] [Device: Desktop] [Browser: Chrome 131.0.0.0] [Platform: Windows 10] User admin - Admin logged IN
+[12-01-2025 18:27:43] [INFO] [User: admin] [IP: 127.0.0.1] [Device: Desktop] [Browser: Chrome 131.0.0.0] [Platform: Windows 10] User admin - Admin logged IN
+[12-01-2025 18:28:18] [INFO] [User: admin] [IP: 127.0.0.1] [Device: Desktop] [Browser: Chrome 131.0.0.0] [Platform: Windows 10] User admin - Admin logged IN
+[12-01-2025 18:28:59] [INFO] [User: admin] [IP: 127.0.0.1] [Device: Desktop] [Browser: Chrome 131.0.0.0] [Platform: Windows 10] User admin - Admin logged IN
+[12-01-2025 18:29:46] [INFO] [User: admin] [IP: 127.0.0.1] [Device: Desktop] [Browser: Chrome 131.0.0.0] [Platform: Windows 10] User eric - Admin created by admin
+[12-01-2025 18:29:46] [INFO] [User: admin] [IP: 127.0.0.1] [Device: Desktop] [Browser: Chrome 131.0.0.0] [Platform: Windows 10] User rudi - Admin created by admin
+[12-01-2025 18:29:46] [INFO] [User: admin] [IP: 127.0.0.1] [Device: Desktop] [Browser: Chrome 131.0.0.0] [Platform: Windows 10] User hendri - Admin created by admin
+[12-01-2025 18:29:52] [ERROR] [User: admin] [IP: 127.0.0.1] [Device: Desktop] [Browser: Chrome 131.0.0.0] [Platform: Windows 10] Error creating users from Excel: Duplicate entry 'eric' for key 'users.username'
+[12-01-2025 18:30:19] [INFO] [User: admin] [IP: 127.0.0.1] [Device: Desktop] [Browser: Chrome 131.0.0.0] [Platform: Windows 10] User admin - Admin logged IN
+[12-01-2025 18:33:26] [INFO] [User: admin] [IP: 127.0.0.1] [Device: Desktop] [Browser: Chrome 131.0.0.0] [Platform: Windows 10] User baru dengan username test telah dibuat oleh admin

@@ -5,6 +5,7 @@ const { log, LOG_LEVELS } = require("../../helpers/log");
 const UAParser = require("ua-parser-js");
 const { getClientIP } = require("../../helpers/getClientIP");
 const fs = require("fs");
+const path = require("path");
 
 const getUserOverviewPage = async (req, res) => {
   try {
@@ -135,10 +136,14 @@ const uploadNewUser = async (req, res) => {
 
     if (!worksheet) {
       req.flash("error", "Invalid file format. Worksheet not found.");
+      fs.unlink(filePath, (err) => {
+        if (err) console.error("Error deleting file:", err);
+      });
       return res.redirect("/user/index");
     }
 
     const users = [];
+    const duplicateEmails = [];
 
     worksheet.eachRow((row, rowNumber) => {
       const rowValues = row.values.filter(Boolean);
@@ -171,12 +176,25 @@ const uploadNewUser = async (req, res) => {
 
     if (users.length === 0) {
       req.flash("error", "No valid data found in the uploaded file.");
+      fs.unlink(filePath, (err) => {
+        if (err) console.error("Error deleting file:", err);
+      });
       return res.redirect("/user/index");
     }
 
     const now = new Date().toISOString().slice(0, 19).replace("T", " ");
 
     for (const user of users) {
+      const existingUser = await db.query(
+        "SELECT id FROM users WHERE email = ?",
+        [user.email]
+      );
+
+      if (existingUser.length > 0) {
+        duplicateEmails.push(user.email);
+        continue;
+      }
+
       const hashedPassword = await bcrypt.hash(user.password, 10);
       await db.query(
         "INSERT INTO users (username, email, role, password_hash, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
@@ -192,7 +210,20 @@ const uploadNewUser = async (req, res) => {
       );
     }
 
-    req.flash("success", "Data user baru sudah di-upload!");
+    if (duplicateEmails.length > 0) {
+      req.flash(
+        "error",
+        `Duplicate emails found: ${duplicateEmails.join(
+          ", "
+        )}. User creation skipped for these.`
+      );
+    } else {
+      req.flash("success", "Data user baru sudah di-upload!");
+    }
+
+    fs.unlink(filePath, (err) => {
+      if (err) console.error("Error deleting file:", err);
+    });
     return res.redirect("/user/index");
   } catch (err) {
     await log(
@@ -206,11 +237,10 @@ const uploadNewUser = async (req, res) => {
       "error",
       `An error occurred while processing the file: ${err.message}`
     );
-    return res.redirect("/user/index");
-  } finally {
     fs.unlink(filePath, (err) => {
       if (err) console.error("Error deleting file:", err);
     });
+    return res.redirect("/user/index");
   }
 };
 
@@ -303,10 +333,30 @@ const createNewUser = async (req, res) => {
   }
 };
 
+const downloadUserTemplate = (req, res) => {
+  try {
+    // Path lengkap ke file template
+    const filePath = path.join(__dirname, "../../templates/data/user.xlsx");
+
+    // Mengatur header untuk download file
+    res.setHeader(
+      "Content-Disposition",
+      'attachment; filename="user_template.xlsx"'
+    );
+
+    // Kirim file sebagai response
+    res.sendFile(filePath);
+  } catch (err) {
+    console.error("Error downloading user template:", err);
+    res.status(500).send("Internal Server Error");
+  }
+};
+
 module.exports = {
   getAllUsersPage,
   getUserOverviewPage,
   downloadUserData,
   uploadNewUser,
   createNewUser,
+  downloadUserTemplate,
 };

@@ -9,6 +9,7 @@ const upload = multer({ dest: "uploads/" });
 router.get("/user/index", user.getAllUsersPage);
 router.get("/user/overview", user.getUserOverviewPage);
 router.get("/user/download", user.downloadUserData);
+router.get("/user/download-template", user.downloadUserTemplate);
 router.post("/user/upload", upload.single("fileUpload"), user.uploadNewUser);
 router.post("/user/create", user.createNewUser);
 
