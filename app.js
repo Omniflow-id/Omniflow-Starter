@@ -2,6 +2,7 @@ const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
 const nunjucks = require("nunjucks");
+const nunjucksDate = require("nunjucks-date-filter");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const flash = require("connect-flash");
@@ -45,10 +46,16 @@ app.use(
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "./public")));
-nunjucks.configure("views", {
+const env = nunjucks.configure("views", {
   autoescape: true,
   express: app,
 });
+
+// Update date filter configuration
+nunjucksDate.setDefaultFormat("YYYY"); // Change default format to YYYY
+env.addFilter("date", nunjucksDate);
+env.addGlobal("currentYear", new Date().getFullYear()); // Add current year as global
+
 app.set("view engine", "njk");
 app.use(morgan("combined"));
 app.use(

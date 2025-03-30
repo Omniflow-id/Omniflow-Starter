@@ -1,13 +1,30 @@
-{% if success_msg.length > 0 %}
-<div class="alert alert-success alert-dismissible fade show" role="alert">
+{% if success_msg.length > 0 or error_msg.length > 0 %}
+<div class="container-fluid px-4">
+  {% if success_msg.length > 0 %}
+  <div
+    class="alert alert-success alert-dismissible fade show mt-4"
+    role="alert"
+  >
+    <i class="fas fa-check-circle me-2"></i>
     {{ success_msg }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-</div>
-{% endif %}
-
-{% if error_msg.length > 0 %}
-<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="alert"
+      aria-label="Close"
+    ></button>
+  </div>
+  {% endif %} {% if error_msg.length > 0 %}
+  <div class="alert alert-danger alert-dismissible fade show mt-4" role="alert">
+    <i class="fas fa-exclamation-circle me-2"></i>
     {{ error_msg }}
-    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <button
+      type="button"
+      class="btn-close"
+      data-bs-dismiss="alert"
+      aria-label="Close"
+    ></button>
+  </div>
+  {% endif %}
 </div>
 {% endif %}
