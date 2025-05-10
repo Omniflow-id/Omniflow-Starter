@@ -12,6 +12,8 @@
   "author": "Eric Julianto",
   "license": "MIT",
   "dependencies": {
+    "@sentry/node": "^9.17.0",
+    "@sentry/profiling-node": "^9.17.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
     "connect-flash": "^0.1.1",

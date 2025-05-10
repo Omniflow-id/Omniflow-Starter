@@ -1,5 +1,5 @@
 require("dotenv").config();
-const mysql = require("mysql2/promise");  // Use the promise version of mysql2
+const mysql = require("mysql2/promise"); // Use the promise version of mysql2
 
 // Create the connection pool (or a connection object if you prefer)
 const db = mysql.createPool({

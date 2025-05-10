@@ -1,3 +1,5 @@
 node_modules
 .env
 logs/app.log
+logs/app.log
+/logs

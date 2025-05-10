@@ -1,3 +1,5 @@
+require("./instrument.js");
+const Sentry = require("@sentry/node");
 const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
@@ -94,10 +96,16 @@ const authRouter = require("./routes/auth/auth.router");
 const userRouter = require("./routes/user/user.router");
 const logRouter = require("./routes/log/log.router");
 
+app.get("/debug-sentry", function mainHandler(req, res) {
+  throw new Error("My first Sentry error!");
+});
+
 app.use("/", authRouter);
 app.use("/", isLoggedIn, adminRouter);
 app.use("/", isLoggedIn, userRouter);
 app.use("/", isLoggedIn, logRouter);
+
+Sentry.setupExpressErrorHandler(app);
 
 const errorHandler = require("./middlewares/errorHandler");
 app.use(errorHandler);
