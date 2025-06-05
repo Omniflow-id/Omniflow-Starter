@@ -24,7 +24,17 @@ const getUserOverviewPage = async (req, res) => {
       roleStats,
     });
   } catch (error) {
-    console.error("Error fetching user statistics:", error);
+    const clientIP = getClientIP(req);
+    const userAgent = getUserAgent(req);
+
+    await log(
+      `Kesalahan saat mengambil statistik user: ${error.message}`,
+      LOG_LEVELS.ERROR,
+      req.session?.user?.id,
+      userAgent,
+      clientIP
+    );
+
     res.status(500).send("Internal Server Error");
   }
 };
@@ -34,7 +44,17 @@ const getAllUsersPage = async (req, res) => {
     const [users] = await db.query("SELECT * FROM users");
     res.render("pages/user/index", { users });
   } catch (error) {
-    console.error("Error fetching all users:", error);
+    const clientIP = getClientIP(req);
+    const userAgent = getUserAgent(req);
+
+    await log(
+      `Kesalahan saat mengambil daftar user: ${error.message}`,
+      LOG_LEVELS.ERROR,
+      req.session?.user?.id,
+      userAgent,
+      clientIP
+    );
+
     res.status(500).send("Internal Server Error");
   }
 };
@@ -104,23 +124,24 @@ const downloadUserData = async (req, res) => {
 
     res.end();
   } catch (error) {
-    console.error("Error downloading user data:", error);
+    const clientIP = getClientIP(req);
+    const userAgent = getUserAgent(req);
+
+    await log(
+      `Kesalahan saat mengunduh data user: ${error.message}`,
+      LOG_LEVELS.ERROR,
+      req.session?.user?.id,
+      userAgent,
+      clientIP
+    );
+
     res.status(500).send("Internal Server Error");
   }
 };
 
 const uploadNewUser = async (req, res) => {
-  const ip = getClientIP(req);
-  const parser = new UAParser(req.headers["user-agent"]);
-  const userAgentData = (() => {
-    const result = parser.getResult();
-    return {
-      deviceType:
-        result.device.type || (result.device.vendor ? "Mobile" : "Desktop"),
-      browser: `${result.browser.name} ${result.browser.version}`,
-      platform: `${result.os.name} ${result.os.version}`,
-    };
-  })();
+  const clientIP = getClientIP(req);
+  const userAgent = getUserAgent(req);
 
   if (!req.file) {
     req.flash("error", "File upload is required");
@@ -247,17 +268,8 @@ const uploadNewUser = async (req, res) => {
 const createNewUser = async (req, res) => {
   const { username, email, role } = req.body;
 
-  const ip = getClientIP(req);
-  const parser = new UAParser(req.headers["user-agent"]);
-  const userAgentData = (() => {
-    const result = parser.getResult();
-    return {
-      deviceType:
-        result.device.type || (result.device.vendor ? "Mobile" : "Desktop"),
-      browser: `${result.browser.name} ${result.browser.version}`,
-      platform: `${result.os.name} ${result.os.version}`,
-    };
-  })();
+  const clientIP = getClientIP(req);
+  const userAgent = getUserAgent(req);
 
   try {
     // Set password based on role
@@ -333,7 +345,7 @@ const createNewUser = async (req, res) => {
   }
 };
 
-const downloadUserTemplate = (req, res) => {
+const downloadUserTemplate = async (req, res) => {
   try {
     // Path lengkap ke file template
     const filePath = path.join(__dirname, "../../templates/data/user.xlsx");
@@ -346,8 +358,29 @@ const downloadUserTemplate = (req, res) => {
 
     // Kirim file sebagai response
     res.sendFile(filePath);
+
+    const clientIP = getClientIP(req);
+    const userAgent = getUserAgent(req);
+
+    await log(
+      `Pengguna ${req.session?.user?.username} mengunduh template user`,
+      LOG_LEVELS.INFO,
+      req.session?.user?.id,
+      userAgent,
+      clientIP
+    );
   } catch (err) {
-    console.error("Error downloading user template:", err);
+    const clientIP = getClientIP(req);
+    const userAgent = getUserAgent(req);
+
+    await log(
+      `Kesalahan saat mengunduh template user: ${err.message}`,
+      LOG_LEVELS.ERROR,
+      req.session?.user?.id,
+      userAgent,
+      clientIP
+    );
+
     res.status(500).send("Internal Server Error");
   }
 };

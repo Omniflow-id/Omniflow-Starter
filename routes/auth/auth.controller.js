@@ -1,7 +1,8 @@
 const { db } = require("../../db/db");
 const bcrypt = require("bcrypt");
-const { LOG_LEVELS } = require("../../helpers/log");
-const { activityLogger } = require("../../middlewares/activityLogger");
+const { LOG_LEVELS, log } = require("../../helpers/log");
+const { getClientIP } = require("../../helpers/getClientIP");
+const { getUserAgent } = require("../../helpers/getUserAgent");
 
 const getLoginPage = (req, res) => {
   res.render("pages/auth/login");
@@ -27,9 +28,16 @@ const login = async (req, res) => {
 
     if (userRows.length === 0) {
       // Use middleware to log failed login attempt
-      const failedLoginLogger = activityLogger(`Failed login attempt for email: ${email}`, LOG_LEVELS.WARN);
-      await new Promise(resolve => failedLoginLogger(req, res, resolve));
-      
+      const clientIP = getClientIP(req);
+      const userAgent = getUserAgent(req);
+      await log(
+        `Percobaan login gagal untuk email: ${email}`,
+        LOG_LEVELS.WARN,
+        req.session?.user?.id || null,
+        userAgent,
+        clientIP
+      );
+
       req.flash("error", "Invalid credentials");
       return res.redirect("/login");
     }
@@ -39,9 +47,16 @@ const login = async (req, res) => {
 
     if (!isValid) {
       // Use middleware to log invalid password attempt
-      const invalidPasswordLogger = activityLogger(`Invalid password attempt for user: ${user.username}`, LOG_LEVELS.WARN);
-      await new Promise(resolve => invalidPasswordLogger(req, res, resolve));
-      
+      const clientIP = getClientIP(req);
+      const userAgent = getUserAgent(req);
+      await log(
+        `Percobaan password salah untuk pengguna: ${user.username}`,
+        LOG_LEVELS.WARN,
+        req.session?.user?.id || user.id,
+        userAgent,
+        clientIP
+      );
+
       req.flash("error", "Invalid credentials");
       return res.redirect("/login");
     }
@@ -54,17 +69,31 @@ const login = async (req, res) => {
     };
 
     // Use middleware to log successful login
-    const successLoginLogger = activityLogger(`User ${user.username} - ${user.role} logged IN`, LOG_LEVELS.INFO);
-    await new Promise(resolve => successLoginLogger(req, res, resolve));
+    const clientIP = getClientIP(req);
+    const userAgent = getUserAgent(req);
+    await log(
+      `Pengguna berhasil masuk: ${user.username}`,
+      LOG_LEVELS.INFO,
+      req.session?.user?.id || user.id,
+      userAgent,
+      clientIP
+    );
 
     req.flash("success", "Berhasil login!");
     return res.redirect("/");
   } catch (err) {
     console.error("Login error:", err);
-    
+
     // Use middleware to log system error
-    const errorLogger = activityLogger(`Login system error: ${err.message}`, LOG_LEVELS.ERROR);
-    await new Promise(resolve => errorLogger(req, res, resolve));
+    const clientIP = getClientIP(req);
+    const userAgent = getUserAgent(req);
+    await log(
+      `Kesalahan sistem login: ${err.message}`,
+      LOG_LEVELS.ERROR,
+      req.session?.user?.id || null,
+      userAgent,
+      clientIP
+    );
 
     req.flash("error", "An error occurred. Please try again later.");
     return res.redirect("/login");
@@ -80,8 +109,15 @@ const logout = async (req, res) => {
 
   if (user) {
     // Use middleware to log logout
-    const logoutLogger = activityLogger(`User ${user.username} - ${user.role} logged OUT`, LOG_LEVELS.INFO);
-    await new Promise(resolve => logoutLogger(req, res, resolve));
+    const clientIP = getClientIP(req);
+    const userAgent = getUserAgent(req);
+    await log(
+      `Pengguna keluar: ${user.username}`,
+      LOG_LEVELS.INFO,
+      req.session?.user?.id || user.id,
+      userAgent,
+      clientIP
+    );
   }
 
   req.session.destroy((err) => {
