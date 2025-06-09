@@ -16,6 +16,7 @@
     "@sentry/profiling-node": "^9.17.0",
     "bcrypt": "^5.1.1",
     "body-parser": "^1.20.3",
+    "chokidar": "^3.6.0",
     "connect-flash": "^0.1.1",
     "dotenv": "^16.4.7",
     "exceljs": "^4.4.0",

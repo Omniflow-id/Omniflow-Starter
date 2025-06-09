@@ -1,0 +1,450 @@
+{% extends "layout/clientMasterLayout.njk" %} {% block content %}
+<div class="container-fluid px-4">
+  <!-- Hero Section -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-lg bg-primary text-white mt-4">
+        <div class="card-body p-5 text-center">
+          <div class="row align-items-center">
+            <div class="col-lg-6">
+              <h1 class="display-4 fw-bold mb-3">Omniflow.id</h1>
+              <p class="lead mb-4">
+                Solusi Digital Terdepan untuk Transformasi Bisnis Anda
+              </p>
+              <p class="mb-4">
+                Kami menghadirkan inovasi teknologi yang mengoptimalkan alur
+                kerja, meningkatkan efisiensi, dan mendorong pertumbuhan bisnis
+                di era digital.
+              </p>
+              <a href="#services" class="btn btn-light btn-lg px-4 me-3"
+                >Layanan Kami</a
+              >
+              <a href="#contact" class="btn btn-outline-light btn-lg px-4"
+                >Hubungi Kami</a
+              >
+            </div>
+            <div class="col-lg-6">
+              <div class="text-center">
+                <i class="fas fa-rocket fa-10x opacity-75"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- About Section -->
+  <div class="row mb-5" id="about">
+    <div class="col-12">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold text-primary">Tentang Omniflow</h2>
+        <p class="lead text-muted">
+          Membangun masa depan digital yang lebih baik
+        </p>
+      </div>
+    </div>
+    <div class="col-lg-4 mb-4">
+      <div class="card h-100 border-0 shadow">
+        <div class="card-body text-center p-4">
+          <div
+            class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+            style="width: 4rem; height: 4rem"
+          >
+            <i class="fas fa-lightbulb text-white"></i>
+          </div>
+          <h4 class="fw-bold">Inovasi</h4>
+          <p class="text-muted">
+            Menghadirkan solusi teknologi terdepan yang mengikuti perkembangan
+            zaman dan kebutuhan industri modern.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 mb-4">
+      <div class="card h-100 border-0 shadow">
+        <div class="card-body text-center p-4">
+          <div
+            class="bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+            style="width: 4rem; height: 4rem"
+          >
+            <i class="fas fa-users text-white"></i>
+          </div>
+          <h4 class="fw-bold">Kolaborasi</h4>
+          <p class="text-muted">
+            Membangun kemitraan strategis dengan klien untuk mencapai tujuan
+            bisnis bersama melalui pendekatan yang personal.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-4 mb-4">
+      <div class="card h-100 border-0 shadow">
+        <div class="card-body text-center p-4">
+          <div
+            class="bg-info bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+            style="width: 4rem; height: 4rem"
+          >
+            <i class="fas fa-chart-line text-white"></i>
+          </div>
+          <h4 class="fw-bold">Pertumbuhan</h4>
+          <p class="text-muted">
+            Fokus pada hasil yang terukur dan berkelanjutan untuk mendorong
+            pertumbuhan bisnis jangka panjang.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Services Section -->
+  <div class="row mb-5" id="services">
+    <div class="col-12">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold text-primary">Layanan Kami</h2>
+        <p class="lead text-muted">
+          Solusi komprehensif untuk kebutuhan digital Anda
+        </p>
+      </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-3">
+            <div
+              class="bg-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3"
+              style="width: 3rem; height: 3rem"
+            >
+              <i class="fas fa-code text-white"></i>
+            </div>
+            <h4 class="fw-bold mb-0">Pengembangan Aplikasi</h4>
+          </div>
+          <p class="text-muted mb-3">
+            Membangun aplikasi web dan mobile yang responsif, scalable, dan
+            user-friendly sesuai kebutuhan bisnis Anda.
+          </p>
+          <ul class="list-unstyled">
+            <li>
+              <i class="fas fa-check text-success me-2"></i>Web Application
+              Development
+            </li>
+            <li>
+              <i class="fas fa-check text-success me-2"></i>Mobile App
+              Development
+            </li>
+            <li>
+              <i class="fas fa-check text-success me-2"></i>API Integration
+            </li>
+            <li>
+              <i class="fas fa-check text-success me-2"></i>Database Design
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-3">
+            <div
+              class="bg-success bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3"
+              style="width: 3rem; height: 3rem"
+            >
+              <i class="fas fa-cogs text-white"></i>
+            </div>
+            <h4 class="fw-bold mb-0">Otomasi Proses Bisnis</h4>
+          </div>
+          <p class="text-muted mb-3">
+            Mengoptimalkan alur kerja dengan sistem otomasi yang mengurangi
+            manual work dan meningkatkan efisiensi.
+          </p>
+          <ul class="list-unstyled">
+            <li>
+              <i class="fas fa-check text-success me-2"></i>Workflow Automation
+            </li>
+            <li>
+              <i class="fas fa-check text-success me-2"></i>Document Management
+            </li>
+            <li>
+              <i class="fas fa-check text-success me-2"></i>Reporting System
+            </li>
+            <li>
+              <i class="fas fa-check text-success me-2"></i>Integration
+              Solutions
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-3">
+            <div
+              class="bg-info bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3"
+              style="width: 3rem; height: 3rem"
+            >
+              <i class="fas fa-chart-bar text-white"></i>
+            </div>
+            <h4 class="fw-bold mb-0">Business Intelligence</h4>
+          </div>
+          <p class="text-muted mb-3">
+            Mengubah data menjadi insight yang actionable untuk pengambilan
+            keputusan bisnis yang lebih baik.
+          </p>
+          <ul class="list-unstyled">
+            <li>
+              <i class="fas fa-check text-success me-2"></i>Data Analytics
+            </li>
+            <li>
+              <i class="fas fa-check text-success me-2"></i>Dashboard
+              Development
+            </li>
+            <li>
+              <i class="fas fa-check text-success me-2"></i>Performance
+              Monitoring
+            </li>
+            <li>
+              <i class="fas fa-check text-success me-2"></i>Predictive Analytics
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6 mb-4">
+      <div class="card border-0 shadow h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-3">
+            <div
+              class="bg-warning bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3"
+              style="width: 3rem; height: 3rem"
+            >
+              <i class="fas fa-shield-alt text-white"></i>
+            </div>
+            <h4 class="fw-bold mb-0">Konsultasi IT</h4>
+          </div>
+          <p class="text-muted mb-3">
+            Memberikan panduan strategis untuk transformasi digital dan optimasi
+            infrastruktur teknologi.
+          </p>
+          <ul class="list-unstyled">
+            <li>
+              <i class="fas fa-check text-success me-2"></i>Digital
+              Transformation
+            </li>
+            <li>
+              <i class="fas fa-check text-success me-2"></i>System Architecture
+            </li>
+            <li>
+              <i class="fas fa-check text-success me-2"></i>Security Assessment
+            </li>
+            <li>
+              <i class="fas fa-check text-success me-2"></i>Technology Roadmap
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Why Choose Us Section -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div class="card border-0 shadow-lg bg-light">
+        <div class="card-body p-5">
+          <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold text-primary">
+              Mengapa Memilih Omniflow?
+            </h2>
+            <p class="lead text-muted">
+              Keunggulan yang membedakan kami dari yang lain
+            </p>
+          </div>
+          <div class="row">
+            <div class="col-lg-3 col-md-6 mb-4">
+              <div class="text-center">
+                <div
+                  class="bg-primary bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                  style="width: 4rem; height: 4rem"
+                >
+                  <i class="fas fa-clock text-white"></i>
+                </div>
+                <h5 class="fw-bold">Delivery Tepat Waktu</h5>
+                <p class="text-muted">
+                  Komitmen untuk menyelesaikan proyek sesuai timeline yang
+                  disepakati
+                </p>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+              <div class="text-center">
+                <div
+                  class="bg-success bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                  style="width: 4rem; height: 4rem"
+                >
+                  <i class="fas fa-medal text-white"></i>
+                </div>
+                <h5 class="fw-bold">Kualitas Terjamin</h5>
+                <p class="text-muted">
+                  Standar kualitas tinggi dengan testing dan quality assurance
+                  yang ketat
+                </p>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+              <div class="text-center">
+                <div
+                  class="bg-info bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                  style="width: 4rem; height: 4rem"
+                >
+                  <i class="fas fa-headset text-white"></i>
+                </div>
+                <h5 class="fw-bold">Support 24/7</h5>
+                <p class="text-muted">
+                  Tim support yang siap membantu kapan saja Anda membutuhkan
+                </p>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+              <div class="text-center">
+                <div
+                  class="bg-warning bg-gradient rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                  style="width: 4rem; height: 4rem"
+                >
+                  <i class="fas fa-dollar-sign text-white"></i>
+                </div>
+                <h5 class="fw-bold">Harga Kompetitif</h5>
+                <p class="text-muted">
+                  Solusi berkualitas dengan harga yang sesuai dengan budget Anda
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Section -->
+  <div class="row mb-5" id="contact">
+    <div class="col-12">
+      <div class="text-center mb-5">
+        <h2 class="display-5 fw-bold text-primary">Hubungi Kami</h2>
+        <p class="lead text-muted">
+          Mari diskusikan kebutuhan digital bisnis Anda
+        </p>
+      </div>
+    </div>
+    <div class="col-lg-8 mx-auto">
+      <div class="card border-0 shadow-lg">
+        <div class="card-body p-5">
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <div class="d-flex align-items-center mb-3">
+                <div
+                  class="bg-primary bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3"
+                  style="width: 3rem; height: 3rem"
+                >
+                  <i class="fas fa-envelope text-white"></i>
+                </div>
+                <div>
+                  <h5 class="fw-bold mb-1">Email</h5>
+                  <p class="text-muted mb-0">info@omniflow.id</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+              <div class="d-flex align-items-center mb-3">
+                <div
+                  class="bg-success bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3"
+                  style="width: 3rem; height: 3rem"
+                >
+                  <i class="fas fa-phone text-white"></i>
+                </div>
+                <div>
+                  <h5 class="fw-bold mb-1">Telepon</h5>
+                  <p class="text-muted mb-0">+62 821 2560 9413</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+              <div class="d-flex align-items-center mb-3">
+                <div
+                  class="bg-info bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3"
+                  style="width: 3rem; height: 3rem"
+                >
+                  <i class="fas fa-map-marker-alt text-white"></i>
+                </div>
+                <div>
+                  <h5 class="fw-bold mb-1">Alamat</h5>
+                  <p class="text-muted mb-0">Jakarta, Indonesia</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6 mb-4">
+              <div class="d-flex align-items-center mb-3">
+                <div
+                  class="bg-warning bg-gradient rounded-circle d-flex align-items-center justify-content-center me-3"
+                  style="width: 3rem; height: 3rem"
+                >
+                  <i class="fas fa-globe text-white"></i>
+                </div>
+                <div>
+                  <h5 class="fw-bold mb-1">Website</h5>
+                  <p class="text-muted mb-0">omniflow.id</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="text-center mt-4">
+            <a
+              href="mailto:info@omniflow.id"
+              class="btn btn-primary btn-lg px-5"
+              >Kirim Email</a
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="row mb-5">
+    <div class="col-12">
+      <div
+        class="card border-0 shadow-lg bg-gradient"
+        style="background: linear-gradient(135deg, #0d6efd 0%, #6610f2 100%)"
+      >
+        <div class="card-body p-5 text-center">
+          <h2 class="display-6 fw-bold mb-3">
+            Siap Memulai Transformasi Digital?
+          </h2>
+          <p class="lead mb-4">
+            Bergabunglah dengan ratusan perusahaan yang telah mempercayai
+            Omniflow untuk mengoptimalkan bisnis mereka.
+          </p>
+          <a href="#contact" class="btn btn-light btn-lg px-5"
+            >Mulai Konsultasi Gratis</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  // Smooth scrolling for anchor links
+  document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+    anchor.addEventListener("click", function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute("href"));
+      if (target) {
+        target.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    });
+  });
+</script>
+{% endblock %}

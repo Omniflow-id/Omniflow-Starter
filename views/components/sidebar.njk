@@ -1,7 +1,7 @@
 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
   <div class="sb-sidenav-menu">
     <div class="nav">
-      <a class="nav-link" href="/"> Beranda </a>
+      <a class="nav-link" href="/admin"> Beranda </a>
       <a
         class="nav-link collapsed {% if url.includes('/admin') %}show{% endif %}"
         href="#"
@@ -42,19 +42,19 @@
         </div>
       </a>
       <div
-        class="collapse {% if url.includes('/user') %}show{% endif %}"
+        class="collapse {% if url.includes('/admin/user') %}show{% endif %}"
         id="collapseLayoutsUser"
         aria-labelledby="headingOne"
         data-bs-parent="#sidenavAccordion"
       >
         <nav class="sb-sidenav-menu-nested nav">
-          <a class="nav-link" href="/user/overview">Gambaran Umum</a>
-          <a class="nav-link" href="/user/index">User</a>
+          <a class="nav-link" href="/admin/user/overview">Gambaran Umum</a>
+          <a class="nav-link" href="/admin/user/index">User</a>
         </nav>
       </div>
 
       <!-- Log -->
-      <a class="nav-link" href="/log/index"> Log </a>
+      <a class="nav-link" href="/admin/log/index"> Log </a>
       {% endif %}
     </div>
   </div>

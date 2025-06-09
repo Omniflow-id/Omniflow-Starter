@@ -1,24 +1,20 @@
-const { db } = require("../../db/db");
+const { db } = require("../../../db/db");
 const bcrypt = require("bcrypt");
-const { LOG_LEVELS, log } = require("../../helpers/log");
-const { getClientIP } = require("../../helpers/getClientIP");
-const { getUserAgent } = require("../../helpers/getUserAgent");
-
-const getLoginPage = (req, res) => {
-  res.render("pages/auth/login");
-};
+const { LOG_LEVELS, log } = require("../../../helpers/log");
+const { getClientIP } = require("../../../helpers/getClientIP");
+const { getUserAgent } = require("../../../helpers/getUserAgent");
 
 const login = async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
     req.flash("error", "Email and password are required");
-    return res.redirect("/login");
+    return res.redirect("/admin/login");
   }
 
   if (password.length < 8) {
     req.flash("error", "Password must be at least 8 characters long");
-    return res.redirect("/login");
+    return res.redirect("/admin/login");
   }
 
   try {
@@ -39,7 +35,7 @@ const login = async (req, res) => {
       );
 
       req.flash("error", "Invalid credentials");
-      return res.redirect("/login");
+      return res.redirect("/admin/login");
     }
 
     const user = userRows[0];
@@ -58,7 +54,7 @@ const login = async (req, res) => {
       );
 
       req.flash("error", "Invalid credentials");
-      return res.redirect("/login");
+      return res.redirect("/admin/login");
     }
 
     req.session.user = {
@@ -80,7 +76,7 @@ const login = async (req, res) => {
     );
 
     req.flash("success", "Berhasil login!");
-    return res.redirect("/");
+    return res.redirect("/admin");
   } catch (err) {
     console.error("Login error:", err);
 
@@ -96,36 +92,10 @@ const login = async (req, res) => {
     );
 
     req.flash("error", "An error occurred. Please try again later.");
-    return res.redirect("/login");
+    return res.redirect("/admin/login");
   }
 };
 
-const getRegisterPage = (req, res) => {
-  res.render("pages/auth/register");
+module.exports = {
+  login,
 };
-
-const logout = async (req, res) => {
-  const user = req.session.user;
-
-  if (user) {
-    // Use middleware to log logout
-    const clientIP = getClientIP(req);
-    const userAgent = getUserAgent(req);
-    await log(
-      `Pengguna keluar: ${user.username}`,
-      LOG_LEVELS.INFO,
-      req.session?.user?.id || user.id,
-      userAgent,
-      clientIP
-    );
-  }
-
-  req.session.destroy((err) => {
-    if (err) {
-      console.error("Error destroying session:", err);
-    }
-    res.redirect("/login");
-  });
-};
-
-module.exports = { getLoginPage, getRegisterPage, logout, login };

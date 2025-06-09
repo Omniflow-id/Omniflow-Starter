@@ -1,13 +1,13 @@
 const getAdminPage = (req, res) => {
-  res.render("pages/index/index");
+  res.render("pages/admin/index/index");
 };
 
 const getOverviewPage = (req, res) => {
-  res.render("pages/index/overview");
+  res.render("pages/admin/index/overview");
 };
 
 const getSubModulePage = (req, res) => {
-  res.render("pages/index/subModule");
+  res.render("pages/admin/index/subModule");
 };
 
 module.exports = {

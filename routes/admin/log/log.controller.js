@@ -1,8 +1,8 @@
 const Excel = require("exceljs");
-const { db } = require("../../db/db");
-const { log, LOG_LEVELS } = require("../../helpers/log");
+const { db } = require("../../../db/db");
+const { log, LOG_LEVELS } = require("../../../helpers/log");
 const UAParser = require("ua-parser-js");
-const { getClientIP } = require("../../helpers/getClientIP");
+const { getClientIP } = require("../../../helpers/getClientIP");
 
 const getLogPage = async (req, res) => {
   try {
@@ -27,7 +27,7 @@ const getLogPage = async (req, res) => {
       };
     });
 
-    res.render("pages/log/index", { logs: formattedLogs });
+    res.render("pages/admin/log/index", { logs: formattedLogs });
   } catch (error) {
     console.error("Error fetching all users:", error);
     res.status(500).send("Internal Server Error");

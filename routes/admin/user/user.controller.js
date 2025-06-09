@@ -1,9 +1,9 @@
 const Excel = require("exceljs");
-const { db } = require("../../db/db");
+const { db } = require("../../../db/db");
 const bcrypt = require("bcrypt");
-const { log, LOG_LEVELS } = require("../../helpers/log");
+const { log, LOG_LEVELS } = require("../../../helpers/log");
 const UAParser = require("ua-parser-js");
-const { getClientIP } = require("../../helpers/getClientIP");
+const { getClientIP } = require("../../../helpers/getClientIP");
 const fs = require("fs");
 const path = require("path");
 
@@ -19,7 +19,7 @@ const getUserOverviewPage = async (req, res) => {
       GROUP BY role
     `);
 
-    res.render("pages/user/overview", {
+    res.render("pages/admin/user/overview", {
       totalUsers: totalUsers[0].total,
       roleStats,
     });
@@ -42,7 +42,7 @@ const getUserOverviewPage = async (req, res) => {
 const getAllUsersPage = async (req, res) => {
   try {
     const [users] = await db.query("SELECT * FROM users");
-    res.render("pages/user/index", { users });
+    res.render("pages/admin/user/index", { users });
   } catch (error) {
     const clientIP = getClientIP(req);
     const userAgent = getUserAgent(req);
@@ -160,7 +160,7 @@ const uploadNewUser = async (req, res) => {
       fs.unlink(filePath, (err) => {
         if (err) console.error("Error deleting file:", err);
       });
-      return res.redirect("/user/index");
+      return res.redirect("/admin/user/index");
     }
 
     const users = [];
@@ -200,7 +200,7 @@ const uploadNewUser = async (req, res) => {
       fs.unlink(filePath, (err) => {
         if (err) console.error("Error deleting file:", err);
       });
-      return res.redirect("/user/index");
+      return res.redirect("/admin/user/index");
     }
 
     const now = new Date().toISOString().slice(0, 19).replace("T", " ");
@@ -245,7 +245,7 @@ const uploadNewUser = async (req, res) => {
     fs.unlink(filePath, (err) => {
       if (err) console.error("Error deleting file:", err);
     });
-    return res.redirect("/user/index");
+    return res.redirect("/admin/user/index");
   } catch (err) {
     await log(
       `Error creating users from Excel: ${err.message}`,
@@ -261,7 +261,7 @@ const uploadNewUser = async (req, res) => {
     fs.unlink(filePath, (err) => {
       if (err) console.error("Error deleting file:", err);
     });
-    return res.redirect("/user/index");
+    return res.redirect("/admin/user/index");
   }
 };
 
@@ -293,7 +293,7 @@ const createNewUser = async (req, res) => {
           ip
         );
         req.flash("error", "Invalid role selected");
-        return res.redirect("/user/index");
+        return res.redirect("/admin/user/index");
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -314,7 +314,7 @@ const createNewUser = async (req, res) => {
         ip
       );
       req.flash("error", "Email sudah ada!");
-      return res.redirect("/user/index");
+      return res.redirect("/admin/user/index");
     }
 
     await db.query(
@@ -331,7 +331,7 @@ const createNewUser = async (req, res) => {
     );
 
     req.flash("success", "User created successfully");
-    res.redirect("/user/index");
+    res.redirect("/admin/user/index");
   } catch (err) {
     await log(
       `${req.session.user.username} gagal membuat user baru untuk username ${username}: ${err.message}`,
@@ -341,7 +341,7 @@ const createNewUser = async (req, res) => {
       ip
     );
     req.flash("error", "Error creating user");
-    res.redirect("/user/index");
+    res.redirect("/admin/user/index");
   }
 };
 

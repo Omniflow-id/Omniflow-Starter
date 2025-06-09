@@ -51,6 +51,7 @@ app.use(express.static(path.join(__dirname, "./public")));
 const env = nunjucks.configure("views", {
   autoescape: true,
   express: app,
+  watch: true,
 });
 
 // Update date filter configuration
@@ -89,21 +90,15 @@ app.use((req, res, next) => {
 app.set("trust proxy", true);
 app.enable("trust proxy");
 
-const { isLoggedIn } = require("./middlewares/isLoggedIn");
+const adminRouter = require("./routes/admin/admin.router");
+const clientRouter = require("./routes/client/client.router");
 
-const adminRouter = require("./routes/index/index.router");
-const authRouter = require("./routes/auth/auth.router");
-const userRouter = require("./routes/user/user.router");
-const logRouter = require("./routes/log/log.router");
+app.use("/", clientRouter);
+app.use("/admin", adminRouter);
 
 app.get("/debug-sentry", function mainHandler(req, res) {
   throw new Error("My first Sentry error!");
 });
-
-app.use("/", authRouter);
-app.use("/", isLoggedIn, adminRouter);
-app.use("/", isLoggedIn, userRouter);
-app.use("/", isLoggedIn, logRouter);
 
 Sentry.setupExpressErrorHandler(app);
 
