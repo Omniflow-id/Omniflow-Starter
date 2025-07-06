@@ -1,10 +1,10 @@
 require("./instrument.js");
-const Sentry = require("@sentry/node");
 const path = require("path");
 const express = require("express");
 const morgan = require("morgan");
 const nunjucks = require("nunjucks");
 const nunjucksDate = require("nunjucks-date-filter");
+const moment = require("moment-timezone");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const flash = require("connect-flash");
@@ -59,6 +59,39 @@ nunjucksDate.setDefaultFormat("YYYY"); // Change default format to YYYY
 env.addFilter("date", nunjucksDate);
 env.addGlobal("currentYear", new Date().getFullYear()); // Add current year as global
 
+// Add formatRupiah filter
+env.addFilter("formatRupiah", function(amount) {
+  if (!amount && amount !== 0) return "Rp 0";
+  const number = parseFloat(amount);
+  if (isNaN(number)) return "Rp 0";
+  
+  return "Rp " + number.toLocaleString("id-ID", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  });
+});
+
+// Add moment timezone filter for Jakarta
+env.addFilter("formatDateTime", function(date, format) {
+  if (!date) return "";
+  const defaultFormat = format || "DD MMMM YYYY HH:mm:ss";
+  return moment(date).tz("Asia/Jakarta").format(defaultFormat);
+});
+
+// Add moment timezone filter for date only
+env.addFilter("formatDate", function(date, format) {
+  if (!date) return "";
+  const defaultFormat = format || "DD MMMM YYYY";
+  return moment(date).tz("Asia/Jakarta").format(defaultFormat);
+});
+
+// Add moment timezone filter for time only
+env.addFilter("formatTime", function(date, format) {
+  if (!date) return "";
+  const defaultFormat = format || "HH:mm:ss";
+  return moment(date).tz("Asia/Jakarta").format(defaultFormat);
+});
+
 app.set("view engine", "njk");
 app.use(morgan("combined"));
 app.use(
@@ -96,11 +129,7 @@ const clientRouter = require("./routes/client/client.router");
 app.use("/", clientRouter);
 app.use("/admin", adminRouter);
 
-app.get("/debug-sentry", function mainHandler(req, res) {
-  throw new Error("My first Sentry error!");
-});
-
-Sentry.setupExpressErrorHandler(app);
+// Debug endpoint removed - using OpenTelemetry for monitoring
 
 const errorHandler = require("./middlewares/errorHandler");
 app.use(errorHandler);

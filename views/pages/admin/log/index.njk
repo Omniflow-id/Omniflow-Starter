@@ -44,7 +44,7 @@
               <tr>
                 <td>{{ log.id }}</td>
                 <td>{{ log.user_id }}</td>
-                <td>{{ log.created_at }}</td>
+                <td>{{ log.created_at | formatDateTime }}</td>
                 <td>{{ log.activity }}</td>
                 <td>{{ log.ip_address }}</td>
                 <td>{{ log.device_type }}</td>

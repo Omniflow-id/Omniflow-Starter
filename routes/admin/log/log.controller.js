@@ -8,26 +8,8 @@ const getLogPage = async (req, res) => {
   try {
     const [allLogs] = await db.query("SELECT * FROM activity_logs");
 
-    const formattedLogs = allLogs.map((log) => {
-      const date = new Date(log.created_at);
-      const formattedDate = date.toLocaleString("id-ID", {
-        weekday: "short",
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-        second: "2-digit",
-        timeZoneName: "short",
-      });
-
-      return {
-        ...log,
-        created_at: formattedDate,
-      };
-    });
-
-    res.render("pages/admin/log/index", { logs: formattedLogs });
+    // No need to format dates here - let the template handle it with Jakarta timezone
+    res.render("pages/admin/log/index", { logs: allLogs });
   } catch (error) {
     console.error("Error fetching all users:", error);
     res.status(500).send("Internal Server Error");
