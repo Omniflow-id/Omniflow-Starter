@@ -22,7 +22,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Database Layer
 - MySQL with connection pooling (`db/db.js`)
-- Two main tables: `users` and `activity_logs`
+- Main tables: `users` (with full_name field) and `activity_logs`
 - Migration script creates schema with proper indexes
 - Default users: admin@omniflow.id/Admin12345., manager@omniflow.id/Manager12345., user@omniflow.id/User12345.
 
@@ -43,11 +43,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Captures IP address, device type, browser, platform via user-agent parsing
 - Helper functions in `helpers/log.js`, `helpers/getClientIP.js`, `helpers/getUserAgent.js`
 
-### File Processing
-- Excel import/export using ExcelJS
-- Template downloads for bulk user import
-- Multer for file uploads with automatic cleanup
-- Templates stored in memory, processed files cleaned after use
+### File Processing & Storage
+- **Excel Operations**: Dynamic template generation using ExcelJS (no static templates)
+- **File Storage**: Store only filename in database, actual files will be configured for S3
+- **Upload Processing**: Multer for file uploads with automatic cleanup
+- **Template Generation**: Excel templates created dynamically with current database schema
+
+### File Storage Strategy
+- **Database**: Store only filename/path references
+- **S3 Configuration**: Ready for dynamic S3 integration using environment variables
+- **File Cleanup**: Temporary files automatically cleaned after processing
+- **Template Downloads**: Generated on-demand, not stored permanently
 
 ## Key Patterns
 
@@ -61,28 +67,39 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Bootstrap + Alpine.js + HTMX for modern interactions
 - DataTables for advanced table functionality
 - Component-based template structure in `views/components/`
-- **Custom Nunjucks filters**: 
-  - `formatRupiah` (formats numbers as Indonesian Rupiah currency)
-  - `formatDateTime` (formats datetime with Jakarta timezone, default: "DD MMMM YYYY HH:mm:ss")
-  - `formatDate` (formats date only with Jakarta timezone, default: "DD MMMM YYYY")
-  - `formatTime` (formats time only with Jakarta timezone, default: "HH:mm:ss")
 
-### Security
-- Helmet for security headers and CSP
-- bcrypt for password hashing
-- Session security with httpOnly cookies
-- Trust proxy configuration for production deployment
+### Nunjucks Configuration (app.js)
+- **Global Variables**: 
+  - `currentYear` - Current year for footer/copyright
+  - `marked` - Markdown parser for content rendering
+  - `user` - Current logged-in user (via middleware)
+  - `url` - Current request URL for navigation highlighting
+  - `success_msg`/`error_msg` - Flash messages for user feedback
+
+- **Custom Filters**: 
+  - `formatRupiah(amount)` - Formats numbers as Indonesian Rupiah currency
+  - `formatDateTime(date, format)` - Formats datetime with Jakarta timezone (default: "DD MMMM YYYY HH:mm:ss")
+  - `formatDate(date, format)` - Formats date only with Jakarta timezone (default: "DD MMMM YYYY")
+  - `formatTime(date, format)` - Formats time only with Jakarta timezone (default: "HH:mm:ss")
+  - `date` - Standard date filter with YYYY default format
 
 ## Environment Configuration
 
 Required `.env` variables:
 - `SESSION_KEY` - Session encryption key
 - `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` - MySQL connection
-- `OTEL_SERVICE_NAME` - OpenTelemetry service name (default: "omniflow-hris")
+- `OTEL_SERVICE_NAME` - OpenTelemetry service name (default: "omniflow-starter")
 - `OTEL_SERVICE_VERSION` - Service version (default: "1.0.0")
 - `OTEL_METRICS_PORT` - Prometheus metrics port (default: 9091)
 - `OTEL_METRICS_ENDPOINT` - Metrics endpoint path (default: "/metrics")
 - `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` - OTLP traces endpoint (default: "http://localhost:4318/v1/traces")
+
+S3 Configuration (for future file storage):
+- `S3_ENDPOINT_URL` - S3 endpoint URL
+- `S3_ACCESS_KEY` - S3 access key
+- `S3_SECRET_KEY` - S3 secret key
+- `S3_BUCKET_NAME` - S3 bucket name
+- `S3_FOLDER_NAME` - S3 folder/prefix for file organization
 
 ## Testing
 

@@ -9,6 +9,7 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const flash = require("connect-flash");
 const helmet = require("helmet");
+const { marked } = require("marked");
 
 const app = express();
 app.use(
@@ -45,6 +46,7 @@ app.use(
     xssFilter: true,
   })
 );
+// app.use(helmet())
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "./public")));
@@ -58,6 +60,7 @@ const env = nunjucks.configure("views", {
 nunjucksDate.setDefaultFormat("YYYY"); // Change default format to YYYY
 env.addFilter("date", nunjucksDate);
 env.addGlobal("currentYear", new Date().getFullYear()); // Add current year as global
+env.addGlobal("marked", marked);
 
 // Add formatRupiah filter
 env.addFilter("formatRupiah", function(amount) {

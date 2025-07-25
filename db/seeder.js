@@ -2,8 +2,8 @@ const bcrypt = require("bcrypt");
 const { db } = require("./db");
 
 const insertUsersQuery = `
-    INSERT INTO users (username, email, password_hash, role) VALUES 
-    (?, ?, ?, ?);
+    INSERT INTO users (username, email, password_hash, full_name, role) VALUES 
+    (?, ?, ?, ?, ?);
 `;
 
 const usersData = [
@@ -11,18 +11,21 @@ const usersData = [
     username: "admin",
     email: "admin@omniflow.id",
     password: "Admin12345.",
+    full_name: "Administrator",
     role: "Admin",
   },
   {
     username: "manager",
     email: "manager@omniflow.id",
     password: "Manager12345.",
+    full_name: "Manager",
     role: "Manager",
   },
   {
     username: "user",
     email: "user@omniflow.id",
     password: "User12345.",
+    full_name: "User",
     role: "User",
   },
 ];
@@ -35,6 +38,7 @@ async function runSeeder() {
         user.username,
         user.email,
         hashedPassword,
+        user.full_name,
         user.role,
       ]);
     }

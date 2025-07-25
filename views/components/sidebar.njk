@@ -3,11 +3,11 @@
     <div class="nav">
       <a class="nav-link" href="/admin"> Beranda </a>
       <a
-        class="nav-link collapsed {% if url.includes('/admin') %}show{% endif %}"
+        class="nav-link collapsed {% if url.includes('/admin/overview') or url.includes('/admin/submodule') %}show{% endif %}"
         href="#"
         data-bs-toggle="collapse"
         data-bs-target="#collapseLayouts"
-        aria-expanded="{% if url.includes('/admin') %}true{% else %}false{% endif %}"
+        aria-expanded="{% if url.includes('/admin/overview') or url.includes('/admin/submodule') %}true{% else %}false{% endif %}"
         aria-controls="collapseLayouts"
       >
         Modul
@@ -16,7 +16,7 @@
         </div>
       </a>
       <div
-        class="collapse {% if url.includes('/admin') %}show{% endif %}"
+        class="collapse {% if url.includes('/admin/overview') or url.includes('/admin/submodule') %}show{% endif %}"
         id="collapseLayouts"
         aria-labelledby="headingOne"
         data-bs-parent="#sidenavAccordion"
@@ -29,11 +29,11 @@
       {% if user.role in ['Admin', 'Manager'] %}
       <!-- User -->
       <a
-        class="nav-link collapsed {% if url.includes('/user') %}show{% endif %}"
+        class="nav-link collapsed {% if url.includes('/admin/user') %}show{% endif %}"
         href="#"
         data-bs-toggle="collapse"
         data-bs-target="#collapseLayoutsUser"
-        aria-expanded="{% if url.includes('/user') %}true{% else %}false{% endif %}"
+        aria-expanded="{% if url.includes('/admin/user') %}true{% else %}false{% endif %}"
         aria-controls="collapseLayoutsUser"
       >
         User

@@ -2,10 +2,9 @@ const Excel = require("exceljs");
 const { db } = require("../../../db/db");
 const bcrypt = require("bcrypt");
 const { log, LOG_LEVELS } = require("../../../helpers/log");
-const UAParser = require("ua-parser-js");
 const { getClientIP } = require("../../../helpers/getClientIP");
+const { getUserAgent } = require("../../../helpers/getUserAgent");
 const fs = require("fs");
-const path = require("path");
 
 const getUserOverviewPage = async (req, res) => {
   try {
@@ -63,7 +62,7 @@ const downloadUserData = async (req, res) => {
   try {
     // Query database untuk mendapatkan semua user
     const [users] = await db.query(`
-      SELECT id, username, email, role
+      SELECT id, username, email, full_name, role
       FROM users
       ORDER BY id
     `);
@@ -77,6 +76,7 @@ const downloadUserData = async (req, res) => {
       { header: "ID", key: "id", width: 10 },
       { header: "Nama", key: "username", width: 30 },
       { header: "Email", key: "email", width: 30 },
+      { header: "Nama Lengkap", key: "full_name", width: 35 },
       { header: "Role", key: "role", width: 15 },
     ];
 
@@ -104,15 +104,7 @@ const downloadUserData = async (req, res) => {
     await workbook.xlsx.write(res);
 
     const ip = getClientIP(req);
-    const parser = new UAParser(req.headers["user-agent"]);
-    const result = parser.getResult();
-
-    const userAgentData = {
-      deviceType:
-        result.device.type || (result.device.vendor ? "Mobile" : "Desktop"),
-      browser: `${result.browser.name} ${result.browser.version}`,
-      platform: `${result.os.name} ${result.os.version}`,
-    };
+    const userAgentData = getUserAgent(req);
 
     await log(
       `${req.session.user.username} DOWNLOADED USER data`,
@@ -140,8 +132,8 @@ const downloadUserData = async (req, res) => {
 };
 
 const uploadNewUser = async (req, res) => {
-  const clientIP = getClientIP(req);
-  const userAgent = getUserAgent(req);
+  const ip = getClientIP(req);
+  const userAgentData = getUserAgent(req);
 
   if (!req.file) {
     req.flash("error", "File upload is required");
@@ -173,20 +165,21 @@ const uploadNewUser = async (req, res) => {
         return;
       }
 
-      if (rowValues.length >= 4) {
-        const [name, email, role, password] = rowValues.map((value) => {
+      if (rowValues.length >= 5) {
+        const [name, email, full_name, role, password] = rowValues.map((value) => {
           if (value && typeof value === "object" && value.text) {
             return value.text;
           }
           return value;
         });
 
-        if (name && email && role && password) {
+        if (name && email && full_name && role && password) {
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           if (emailRegex.test(email)) {
             users.push({
               username: name,
               email,
+              full_name,
               role,
               password,
             });
@@ -218,8 +211,8 @@ const uploadNewUser = async (req, res) => {
 
       const hashedPassword = await bcrypt.hash(user.password, 10);
       await db.query(
-        "INSERT INTO users (username, email, role, password_hash, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
-        [user.username, user.email, user.role, hashedPassword, now, now]
+        "INSERT INTO users (username, email, full_name, role, password_hash, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [user.username, user.email, user.full_name, user.role, hashedPassword, now, now]
       );
 
       await log(
@@ -266,10 +259,10 @@ const uploadNewUser = async (req, res) => {
 };
 
 const createNewUser = async (req, res) => {
-  const { username, email, role } = req.body;
+  const { username, email, full_name, role } = req.body;
 
-  const clientIP = getClientIP(req);
-  const userAgent = getUserAgent(req);
+  const ip = getClientIP(req);
+  const userAgentData = getUserAgent(req);
 
   try {
     // Set password based on role
@@ -318,8 +311,8 @@ const createNewUser = async (req, res) => {
     }
 
     await db.query(
-      "INSERT INTO users (username, email, role, password_hash, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
-      [username, email, role, hashedPassword, now, now]
+      "INSERT INTO users (username, email, full_name, role, password_hash, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [username, email, full_name, role, hashedPassword, now, now]
     );
 
     await log(
@@ -347,38 +340,90 @@ const createNewUser = async (req, res) => {
 
 const downloadUserTemplate = async (req, res) => {
   try {
-    // Path lengkap ke file template
-    const filePath = path.join(__dirname, "../../templates/data/user.xlsx");
+    // Query database untuk mendapatkan role yang tersedia
+    const [roleResults] = await db.query(
+      "SELECT DISTINCT role FROM users ORDER BY role"
+    );
+    const availableRoles = roleResults.map(row => row.role);
+    
+    // Jika tidak ada role di database, gunakan default dari enum
+    const defaultRoles = ['Admin', 'Manager', 'User'];
+    const roles = availableRoles.length > 0 ? availableRoles : defaultRoles;
 
-    // Mengatur header untuk download file
+    // Buat workbook dan worksheet baru
+    const workbook = new Excel.Workbook();
+    const worksheet = workbook.addWorksheet("User Template");
+
+    // Definisikan kolom berdasarkan struktur database
+    worksheet.columns = [
+      { header: "Username", key: "username", width: 30 },
+      { header: "Email", key: "email", width: 35 },
+      { header: "Nama Lengkap", key: "full_name", width: 35 },
+      { header: "Role", key: "role", width: 20 },
+      { header: "Password", key: "password", width: 20 }
+    ];
+
+    // Style untuk header
+    worksheet.getRow(1).font = { bold: true };
+    worksheet.getRow(1).fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFE0E0E0" }
+    };
+
+    // Tambahkan contoh data berdasarkan role yang tersedia
+    const exampleData = roles.slice(0, 3).map((role, index) => ({
+      username: `contoh_user_${index + 1}`,
+      email: `user${index + 1}@example.com`,
+      full_name: `Contoh User ${index + 1}`,
+      role: role,
+      password: "Password123!"
+    }));
+
+    worksheet.addRows(exampleData);
+
+    // Tambahkan komentar untuk kolom role
+    const roleCell = worksheet.getCell('D1');
+    roleCell.note = `Role yang tersedia: ${roles.join(', ')}`;
+
+    // Tambahkan komentar untuk kolom password
+    const passwordCell = worksheet.getCell('E1');
+    passwordCell.note = 'Password minimal 8 karakter, disarankan menggunakan kombinasi huruf, angka, dan simbol';
+
+    // Set response header
+    res.setHeader(
+      "Content-Type",
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    );
     res.setHeader(
       "Content-Disposition",
       'attachment; filename="user_template.xlsx"'
     );
 
     // Kirim file sebagai response
-    res.sendFile(filePath);
+    await workbook.xlsx.write(res);
+    res.end();
 
-    const clientIP = getClientIP(req);
-    const userAgent = getUserAgent(req);
+    const ip = getClientIP(req);
+    const userAgentData = getUserAgent(req);
 
     await log(
-      `Pengguna ${req.session?.user?.username} mengunduh template user`,
+      `Pengguna ${req.session?.user?.username} mengunduh template user dinamis`,
       LOG_LEVELS.INFO,
       req.session?.user?.id,
-      userAgent,
-      clientIP
+      userAgentData,
+      ip
     );
   } catch (err) {
-    const clientIP = getClientIP(req);
-    const userAgent = getUserAgent(req);
+    const ip = getClientIP(req);
+    const userAgentData = getUserAgent(req);
 
     await log(
       `Kesalahan saat mengunduh template user: ${err.message}`,
       LOG_LEVELS.ERROR,
       req.session?.user?.id,
-      userAgent,
-      clientIP
+      userAgentData,
+      ip
     );
 
     res.status(500).send("Internal Server Error");
