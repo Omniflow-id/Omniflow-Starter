@@ -95,7 +95,16 @@ app.use("/admin", adminRouter);
 
 // Debug endpoint removed - using OpenTelemetry for monitoring
 
-const errorHandler = require("./middlewares/errorHandler");
-app.use(errorHandler);
+// Error handling middlewares
+const {
+  centralizedErrorHandler,
+  notFoundHandler,
+} = require("./middlewares/errorHandler");
+
+// 404 handler - must be before error handler
+app.use(notFoundHandler);
+
+// Global error handler - must be last
+app.use(centralizedErrorHandler);
 
 module.exports = app;

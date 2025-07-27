@@ -9,6 +9,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Development Commands
 
 - **Start server**: `npm start` or `npm run dev` (runs on port 1234 or PORT env var)
+- **Code formatting**: `npm run format` (Biome formatter + linter with auto-fix)
+- **Code linting**: `npm run lint` (Biome linter check only)
 - **No build process** - static files served directly from public/
 
 ## Architecture
@@ -66,9 +68,132 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Error Handling
 
+- **Centralized Error Handler**: `middlewares/centralizedErrorHandler.js` with custom error classes
+- **Custom Error Types**: ValidationError, AuthenticationError, AuthorizationError, DatabaseError
+- **Async Error Wrapper**: Use `asyncHandler` to eliminate try-catch boilerplate
+- **Error Pages**: 400, 401, 403, 404, 500 with user-friendly messages
+- **Smart Error Detection**: Automatic handling of database errors, validation errors
+- **Dual Response Format**: JSON for API requests, HTML for web requests
 - OpenTelemetry (OTEL) integration for application monitoring and tracing
-- Custom error middleware in `middlewares/errorHandler.js`
 - Flash messages for user feedback using connect-flash
+
+#### Error Handling Examples:
+
+**Basic Usage:**
+```js
+const { asyncHandler, ValidationError, AuthenticationError } = require("../middlewares/errorHandler");
+
+// Replace try-catch with asyncHandler
+const getUsers = asyncHandler(async (req, res) => {
+  const [users] = await db.query("SELECT * FROM users");
+  res.render("pages/admin/user/index", { users });
+});
+```
+
+**Input Validation:**
+```js
+const createUser = asyncHandler(async (req, res) => {
+  const { email, username } = req.body;
+  
+  if (!email) {
+    throw new ValidationError("Email is required", "email");
+  }
+  
+  if (!username) {
+    throw new ValidationError("Username is required", "username");
+  }
+  
+  // Email format validation
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    throw new ValidationError("Please provide a valid email address", "email");
+  }
+  
+  // Business logic...
+});
+```
+
+**Authorization Checks:**
+```js
+const deleteUser = asyncHandler(async (req, res) => {
+  // Check user permissions
+  if (req.session.user.role !== "Admin") {
+    throw new AuthorizationError("Only admins can delete users");
+  }
+  
+  // Check if trying to delete self
+  if (req.params.id === req.session.user.id) {
+    throw new ValidationError("Cannot delete your own account");
+  }
+  
+  // Delete logic...
+});
+```
+
+**Database Error Handling:**
+```js
+const updateUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { email } = req.body;
+  
+  try {
+    const [result] = await db.query("UPDATE users SET email = ? WHERE id = ?", [email, id]);
+    
+    if (result.affectedRows === 0) {
+      throw new ValidationError("User not found");
+    }
+  } catch (dbError) {
+    if (dbError.code === "ER_DUP_ENTRY") {
+      throw new ValidationError("Email already exists", "email");
+    }
+    throw new DatabaseError(`Database operation failed: ${dbError.message}`);
+  }
+  
+  res.json({ success: true });
+});
+```
+
+**API vs Web Response:**
+```js
+const getUserProfile = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  
+  const [users] = await db.query("SELECT * FROM users WHERE id = ?", [id]);
+  
+  if (users.length === 0) {
+    throw new ValidationError("User not found");
+  }
+  
+  // For API requests: returns JSON { success: false, error: {...} }
+  // For web requests: redirects with flash message or renders error page
+  
+  if (req.xhr || req.headers.accept?.includes("application/json")) {
+    res.json({ user: users[0] });
+  } else {
+    res.render("pages/admin/user/profile", { user: users[0] });
+  }
+});
+```
+
+**File Upload with Error Handling:**
+```js
+const uploadFile = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    throw new ValidationError("File upload is required");
+  }
+  
+  const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
+  if (!allowedTypes.includes(req.file.mimetype)) {
+    throw new ValidationError("Only JPEG, PNG, and PDF files are allowed");
+  }
+  
+  if (req.file.size > 5 * 1024 * 1024) { // 5MB
+    throw new ValidationError("File size must be less than 5MB");
+  }
+  
+  // Process file...
+});
+```
 
 ### Frontend Architecture
 
@@ -137,10 +262,30 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - `LOG_LEVEL` - Logging level (default: "info")
 - `LOG_FILE` - Log file path (default: "./logs/app.log")
 
+## Code Quality
+
+### Formatter & Linter Setup
+
+- **Biome**: All-in-one formatter and linter for JavaScript/Node.js
+- **Configuration**: `biome.json` with Prettier-style formatting rules
+- **Commands**: `npm run format` (fix), `npm run lint` (check only)
+- **Features**: Auto-fix, unused variable detection, consistent code style
+- **Template Files**: Manual formatting (no automated tooling for Nunjucks)
+
+### Biome Configuration Highlights
+
+- **Prettier-style**: Double quotes, semicolons, trailing commas
+- **Line width**: 80 characters
+- **Indentation**: 2 spaces
+- **Auto-organize imports**: Enabled
+- **Ignored paths**: `node_modules/`, `public/`, `logs/`, `*.min.js`
+
 ## Testing
 
 - No test framework currently configured
 - Manual testing via web interface
 - Database seeder provides test users for development
+
+## Additional Resources
 
 https://chatgpt.com/share/6883a5cc-f2c0-8005-95cf-e8a76653d1d2

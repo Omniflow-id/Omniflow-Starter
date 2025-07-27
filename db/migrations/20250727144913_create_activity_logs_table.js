@@ -6,7 +6,7 @@ exports.up = (knex) =>
   knex.schema.createTable("activity_logs", (table) => {
     table.increments("id").primary();
     table.integer("user_id").unsigned();
-    table.string("activity", 255).notNullable();
+    table.text("activity").notNullable();
     table.string("ip_address", 45);
     table.string("device_type", 50);
     table.string("browser", 50);
