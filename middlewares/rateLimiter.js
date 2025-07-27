@@ -14,8 +14,20 @@ const generalLimiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   skip: (req) => {
     // Skip rate limiting for static assets to prevent spam
-    const staticExtensions = ['.css', '.js', '.png', '.jpg', '.jpeg', '.gif', '.ico', '.svg', '.woff', '.woff2', '.ttf'];
-    return staticExtensions.some(ext => req.path.toLowerCase().endsWith(ext));
+    const staticExtensions = [
+      ".css",
+      ".js",
+      ".png",
+      ".jpg",
+      ".jpeg",
+      ".gif",
+      ".ico",
+      ".svg",
+      ".woff",
+      ".woff2",
+      ".ttf",
+    ];
+    return staticExtensions.some((ext) => req.path.toLowerCase().endsWith(ext));
   },
   handler: async (req, res) => {
     try {

@@ -12,10 +12,10 @@ const helmet = require("helmet");
 const { marked } = require("marked");
 const config = require("./config");
 const { generalLimiter } = require("@middlewares/rateLimiter");
-const { 
-  botProtectionLimiter, 
-  bannedIPLimiter, 
-  suspiciousActivityLogger 
+const {
+  botProtectionLimiter,
+  bannedIPLimiter,
+  suspiciousActivityLogger,
 } = require("@middlewares/botProtection");
 
 const app = express();
@@ -98,7 +98,7 @@ app.use((req, res, next) => {
   next();
 });
 // Trust proxy setting - security consideration for rate limiting
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === "production") {
   // Production: Trust only first proxy (e.g., Nginx, Cloudflare)
   // This allows getting real client IP from X-Forwarded-For header
   app.set("trust proxy", 1);

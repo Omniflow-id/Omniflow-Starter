@@ -62,26 +62,26 @@ const LEGITIMATE_PATHS = [
   "/admin",
   "/admin/",
   "/admin/login",
-  "/admin/logout", 
+  "/admin/logout",
   "/admin/user",
   "/admin/log",
   "/admin/index",
-  "/admin/overview"
+  "/admin/overview",
 ];
 
 // Check if path is suspicious
 const isSuspiciousPath = (path) => {
   const normalizedPath = path.toLowerCase();
-  
+
   // First check if it's a legitimate admin path
-  const isLegitimate = LEGITIMATE_PATHS.some(legitPath => 
+  const isLegitimate = LEGITIMATE_PATHS.some((legitPath) =>
     normalizedPath.startsWith(legitPath.toLowerCase())
   );
-  
+
   if (isLegitimate) {
     return false;
   }
-  
+
   // Then check against suspicious patterns
   return SUSPICIOUS_PATHS.some((suspiciousPath) =>
     normalizedPath.includes(suspiciousPath.toLowerCase())
@@ -195,7 +195,7 @@ const bannedIPLimiter = rateLimit({
 });
 
 // Middleware to log suspicious activity even if not rate limited
-const suspiciousActivityLogger = (req, res, next) => {
+const suspiciousActivityLogger = (req, _res, next) => {
   if (isSuspiciousPath(req.path)) {
     try {
       const clientIP = getClientIP(req);
