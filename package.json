@@ -32,6 +32,7 @@
     "helmet": "^8.0.0",
     "knex": "^3.1.0",
     "marked": "^12.0.2",
+    "module-alias": "^2.2.3",
     "moment": "^2.30.1",
     "moment-timezone": "^0.6.0",
     "morgan": "^1.10.0",
@@ -43,5 +44,15 @@
   },
   "devDependencies": {
     "@biomejs/biome": "^2.1.2"
+  },
+  "_moduleAliases": {
+    "@": ".",
+    "@config": "./config",
+    "@db": "./db",
+    "@helpers": "./helpers",
+    "@middlewares": "./middlewares",
+    "@routes": "./routes",
+    "@views": "./views",
+    "@public": "./public"
   }
 }

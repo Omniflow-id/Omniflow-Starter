@@ -1,9 +1,9 @@
-const { db } = require("../../../db/db");
+const { db } = require("@db/db");
 const bcrypt = require("bcrypt");
-const { LOG_LEVELS, log } = require("../../../helpers/log");
-const { getClientIP } = require("../../../helpers/getClientIP");
-const { getUserAgent } = require("../../../helpers/getUserAgent");
-const { asyncHandler, ValidationError, AuthenticationError, DatabaseError } = require("../../../middlewares/errorHandler");
+const { LOG_LEVELS, log } = require("@helpers/log");
+const { getClientIP } = require("@helpers/getClientIP");
+const { getUserAgent } = require("@helpers/getUserAgent");
+const { asyncHandler, ValidationError, AuthenticationError, DatabaseError } = require("@middlewares/errorHandler");
 
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;

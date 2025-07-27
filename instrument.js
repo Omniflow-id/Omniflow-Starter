@@ -1,3 +1,6 @@
+// Register module aliases first (for config import)
+require("module-alias/register");
+
 const { NodeSDK } = require("@opentelemetry/sdk-node");
 const {
   getNodeAutoInstrumentations,
@@ -6,7 +9,7 @@ const { PrometheusExporter } = require("@opentelemetry/exporter-prometheus");
 const {
   OTLPTraceExporter,
 } = require("@opentelemetry/exporter-trace-otlp-http");
-const config = require("./config");
+const config = require("@config");
 
 const sdk = new NodeSDK({
   instrumentations: [getNodeAutoInstrumentations()],

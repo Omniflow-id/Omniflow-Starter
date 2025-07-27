@@ -1,3 +1,5 @@
+require("module-alias/register");
+
 const http = require("node:http");
 const app = require("./app");
 const config = require("./config");

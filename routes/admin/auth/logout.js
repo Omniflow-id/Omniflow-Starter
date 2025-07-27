@@ -1,6 +1,6 @@
-const { LOG_LEVELS, log } = require("../../../helpers/log");
-const { getClientIP } = require("../../../helpers/getClientIP");
-const { getUserAgent } = require("../../../helpers/getUserAgent");
+const { LOG_LEVELS, log } = require("@helpers/log");
+const { getClientIP } = require("@helpers/getClientIP");
+const { getUserAgent } = require("@helpers/getUserAgent");
 
 const logout = async (req, res) => {
   const user = req.session.user;

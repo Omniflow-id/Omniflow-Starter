@@ -1,9 +1,9 @@
 const Excel = require("exceljs");
-const { db } = require("../../../db/db");
+const { db } = require("@db/db");
 const bcrypt = require("bcrypt");
-const { log, LOG_LEVELS } = require("../../../helpers/log");
-const { getClientIP } = require("../../../helpers/getClientIP");
-const { getUserAgent } = require("../../../helpers/getUserAgent");
+const { log, LOG_LEVELS } = require("@helpers/log");
+const { getClientIP } = require("@helpers/getClientIP");
+const { getUserAgent } = require("@helpers/getUserAgent");
 const fs = require("node:fs");
 
 const getUserOverviewPage = async (req, res) => {

@@ -13,6 +13,44 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Code linting**: `npm run lint` (Biome linter check only)
 - **No build process** - static files served directly from public/
 
+## Module Aliases
+
+The project uses `module-alias` for cleaner import paths:
+
+### Available Aliases
+
+- `@` - Project root (.)
+- `@config` - Configuration files (./config)
+- `@db` - Database files (./db)
+- `@helpers` - Helper utilities (./helpers) 
+- `@middlewares` - Express middlewares (./middlewares)
+- `@routes` - Route handlers (./routes)
+- `@views` - Nunjucks templates (./views)
+- `@public` - Static files (./public)
+
+### Usage Examples
+
+**Before (relative paths):**
+```js
+const { db } = require("../../../db/db");
+const { log } = require("../../../helpers/log");
+const { asyncHandler } = require("../../../middlewares/errorHandler");
+```
+
+**After (module aliases):**
+```js
+const { db } = require("@db/db");
+const { log } = require("@helpers/log");
+const { asyncHandler } = require("@middlewares/errorHandler");
+```
+
+### Setup Notes
+
+- Module aliases are registered in `server.js` and `instrument.js`
+- Configured in `package.json` under `_moduleAliases`
+- Works with all Node.js require() calls
+- No additional build step required
+
 ## Architecture
 
 ### Entry Points

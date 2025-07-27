@@ -71,7 +71,9 @@ const centralizedErrorHandler = async (err, req, res, _next) => {
 
   // Log error based on severity
   const logLevel = statusCode >= 500 ? LOG_LEVELS.ERROR : LOG_LEVELS.WARN;
-  const logMessage = `${req.method} ${req.originalUrl} - ${statusCode} - ${message}${err.stack ? ` - Stack: ${err.stack}` : ""}`;
+  const logMessage = `${req.method} ${
+    req.originalUrl
+  } - ${statusCode} - ${message}${err.stack ? ` - Stack: ${err.stack}` : ""}`;
 
   await log(logMessage, logLevel, userId, userAgent, clientIP);
 

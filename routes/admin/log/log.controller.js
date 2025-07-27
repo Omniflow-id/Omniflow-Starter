@@ -1,5 +1,5 @@
 const Excel = require("exceljs");
-const { db } = require("../../../db/db");
+const { db } = require("@db/db");
 
 const getLogPage = async (_req, res) => {
   try {
