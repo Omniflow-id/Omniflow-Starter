@@ -22,7 +22,7 @@ const logout = async (req, res) => {
     if (err) {
       console.error("Error destroying session:", err);
     }
-    res.redirect("/login");
+    res.redirect("/admin/login");
   });
 };
 

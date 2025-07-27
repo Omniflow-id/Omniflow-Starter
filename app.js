@@ -11,9 +11,22 @@ const flash = require("connect-flash");
 const helmet = require("helmet");
 const { marked } = require("marked");
 const config = require("./config");
+const { generalLimiter } = require("@middlewares/rateLimiter");
+const { 
+  botProtectionLimiter, 
+  bannedIPLimiter, 
+  suspiciousActivityLogger 
+} = require("@middlewares/botProtection");
 
 const app = express();
 app.use(helmet(config.security.helmetConfig));
+
+// Bot protection - apply first for maximum security
+app.use(suspiciousActivityLogger);
+app.use(bannedIPLimiter);
+app.use(botProtectionLimiter);
+app.use(generalLimiter);
+
 // app.use(helmet())
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -84,8 +97,16 @@ app.use((req, res, next) => {
 
   next();
 });
-app.set("trust proxy", true);
-app.enable("trust proxy");
+// Trust proxy setting - security consideration for rate limiting
+if (process.env.NODE_ENV === 'production') {
+  // Production: Trust only first proxy (e.g., Nginx, Cloudflare)
+  // This allows getting real client IP from X-Forwarded-For header
+  app.set("trust proxy", 1);
+} else {
+  // Development: Don't trust proxy to prevent rate limiting bypass
+  // Use direct connection IP (127.0.0.1, ::1)
+  app.set("trust proxy", false);
+}
 
 const adminRouter = require("./routes/admin/admin.router");
 const clientRouter = require("./routes/client/client.router");

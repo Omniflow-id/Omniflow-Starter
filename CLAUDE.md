@@ -88,6 +88,48 @@ const { asyncHandler } = require("@middlewares/errorHandler");
 - Captures IP address, device type, browser, platform via user-agent parsing
 - Helper functions in `helpers/log.js`, `helpers/getClientIP.js`, `helpers/getUserAgent.js`
 
+### Rate Limiting & Security
+
+- **Express Rate Limiting**: Multi-tier rate limiting with `express-rate-limit`
+- **Rate Limiting Tiers**:
+  - **General**: 100 requests/15 min (all endpoints)
+  - **Authentication**: 5 login attempts/15 min (POST `/admin/login`)
+  - **Admin Operations**: 50 requests/5 min (admin routes)
+  - **File Uploads**: 10 uploads/15 min (file upload endpoints)
+  - **Data Export**: 20 exports/5 min (download/export endpoints)
+- **Security Features**:
+  - Proper IP detection with configurable trust proxy settings
+  - Flash message integration for user feedback
+  - Comprehensive logging of rate limit violations
+  - JSON response for API calls, HTML response for web requests
+  - Development vs Production trust proxy configuration
+- **Trust Proxy Configuration**:
+  - Development: `trust proxy: false` (direct IP, security-first)
+  - Production: `trust proxy: 1` (trust first proxy for real client IP)
+- **Implementation**: `middlewares/rateLimiter.js` with different limiters applied to specific route groups
+
+### Bot Protection & Threat Detection
+
+- **Advanced Bot Protection**: Multi-layer defense against automated attacks
+- **Protection Layers**:
+  - **Suspicious Activity Logger**: Passive monitoring and logging of suspicious paths
+  - **Banned IP Limiter**: Ultra-aggressive blocking (1 request/hour) for obvious bot patterns
+  - **Bot Protection Limiter**: Moderate protection (3 requests/5min) for suspicious paths
+- **Threat Detection**:
+  - **Suspicious Path Detection**: WordPress, CMS, config files, attack vectors
+  - **Bot User-Agent Detection**: Scanner bots, crawlers, automated tools
+  - **Legitimate Path Whitelist**: Admin panel paths exempted from suspicion
+- **Security Response**:
+  - **Error Codes**: `BOT_PROTECTION_TRIGGERED`, `IP_BANNED`
+  - **JSON Response**: Machine-readable responses for bots
+  - **Comprehensive Logging**: Database and console logging with IP, path, user-agent
+- **Protected Attack Vectors**:
+  - WordPress: `/wp/`, `/wp-admin`, `/xmlrpc.php`
+  - CMS: `/administrator`, `/phpmyadmin`, `/drupal`
+  - Config: `/.env`, `/config`, `/.htaccess`
+  - Shells: `/webshell`, `/cmd`, `/backup`
+- **Implementation**: `middlewares/botProtection.js` with intelligent path filtering and legitimate path whitelisting
+
 ### File Processing & Storage
 
 - **Excel Operations**: Dynamic template generation using ExcelJS (no static templates)

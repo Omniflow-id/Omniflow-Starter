@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
   {% include "includes/head.njk" %}
-  <body class="sb-nav-fixed">
-    <div id="layoutSidenav">
-        <main>
-          {% include "components/alert_flash_message.njk" %} {% block content %}
-          {% endblock %}
-        </main>
-      </div>
-    </div>
-    {% include "includes/script.njk" %} {% block scripts %} {% endblock %}
+  <body>
+    <main>
+      {% include "components/alert_flash_message.njk" %} 
+      {% block content %}
+      {% endblock %}
+    </main>
+    {% include "includes/script.njk" %} 
+    {% block scripts %} 
+    {% endblock %}
   </body>
 </html>
