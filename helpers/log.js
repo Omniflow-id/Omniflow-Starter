@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { db } = require('../db/db');
+const config = require('../config');
 
 const LOG_LEVELS = {
   INFO: 'INFO',
@@ -39,7 +40,7 @@ async function log(message, level = LOG_LEVELS.INFO, user_id = null, userAgentDa
 
   console.log(detailedLogMessage);
 
-  const logFilePath = path.join(__dirname, '..', 'logs', 'app.log');
+  const logFilePath = path.resolve(config.logging.file);
   if (!fs.existsSync(path.dirname(logFilePath))) {
     fs.mkdirSync(path.dirname(logFilePath), { recursive: true });
   }

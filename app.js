@@ -10,42 +10,10 @@ const session = require("express-session");
 const flash = require("connect-flash");
 const helmet = require("helmet");
 const { marked } = require("marked");
+const config = require("./config");
 
 const app = express();
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: [
-          "'self'",
-          "'unsafe-inline'",
-          "cdn.jsdelivr.net",
-          "use.fontawesome.com",
-        ],
-        objectSrc: ["'none'"],
-        upgradeInsecureRequests: [],
-      },
-    },
-    crossOriginEmbedderPolicy: true,
-    crossOriginOpenerPolicy: { policy: "same-origin" },
-    crossOriginResourcePolicy: { policy: "same-origin" },
-    dnsPrefetchControl: { allow: false },
-    expectCt: { maxAge: 86400, enforce: true },
-    frameguard: { action: "deny" },
-    hidePoweredBy: true,
-    hsts: {
-      maxAge: 63072000,
-      includeSubDomains: true,
-      preload: true,
-    },
-    ieNoOpen: true,
-    noSniff: true,
-    permittedCrossDomainPolicies: { policy: "none" },
-    referrerPolicy: { policy: "no-referrer" },
-    xssFilter: true,
-  })
-);
+app.use(helmet(config.security.helmetConfig));
 // app.use(helmet())
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -74,40 +42,30 @@ env.addFilter("formatRupiah", function(amount) {
   });
 });
 
-// Add moment timezone filter for Jakarta
+// Add moment timezone filters using config timezone
 env.addFilter("formatDateTime", function(date, format) {
   if (!date) return "";
   const defaultFormat = format || "DD MMMM YYYY HH:mm:ss";
-  return moment(date).tz("Asia/Jakarta").format(defaultFormat);
+  return moment(date).tz(config.timezone).format(defaultFormat);
 });
 
 // Add moment timezone filter for date only
 env.addFilter("formatDate", function(date, format) {
   if (!date) return "";
   const defaultFormat = format || "DD MMMM YYYY";
-  return moment(date).tz("Asia/Jakarta").format(defaultFormat);
+  return moment(date).tz(config.timezone).format(defaultFormat);
 });
 
 // Add moment timezone filter for time only
 env.addFilter("formatTime", function(date, format) {
   if (!date) return "";
   const defaultFormat = format || "HH:mm:ss";
-  return moment(date).tz("Asia/Jakarta").format(defaultFormat);
+  return moment(date).tz(config.timezone).format(defaultFormat);
 });
 
 app.set("view engine", "njk");
 app.use(morgan("combined"));
-app.use(
-  session({
-    secret: process.env.SESSION_KEY,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === "production",
-      maxAge: 24 * 60 * 60 * 1000,
-    },
-  })
-);
+app.use(session(config.session));
 app.use(flash());
 app.use((req, res, next) => {
   res.locals.user = req.session.user;

@@ -1,19 +1,11 @@
-require("dotenv").config();
+const config = require("./config");
+
+const env = process.env.NODE_ENV || "development";
+const envConfig = env === "production" 
+  ? require("./config/production")
+  : require("./config/development");
 
 module.exports = {
-  development: {
-    client: "mysql2",
-    connection: {
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-    },
-    migrations: {
-      directory: "./db/migrations",
-    },
-    seeds: {
-      directory: "./db/seeders",
-    },
-  },
+  development: envConfig.knex,
+  production: envConfig.knex,
 };

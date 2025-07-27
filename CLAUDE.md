@@ -8,9 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-- **Start server**: `node server.js` (runs on port 1234 or PORT env var)
-- **Database setup**: `node db/migration.js` (creates tables)
-- **Seed default users**: `node db/seeder.js` (creates admin/manager/user accounts)
+- **Start server**: `npm start` or `npm run dev` (runs on port 1234 or PORT env var)
 - **No build process** - static files served directly from public/
 
 ## Architecture
@@ -19,13 +17,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - `server.js` - Server startup
 - `app.js` - Express configuration and middleware setup
-- `instrument.js` - Sentry monitoring initialization
+- `instrument.js` - OpenTelemetry monitoring initialization
 
 ### Database Layer
 
-- MySQL with connection pooling (`db/db.js`)
+- MySQL with connection pooling (`db/db.js`) using centralized config
 - Main tables: `users` (with full_name field) and `activity_logs`
-- Migration script creates schema with proper indexes
+- **Knex.js integration**: Database migrations and seeding with proper tracking
+- Migrations located in `db/migrations/` with timestamp-based naming
+- Seeders located in `db/seeders/` for development data
 - Default users: admin@omniflow.id/Admin12345., manager@omniflow.id/Manager12345., user@omniflow.id/User12345.
 
 ### Authentication & Authorization
@@ -89,30 +89,53 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Custom Filters**:
   - `formatRupiah(amount)` - Formats numbers as Indonesian Rupiah currency
-  - `formatDateTime(date, format)` - Formats datetime with Jakarta timezone (default: "DD MMMM YYYY HH:mm:ss")
-  - `formatDate(date, format)` - Formats date only with Jakarta timezone (default: "DD MMMM YYYY")
-  - `formatTime(date, format)` - Formats time only with Jakarta timezone (default: "HH:mm:ss")
+  - `formatDateTime(date, format)` - Formats datetime with configurable timezone (default: "DD MMMM YYYY HH:mm:ss")
+  - `formatDate(date, format)` - Formats date only with configurable timezone (default: "DD MMMM YYYY")
+  - `formatTime(date, format)` - Formats time only with configurable timezone (default: "HH:mm:ss")
   - `date` - Standard date filter with YYYY default format
 
-## Environment Configuration
+## Configuration System
 
-Required `.env` variables:
+**Centralized Configuration**: All configuration managed through `config/` directory with environment-specific overrides.
 
+### Configuration Files
+
+- `config/index.js` - Base configuration with all environment variables
+- `config/development.js` - Development environment overrides (debug enabled, seeds allowed)
+- `config/production.js` - Production environment overrides (secure cookies, no seeds)
+
+### Required `.env` variables:
+
+- `NODE_ENV` - Environment (development/production)
 - `SESSION_KEY` - Session encryption key
+- `APP_URL` - Application URL (default: "http://localhost")
+- `PORT` - Server port (default: 1234)
+
+**Database Configuration:**
+
 - `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` - MySQL connection
-- `OTEL_SERVICE_NAME` - OpenTelemetry service name (default: "omniflow-starter")
+
+**OpenTelemetry Configuration:**
+
+- `OTEL_SERVICE_NAME` - Service name (default: "omniflow-starter")
 - `OTEL_SERVICE_VERSION` - Service version (default: "1.0.0")
 - `OTEL_METRICS_PORT` - Prometheus metrics port (default: 9091)
 - `OTEL_METRICS_ENDPOINT` - Metrics endpoint path (default: "/metrics")
 - `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` - OTLP traces endpoint (default: "http://localhost:4318/v1/traces")
 
-S3 Configuration (for future file storage):
+**S3 Configuration (for future file storage):**
 
 - `S3_ENDPOINT_URL` - S3 endpoint URL
 - `S3_ACCESS_KEY` - S3 access key
 - `S3_SECRET_KEY` - S3 secret key
 - `S3_BUCKET_NAME` - S3 bucket name
 - `S3_FOLDER_NAME` - S3 folder/prefix for file organization
+
+**Optional Configuration:**
+
+- `TIMEZONE` - Application timezone (default: "Asia/Jakarta")
+- `LOG_LEVEL` - Logging level (default: "info")
+- `LOG_FILE` - Log file path (default: "./logs/app.log")
 
 ## Testing
 
