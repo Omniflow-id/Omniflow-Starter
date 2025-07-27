@@ -1,0 +1,74 @@
+name: ci
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.1'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Code formatting and linting
+        run: |
+          echo "🎨 Running code formatting..."
+          npm run format
+          
+          echo "🔍 Running code linting..."
+          npm run lint
+
+      - name: Security audit
+        run: |
+          echo "🔒 Running security audit..."
+          npm audit --audit-level moderate
+
+      - name: Check for uncommitted changes
+        run: |
+          echo "📋 Checking for formatting changes..."
+          if ! git diff --exit-code; then
+            echo "❌ Code formatting issues found! Please run 'npm run format' locally and commit the changes."
+            git diff
+            exit 1
+          else
+            echo "✅ Code formatting is consistent"
+          fi
+
+      - name: CI success notification
+        if: success() && github.event_name == 'push'
+        run: |
+          curl -X POST https://beepbot.ngodings.my.id/notify \
+          -H "Content-Type: application/json" \
+          -H "X-Notify-Secret: ${{ secrets.BEEPBOT_SECRET }}" \
+          -d '{
+            "text": "✅ *CI Passed*\n\n📋 **Repository:** Omniflow-Starter\n🌿 **Branch:** ${{ github.ref_name }}\n👤 **Author:** ${{ github.actor }}\n🔗 **Commit:** [`${{ github.sha }}`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\n💬 **Message:** ${{ github.event.head_commit.message }}\n🎯 **Status:** Code quality checks passed",
+            "chat_id": 1185624008,
+            "parse_mode": "Markdown"
+          }' || true
+
+      - name: CI failure notification  
+        if: failure() && github.event_name == 'push'
+        run: |
+          curl -X POST https://beepbot.ngodings.my.id/notify \
+          -H "Content-Type: application/json" \
+          -H "X-Notify-Secret: ${{ secrets.BEEPBOT_SECRET }}" \
+          -d '{
+            "text": "❌ *CI Failed*\n\n📋 **Repository:** Omniflow-Starter\n🌿 **Branch:** ${{ github.ref_name }}\n👤 **Author:** ${{ github.actor }}\n🔗 **Commit:** [`${{ github.sha }}`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\n🚨 **Status:** Code quality checks failed\n🔗 **Workflow:** [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+            "chat_id": 1185624008,
+            "parse_mode": "Markdown"
+          }' || true

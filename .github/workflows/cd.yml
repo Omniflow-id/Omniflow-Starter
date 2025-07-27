@@ -41,7 +41,7 @@ jobs:
             [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
             # Use the correct Node.js version
-            nvm use 20.15.1
+            nvm use 22
 
             # Create symlinks if they don't exist
             sudo ln -sf "$(which node)" "/usr/local/bin/node"
