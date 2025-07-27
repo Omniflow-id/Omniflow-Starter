@@ -1,0 +1,88 @@
+name: cd
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  cd:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Send deployment start notification
+        run: |
+          curl -X POST https://beepbot.ngodings.my.id/notify \
+          -H "Content-Type: application/json" \
+          -H "X-Notify-Secret: ${{ secrets.BEEPBOT_SECRET }}" \
+          -d '{
+            "text": "🚀 *Deployment Started*\n\n📋 **Repository:** Omniflow-Starter\n🌿 **Branch:** ${{ github.ref_name }}\n👤 **Triggered by:** ${{ github.actor }}\n🔗 **Commit:** [`${{ github.sha }}`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\n💬 **Message:** ${{ github.event.head_commit.message }}",
+            "chat_id": 1185624008,
+            "parse_mode": "Markdown"
+          }'
+
+      - name: Deploy Using ssh
+        id: deploy
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd Omniflow-Starter
+            git pull origin main
+            git status
+
+            # Ensure NVM is loaded
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+            # Use the correct Node.js version
+            nvm use 20.15.1
+
+            # Create symlinks if they don't exist
+            sudo ln -sf "$(which node)" "/usr/local/bin/node"
+            sudo ln -sf "$(which npm)" "/usr/local/bin/npm"
+
+            # Install PM2 globally if not already installed
+            npm list -g | grep pm2 || npm install -g pm2
+
+            # Create PM2 symlink
+            sudo ln -sf "$(which pm2)" "/usr/local/bin/pm2"
+
+            # Install dependencies
+            npm install
+            
+            # Start/Restart application using ecosystem config
+            pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js
+            
+            # Save PM2 process list and setup startup script
+            pm2 save
+            pm2 startup
+
+      - name: Send deployment success notification
+        if: success()
+        run: |
+          curl -X POST https://beepbot.ngodings.my.id/notify \
+          -H "Content-Type: application/json" \
+          -H "X-Notify-Secret: ${{ secrets.BEEPBOT_SECRET }}" \
+          -d '{
+            "text": "✅ *Deployment Successful*\n\n📋 **Repository:** Omniflow-Starter\n🌿 **Branch:** ${{ github.ref_name }}\n👤 **Deployed by:** ${{ github.actor }}\n🔗 **Commit:** [`${{ github.sha }}`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\n⏱️ **Duration:** ${{ job.duration }}\n🎯 **Status:** Application successfully deployed and restarted",
+            "chat_id": 1185624008,
+            "parse_mode": "Markdown"
+          }'
+
+      - name: Send deployment failure notification
+        if: failure()
+        run: |
+          curl -X POST https://beepbot.ngodings.my.id/notify \
+          -H "Content-Type: application/json" \
+          -H "X-Notify-Secret: ${{ secrets.BEEPBOT_SECRET }}" \
+          -d '{
+            "text": "❌ *Deployment Failed*\n\n📋 **Repository:** Omniflow-Starter\n🌿 **Branch:** ${{ github.ref_name }}\n👤 **Triggered by:** ${{ github.actor }}\n🔗 **Commit:** [`${{ github.sha }}`](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\n🚨 **Status:** Deployment failed - check workflow logs\n🔗 **Workflow:** [View Details](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})",
+            "chat_id": 1185624008,
+            "parse_mode": "Markdown"
+          }'
