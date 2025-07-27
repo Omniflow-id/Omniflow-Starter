@@ -1,5 +1,5 @@
 require("./instrument.js");
-const path = require("path");
+const path = require("node:path");
 const express = require("express");
 const morgan = require("morgan");
 const nunjucks = require("nunjucks");
@@ -31,33 +31,36 @@ env.addGlobal("currentYear", new Date().getFullYear()); // Add current year as g
 env.addGlobal("marked", marked);
 
 // Add formatRupiah filter
-env.addFilter("formatRupiah", function(amount) {
+env.addFilter("formatRupiah", (amount) => {
   if (!amount && amount !== 0) return "Rp 0";
   const number = parseFloat(amount);
-  if (isNaN(number)) return "Rp 0";
-  
-  return "Rp " + number.toLocaleString("id-ID", {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
-  });
+  if (Number.isNaN(number)) return "Rp 0";
+
+  return (
+    "Rp " +
+    number.toLocaleString("id-ID", {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    })
+  );
 });
 
 // Add moment timezone filters using config timezone
-env.addFilter("formatDateTime", function(date, format) {
+env.addFilter("formatDateTime", (date, format) => {
   if (!date) return "";
   const defaultFormat = format || "DD MMMM YYYY HH:mm:ss";
   return moment(date).tz(config.timezone).format(defaultFormat);
 });
 
 // Add moment timezone filter for date only
-env.addFilter("formatDate", function(date, format) {
+env.addFilter("formatDate", (date, format) => {
   if (!date) return "";
   const defaultFormat = format || "DD MMMM YYYY";
   return moment(date).tz(config.timezone).format(defaultFormat);
 });
 
 // Add moment timezone filter for time only
-env.addFilter("formatTime", function(date, format) {
+env.addFilter("formatTime", (date, format) => {
   if (!date) return "";
   const defaultFormat = format || "HH:mm:ss";
   return moment(date).tz(config.timezone).format(defaultFormat);

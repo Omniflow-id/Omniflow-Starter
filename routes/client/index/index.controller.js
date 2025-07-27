@@ -1,4 +1,4 @@
-const getClientIndexPage = (req, res) => {
+const getClientIndexPage = (_req, res) => {
   res.render("pages/client/index/index");
 };
 

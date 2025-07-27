@@ -46,7 +46,9 @@ const config = {
     serviceVersion: process.env.OTEL_SERVICE_VERSION || "1.0.0",
     metricsPort: process.env.OTEL_METRICS_PORT || 9091,
     metricsEndpoint: process.env.OTEL_METRICS_ENDPOINT || "/metrics",
-    tracesEndpoint: process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT || "http://localhost:4318/v1/traces",
+    tracesEndpoint:
+      process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT ||
+      "http://localhost:4318/v1/traces",
   },
 
   s3: {

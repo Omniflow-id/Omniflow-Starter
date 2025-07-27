@@ -1,4 +1,4 @@
-const getRegisterPage = (req, res) => {
+const getRegisterPage = (_req, res) => {
   res.render("pages/auth/register");
 };
 

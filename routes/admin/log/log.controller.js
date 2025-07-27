@@ -1,10 +1,7 @@
 const Excel = require("exceljs");
 const { db } = require("../../../db/db");
-const { log, LOG_LEVELS } = require("../../../helpers/log");
-const UAParser = require("ua-parser-js");
-const { getClientIP } = require("../../../helpers/getClientIP");
 
-const getLogPage = async (req, res) => {
+const getLogPage = async (_req, res) => {
   try {
     const [allLogs] = await db.query("SELECT * FROM activity_logs");
 
@@ -16,7 +13,7 @@ const getLogPage = async (req, res) => {
   }
 };
 
-const downloadLogData = async (req, res) => {
+const downloadLogData = async (_req, res) => {
   try {
     const [logs] = await db.query(`
             SELECT id, user_id, activity, ip_address, device_type, browser, platform, created_at

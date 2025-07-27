@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const { log, LOG_LEVELS } = require("../../../helpers/log");
 const { getClientIP } = require("../../../helpers/getClientIP");
 const { getUserAgent } = require("../../../helpers/getUserAgent");
-const fs = require("fs");
+const fs = require("node:fs");
 
 const getUserOverviewPage = async (req, res) => {
   try {
@@ -166,12 +166,14 @@ const uploadNewUser = async (req, res) => {
       }
 
       if (rowValues.length >= 5) {
-        const [name, email, full_name, role, password] = rowValues.map((value) => {
-          if (value && typeof value === "object" && value.text) {
-            return value.text;
+        const [name, email, full_name, role, password] = rowValues.map(
+          (value) => {
+            if (value && typeof value === "object" && value.text) {
+              return value.text;
+            }
+            return value;
           }
-          return value;
-        });
+        );
 
         if (name && email && full_name && role && password) {
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -212,7 +214,15 @@ const uploadNewUser = async (req, res) => {
       const hashedPassword = await bcrypt.hash(user.password, 10);
       await db.query(
         "INSERT INTO users (username, email, full_name, role, password_hash, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        [user.username, user.email, user.full_name, user.role, hashedPassword, now, now]
+        [
+          user.username,
+          user.email,
+          user.full_name,
+          user.role,
+          hashedPassword,
+          now,
+          now,
+        ]
       );
 
       await log(
@@ -344,10 +354,10 @@ const downloadUserTemplate = async (req, res) => {
     const [roleResults] = await db.query(
       "SELECT DISTINCT role FROM users ORDER BY role"
     );
-    const availableRoles = roleResults.map(row => row.role);
-    
+    const availableRoles = roleResults.map((row) => row.role);
+
     // Jika tidak ada role di database, gunakan default dari enum
-    const defaultRoles = ['Admin', 'Manager', 'User'];
+    const defaultRoles = ["Admin", "Manager", "User"];
     const roles = availableRoles.length > 0 ? availableRoles : defaultRoles;
 
     // Buat workbook dan worksheet baru
@@ -360,7 +370,7 @@ const downloadUserTemplate = async (req, res) => {
       { header: "Email", key: "email", width: 35 },
       { header: "Nama Lengkap", key: "full_name", width: 35 },
       { header: "Role", key: "role", width: 20 },
-      { header: "Password", key: "password", width: 20 }
+      { header: "Password", key: "password", width: 20 },
     ];
 
     // Style untuk header
@@ -368,7 +378,7 @@ const downloadUserTemplate = async (req, res) => {
     worksheet.getRow(1).fill = {
       type: "pattern",
       pattern: "solid",
-      fgColor: { argb: "FFE0E0E0" }
+      fgColor: { argb: "FFE0E0E0" },
     };
 
     // Tambahkan contoh data berdasarkan role yang tersedia
@@ -377,18 +387,19 @@ const downloadUserTemplate = async (req, res) => {
       email: `user${index + 1}@example.com`,
       full_name: `Contoh User ${index + 1}`,
       role: role,
-      password: "Password123!"
+      password: "Password123!",
     }));
 
     worksheet.addRows(exampleData);
 
     // Tambahkan komentar untuk kolom role
-    const roleCell = worksheet.getCell('D1');
-    roleCell.note = `Role yang tersedia: ${roles.join(', ')}`;
+    const roleCell = worksheet.getCell("D1");
+    roleCell.note = `Role yang tersedia: ${roles.join(", ")}`;
 
     // Tambahkan komentar untuk kolom password
-    const passwordCell = worksheet.getCell('E1');
-    passwordCell.note = 'Password minimal 8 karakter, disarankan menggunakan kombinasi huruf, angka, dan simbol';
+    const passwordCell = worksheet.getCell("E1");
+    passwordCell.note =
+      "Password minimal 8 karakter, disarankan menggunakan kombinasi huruf, angka, dan simbol";
 
     // Set response header
     res.setHeader(

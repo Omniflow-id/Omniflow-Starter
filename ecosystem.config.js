@@ -1,5 +1,3 @@
-const { max } = require("moment");
-
 module.exports = {
   apps: [
     {

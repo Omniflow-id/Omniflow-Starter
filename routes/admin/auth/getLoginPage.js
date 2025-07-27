@@ -1,4 +1,4 @@
-const getLoginPage = (req, res) => {
+const getLoginPage = (_req, res) => {
   res.render("pages/admin/auth/login");
 };
 

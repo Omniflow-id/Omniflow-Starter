@@ -1,12 +1,12 @@
-const fs = require('fs');
-const path = require('path');
-const { db } = require('../db/db');
-const config = require('../config');
+const fs = require("node:fs");
+const path = require("node:path");
+const { db } = require("../db/db");
+const config = require("../config");
 
 const LOG_LEVELS = {
-  INFO: 'INFO',
-  ERROR: 'ERROR',
-  WARN: 'WARN',
+  INFO: "INFO",
+  ERROR: "ERROR",
+  WARN: "WARN",
 };
 
 const getTimestamp = () => {
@@ -17,17 +17,29 @@ const getTimestamp = () => {
   const hours = now.getHours();
   const minutes = now.getMinutes();
   const seconds = now.getSeconds();
-  return `${day < 10 ? '0' : ''}${day}-${month < 10 ? '0' : ''}${month}-${year} ${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  return `${day < 10 ? "0" : ""}${day}-${month < 10 ? "0" : ""}${month}-${year} ${hours < 10 ? "0" : ""}${hours}:${minutes < 10 ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
 };
 
-async function log(message, level = LOG_LEVELS.INFO, user_id = null, userAgentData = {}, ip = '') {
+async function log(
+  message,
+  level = LOG_LEVELS.INFO,
+  user_id = null,
+  userAgentData = {},
+  ip = ""
+) {
   const timestamp = getTimestamp();
-  const { deviceType = 'Unknown', browser = 'Unknown', platform = 'Unknown' } = userAgentData;
-  
-  let username = 'Unknown User';
+  const {
+    deviceType = "Unknown",
+    browser = "Unknown",
+    platform = "Unknown",
+  } = userAgentData;
+
+  let username = "Unknown User";
   if (user_id) {
     try {
-      const [rows] = await db.query("SELECT username FROM users WHERE id = ?", [user_id]);
+      const [rows] = await db.query("SELECT username FROM users WHERE id = ?", [
+        user_id,
+      ]);
       if (rows.length > 0) {
         username = rows[0].username;
       }
@@ -44,7 +56,7 @@ async function log(message, level = LOG_LEVELS.INFO, user_id = null, userAgentDa
   if (!fs.existsSync(path.dirname(logFilePath))) {
     fs.mkdirSync(path.dirname(logFilePath), { recursive: true });
   }
-  fs.appendFileSync(logFilePath, detailedLogMessage + '\n', 'utf8');
+  fs.appendFileSync(logFilePath, `${detailedLogMessage}\n`, "utf8");
 
   try {
     await db.query(

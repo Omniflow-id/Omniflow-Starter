@@ -2,7 +2,7 @@ const baseConfig = require("./index");
 
 module.exports = {
   ...baseConfig,
-  
+
   // Production specific overrides
   app: {
     ...baseConfig.app,

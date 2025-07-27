@@ -1,12 +1,12 @@
-const getAdminPage = (req, res) => {
+const getAdminPage = (_req, res) => {
   res.render("pages/admin/index/index");
 };
 
-const getOverviewPage = (req, res) => {
+const getOverviewPage = (_req, res) => {
   res.render("pages/admin/index/overview");
 };
 
-const getSubModulePage = (req, res) => {
+const getSubModulePage = (_req, res) => {
   res.render("pages/admin/index/subModule");
 };
 

@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node --no-deprecation server.js",
     "dev": "nodemon --exec \"node --no-deprecation\" server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "biome check --write .",
+    "lint": "biome lint ."
   },
   "keywords": [
     "HRIS"
@@ -38,5 +40,8 @@
     "nunjucks": "^3.2.4",
     "nunjucks-date-filter": "^0.1.1",
     "ua-parser-js": "^2.0.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.1.2"
   }
 }
