@@ -1,7 +1,7 @@
 {
-  "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["mcp-tools", "sequential-thinking", "filesystem"],
   "permissions": {
-    "allow": ["Bash(git add:*)"]
-  }
+    "allow": ["Bash(git add:*)", "mcp__sequential-thinking__sequentialthinking"]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": ["mcp-tools", "sequential-thinking", "filesystem"]
 }

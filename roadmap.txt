@@ -11,6 +11,7 @@ Omniflow Starter
   - Comprehensive MIME type detection and filtering
   - Development logging with algorithm detection
 
+Response Compression
 Backup/restore system
 Audit trail - Activity logs ada tapi belum comprehensive
 Data archiving - Tidak ada sistem archive data lama
