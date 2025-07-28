@@ -11,6 +11,10 @@ const flash = require("connect-flash");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const { csrfGlobalMiddleware } = require("@middlewares/csrfProtection");
+const {
+  compressionMiddleware,
+  compressionLogger,
+} = require("@middlewares/compressionMiddleware");
 const { marked } = require("marked");
 const config = require("./config");
 const { generalLimiter } = require("@middlewares/rateLimiter");
@@ -22,6 +26,12 @@ const {
 
 const app = express();
 app.use(helmet(config.security.helmetConfig));
+
+// Compression - apply early for better performance
+if (config.compression.enabled) {
+  app.use(compressionMiddleware);
+  app.use(compressionLogger);
+}
 
 // Bot protection - apply first for maximum security
 app.use(suspiciousActivityLogger);

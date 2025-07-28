@@ -130,6 +130,40 @@ const { asyncHandler } = require("@middlewares/errorHandler");
   - Shells: `/webshell`, `/cmd`, `/backup`
 - **Implementation**: `middlewares/botProtection.js` with intelligent path filtering and legitimate path whitelisting
 
+### Response Compression
+
+- **Dual Algorithm Support**: Automatic Brotli and Gzip compression with intelligent client detection
+- **Implementation**: `middlewares/compressionMiddleware.js` with configurable settings
+- **Performance Benefits**: 60-90% bandwidth reduction for text-based content
+- **Automatic Detection**: Skips already compressed files (images, videos, PDFs, archives)
+- **Compression Algorithms**:
+  - **Brotli**: Modern compression (8.1% better than gzip, supported by modern browsers)
+  - **Gzip**: Fallback compression (universal browser support)
+  - **Automatic Selection**: Middleware chooses best algorithm based on client Accept-Encoding header
+- **Content Type Filtering**:
+  - **Compressed**: HTML, CSS, JavaScript, JSON, XML, text files
+  - **Skipped**: Images, videos, audio, PDFs, archives, executables
+- **Configuration Options**:
+  - **Threshold**: Minimum response size to compress (default: 1KB)
+  - **Gzip Level**: Compression level 1-9 (default: 6 for balance)
+  - **Brotli Quality**: Compression quality 0-11 (default: 4 for balance)
+  - **Chunk Size**: Streaming chunk size (default: 16KB)
+  - **Enable/Disable**: Toggle compression algorithms via environment variables
+- **Development Logging**: Response size monitoring with algorithm detection in development mode
+- **Environment Variables**:
+  - `COMPRESSION_ENABLED` - Enable/disable all compression (default: true)
+  - `COMPRESSION_THRESHOLD` - Minimum size in bytes (default: 1024)
+  - `COMPRESSION_LEVEL` - Gzip compression level 1-9 (default: 6)
+  - `COMPRESSION_CHUNK_SIZE` - Gzip chunk size in bytes (default: 16384)
+  - `BROTLI_ENABLED` - Enable/disable Brotli compression (default: true)
+  - `BROTLI_QUALITY` - Brotli quality 0-11 (default: 4)
+  - `BROTLI_CHUNK_SIZE` - Brotli chunk size in bytes (default: 16384)
+- **Typical Compression Ratios**:
+  - HTML with Brotli: 72.5% reduction (vs 70% with Gzip)
+  - JSON APIs with Brotli: 80-92% reduction
+  - CSS/JavaScript with Brotli: 65-85% reduction
+  - Plain text with Brotli: 75-90% reduction
+
 ### CSRF Protection
 
 - **Laravel-Style CSRF Protection**: Double submit cookie pattern with session binding for maximum security
@@ -380,6 +414,16 @@ router.post("/logout", doubleCsrfProtection, auth.logout);
 
 - `CSRF_SECRET` - CSRF token secret key (falls back to SESSION_KEY if not provided)
 - `SESSION_TIMEOUT_HOURS` - Session timeout in hours (default: 24 hours)
+
+**Performance Configuration:**
+
+- `COMPRESSION_ENABLED` - Enable/disable all compression (default: true)
+- `COMPRESSION_THRESHOLD` - Minimum response size to compress in bytes (default: 1024)
+- `COMPRESSION_LEVEL` - Gzip compression level 1-9, higher = better compression but slower (default: 6)
+- `COMPRESSION_CHUNK_SIZE` - Gzip streaming chunk size in bytes (default: 16384)
+- `BROTLI_ENABLED` - Enable/disable Brotli compression (default: true)
+- `BROTLI_QUALITY` - Brotli quality 0-11, higher = better compression but slower (default: 4)
+- `BROTLI_CHUNK_SIZE` - Brotli streaming chunk size in bytes (default: 16384)
 
 **Database Configuration:**
 

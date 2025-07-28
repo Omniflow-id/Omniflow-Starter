@@ -111,6 +111,18 @@ const config = {
       path: "/",
     },
   },
+
+  compression: {
+    threshold: parseInt(process.env.COMPRESSION_THRESHOLD) || 1024, // Only compress if >= 1KB
+    level: parseInt(process.env.COMPRESSION_LEVEL) || 6, // Balance between compression ratio and speed (1-9)
+    chunkSize: parseInt(process.env.COMPRESSION_CHUNK_SIZE) || 16 * 1024, // 16KB chunks
+    enabled: process.env.COMPRESSION_ENABLED !== "false", // Default: enabled
+    brotli: {
+      enabled: process.env.BROTLI_ENABLED !== "false", // Default: enabled
+      quality: parseInt(process.env.BROTLI_QUALITY) || 4, // Brotli quality 0-11 (4 = balanced)
+      chunkSize: parseInt(process.env.BROTLI_CHUNK_SIZE) || 16 * 1024, // 16KB chunks
+    },
+  },
 };
 
 module.exports = config;
