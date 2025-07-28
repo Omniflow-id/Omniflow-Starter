@@ -57,6 +57,14 @@ const centralizedErrorHandler = async (err, req, res, _next) => {
     isOperational = true;
   }
 
+  // Handle CSRF token validation errors
+  if (err.code === "EBADCSRFTOKEN" || err.message === "invalid csrf token") {
+    statusCode = 403;
+    message =
+      "CSRF token validation failed. Please refresh the page and try again.";
+    isOperational = true;
+  }
+
   if (err.code === "ER_DUP_ENTRY") {
     statusCode = 409;
     message = "Duplicate entry found";
@@ -71,14 +79,22 @@ const centralizedErrorHandler = async (err, req, res, _next) => {
 
   // Log error based on severity
   const logLevel = statusCode >= 500 ? LOG_LEVELS.ERROR : LOG_LEVELS.WARN;
-  const logMessage = `${req.method} ${
-    req.originalUrl
-  } - ${statusCode} - ${message}${err.stack ? ` - Stack: ${err.stack}` : ""}`;
+
+  // Clean logging for CSRF errors (no stack trace needed)
+  const isCsrfError =
+    err.code === "EBADCSRFTOKEN" || err.message === "invalid csrf token";
+  const logMessage = `${req.method} ${req.originalUrl} - ${statusCode} - ${message}${
+    !isCsrfError && err.stack ? ` - Stack: ${err.stack}` : ""
+  }`;
 
   await log(logMessage, logLevel, userId, userAgent, clientIP);
 
-  // Don't log stack trace in production for security
-  if (process.env.NODE_ENV === "production" && !isOperational) {
+  // Don't log stack trace for CSRF errors (too verbose) and in production for security
+  if (isCsrfError) {
+    console.log(
+      `[CSRF] ${req.method} ${req.originalUrl} - Blocked request without valid CSRF token`
+    );
+  } else if (process.env.NODE_ENV === "production" && !isOperational) {
     console.error("Error:", err);
   } else {
     console.error("Error stack:", err.stack);

@@ -67,6 +67,7 @@
                   <div class="card-body">
                     {% include "components/alert_flash_message.njk" %}
                     <form id="login-form" action="/admin/login" method="post">
+                      {{ csrfField() | safe }}
                       <div class="form-floating mb-3">
                         <input
                           class="form-control"

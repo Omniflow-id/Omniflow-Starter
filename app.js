@@ -9,6 +9,8 @@ const bodyParser = require("body-parser");
 const session = require("express-session");
 const flash = require("connect-flash");
 const helmet = require("helmet");
+const cookieParser = require("cookie-parser");
+const { csrfGlobalMiddleware } = require("@middlewares/csrfProtection");
 const { marked } = require("marked");
 const config = require("./config");
 const { generalLimiter } = require("@middlewares/rateLimiter");
@@ -82,7 +84,11 @@ env.addFilter("formatTime", (date, format) => {
 app.set("view engine", "njk");
 app.use(morgan("combined"));
 app.use(session(config.session));
+app.use(cookieParser());
 app.use(flash());
+
+// Global CSRF middleware - Laravel-style implementation
+app.use(csrfGlobalMiddleware);
 app.use((req, res, next) => {
   res.locals.user = req.session.user;
   res.locals.url = req.originalUrl;

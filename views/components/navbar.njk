@@ -29,7 +29,7 @@
         class="dropdown-menu dropdown-menu-end"
         aria-labelledby="navbarDropdown"
       >
-        <li><form action="/admin/logout" method="post"><button class="dropdown-item" type="submit">Keluar</button></form></li>
+        <li><form action="/admin/logout" method="post">{{ csrfField() | safe }}<button class="dropdown-item" type="submit">Keluar</button></form></li>
       </ul>
     </li>
   </ul>

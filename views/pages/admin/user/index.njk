@@ -109,6 +109,7 @@
         action="/user/upload"
       >
         <div class="modal-body">
+          {{ csrfField() | safe }}
           <div class="mb-3">
             <label for="fileUpload" class="form-label"
               >Pilih file untuk diupload:</label
@@ -161,6 +162,7 @@
       </div>
       <form id="tambahForm" method="POST" action="/user/create">
         <div class="modal-body">
+          {{ csrfField() | safe }}
           <div class="mb-3">
             <label for="username" class="form-label">Nama:</label>
             <input

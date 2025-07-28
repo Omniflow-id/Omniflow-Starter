@@ -13,7 +13,7 @@ const config = {
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
+      maxAge: (process.env.SESSION_TIMEOUT_HOURS || 24) * 60 * 60 * 1000, // Default 24 hours
       secure: process.env.NODE_ENV === "production",
     },
   },
@@ -98,6 +98,17 @@ const config = {
       permittedCrossDomainPolicies: { policy: "none" },
       referrerPolicy: { policy: "no-referrer" },
       xssFilter: true,
+    },
+  },
+
+  csrf: {
+    secret: process.env.CSRF_SECRET,
+    cookieName: "csrf-token",
+    cookieOptions: {
+      httpOnly: true,
+      sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+      secure: process.env.NODE_ENV === "production",
+      path: "/",
     },
   },
 };

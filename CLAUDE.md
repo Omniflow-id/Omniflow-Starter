@@ -130,6 +130,43 @@ const { asyncHandler } = require("@middlewares/errorHandler");
   - Shells: `/webshell`, `/cmd`, `/backup`
 - **Implementation**: `middlewares/botProtection.js` with intelligent path filtering and legitimate path whitelisting
 
+### CSRF Protection
+
+- **Laravel-Style CSRF Protection**: Double submit cookie pattern with session binding for maximum security
+- **Implementation**: `middlewares/csrfProtection.js` with centralized configuration from `config/index.js`
+- **Global Token Generation**: CSRF tokens automatically available in all templates via global middleware
+- **Template Integration**: Use `{{ csrfField() | safe }}` helper function in all POST forms (Laravel @csrf equivalent)
+- **Route Protection**: `doubleCsrfProtection` middleware applied to all protected POST routes
+- **Environment-Aware Configuration**:
+  - **Development**: `sameSite: 'lax'`, `secure: false` for HTTP testing
+  - **Production**: `sameSite: 'strict'`, `secure: true` for HTTPS security
+- **Error Handling**: Automatic CSRF token validation error handling with user-friendly 403 messages
+- **Security Features**:
+  - **Double Protection**: Cookie + form token must match
+  - **Session Binding**: Tokens tied to specific user sessions
+  - **HTTP-only Cookies**: Prevents XSS token theft
+  - **Cross-origin Protection**: Strict SameSite policy in production
+- **Template Usage Examples**:
+  ```html
+  <!-- Login form -->
+  <form action="/admin/login" method="post">
+    {{ csrfField() | safe }}
+    <input type="email" name="email" required>
+    <input type="password" name="password" required>
+    <button type="submit">Login</button>
+  </form>
+  
+  <!-- Alternative using global variables -->
+  <form action="/protected" method="post">
+    <input type="hidden" name="_csrf" value="{{ csrf }}">
+    <!-- form fields -->
+  </form>
+  ```
+- **Configuration Variables**:
+  - `CSRF_SECRET` - Custom CSRF secret (falls back to SESSION_KEY)
+  - Cookie name: `csrf-token`
+  - Token extraction from: `req.body._csrf` or `req.headers['x-csrf-token']`
+
 ### File Processing & Storage
 
 - **Excel Operations**: Dynamic template generation using ExcelJS (no static templates)
@@ -275,6 +312,27 @@ const uploadFile = asyncHandler(async (req, res) => {
 });
 ```
 
+**CSRF Error Handling:**
+The centralized error handler automatically catches CSRF token validation errors:
+```js
+// Automatic handling in centralizedErrorHandler.js
+if (err.code === "EBADCSRFTOKEN") {
+  statusCode = 403;
+  message = "CSRF token validation failed. Please refresh the page and try again.";
+  isOperational = true;
+}
+```
+
+**CSRF Protected Routes:**
+```js
+const { doubleCsrfProtection } = require("@middlewares/csrfProtection");
+
+// Apply CSRF protection to POST routes
+router.post("/login", authLimiter, doubleCsrfProtection, auth.login);
+router.post("/user/create", doubleCsrfProtection, user.createNewUser);
+router.post("/logout", doubleCsrfProtection, auth.logout);
+```
+
 ### Frontend Architecture
 
 - Nunjucks templates with layout inheritance
@@ -291,6 +349,8 @@ const uploadFile = asyncHandler(async (req, res) => {
   - `user` - Current logged-in user (via middleware)
   - `url` - Current request URL for navigation highlighting
   - `success_msg`/`error_msg` - Flash messages for user feedback
+  - `csrf`/`csrfToken` - CSRF token for form protection
+  - `csrfField()` - Helper function to generate CSRF hidden input field
 
 - **Custom Filters**:
   - `formatRupiah(amount)` - Formats numbers as Indonesian Rupiah currency
@@ -315,6 +375,11 @@ const uploadFile = asyncHandler(async (req, res) => {
 - `SESSION_KEY` - Session encryption key
 - `APP_URL` - Application URL (default: "http://localhost")
 - `PORT` - Server port (default: 1234)
+
+**Security Configuration:**
+
+- `CSRF_SECRET` - CSRF token secret key (falls back to SESSION_KEY if not provided)
+- `SESSION_TIMEOUT_HOURS` - Session timeout in hours (default: 24 hours)
 
 **Database Configuration:**
 
