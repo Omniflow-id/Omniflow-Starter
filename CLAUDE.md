@@ -395,61 +395,121 @@ router.post("/logout", doubleCsrfProtection, auth.logout);
 
 ## Configuration System
 
-**Centralized Configuration**: All configuration managed through `config/` directory with environment-specific overrides.
+**Centralized Configuration**: All configuration managed through `config/` directory with environment-specific overrides and feature-based validation.
 
 ### Configuration Files
 
 - `config/index.js` - Base configuration with all environment variables
 - `config/development.js` - Development environment overrides (debug enabled, seeds allowed)
 - `config/production.js` - Production environment overrides (secure cookies, no seeds)
+- `config/validation.js` - Environment variable validation with feature-based approach
 
-### Required `.env` variables:
+### Environment Variable Validation
 
-- `NODE_ENV` - Environment (development/production)
+**Feature-Based Validation System**: The application uses a batteries-included approach where optional features only require their environment variables when explicitly enabled.
+
+**Core Required Variables** (always validated):
 - `SESSION_KEY` - Session encryption key
-- `APP_URL` - Application URL (default: "http://localhost")
-- `PORT` - Server port (default: 1234)
-
-**Security Configuration:**
-
-- `CSRF_SECRET` - CSRF token secret key (falls back to SESSION_KEY if not provided)
-- `SESSION_TIMEOUT_HOURS` - Session timeout in hours (default: 24 hours)
-
-**Performance Configuration:**
-
-- `COMPRESSION_ENABLED` - Enable/disable all compression (default: true)
-- `COMPRESSION_THRESHOLD` - Minimum response size to compress in bytes (default: 1024)
-- `COMPRESSION_LEVEL` - Gzip compression level 1-9, higher = better compression but slower (default: 6)
-- `COMPRESSION_CHUNK_SIZE` - Gzip streaming chunk size in bytes (default: 16384)
-- `BROTLI_ENABLED` - Enable/disable Brotli compression (default: true)
-- `BROTLI_QUALITY` - Brotli quality 0-11, higher = better compression but slower (default: 4)
-- `BROTLI_CHUNK_SIZE` - Brotli streaming chunk size in bytes (default: 16384)
-
-**Database Configuration:**
-
 - `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` - MySQL connection
 
-**OpenTelemetry Configuration:**
+**Basic Configuration Variables** (have defaults):
+- `NODE_ENV` - Environment (default: "development")
+- `APP_URL` - Application URL (default: "http://localhost")
+- `PORT` - Server port (default: 1234)
+- `CSRF_SECRET` - CSRF token secret (falls back to SESSION_KEY)
+- `SESSION_TIMEOUT_HOURS` - Session timeout in hours (default: 24)
 
+### Optional Features (Batteries-Included)
+
+Each optional feature is controlled by an enable flag and only validates its variables when enabled:
+
+#### Redis Caching (`REDIS_ENABLED=true`)
+**Required when enabled:**
+- `REDIS_HOST` - Redis server host
+- `REDIS_PORT` - Redis server port
+
+**Optional:**
+- `REDIS_PASSWORD` - Redis authentication password
+- `REDIS_DB` - Redis database number (default: 0)
+- `REDIS_USERNAME` - Redis ACL username
+
+#### Email Notifications (`EMAIL_ENABLED=true`)
+**Required when enabled:**
+- `SMTP_HOST` - SMTP server hostname
+- `SMTP_PORT` - SMTP server port
+- `SMTP_USER` - SMTP authentication username
+- `SMTP_PASSWORD` - SMTP authentication password
+
+**Optional:**
+- `SMTP_FROM_NAME` - Default sender name
+- `SMTP_FROM_EMAIL` - Default sender email address
+
+#### S3 File Storage (`S3_ENABLED=true`)
+**Required when enabled:**
+- `S3_ENDPOINT_URL` - S3-compatible endpoint URL
+- `S3_ACCESS_KEY` - S3 access key ID
+- `S3_SECRET_KEY` - S3 secret access key
+- `S3_BUCKET_NAME` - S3 bucket name
+
+**Optional:**
+- `S3_FOLDER_NAME` - S3 folder/prefix for file organization
+- `S3_REGION` - S3 region (if applicable)
+
+#### OpenTelemetry Monitoring (`MONITORING_ENABLED=true`)
+**Required when enabled:**
+- `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` - OTLP traces endpoint URL
+
+**Optional:**
 - `OTEL_SERVICE_NAME` - Service name (default: "omniflow-starter")
 - `OTEL_SERVICE_VERSION` - Service version (default: "1.0.0")
 - `OTEL_METRICS_PORT` - Prometheus metrics port (default: 9091)
 - `OTEL_METRICS_ENDPOINT` - Metrics endpoint path (default: "/metrics")
-- `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` - OTLP traces endpoint (default: "http://localhost:4318/v1/traces")
 
-**S3 Configuration (for future file storage):**
+### Built-in Features (Always Available)
 
-- `S3_ENDPOINT_URL` - S3 endpoint URL
-- `S3_ACCESS_KEY` - S3 access key
-- `S3_SECRET_KEY` - S3 secret key
-- `S3_BUCKET_NAME` - S3 bucket name
-- `S3_FOLDER_NAME` - S3 folder/prefix for file organization
+**Response Compression Configuration:**
+- `COMPRESSION_ENABLED` - Enable/disable all compression (default: true)
+- `COMPRESSION_THRESHOLD` - Minimum response size to compress in bytes (default: 1024)
+- `COMPRESSION_LEVEL` - Gzip compression level 1-9 (default: 6)
+- `COMPRESSION_CHUNK_SIZE` - Gzip streaming chunk size in bytes (default: 16384)
+- `BROTLI_ENABLED` - Enable/disable Brotli compression (default: true)
+- `BROTLI_QUALITY` - Brotli quality 0-11 (default: 4)
+- `BROTLI_CHUNK_SIZE` - Brotli streaming chunk size in bytes (default: 16384)
 
-**Optional Configuration:**
-
+**Logging Configuration:**
 - `TIMEZONE` - Application timezone (default: "Asia/Jakarta")
 - `LOG_LEVEL` - Logging level (default: "info")
 - `LOG_FILE` - Log file path (default: "./logs/app.log")
+
+### Validation Behavior
+
+**Startup Validation**: The application validates all environment variables at startup via `config/validation.js`:
+
+1. **Core variables** are always checked and application fails if missing
+2. **Feature variables** are only checked if the feature is enabled (`FEATURE_ENABLED=true`)
+3. **Optional variables** with defaults never cause startup failure
+4. **Helpful error messages** guide users to disable unused features or check their `.env` file
+
+**Example validation output:**
+```
+🔧 [CONFIG] Enabled optional features:
+   • Redis caching (REDIS_ENABLED=true)
+   • Email notifications (EMAIL_ENABLED=true)
+
+✅ [CONFIG] Validation passed (2 optional features enabled)
+```
+
+**Error example:**
+```
+❌ [CONFIG] Missing required environment variables:
+   REDIS_HOST (required for Redis caching)
+   SMTP_HOST (required for Email notifications)
+
+💡 [CONFIG] Tips:
+   • Check your .env file (example: .env.example)
+   • Disable unused features by setting FEATURE_ENABLED=false
+   • Only enabled features require their variables
+```
 
 ## Code Quality
 

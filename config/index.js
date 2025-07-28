@@ -1,5 +1,9 @@
 require("dotenv").config();
 
+// Validate environment variables before loading config
+const { validateEnvVariables } = require("./validation");
+validateEnvVariables();
+
 const config = {
   app: {
     name: "Omniflow Starter",
