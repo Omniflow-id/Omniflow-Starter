@@ -94,22 +94,25 @@ const centralizedErrorHandler = async (err, req, res, _next) => {
     console.log(
       `[CSRF] ${req.method} ${req.originalUrl} - Blocked request without valid CSRF token`
     );
-  } else if (process.env.NODE_ENV === "production" && !isOperational) {
-    console.error("Error:", err);
-  } else {
+  } else if (process.env.NODE_ENV === "development") {
     console.error("Error stack:", err.stack);
+  } else {
+    console.error("Error:", err.message);
   }
 
   // Handle different response types
-  if (req.xhr || req.headers.accept?.includes("application/json")) {
+  const isApiRequest =
+    req.xhr ||
+    req.headers.accept?.includes("application/json") ||
+    req.originalUrl.startsWith("/api/");
+
+  if (isApiRequest) {
     // API/AJAX request - return JSON
     return res.status(statusCode).json({
       success: false,
-      error: {
-        message: isOperational ? message : "Something went wrong",
-        statusCode,
-        ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
-      },
+      message: isOperational ? message : "Something went wrong",
+      data: null,
+      ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
     });
   }
 

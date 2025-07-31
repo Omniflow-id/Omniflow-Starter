@@ -128,6 +128,13 @@ const config = {
       chunkSize: parseInt(process.env.BROTLI_CHUNK_SIZE) || 16 * 1024, // 16KB chunks
     },
   },
+
+  jwt: {
+    enabled: process.env.JWT_ENABLED === "true",
+    secret: process.env.JWT_SECRET || process.env.SESSION_KEY,
+    expiresIn: process.env.JWT_EXPIRES_IN || "24h",
+    refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "7d",
+  },
 };
 
 module.exports = config;

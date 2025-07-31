@@ -49,6 +49,12 @@ const validateEnvVariables = () => {
       ],
       description: "OpenTelemetry monitoring",
     },
+    jwt: {
+      enableFlag: "JWT_ENABLED",
+      required: ["JWT_SECRET"],
+      optional: ["JWT_EXPIRES_IN", "JWT_REFRESH_EXPIRES_IN"],
+      description: "JWT authentication",
+    },
   };
 
   // Variables with defaults (always optional)
@@ -58,6 +64,9 @@ const validateEnvVariables = () => {
     "PORT",
     "SESSION_TIMEOUT_HOURS",
     "CSRF_SECRET", // falls back to SESSION_KEY
+    "JWT_SECRET", // falls back to SESSION_KEY
+    "JWT_EXPIRES_IN",
+    "JWT_REFRESH_EXPIRES_IN",
     "COMPRESSION_ENABLED",
     "COMPRESSION_THRESHOLD",
     "COMPRESSION_LEVEL",
@@ -88,6 +97,12 @@ const validateEnvVariables = () => {
   // CSRF_SECRET validation - must exist if SESSION_KEY doesn't exist
   if (!process.env.CSRF_SECRET && !process.env.SESSION_KEY) {
     missing.push("CSRF_SECRET (or SESSION_KEY as fallback)");
+  }
+
+  // JWT_SECRET validation - must exist if SESSION_KEY doesn't exist and JWT is enabled
+  const isJwtEnabled = process.env.JWT_ENABLED === "true";
+  if (isJwtEnabled && !process.env.JWT_SECRET && !process.env.SESSION_KEY) {
+    missing.push("JWT_SECRET (or SESSION_KEY as fallback)");
   }
 
   // Check feature-based validation
