@@ -61,12 +61,21 @@ const { asyncHandler } = require("@middlewares/errorHandler");
 
 ### Database Layer
 
-- MySQL with connection pooling (`db/db.js`) using centralized config
-- Main tables: `users` (with full_name field) and `activity_logs`
+- **MySQL with optimized connection pooling** (`db/db.js`) using centralized config
+- **Connection Pool Management**: Environment-aware pool sizing and monitoring
+- **Main tables**: `users` (with full_name field) and `activity_logs`
 - **Knex.js integration**: Database migrations and seeding with proper tracking
-- Migrations located in `db/migrations/` with timestamp-based naming
-- Seeders located in `db/seeders/` for development data
-- Default users: admin@omniflow.id/Admin12345., manager@omniflow.id/Manager12345., user@omniflow.id/User12345.
+- **Migrations**: Located in `db/migrations/` with timestamp-based naming
+- **Seeders**: Located in `db/seeders/` for development data
+- **Default users**: admin@omniflow.id/Admin12345., manager@omniflow.id/Manager12345., user@omniflow.id/User12345.
+
+#### Connection Pool Optimization
+- **Environment-aware sizing**: 10 connections (dev) vs 50 connections (prod)
+- **Timeout management**: 60s acquire timeout, 60s query timeout
+- **Health monitoring**: Connection lifecycle logging and error tracking
+- **Auto-reconnection**: Built-in reconnection with configurable retry logic
+- **Pool statistics**: Real-time connection metrics via `getPoolStats()`
+- **Graceful shutdown**: Proper cleanup with `closePool()` function
 
 ### Authentication & Authorization
 
@@ -499,6 +508,11 @@ Each optional feature is controlled by an enable flag and only validates its var
 - `BROTLI_ENABLED` - Enable/disable Brotli compression (default: true)
 - `BROTLI_QUALITY` - Brotli quality 0-11 (default: 4)
 - `BROTLI_CHUNK_SIZE` - Brotli streaming chunk size in bytes (default: 16384)
+
+**Database Connection Pool:**
+- `DB_CONNECTION_LIMIT` - Max simultaneous connections (default: 10 dev, 50 prod)
+- `DB_ACQUIRE_TIMEOUT` - Connection acquire timeout in ms (default: 60000)
+- `DB_QUERY_TIMEOUT` - Query timeout in ms (default: 60000)
 
 **Logging Configuration:**
 - `TIMEZONE` - Application timezone (default: "Asia/Jakarta")

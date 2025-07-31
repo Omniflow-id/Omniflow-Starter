@@ -28,6 +28,31 @@ const config = {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
+    // Connection Pool Configuration
+    connectionLimit:
+      parseInt(process.env.DB_CONNECTION_LIMIT) ||
+      (process.env.NODE_ENV === "production" ? 50 : 10),
+    acquireTimeout: parseInt(process.env.DB_ACQUIRE_TIMEOUT) || 60000, // 60 seconds
+    timeout: parseInt(process.env.DB_QUERY_TIMEOUT) || 60000, // 60 seconds
+    reconnect: process.env.DB_RECONNECT !== "false", // Default: true
+    // Connection Retry Configuration
+    reconnectDelay: parseInt(process.env.DB_RECONNECT_DELAY) || 2000, // 2 seconds
+    maxReconnects: parseInt(process.env.DB_MAX_RECONNECTS) || 3,
+    // Connection Health Configuration
+    keepAliveInitialDelay: parseInt(process.env.DB_KEEPALIVE_DELAY) || 0,
+    enableKeepAlive: process.env.DB_ENABLE_KEEPALIVE !== "false", // Default: true
+    // Advanced Settings
+    multipleStatements: process.env.DB_MULTIPLE_STATEMENTS === "true", // Default: false for security
+    timezone: process.env.DB_TIMEZONE || process.env.TIMEZONE || "Asia/Jakarta",
+    charset: process.env.DB_CHARSET || "utf8mb4",
+    // SSL Configuration (optional)
+    ssl:
+      process.env.DB_SSL_ENABLED === "true"
+        ? {
+            rejectUnauthorized:
+              process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
+          }
+        : false,
   },
 
   knex: {

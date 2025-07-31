@@ -1,6 +1,6 @@
 const bcrypt = require("bcrypt");
 
-const { db } = require("@db/db");
+const { db, getPoolStats, testConnection } = require("@db/db");
 const { log, LOG_LEVELS } = require("@helpers/log");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
@@ -103,9 +103,59 @@ const protectedAPI = (req, res) => {
   });
 };
 
+const healthAPI = asyncHandler(async (_req, res) => {
+  const startTime = Date.now();
+
+  // Test database connection
+  const dbHealthy = await testConnection();
+  const dbResponseTime = Date.now() - startTime;
+
+  // Get connection pool statistics
+  const poolStats = getPoolStats();
+
+  // Calculate pool utilization
+  const poolUtilization =
+    poolStats.activeConnections / poolStats.totalConnections;
+
+  // Determine overall health status
+  const isHealthy = dbHealthy && poolUtilization < 0.8; // Consider unhealthy if >80% utilization
+
+  const healthData = {
+    status: isHealthy ? "healthy" : "degraded",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    database: {
+      status: dbHealthy ? "connected" : "disconnected",
+      responseTime: `${dbResponseTime}ms`,
+      pool: {
+        totalConnections: poolStats.totalConnections,
+        activeConnections: poolStats.activeConnections,
+        idleConnections: poolStats.idleConnections,
+        queuedRequests: poolStats.queuedRequests,
+        utilization: `${Math.round(poolUtilization * 100)}%`,
+        acquireTimeout: poolStats.acquireTimeout,
+        queryTimeout: poolStats.queryTimeout,
+      },
+    },
+    memory: {
+      used: `${Math.round(process.memoryUsage().heapUsed / 1024 / 1024)}MB`,
+      total: `${Math.round(process.memoryUsage().heapTotal / 1024 / 1024)}MB`,
+    },
+    environment: process.env.NODE_ENV,
+  };
+
+  // Return appropriate status code
+  res.status(isHealthy ? 200 : 503).json({
+    message: `System is ${healthData.status}`,
+    success: isHealthy,
+    data: healthData,
+  });
+});
+
 module.exports = {
   indexAPI,
   loginAPI,
   refreshTokenAPI,
   protectedAPI,
+  healthAPI,
 };

@@ -151,6 +151,23 @@
                     </button>
                 </div>
 
+                <!-- Health API -->
+                <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/25 animate-fade-in" style="animation-delay: 0.15s;">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-white flex items-center">
+                            💊 Health Check
+                            <span class="ml-2 px-2 py-1 bg-emerald-500/20 text-emerald-300 text-xs rounded-full">GET</span>
+                        </h3>
+                    </div>
+                    <p class="text-white/60 text-sm mb-4">/api/health - System & DB pool status</p>
+                    <button onclick="testHealthAPI()" class="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-medium py-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-emerald-500/40 active:scale-[0.98]">
+                        <span class="flex items-center justify-center">
+                            <span id="healthBtnText">Check Health</span>
+                            <div id="healthSpinner" class="hidden ml-2 w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        </span>
+                    </button>
+                </div>
+
                 <!-- Login API -->
                 <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/25 animate-fade-in" style="animation-delay: 0.2s;">
                     <div class="flex items-center justify-between mb-4">
@@ -537,6 +554,20 @@
             }
         }
 
+        async function testHealthAPI() {
+            try {
+                const { response, data } = await makeRequest(`${API_BASE}/health`, {}, 'healthBtn');
+                
+                if (response.ok) {
+                    showToast('Health Check OK', `System is ${data.data.status}`, 'success');
+                } else {
+                    showToast('Health Check Warning', `System is ${data.data.status}`, 'warning');
+                }
+            } catch (error) {
+                showToast('Health Check Failed', 'Could not reach the health endpoint', 'error');
+            }
+        }
+
         async function testLoginAPI() {
             const email = document.getElementById("loginEmail").value;
             const password = document.getElementById("loginPassword").value;
@@ -646,6 +677,7 @@
                     version: "v1.0.0",
                     endpoints: [
                         "GET /api/ - Index API",
+                        "GET /api/health - Health Check API",
                         "POST /api/login - Login API", 
                         "POST /api/refresh - Refresh Token API",
                         "GET /api/protected - Protected API"
