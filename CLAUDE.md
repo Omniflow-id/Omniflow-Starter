@@ -529,6 +529,54 @@ Each optional feature is controlled by an enable flag and only validates its var
 - **Auto-organize imports**: Enabled
 - **Ignored paths**: `node_modules/`, `public/`, `logs/`, `*.min.js`
 
+### Import Organization Standards
+
+**All JavaScript files in this project follow a consistent import organization pattern**:
+
+```js
+// === Side-effect imports (HARUS PALING ATAS) ===
+require("./instrument.js");        // OTEL, APM, error monitoring
+require("module-alias/register");  // Module alias registration
+require("dotenv").config();        // Environment variable loading
+
+// === Core modules ===
+const fs = require("node:fs");
+const path = require("node:path");
+const http = require("node:http");
+
+// === Third-party modules ===
+const express = require("express");
+const bcrypt = require("bcrypt");
+const morgan = require("morgan");
+// ... sorted alphabetically
+
+// === Absolute / alias imports ===
+const { db } = require("@db/db");
+const { log, LOG_LEVELS } = require("@helpers/log");
+const { csrfGlobalMiddleware } = require("@middlewares/csrfProtection");
+// ... sorted alphabetically
+
+// === Relative imports ===
+const config = require("./config");
+const routes = require("./routes");
+// ... sorted alphabetically
+```
+
+**Import Organization Rules**:
+1. **Side-effect imports** go first (instrument.js, module-alias, dotenv)
+2. **Core modules** (Node.js built-ins with `node:` prefix)
+3. **Third-party modules** (from node_modules, sorted alphabetically)
+4. **Absolute/alias imports** (using `@` aliases, sorted alphabetically)  
+5. **Relative imports** (using `./` or `../`, sorted alphabetically)
+6. **Visual separation** with comments and blank lines between each group
+7. **Alphabetical sorting** within each group for consistency
+
+**Benefits**:
+- ✅ **Consistency** across all files
+- ✅ **Readability** with clear visual separation
+- ✅ **Maintainability** easy to add/remove dependencies
+- ✅ **Team-ready** standardized structure
+
 ## Testing
 
 - No test framework currently configured
