@@ -1,6 +1,7 @@
+// === Side-effect imports (HARUS PALING ATAS) ===
 require("dotenv").config();
 
-// Validate environment variables before loading config
+// === Relative imports ===
 const { validateEnvVariables } = require("./validation");
 validateEnvVariables();
 

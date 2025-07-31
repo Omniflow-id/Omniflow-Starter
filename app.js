@@ -1,28 +1,37 @@
+// === Side-effect imports (HARUS PALING ATAS) ===
 require("./instrument.js");
+
+// === Core modules ===
 const path = require("node:path");
+
+// === Third-party modules ===
+const bodyParser = require("body-parser");
+const cookieParser = require("cookie-parser");
 const express = require("express");
+const flash = require("connect-flash");
+const helmet = require("helmet");
+const { marked } = require("marked");
+const moment = require("moment-timezone");
 const morgan = require("morgan");
 const nunjucks = require("nunjucks");
 const nunjucksDate = require("nunjucks-date-filter");
-const moment = require("moment-timezone");
-const bodyParser = require("body-parser");
 const session = require("express-session");
-const flash = require("connect-flash");
-const helmet = require("helmet");
-const cookieParser = require("cookie-parser");
-const { csrfGlobalMiddleware } = require("@middlewares/csrfProtection");
-const {
-  compressionMiddleware,
-  compressionLogger,
-} = require("@middlewares/compressionMiddleware");
-const { marked } = require("marked");
-const config = require("./config");
-const { generalLimiter } = require("@middlewares/rateLimiter");
+
+// === Absolute / alias imports ===
 const {
   botProtectionLimiter,
   bannedIPLimiter,
   suspiciousActivityLogger,
 } = require("@middlewares/botProtection");
+const {
+  compressionMiddleware,
+  compressionLogger,
+} = require("@middlewares/compressionMiddleware");
+const { csrfGlobalMiddleware } = require("@middlewares/csrfProtection");
+const { generalLimiter } = require("@middlewares/rateLimiter");
+
+// === Relative imports ===
+const config = require("./config");
 
 const app = express();
 app.use(helmet(config.security.helmetConfig));

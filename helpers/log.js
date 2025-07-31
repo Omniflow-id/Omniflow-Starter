@@ -1,5 +1,8 @@
+// === Core modules ===
 const fs = require("node:fs");
 const path = require("node:path");
+
+// === Relative imports ===
 const { db } = require("../db/db");
 const config = require("../config");
 

@@ -1,7 +1,10 @@
+// === Third-party modules ===
 const rateLimit = require("express-rate-limit");
-const { log, LOG_LEVELS } = require("@helpers/log");
+
+// === Absolute / alias imports ===
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
+const { log, LOG_LEVELS } = require("@helpers/log");
 
 // Basic rate limiter - general requests
 const generalLimiter = rateLimit({

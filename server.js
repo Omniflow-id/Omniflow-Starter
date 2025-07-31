@@ -1,6 +1,10 @@
+// === Side-effect imports (HARUS PALING ATAS) ===
 require("module-alias/register");
 
+// === Core modules ===
 const http = require("node:http");
+
+// === Relative imports ===
 const app = require("./app");
 const config = require("./config");
 

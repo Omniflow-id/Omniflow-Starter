@@ -1,4 +1,7 @@
+// === Third-party modules ===
 const mysql = require("mysql2/promise");
+
+// === Relative imports ===
 const config = require("../config");
 
 // Create the connection pool using centralized config

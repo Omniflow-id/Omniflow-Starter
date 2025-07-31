@@ -1,10 +1,15 @@
-const Excel = require("exceljs");
-const { db } = require("@db/db");
+// === Core modules ===
+const fs = require("node:fs");
+
+// === Third-party modules ===
 const bcrypt = require("bcrypt");
-const { log, LOG_LEVELS } = require("@helpers/log");
+const Excel = require("exceljs");
+
+// === Absolute / alias imports ===
+const { db } = require("@db/db");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
-const fs = require("node:fs");
+const { log, LOG_LEVELS } = require("@helpers/log");
 
 const getUserOverviewPage = async (req, res) => {
   try {
