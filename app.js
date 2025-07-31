@@ -133,9 +133,11 @@ if (process.env.NODE_ENV === "production") {
   app.set("trust proxy", false);
 }
 
+const apiRouter = require("./routes/api/api.router");
 const adminRouter = require("./routes/admin/admin.router");
 const clientRouter = require("./routes/client/client.router");
 
+app.use("/api", apiRouter);
 app.use("/", clientRouter);
 app.use("/admin", adminRouter);
 
