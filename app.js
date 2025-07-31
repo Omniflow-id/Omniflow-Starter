@@ -27,6 +27,7 @@ const {
   compressionMiddleware,
   compressionLogger,
 } = require("@middlewares/compressionMiddleware");
+const { createCorsMiddleware } = require("@middlewares/corsMiddleware");
 const { csrfGlobalMiddleware } = require("@middlewares/csrfProtection");
 const { generalLimiter } = require("@middlewares/rateLimiter");
 
@@ -35,6 +36,9 @@ const config = require("./config");
 
 const app = express();
 app.use(helmet(config.security.helmetConfig));
+
+// CORS - apply early for cross-origin requests
+app.use(createCorsMiddleware());
 
 // Compression - apply early for better performance
 if (config.compression.enabled) {

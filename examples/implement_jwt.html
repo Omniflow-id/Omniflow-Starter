@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT API Test Suite - Omniflow</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    animation: {
+                        'bounce-slow': 'bounce 2s infinite',
+                        'pulse-slow': 'pulse 3s infinite',
+                        'spin-slow': 'spin 3s linear infinite',
+                        'wiggle': 'wiggle 1s ease-in-out infinite',
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-up': 'slideUp 0.3s ease-out',
+                        'slide-down': 'slideDown 0.3s ease-out',
+                        'shake': 'shake 0.5s ease-in-out',
+                        'glow': 'glow 2s ease-in-out infinite alternate',
+                    },
+                    keyframes: {
+                        wiggle: {
+                            '0%, 100%': { transform: 'rotate(-3deg)' },
+                            '50%': { transform: 'rotate(3deg)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(100%)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        slideDown: {
+                            '0%': { transform: 'translateY(-100%)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        },
+                        shake: {
+                            '0%, 100%': { transform: 'translateX(0)' },
+                            '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-10px)' },
+                            '20%, 40%, 60%, 80%': { transform: 'translateX(10px)' },
+                        },
+                        glow: {
+                            '0%': { boxShadow: '0 0 5px #3b82f6, 0 0 10px #3b82f6, 0 0 15px #3b82f6' },
+                            '100%': { boxShadow: '0 0 10px #3b82f6, 0 0 20px #3b82f6, 0 0 30px #3b82f6' },
+                        },
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .loading-dots::after {
+            content: '';
+            animation: loading-dots 1.5s infinite;
+        }
+        
+        @keyframes loading-dots {
+            0%, 20% { content: ''; }
+            40% { content: '.'; }
+            60% { content: '..'; }
+            80%, 100% { content: '...'; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-indigo-500 via-purple-600 to-purple-800 min-h-screen scroll-smooth">
+    <!-- Floating Particles Background -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute w-2 h-2 bg-white/20 rounded-full animate-bounce-slow" style="top: 20%; left: 10%; animation-delay: 0s;"></div>
+        <div class="absolute w-1 h-1 bg-white/30 rounded-full animate-pulse-slow" style="top: 70%; left: 80%; animation-delay: 1s;"></div>
+        <div class="absolute w-3 h-3 bg-white/10 rounded-full animate-bounce-slow" style="top: 40%; left: 70%; animation-delay: 2s;"></div>
+        <div class="absolute w-1.5 h-1.5 bg-white/25 rounded-full animate-pulse-slow" style="top: 80%; left: 20%; animation-delay: 3s;"></div>
+    </div>
+
+    <div class="relative z-10 container mx-auto px-4 py-8">
+        <!-- Header -->
+        <div class="text-center mb-12 animate-fade-in">
+            <h1 class="text-5xl font-bold text-white mb-4 tracking-tight">
+                🚀 <span class="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">JWT API</span> Test Suite
+            </h1>
+            <p class="text-xl text-white/80 font-light">
+                Test all authentication endpoints with beautiful interactions
+            </p>
+            <div class="mt-6 flex justify-center">
+                <div class="px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full border border-white/20">
+                    <span class="text-white/90 text-sm">Omniflow Starter • v1.0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="max-w-7xl mx-auto">
+            <!-- Token Status Panel -->
+            <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 mb-8 animate-slide-down">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="text-2xl font-semibold text-white flex items-center">
+                        🔑 Token Status
+                        <div id="statusIndicator" class="ml-3 w-3 h-3 rounded-full bg-red-500 animate-pulse"></div>
+                    </h2>
+                    <button id="clearTokensBtn" class="hidden px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition-all duration-300 transform hover:scale-105 active:scale-95">
+                        🗑️ Clear All
+                    </button>
+                </div>
+                
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Access Token -->
+                    <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                        <label class="block text-white/70 text-sm font-medium mb-2">Access Token</label>
+                        <div id="accessTokenDisplay" class="bg-gray-900/50 p-3 rounded-lg font-mono text-sm text-green-400 break-all min-h-[60px] flex items-center">
+                            <span class="text-gray-400">Not logged in</span>
+                        </div>
+                        <div id="accessTokenTimer" class="mt-2 text-xs text-white/50 hidden">
+                            Expires in: <span class="font-semibold">--:--</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Refresh Token -->
+                    <div class="bg-white/5 rounded-xl p-4 border border-white/10">
+                        <label class="block text-white/70 text-sm font-medium mb-2">Refresh Token</label>
+                        <div id="refreshTokenDisplay" class="bg-gray-900/50 p-3 rounded-lg font-mono text-sm text-blue-400 break-all min-h-[60px] flex items-center">
+                            <span class="text-gray-400">Not logged in</span>
+                        </div>
+                        <div id="refreshTokenTimer" class="mt-2 text-xs text-white/50 hidden">
+                            Expires in: <span class="font-semibold">--:--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Testing Grid -->
+            <div class="grid lg:grid-cols-2 gap-6 mb-8">
+                <!-- Index API -->
+                <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/25 animate-fade-in" style="animation-delay: 0.1s;">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-white flex items-center">
+                            📍 Index API
+                            <span class="ml-2 px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded-full">GET</span>
+                        </h3>
+                    </div>
+                    <p class="text-white/60 text-sm mb-4">/api/ - Basic connectivity test</p>
+                    <button onclick="testIndexAPI()" class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium py-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40 active:scale-[0.98]">
+                        <span class="flex items-center justify-center">
+                            <span id="indexBtnText">Test Connection</span>
+                            <div id="indexSpinner" class="hidden ml-2 w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        </span>
+                    </button>
+                </div>
+
+                <!-- Login API -->
+                <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/25 animate-fade-in" style="animation-delay: 0.2s;">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-white flex items-center">
+                            🔐 Login API
+                            <span class="ml-2 px-2 py-1 bg-blue-500/20 text-blue-300 text-xs rounded-full">POST</span>
+                        </h3>
+                    </div>
+                    <p class="text-white/60 text-sm mb-4">/api/login - Get JWT tokens</p>
+                    
+                    <div class="space-y-4 mb-4">
+                        <div>
+                            <label class="block text-white/70 text-sm font-medium mb-2">Email</label>
+                            <input type="email" id="loginEmail" value="admin@omniflow.id" 
+                                   class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300">
+                        </div>
+                        <div>
+                            <label class="block text-white/70 text-sm font-medium mb-2">Password</label>
+                            <input type="password" id="loginPassword" value="Admin12345." 
+                                   class="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300">
+                        </div>
+                    </div>
+                    
+                    <button onclick="testLoginAPI()" class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium py-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40 active:scale-[0.98]">
+                        <span class="flex items-center justify-center">
+                            <span id="loginBtnText">🚀 Login</span>
+                            <div id="loginSpinner" class="hidden ml-2 w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        </span>
+                    </button>
+                </div>
+
+                <!-- Refresh Token API -->
+                <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/25 animate-fade-in" style="animation-delay: 0.3s;">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-white flex items-center">
+                            🔄 Refresh Token
+                            <span class="ml-2 px-2 py-1 bg-yellow-500/20 text-yellow-300 text-xs rounded-full">POST</span>
+                        </h3>
+                    </div>
+                    <p class="text-white/60 text-sm mb-4">/api/refresh - Renew access token</p>
+                    <button onclick="testRefreshTokenAPI()" id="refreshBtn" disabled 
+                            class="w-full bg-gray-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium py-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-gray-500/40 active:scale-[0.98] hover:bg-gray-500 enabled:bg-gradient-to-r enabled:from-indigo-500 enabled:to-purple-600 enabled:hover:from-indigo-600 enabled:hover:to-purple-700 enabled:hover:shadow-indigo-500/40">
+                        <span class="flex items-center justify-center">
+                            <span id="refreshBtnText">Refresh Tokens</span>
+                            <div id="refreshSpinner" class="hidden ml-2 w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        </span>
+                    </button>
+                    <p class="text-white/40 text-xs mt-2 text-center">Login first to enable</p>
+                </div>
+
+                <!-- Protected API -->
+                <div class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-indigo-500/25 animate-fade-in" style="animation-delay: 0.4s;">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-semibold text-white flex items-center">
+                            🛡️ Protected API
+                            <span class="ml-2 px-2 py-1 bg-purple-500/20 text-purple-300 text-xs rounded-full">GET</span>
+                        </h3>
+                    </div>
+                    <p class="text-white/60 text-sm mb-4">/api/protected - Requires access token</p>
+                    <button onclick="testProtectedAPI()" id="protectedBtn" disabled 
+                            class="w-full bg-gray-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium py-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-gray-500/40 active:scale-[0.98] hover:bg-gray-500 enabled:bg-gradient-to-r enabled:from-indigo-500 enabled:to-purple-600 enabled:hover:from-indigo-600 enabled:hover:to-purple-700 enabled:hover:shadow-indigo-500/40">
+                        <span class="flex items-center justify-center">
+                            <span id="protectedBtnText">Test Protected Route</span>
+                            <div id="protectedSpinner" class="hidden ml-2 w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                        </span>
+                    </button>
+                    <p class="text-white/40 text-xs mt-2 text-center">Login first to enable</p>
+                </div>
+            </div>
+
+            <!-- Response Terminal -->
+            <div id="responseSection" class="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 animate-slide-up">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-xl font-semibold text-white flex items-center">
+                        💻 Response Terminal
+                        <div class="ml-3 flex space-x-1">
+                            <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                        </div>
+                    </h3>
+                    <button onclick="clearResponse()" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white/70 text-sm rounded-lg transition-all duration-300">
+                        Clear
+                    </button>
+                </div>
+                
+                <div id="responseDisplay" class="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-600 rounded-xl p-6 min-h-[400px] max-h-[500px] overflow-y-auto text-sm font-mono text-green-400">
+                    <div class="flex items-center mb-2">
+                        <span class="text-blue-400">$</span>
+                        <span class="ml-2 text-white">omniflow-api-test</span>
+                        <span class="ml-2 animate-pulse">▋</span>
+                    </div>
+                    <div class="text-gray-400">Ready to test APIs... 🎯</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success/Error Toast -->
+    <div id="toast" class="fixed top-4 right-4 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-4 max-w-sm transform transition-all duration-500 translate-x-full">
+            <div class="flex items-center">
+                <div id="toastIcon" class="mr-3"></div>
+                <div>
+                    <div id="toastTitle" class="font-semibold text-gray-900"></div>
+                    <div id="toastMessage" class="text-sm text-gray-600"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let accessToken = "";
+        let refreshToken = "";
+        const API_BASE = "http://127.0.0.1:1234/api";
+        let accessTokenExpiry = null;
+        let refreshTokenExpiry = null;
+
+        // Toast notification system
+        function showToast(title, message, type = 'info') {
+            const toast = document.getElementById('toast');
+            const toastDiv = toast.firstElementChild;
+            const icon = document.getElementById('toastIcon');
+            const titleEl = document.getElementById('toastTitle');
+            const messageEl = document.getElementById('toastMessage');
+
+            const icons = {
+                success: '✅',
+                error: '❌',
+                info: 'ℹ️',
+                warning: '⚠️'
+            };
+
+            const colors = {
+                success: 'text-green-600',
+                error: 'text-red-600', 
+                info: 'text-blue-600',
+                warning: 'text-yellow-600'
+            };
+
+            icon.textContent = icons[type];
+            titleEl.textContent = title;
+            titleEl.className = `font-semibold ${colors[type]}`;
+            messageEl.textContent = message;
+
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toastDiv.classList.remove('translate-x-full');
+            }, 100);
+
+            setTimeout(() => {
+                toastDiv.classList.add('translate-x-full');
+                setTimeout(() => {
+                    toast.classList.add('hidden');
+                }, 500);
+            }, 3000);
+        }
+
+        // Storage helpers
+        function saveTokens() {
+            if (accessToken) {
+                localStorage.setItem('apitest_access_token', accessToken);
+                localStorage.setItem('apitest_access_expiry', accessTokenExpiry);
+            }
+            if (refreshToken) {
+                localStorage.setItem('apitest_refresh_token', refreshToken);
+                localStorage.setItem('apitest_refresh_expiry', refreshTokenExpiry);
+            }
+        }
+
+        function loadTokens() {
+            accessToken = localStorage.getItem('apitest_access_token') || "";
+            refreshToken = localStorage.getItem('apitest_refresh_token') || "";
+            accessTokenExpiry = localStorage.getItem('apitest_access_expiry');
+            refreshTokenExpiry = localStorage.getItem('apitest_refresh_expiry');
+        }
+
+        function clearTokens() {
+            accessToken = "";
+            refreshToken = "";
+            accessTokenExpiry = null;
+            refreshTokenExpiry = null;
+            localStorage.removeItem('apitest_access_token');
+            localStorage.removeItem('apitest_refresh_token');
+            localStorage.removeItem('apitest_access_expiry');
+            localStorage.removeItem('apitest_refresh_expiry');
+            updateTokenDisplays();
+            showToast('Tokens Cleared', 'All authentication tokens have been removed', 'info');
+        }
+
+        // Parse JWT to get expiry
+        function parseJWT(token) {
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                return payload.exp * 1000; // Convert to milliseconds
+            } catch (e) {
+                return null;
+            }
+        }
+
+        // Update token displays with animations
+        function updateTokenDisplays() {
+            const accessDisplay = document.getElementById("accessTokenDisplay");
+            const refreshDisplay = document.getElementById("refreshTokenDisplay");
+            const statusIndicator = document.getElementById("statusIndicator");
+            const clearBtn = document.getElementById("clearTokensBtn");
+
+            // Update access token display
+            if (accessToken) {
+                const truncated = accessToken.length > 50 ? 
+                    accessToken.substring(0, 50) + "..." : accessToken;
+                accessDisplay.innerHTML = `<span class="text-green-400">${truncated}</span>`;
+                accessDisplay.title = accessToken;
+                accessDisplay.classList.add('animate-fade-in');
+            } else {
+                accessDisplay.innerHTML = '<span class="text-gray-400">Not logged in</span>';
+                accessDisplay.classList.remove('animate-fade-in');
+            }
+
+            // Update refresh token display
+            if (refreshToken) {
+                const truncated = refreshToken.length > 50 ? 
+                    refreshToken.substring(0, 50) + "..." : refreshToken;
+                refreshDisplay.innerHTML = `<span class="text-blue-400">${truncated}</span>`;
+                refreshDisplay.title = refreshToken;
+                refreshDisplay.classList.add('animate-fade-in');
+            } else {
+                refreshDisplay.innerHTML = '<span class="text-gray-400">Not logged in</span>';
+                refreshDisplay.classList.remove('animate-fade-in');
+            }
+
+            // Update status indicator
+            const hasTokens = accessToken && refreshToken;
+            if (hasTokens) {
+                statusIndicator.className = "ml-3 w-3 h-3 rounded-full bg-green-500 animate-pulse";
+                clearBtn.classList.remove('hidden');
+            } else {
+                statusIndicator.className = "ml-3 w-3 h-3 rounded-full bg-red-500 animate-pulse";
+                clearBtn.classList.add('hidden');
+            }
+
+            // Update button states with smooth transitions
+            const refreshBtn = document.getElementById("refreshBtn");
+            const protectedBtn = document.getElementById("protectedBtn");
+
+            if (hasTokens) {
+                refreshBtn.disabled = false;
+                refreshBtn.className = "w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium py-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40 active:scale-[0.98]";
+            } else {
+                refreshBtn.disabled = true;
+                refreshBtn.className = "w-full bg-gray-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium py-3 rounded-xl transition-all duration-300";
+            }
+
+            if (accessToken) {
+                protectedBtn.disabled = false;
+                protectedBtn.className = "w-full bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-medium py-3 rounded-xl transition-all duration-300 transform hover:scale-[1.02] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40 active:scale-[0.98]";
+            } else {
+                protectedBtn.disabled = true;
+                protectedBtn.className = "w-full bg-gray-600 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium py-3 rounded-xl transition-all duration-300";
+            }
+        }
+
+        // Enhanced response display with syntax highlighting and smooth scroll
+        function updateResponse(response, status = "info") {
+            const display = document.getElementById("responseDisplay");
+            const responseSection = document.getElementById("responseSection");
+            const timestamp = new Date().toLocaleTimeString();
+            const statusIcons = {
+                success: "✅",
+                error: "❌", 
+                info: "ℹ️",
+                warning: "⚠️"
+            };
+
+            const statusColors = {
+                success: "text-green-400",
+                error: "text-red-400",
+                info: "text-blue-400", 
+                warning: "text-yellow-400"
+            };
+
+            const formattedResponse = JSON.stringify(response, null, 2);
+            
+            display.innerHTML = `
+                <div class="flex items-center mb-2">
+                    <span class="text-blue-400">$</span>
+                    <span class="ml-2 text-white">omniflow-api-test</span>
+                    <span class="ml-2 text-gray-500">[${timestamp}]</span>
+                    <span class="ml-2 ${statusColors[status]}">${statusIcons[status]}</span>
+                </div>
+                <pre class="text-gray-300 whitespace-pre-wrap overflow-x-auto">${formattedResponse}</pre>
+                <div class="mt-2 flex items-center">
+                    <span class="text-blue-400">$</span>
+                    <span class="ml-2 animate-pulse text-white">▋</span>
+                </div>
+            `;
+            
+            display.scrollTop = display.scrollHeight;
+            display.classList.add('animate-fade-in');
+            
+            // Smooth scroll to response section after a short delay
+            setTimeout(() => {
+                responseSection.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+            }, 300);
+        }
+
+        function clearResponse() {
+            const display = document.getElementById("responseDisplay");
+            display.innerHTML = `
+                <div class="flex items-center mb-2">
+                    <span class="text-blue-400">$</span>
+                    <span class="ml-2 text-white">omniflow-api-test</span>
+                    <span class="ml-2 animate-pulse">▋</span>
+                </div>
+                <div class="text-gray-400">Terminal cleared... 🧹</div>
+            `;
+        }
+
+        // Enhanced API request helper with loading states
+        async function makeRequest(url, options = {}, buttonId = '') {
+            // Show loading state
+            if (buttonId) {
+                const btn = document.getElementById(buttonId);
+                const spinner = document.getElementById(buttonId.replace('Btn', 'Spinner'));
+                const text = document.getElementById(buttonId.replace('Btn', 'BtnText'));
+                
+                if (btn) btn.disabled = true;
+                if (spinner) spinner.classList.remove('hidden');
+                if (text) text.classList.add('loading-dots');
+            }
+
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        "Content-Type": "application/json",
+                        ...options.headers,
+                    },
+                    ...options,
+                });
+
+                const data = await response.json();
+                const status = response.ok ? "success" : "error";
+
+                updateResponse({
+                    status: response.status,
+                    statusText: response.statusText,
+                    url: url,
+                    method: options.method || "GET",
+                    data: data,
+                }, status);
+
+                return { response, data };
+            } catch (error) {
+                updateResponse({
+                    error: "Network Error",
+                    message: error.message,
+                    url: url,
+                }, "error");
+                throw error;
+            } finally {
+                // Hide loading state
+                if (buttonId) {
+                    const btn = document.getElementById(buttonId);
+                    const spinner = document.getElementById(buttonId.replace('Btn', 'Spinner'));
+                    const text = document.getElementById(buttonId.replace('Btn', 'BtnText'));
+                    
+                    if (btn) btn.disabled = false;
+                    if (spinner) spinner.classList.add('hidden');
+                    if (text) text.classList.remove('loading-dots');
+                }
+            }
+        }
+
+        // API test functions with enhanced UX
+        async function testIndexAPI() {
+            try {
+                await makeRequest(`${API_BASE}/`, {}, 'indexBtn');
+                showToast('Connection Success', 'API server is responding correctly', 'success');
+            } catch (error) {
+                showToast('Connection Failed', 'Could not reach the API server', 'error');
+            }
+        }
+
+        async function testLoginAPI() {
+            const email = document.getElementById("loginEmail").value;
+            const password = document.getElementById("loginPassword").value;
+
+            if (!email || !password) {
+                updateResponse({
+                    error: "Validation Error",
+                    message: "Email and password are required",
+                }, "error");
+                showToast('Validation Error', 'Please fill in all fields', 'warning');
+                return;
+            }
+
+            try {
+                const { response, data } = await makeRequest(`${API_BASE}/login`, {
+                    method: "POST",
+                    body: JSON.stringify({ email, password }),
+                }, 'loginBtn');
+
+                if (response.ok && data.success) {
+                    accessToken = data.data.accessToken;
+                    refreshToken = data.data.refreshToken;
+                    accessTokenExpiry = parseJWT(accessToken);
+                    refreshTokenExpiry = parseJWT(refreshToken);
+                    saveTokens();
+                    updateTokenDisplays();
+                    showToast('Login Success', 'Authentication tokens received', 'success');
+                } else {
+                    showToast('Login Failed', data.message || 'Invalid credentials', 'error');
+                }
+            } catch (error) {
+                showToast('Login Error', 'Network error during login', 'error');
+            }
+        }
+
+        async function testRefreshTokenAPI() {
+            if (!refreshToken) {
+                updateResponse({
+                    error: "No Refresh Token",
+                    message: "Please login first to get refresh token",
+                }, "error");
+                showToast('No Refresh Token', 'Login first to get tokens', 'warning');
+                return;
+            }
+
+            try {
+                const { response, data } = await makeRequest(`${API_BASE}/refresh`, {
+                    method: "POST",
+                    body: JSON.stringify({ refreshToken }),
+                }, 'refreshBtn');
+
+                if (response.ok && data.success) {
+                    accessToken = data.data.accessToken;
+                    refreshToken = data.data.refreshToken;
+                    accessTokenExpiry = parseJWT(accessToken);
+                    refreshTokenExpiry = parseJWT(refreshToken);
+                    saveTokens();
+                    updateTokenDisplays();
+                    showToast('Tokens Refreshed', 'New authentication tokens received', 'success');
+                } else {
+                    showToast('Refresh Failed', data.message || 'Token refresh failed', 'error');
+                }
+            } catch (error) {
+                showToast('Refresh Error', 'Network error during refresh', 'error');
+            }
+        }
+
+        async function testProtectedAPI() {
+            if (!accessToken) {
+                updateResponse({
+                    error: "No Access Token",
+                    message: "Please login first to get access token",
+                }, "error");
+                showToast('No Access Token', 'Login first to access protected routes', 'warning');
+                return;
+            }
+
+            try {
+                const { response, data } = await makeRequest(`${API_BASE}/protected`, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                }, 'protectedBtn');
+
+                if (response.ok) {
+                    showToast('Protected Route Success', 'Access granted to protected endpoint', 'success');
+                } else {
+                    showToast('Access Denied', 'Token may be expired or invalid', 'error');
+                }
+            } catch (error) {
+                showToast('Protected Route Error', 'Network error accessing protected route', 'error');
+            }
+        }
+
+        // Event listeners
+        document.getElementById('clearTokensBtn').addEventListener('click', clearTokens);
+
+        // Initialize app with loading animation
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTokens();
+            updateTokenDisplays();
+            
+            // Show welcome message
+            setTimeout(() => {
+                updateResponse({
+                    message: "🚀 JWT API Test Suite Ready!",
+                    version: "v1.0.0",
+                    endpoints: [
+                        "GET /api/ - Index API",
+                        "POST /api/login - Login API", 
+                        "POST /api/refresh - Refresh Token API",
+                        "GET /api/protected - Protected API"
+                    ],
+                    features: [
+                        "✨ Beautiful micro-interactions",
+                        "🔄 Real-time token management", 
+                        "💾 Persistent localStorage",
+                        "🎨 Modern Tailwind UI",
+                        "📱 Fully responsive design"
+                    ]
+                }, "info");
+            }, 1000);
+        });
+
+        // Auto-refresh UI every second to update timers
+        setInterval(() => {
+            // Could add token expiry countdown here
+        }, 1000);
+    </script>
+</body>
+</html>

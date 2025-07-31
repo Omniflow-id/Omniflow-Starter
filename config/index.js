@@ -135,6 +135,21 @@ const config = {
     expiresIn: process.env.JWT_EXPIRES_IN || "24h",
     refreshExpiresIn: process.env.JWT_REFRESH_EXPIRES_IN || "7d",
   },
+
+  cors: {
+    enabled: process.env.CORS_ENABLED !== "false", // Default enabled
+    origin: process.env.CORS_ORIGIN || "*",
+    credentials: process.env.CORS_CREDENTIALS === "true",
+    methods: process.env.CORS_METHODS || "GET,HEAD,PUT,PATCH,POST,DELETE",
+    allowedHeaders:
+      process.env.CORS_ALLOWED_HEADERS ||
+      "Content-Type,Authorization,X-Requested-With",
+    exposedHeaders: process.env.CORS_EXPOSED_HEADERS || "",
+    maxAge: parseInt(process.env.CORS_MAX_AGE) || 86400, // 24 hours
+    preflightContinue: process.env.CORS_PREFLIGHT_CONTINUE === "true",
+    optionsSuccessStatus:
+      parseInt(process.env.CORS_OPTIONS_SUCCESS_STATUS) || 204,
+  },
 };
 
 module.exports = config;

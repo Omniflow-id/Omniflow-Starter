@@ -70,17 +70,21 @@ const { asyncHandler } = require("@middlewares/errorHandler");
 
 ### Authentication & Authorization
 
-- Session-based auth with 24-hour timeout
-- Three roles: Admin (full access), Manager (limited admin), User (basic)
-- Middleware: `isLoggedIn` (auth check), `isAdmin` (admin-only routes)
-- Login/logout routes at `/admin/login` and `/admin/logout`
+- **Session-based auth** with 24-hour timeout for web interface
+- **JWT Authentication** for API endpoints with access/refresh tokens
+- **Three roles**: Admin (full access), Manager (limited admin), User (basic)
+- **Web Middleware**: `isLoggedIn` (auth check), `isAdmin` (admin-only routes)
+- **API Middleware**: `verifyJWT` (access token), `verifyRefreshToken` (refresh token)
+- **Web Routes**: `/admin/login` and `/admin/logout`
+- **API Routes**: `/api/login`, `/api/refresh`, `/api/protected`
 
 ### Route Structure
 
 - **Public**: `/` (client landing)
-- **Admin**: `/admin/*` (dashboard, user management, logs)
+- **Admin Web**: `/admin/*` (dashboard, user management, logs)
 - **User Management**: `/admin/user/*` (CRUD, Excel import/export)
 - **Activity Logs**: `/admin/log/*` (view logs, export)
+- **API Endpoints**: `/api/*` (JWT-based authentication, JSON responses)
 
 ### Activity Logging System
 
@@ -465,6 +469,26 @@ Each optional feature is controlled by an enable flag and only validates its var
 - `OTEL_METRICS_PORT` - Prometheus metrics port (default: 9091)
 - `OTEL_METRICS_ENDPOINT` - Metrics endpoint path (default: "/metrics")
 
+#### JWT Authentication (`JWT_ENABLED=true`)
+**Required when enabled:**
+- `JWT_SECRET` - JWT signing secret key
+
+**Optional:**
+- `JWT_EXPIRES_IN` - Access token expiration (default: "1h")
+- `JWT_REFRESH_EXPIRES_IN` - Refresh token expiration (default: "7d")
+- `JWT_ALGORITHM` - JWT signing algorithm (default: "HS256")
+
+#### CORS Configuration (`CORS_ENABLED=true`)
+**Optional (all have defaults):**
+- `CORS_ORIGIN` - Allowed origins (default: "*", support comma-separated multiple origins)
+- `CORS_CREDENTIALS` - Allow credentials (default: true)
+- `CORS_METHODS` - Allowed HTTP methods (default: "GET,HEAD,PUT,PATCH,POST,DELETE")
+- `CORS_ALLOWED_HEADERS` - Allowed request headers
+- `CORS_EXPOSED_HEADERS` - Headers exposed to client
+- `CORS_MAX_AGE` - Preflight cache duration in seconds (default: 86400)
+- `CORS_PREFLIGHT_CONTINUE` - Pass preflight to next handler (default: false)
+- `CORS_OPTIONS_SUCCESS_STATUS` - Status code for successful OPTIONS requests (default: 204)
+
 ### Built-in Features (Always Available)
 
 **Response Compression Configuration:**
@@ -579,9 +603,15 @@ const routes = require("./routes");
 
 ## Testing
 
-- No test framework currently configured
-- Manual testing via web interface
-- Database seeder provides test users for development
+- **No test framework** currently configured
+- **Manual testing** via web interface and API test suite
+- **Database seeder** provides test users for development
+- **API Test Suite**: `test.html` - Comprehensive JWT API testing interface with:
+  - Token management with localStorage persistence
+  - All API endpoint testing (login, refresh, protected)
+  - CORS support for cross-origin testing
+  - Real-time response visualization
+  - Modern responsive UI with error handling
 
 ## Additional Resources
 
