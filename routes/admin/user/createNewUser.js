@@ -6,7 +6,10 @@ const { db } = require("@db/db");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
 const { log, LOG_LEVELS } = require("@helpers/log");
-const { generatePredictablePassword, validatePassword } = require("@helpers/passwordPolicy");
+const {
+  generatePredictablePassword,
+  validatePassword,
+} = require("@helpers/passwordPolicy");
 
 const createNewUser = async (req, res) => {
   const { username, email, full_name, role } = req.body;
