@@ -1,7 +1,7 @@
 module.exports = {
   apps: [
     {
-      name: "omniflow-starter",
+      name: "Omniflow-Starter",
       script: "server.js",
       port: 8203,
       max_memory_restart: "1G",
