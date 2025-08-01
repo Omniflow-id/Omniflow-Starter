@@ -1,15 +1,12 @@
 /**
  * Password Policy Management System
  *
- * Handles password complexity validation, generation, and policy enforcement
- * for user accounts with configurable rules and automatic generation patterns.
+ * Handles password complexity validation and automatic generation for bulk uploads.
  *
  * Features:
  * - Configurable complexity requirements
- * - Automatic password generation for bulk uploads
- * - Pattern-based generation (username-based)
+ * - Predictable password generation using full name pattern
  * - Security-focused validation rules
- * - Detailed validation feedback
  */
 
 /**
@@ -189,37 +186,16 @@ function validatePassword(password, options = {}) {
     }
   }
 
-  // Password strength calculation
-  const strength = calculatePasswordStrength(password, policy);
-
-  // Warnings for weak but valid passwords
-  if (strength === "weak" && errors.length === 0) {
-    warnings.push(
-      "Consider using a stronger password with more character variety"
-    );
-  }
-
   return {
     isValid: errors.length === 0,
     errors,
     warnings,
-    strength,
-    score: getPasswordScore(password, policy),
   };
 }
 
 /**
- * Generate username-based password for bulk uploads
- * Pattern: Username + Numbers + Symbols + Random
- * @param {string} username - Base username
- * @param {number} length - Target length
- * @param {Object} policy - Password policy
- * @returns {string} Generated password
- */
-
-/**
  * Generate predictable password for bulk user creation
- * Pattern: AllNamesJoined@12345?. (with proper capitalization)
+ * Pattern: FullNameWithoutSpaces@12345?. (with proper capitalization)
  * @param {string} fullName - User's full name
  * @returns {string} Predictable password
  */
@@ -243,7 +219,7 @@ function generatePredictablePassword(fullName) {
 }
 
 /**
- * Helper functions
+ * Helper function to find maximum repeating characters
  */
 function findMaxRepeatingChars(str) {
   let maxCount = 1;
@@ -261,90 +237,9 @@ function findMaxRepeatingChars(str) {
   return maxCount;
 }
 
-function calculatePasswordStrength(password, policy) {
-  const score = getPasswordScore(password, policy);
-
-  if (score >= 80) return "very-strong";
-  if (score >= 60) return "strong";
-  if (score >= 40) return "medium";
-  if (score >= 20) return "weak";
-  return "very-weak";
-}
-
-function getPasswordScore(password, policy) {
-  let score = 0;
-
-  // Length score (0-25 points)
-  score += Math.min(25, (password.length / policy.maxLength) * 25);
-
-  // Character variety (0-40 points)
-  if (/[a-z]/.test(password)) score += 10;
-  if (/[A-Z]/.test(password)) score += 10;
-  if (/\d/.test(password)) score += 10;
-  if (/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?~`]/.test(password)) score += 10;
-
-  // Complexity bonus (0-35 points)
-  const uniqueChars = new Set(password).size;
-  score += Math.min(15, uniqueChars);
-
-  // No repeating characters bonus
-  if (findMaxRepeatingChars(password) <= 2) score += 10;
-
-  // No common patterns bonus
-  const hasCommonPatterns = policy.forbiddenPatterns.some((pattern) =>
-    password.toLowerCase().includes(pattern.toLowerCase())
-  );
-  if (!hasCommonPatterns) score += 10;
-
-  return Math.min(100, score);
-}
-
-/**
- * Get password policy requirements as human-readable text
- * @returns {Array} Array of requirement strings
- */
-function getPasswordRequirements() {
-  const policy = getPasswordPolicy();
-  const requirements = [];
-
-  requirements.push(
-    `Must be ${policy.minLength}-${policy.maxLength} characters long`
-  );
-
-  if (policy.requireUppercase) {
-    requirements.push(
-      `Must contain at least ${policy.minUppercase} uppercase letter(s)`
-    );
-  }
-
-  if (policy.requireLowercase) {
-    requirements.push(
-      `Must contain at least ${policy.minLowercase} lowercase letter(s)`
-    );
-  }
-
-  if (policy.requireNumbers) {
-    requirements.push(`Must contain at least ${policy.minNumbers} number(s)`);
-  }
-
-  if (policy.requireSymbols) {
-    requirements.push(
-      `Must contain at least ${policy.minSymbols} special character(s)`
-    );
-  }
-
-  requirements.push(
-    `Cannot have more than ${policy.maxRepeatingChars} consecutive identical characters`
-  );
-  requirements.push("Cannot contain common words or personal information");
-
-  return requirements;
-}
-
 module.exports = {
   validatePassword,
   generatePredictablePassword,
   getPasswordPolicy,
-  getPasswordRequirements,
   DEFAULT_POLICY,
 };
