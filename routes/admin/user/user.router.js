@@ -6,7 +6,25 @@ const { doubleCsrfProtection } = require("@middlewares/csrfProtection");
 
 const user = require("./user.controller");
 
-const upload = multer({ dest: "uploads/" });
+// Use memory storage instead of disk storage for temporary Excel processing
+const upload = multer({ 
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB limit
+  },
+  fileFilter: (_req, file, cb) => {
+    // Only allow Excel files
+    const allowedMimes = [
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'application/vnd.ms-excel'
+    ];
+    if (allowedMimes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Only Excel files (.xlsx, .xls) are allowed'));
+    }
+  }
+});
 
 router.get("/user/index", user.getAllUsersPage);
 router.get("/user/overview", user.getUserOverviewPage);
