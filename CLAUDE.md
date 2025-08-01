@@ -67,7 +67,10 @@ const { asyncHandler } = require("@middlewares/errorHandler");
 - **Knex.js integration**: Database migrations and seeding with proper tracking
 - **Migrations**: Located in `db/migrations/` with timestamp-based naming
 - **Seeders**: Located in `db/seeders/` for development data
-- **Default users**: admin@omniflow.id/Admin12345., manager@omniflow.id/Manager12345., user@omniflow.id/User12345.
+- **Default users**: 
+  - admin@omniflow.id/ChiefExecutive@12345?.
+  - manager@omniflow.id/SystemSupervisor@12345?.
+  - user@omniflow.id/BasicStaff@12345?.
 
 #### Connection Pool Optimization
 - **Environment-aware sizing**: 10 connections (dev) vs 50 connections (prod)
@@ -86,6 +89,21 @@ const { asyncHandler } = require("@middlewares/errorHandler");
 - **API Middleware**: `verifyJWT` (access token), `verifyRefreshToken` (refresh token)
 - **Web Routes**: `/admin/login` and `/admin/logout`
 - **API Routes**: `/api/login`, `/api/refresh`, `/api/protected`
+
+### Password Policy System
+
+- **Comprehensive Password Policies** with configurable complexity requirements
+- **Automatic Password Generation** for bulk user uploads using predictable patterns
+- **Pattern Format**: `FullNameWithoutSpaces@12345?.` (e.g., `EricJulianto@12345?.`)
+- **Policy Features**:
+  - Configurable minimum/maximum length (default: 8-128 characters)
+  - Character type requirements (uppercase, lowercase, numbers, symbols)
+  - Forbidden pattern detection (common words, personal information)
+  - Maximum consecutive identical characters limit
+  - Password strength scoring and validation feedback
+- **Bulk Upload Integration**: Excel files now require only 4 columns (name, email, full_name, role)
+- **Generated Password Display**: Admin interface shows generated passwords for communication
+- **Policy Configuration**: Environment variables for customizable password requirements
 
 ### Route Structure
 
@@ -513,6 +531,18 @@ Each optional feature is controlled by an enable flag and only validates its var
 - `DB_CONNECTION_LIMIT` - Max simultaneous connections (default: 10 dev, 50 prod)
 - `DB_ACQUIRE_TIMEOUT` - Connection acquire timeout in ms (default: 60000)
 - `DB_QUERY_TIMEOUT` - Query timeout in ms (default: 60000)
+
+**Password Policy Configuration:**
+- `PASSWORD_MIN_LENGTH` - Minimum password length (default: 8)
+- `PASSWORD_MAX_LENGTH` - Maximum password length (default: 128)
+- `PASSWORD_REQUIRE_UPPERCASE` - Require uppercase letters (default: true)
+- `PASSWORD_REQUIRE_LOWERCASE` - Require lowercase letters (default: true)
+- `PASSWORD_REQUIRE_NUMBERS` - Require numbers (default: true)
+- `PASSWORD_REQUIRE_SYMBOLS` - Require special characters (default: true)
+- `PASSWORD_MIN_SYMBOLS` - Minimum special characters (default: 1)
+- `PASSWORD_MIN_NUMBERS` - Minimum numbers (default: 1)
+- `PASSWORD_MAX_REPEATING` - Max consecutive identical chars (default: 3)
+- `PASSWORD_FORBIDDEN_PATTERNS` - Comma-separated forbidden words
 
 **Logging Configuration:**
 - `TIMEZONE` - Application timezone (default: "Asia/Jakarta")

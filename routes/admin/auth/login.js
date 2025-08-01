@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const { LOG_LEVELS, log } = require("@helpers/log");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
+const { validatePassword } = require("@helpers/passwordPolicy");
 const {
   asyncHandler,
   ValidationError,
@@ -18,14 +19,15 @@ const login = asyncHandler(async (req, res) => {
     throw new ValidationError("Email and password are required");
   }
 
-  if (password.length < 8) {
-    throw new ValidationError("Password must be at least 8 characters long");
-  }
-
   // Email format validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     throw new ValidationError("Please provide a valid email address");
+  }
+
+  // Basic password length check (detailed validation only for new passwords)
+  if (password.length < 8) {
+    throw new ValidationError("Password must be at least 8 characters long");
   }
 
   let userRows;

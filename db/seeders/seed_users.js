@@ -8,31 +8,31 @@ exports.seed = async (knex) => {
   // Deletes ALL existing entries
   await knex("users").del();
 
-  // Hash passwords
-  const adminPassword = await bcrypt.hash("Admin12345.", 10);
-  const managerPassword = await bcrypt.hash("Manager12345.", 10);
-  const userPassword = await bcrypt.hash("User12345.", 10);
+  // Hash passwords with policy-compliant patterns (avoid username conflicts)
+  const adminPassword = await bcrypt.hash("ChiefExecutive@12345?.", 10);
+  const managerPassword = await bcrypt.hash("SystemSupervisor@12345?.", 10);
+  const userPassword = await bcrypt.hash("BasicStaff@12345?.", 10);
 
   await knex("users").insert([
     {
       username: "admin",
       email: "admin@omniflow.id",
       password_hash: adminPassword,
-      full_name: "Administrator",
+      full_name: "Chief Executive",
       role: "Admin",
     },
     {
       username: "manager",
       email: "manager@omniflow.id",
       password_hash: managerPassword,
-      full_name: "Manager",
+      full_name: "System Supervisor",
       role: "Manager",
     },
     {
       username: "user",
       email: "user@omniflow.id",
       password_hash: userPassword,
-      full_name: "User",
+      full_name: "Basic Staff",
       role: "User",
     },
   ]);

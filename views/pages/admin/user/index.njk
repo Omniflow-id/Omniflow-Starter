@@ -106,7 +106,7 @@
         id="uploadForm"
         enctype="multipart/form-data"
         method="post"
-        action="/user/upload"
+        action="/admin/user/upload"
       >
         <div class="modal-body">
           {{ csrfField() | safe }}
@@ -160,11 +160,11 @@
           aria-label="Close"
         ></button>
       </div>
-      <form id="tambahForm" method="POST" action="/user/create">
+      <form id="tambahForm" method="POST" action="/admin/user/create">
         <div class="modal-body">
           {{ csrfField() | safe }}
           <div class="mb-3">
-            <label for="username" class="form-label">Nama:</label>
+            <label for="username" class="form-label">Username:</label>
             <input
               type="text"
               class="form-control"
@@ -184,10 +184,25 @@
             />
           </div>
           <div class="mb-3">
+            <label for="full_name" class="form-label">Nama Lengkap:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="full_name"
+              name="full_name"
+              placeholder="Contoh: John Smith"
+              required
+            />
+            <div class="form-text">
+              Password akan dibuat otomatis: NamaLengkap@12345?.
+            </div>
+          </div>
+          <div class="mb-3">
             <label for="role" class="form-label">Role:</label>
             <select class="form-control" id="role" name="role" required>
               <option value="">Pilih Role</option>
               <option value="Admin">Admin</option>
+              <option value="Manager">Manager</option>
               <option value="User">User</option>
             </select>
           </div>
