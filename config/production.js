@@ -23,7 +23,9 @@ module.exports = {
   // No seeds in production - migrations only
   knex: {
     ...baseConfig.knex,
-    seeds: false,
+    seeds: {
+      directory: "./db/seeders",
+    },
   },
 
   otel: {
