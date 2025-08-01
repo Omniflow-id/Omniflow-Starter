@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "omniflow-starter",
       script: "server.js",
-      port: 1234,
+      port: 8203,
       max_memory_restart: "1G",
       instances: 1,
       autorestart: true,
@@ -14,11 +14,11 @@ module.exports = {
       exec_mode: "fork",
       env: {
         NODE_ENV: "development",
-        PORT: 1234,
+        PORT: 8203,
       },
       env_production: {
         NODE_ENV: "production",
-        PORT: 1234,
+        PORT: 8203,
       },
       error_file: "./logs/pm2-error.log",
       out_file: "./logs/pm2-out.log",
