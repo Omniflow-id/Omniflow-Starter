@@ -1,0 +1,25 @@
+name: test_starter
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  test_starter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checking Secrets
+        run: |
+          echo "🔍 Checking for required secrets..."
+          if [ -z "${{ secrets.PROJECT_NAME }}" ]; then
+            echo "❌ PROJECT_NAME is not set! Please add it to your repository secrets."
+            exit 1
+          else
+            echo "✅ PROJECT_NAME is set."
+            echo "Project Name: ${{ secrets.PROJECT_NAME }}"
+          fi

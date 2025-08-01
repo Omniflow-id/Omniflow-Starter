@@ -3,3 +3,8 @@ node_modules
 logs/app.log
 logs/app.log
 /logs
+
+# nektos/act secrets files
+.secrets
+my.secrets
+*.secrets

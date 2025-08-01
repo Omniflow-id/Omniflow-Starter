@@ -673,6 +673,14 @@ const routes = require("./routes");
   - Real-time response visualization
   - Modern responsive UI with error handling
 
+### Local GitHub Actions Testing
+
+- **nektos/act**: Local GitHub Actions runner for testing workflows before pushing
+- **Installation**: `brew install act` (macOS) or check [nektos/act documentation](https://github.com/nektos/act)
+- **Usage**: `act` - Run all workflows locally
+- **Secret files**: Use `.secrets` file for environment variables (already ignored in `.gitignore`)
+- **Benefits**: Test CI/CD workflows locally without pushing to GitHub
+
 ## Additional Resources
 
 https://chatgpt.com/share/6883a5cc-f2c0-8005-95cf-e8a76653d1d2
