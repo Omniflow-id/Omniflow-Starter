@@ -104,6 +104,22 @@ const { asyncHandler } = require("@middlewares/errorHandler");
 - **Bulk Upload Integration**: Excel files now require only 4 columns (name, email, full_name, role)
 - **Generated Password Display**: Admin interface shows generated passwords for communication
 - **Policy Configuration**: Environment variables for customizable password requirements
+- **Login Protection**: Automatic password complexity validation during authentication
+
+### User Account Management
+
+- **Account Status Control**: `is_active` boolean field for enabling/disabling user accounts
+- **Admin Dashboard**: Toggle active/inactive status with visual badges and intuitive controls
+- **Access Control Middleware**: `checkActiveUser` middleware prevents inactive users from accessing system
+- **Login Protection**: Inactive users blocked at login with clear error messages
+- **Self-Protection**: Admins cannot deactivate their own accounts
+- **Activity Logging**: All account status changes logged with comprehensive audit trail
+- **Session Management**: Automatic session cleanup for deactivated users
+- **UI Features**:
+  - Status badges (Active/Inactive) with color coding
+  - Toggle buttons with icons (activate/deactivate)
+  - Prevention of self-deactivation in interface
+  - CSRF protection on all status change operations
 
 ### Route Structure
 

@@ -9,7 +9,7 @@ exports.seed = async (knex) => {
   await knex("users").del();
 
   // Hash passwords with policy-compliant patterns (avoid username conflicts)
-  const adminPassword = await bcrypt.hash("ChiefExecutive@12345?.", 10);
+  const adminPassword = await bcrypt.hash("Admin12345.", 10);
   const managerPassword = await bcrypt.hash("SystemSupervisor@12345?.", 10);
   const userPassword = await bcrypt.hash("BasicStaff@12345?.", 10);
 
@@ -20,6 +20,7 @@ exports.seed = async (knex) => {
       password_hash: adminPassword,
       full_name: "Chief Executive",
       role: "Admin",
+      is_active: true,
     },
     {
       username: "manager",
@@ -27,6 +28,7 @@ exports.seed = async (knex) => {
       password_hash: managerPassword,
       full_name: "System Supervisor",
       role: "Manager",
+      is_active: true,
     },
     {
       username: "user",
@@ -34,6 +36,7 @@ exports.seed = async (knex) => {
       password_hash: userPassword,
       full_name: "Basic Staff",
       role: "User",
+      is_active: true,
     },
   ]);
 };

@@ -10,7 +10,10 @@ const { db } = require("@db/db");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
 const { log, LOG_LEVELS } = require("@helpers/log");
-const { generatePredictablePassword, validatePassword } = require("@helpers/passwordPolicy");
+const {
+  generatePredictablePassword,
+  validatePassword,
+} = require("@helpers/passwordPolicy");
 
 const getUserOverviewPage = async (req, res) => {
   try {
@@ -46,8 +49,17 @@ const getUserOverviewPage = async (req, res) => {
 
 const getAllUsersPage = async (req, res) => {
   try {
-    const [users] = await db.query("SELECT * FROM users");
-    res.render("pages/admin/user/index", { users });
+    const [users] = await db.query(
+      "SELECT id, username, email, full_name, role, is_active FROM users ORDER BY id"
+    );
+
+    // Add session user ID to prevent self-deactivation
+    const usersWithSessionInfo = users.map((user) => ({
+      ...user,
+      session_user_id: req.session.user.id,
+    }));
+
+    res.render("pages/admin/user/index", { users: usersWithSessionInfo });
   } catch (error) {
     const clientIP = getClientIP(req);
     const userAgent = getUserAgent(req);
@@ -68,7 +80,7 @@ const downloadUserData = async (req, res) => {
   try {
     // Query database untuk mendapatkan semua user
     const [users] = await db.query(`
-      SELECT id, username, email, full_name, role
+      SELECT id, username, email, full_name, role, is_active
       FROM users
       ORDER BY id
     `);
@@ -84,6 +96,7 @@ const downloadUserData = async (req, res) => {
       { header: "Email", key: "email", width: 30 },
       { header: "Nama Lengkap", key: "full_name", width: 35 },
       { header: "Role", key: "role", width: 15 },
+      { header: "Status", key: "is_active", width: 15 },
     ];
 
     // Style untuk header
@@ -94,8 +107,14 @@ const downloadUserData = async (req, res) => {
       fgColor: { argb: "FFE0E0E0" },
     };
 
+    // Format data untuk display yang user-friendly
+    const formattedUsers = users.map((user) => ({
+      ...user,
+      is_active: user.is_active ? "Active" : "Inactive",
+    }));
+
     // Tambahkan data
-    worksheet.addRows(users);
+    worksheet.addRows(formattedUsers);
 
     // Set response header
     res.setHeader(
@@ -172,21 +191,19 @@ const uploadNewUser = async (req, res) => {
       }
 
       if (rowValues.length >= 4) {
-        const [name, email, full_name, role] = rowValues.map(
-          (value) => {
-            if (value && typeof value === "object" && value.text) {
-              return value.text;
-            }
-            return value;
+        const [name, email, full_name, role] = rowValues.map((value) => {
+          if (value && typeof value === "object" && value.text) {
+            return value.text;
           }
-        );
+          return value;
+        });
 
         if (name && email && full_name && role) {
           const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
           if (emailRegex.test(email)) {
             // Generate predictable password from full name
             const generatedPassword = generatePredictablePassword(full_name);
-            
+
             if (generatedPassword) {
               users.push({
                 username: name,
@@ -225,13 +242,14 @@ const uploadNewUser = async (req, res) => {
 
       const hashedPassword = await bcrypt.hash(user.password, 10);
       await db.query(
-        "INSERT INTO users (username, email, full_name, role, password_hash, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO users (username, email, full_name, role, password_hash, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         [
           user.username,
           user.email,
           user.full_name,
           user.role,
           hashedPassword,
+          true,
           now,
           now,
         ]
@@ -259,22 +277,25 @@ const uploadNewUser = async (req, res) => {
     if (successfulUsers.length > 0) {
       // Store generated passwords in session for display
       req.session.generatedPasswords = successfulUsers;
-      
+
       if (duplicateEmails.length > 0) {
         req.flash(
           "success",
           `${successfulUsers.length} users created successfully! Some duplicate emails were skipped: ${duplicateEmails.join(", ")}`
         );
       } else {
-        req.flash("success", `${successfulUsers.length} users created successfully! Generated passwords are shown below.`);
+        req.flash(
+          "success",
+          `${successfulUsers.length} users created successfully! Generated passwords are shown below.`
+        );
       }
-      
+
       // Redirect to password display page
       return res.redirect("/admin/user/passwords");
     } else {
       req.flash(
         "error",
-        duplicateEmails.length > 0 
+        duplicateEmails.length > 0
           ? `All users skipped due to duplicate emails: ${duplicateEmails.join(", ")}`
           : "No users were created"
       );
@@ -305,18 +326,18 @@ const uploadNewUser = async (req, res) => {
 
 const showGeneratedPasswordsPage = (req, res) => {
   const generatedPasswords = req.session.generatedPasswords;
-  
+
   if (!generatedPasswords || generatedPasswords.length === 0) {
     req.flash("error", "No generated passwords to display");
     return res.redirect("/admin/user/index");
   }
-  
+
   // Clear passwords from session after displaying (security)
   delete req.session.generatedPasswords;
-  
+
   res.render("pages/admin/user/passwords", {
     generatedPasswords,
-    title: "Generated Passwords"
+    title: "Generated Passwords",
   });
 };
 
@@ -372,7 +393,10 @@ const createNewUser = async (req, res) => {
         userAgentData,
         ip
       );
-      req.flash("error", "Generated password does not meet security requirements");
+      req.flash(
+        "error",
+        "Generated password does not meet security requirements"
+      );
       return res.redirect("/admin/user/index");
     }
 
@@ -398,8 +422,8 @@ const createNewUser = async (req, res) => {
     }
 
     await db.query(
-      "INSERT INTO users (username, email, full_name, role, password_hash, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
-      [username, email, full_name, role, hashedPassword, now, now]
+      "INSERT INTO users (username, email, full_name, role, password_hash, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      [username, email, full_name, role, hashedPassword, true, now, now]
     );
 
     await log(
@@ -416,10 +440,13 @@ const createNewUser = async (req, res) => {
       email: email,
       full_name: full_name,
       role: role,
-      generatedPassword: generatedPassword
+      generatedPassword: generatedPassword,
     };
 
-    req.flash("success", `User created successfully! Generated password: ${generatedPassword}`);
+    req.flash(
+      "success",
+      `User created successfully! Generated password: ${generatedPassword}`
+    );
     res.redirect("/admin/user/index");
   } catch (err) {
     await log(
@@ -479,8 +506,12 @@ const downloadUserTemplate = async (req, res) => {
     // Tambahkan instruksi penggunaan template
     worksheet.addRow([]);
     worksheet.addRow(["=== INSTRUKSI PENGGUNAAN TEMPLATE ==="]);
-    worksheet.addRow(["1. Hapus baris contoh dan instruksi ini sebelum upload"]);
-    worksheet.addRow(["2. Password akan dibuat otomatis dengan pola: NamaLengkap@12345?."]);
+    worksheet.addRow([
+      "1. Hapus baris contoh dan instruksi ini sebelum upload",
+    ]);
+    worksheet.addRow([
+      "2. Password akan dibuat otomatis dengan pola: NamaLengkap@12345?.",
+    ]);
     worksheet.addRow(["3. Contoh: 'Eric Julianto' → 'EricJulianto@12345?.'"]);
     worksheet.addRow(["4. Nama lengkap WAJIB diisi untuk generate password"]);
     worksheet.addRow([`5. Role tersedia: ${roles.join(", ")}`]);
@@ -492,7 +523,7 @@ const downloadUserTemplate = async (req, res) => {
 
     // Tambahkan komentar untuk kolom full_name dengan password info
     const fullNameCell = worksheet.getCell("C1");
-    fullNameCell.note = 
+    fullNameCell.note =
       "Password akan dibuat otomatis dari Nama Lengkap dengan pola: NamaLengkapTanpaSpasi@12345?. " +
       "Contoh: 'John Smith' → 'JohnSmith@12345?.' Pastikan nama lengkap tidak kosong!";
 
@@ -536,6 +567,65 @@ const downloadUserTemplate = async (req, res) => {
   }
 };
 
+const toggleUserActive = async (req, res) => {
+  const userId = req.params.id;
+
+  const ip = getClientIP(req);
+  const userAgentData = getUserAgent(req);
+
+  try {
+    // Check if trying to deactivate own account
+    if (parseInt(userId) === req.session.user.id) {
+      req.flash("error", "Cannot deactivate your own account");
+      return res.redirect("/admin/user/index");
+    }
+
+    // Get current user status
+    const [users] = await db.query(
+      "SELECT username, is_active FROM users WHERE id = ?",
+      [userId]
+    );
+
+    if (users.length === 0) {
+      req.flash("error", "User not found");
+      return res.redirect("/admin/user/index");
+    }
+
+    const targetUser = users[0];
+    const newStatus = !targetUser.is_active;
+
+    // Update user status
+    await db.query("UPDATE users SET is_active = ? WHERE id = ?", [
+      newStatus,
+      userId,
+    ]);
+
+    await log(
+      `User ${targetUser.username} ${newStatus ? "activated" : "deactivated"} by ${req.session.user.username}`,
+      LOG_LEVELS.INFO,
+      req.session.user.id,
+      userAgentData,
+      ip
+    );
+
+    req.flash(
+      "success",
+      `User ${targetUser.username} has been ${newStatus ? "activated" : "deactivated"} successfully`
+    );
+    res.redirect("/admin/user/index");
+  } catch (error) {
+    await log(
+      `Error toggling user active status: ${error.message}`,
+      LOG_LEVELS.ERROR,
+      req.session.user.id,
+      userAgentData,
+      ip
+    );
+    req.flash("error", "An error occurred while updating user status");
+    res.redirect("/admin/user/index");
+  }
+};
+
 module.exports = {
   getAllUsersPage,
   getUserOverviewPage,
@@ -544,4 +634,5 @@ module.exports = {
   createNewUser,
   downloadUserTemplate,
   showGeneratedPasswordsPage,
+  toggleUserActive,
 };

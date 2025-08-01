@@ -13,6 +13,7 @@ exports.up = (knex) =>
       .enum("role", ["Admin", "Manager", "User"])
       .notNullable()
       .defaultTo("User");
+    table.boolean("is_active").notNullable().defaultTo(true);
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table
       .timestamp("updated_at")

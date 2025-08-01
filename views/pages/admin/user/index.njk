@@ -58,6 +58,7 @@
                 <th>Nama</th>
                 <th>Email</th>
                 <th>Role</th>
+                <th>Status</th>
                 <th>Aksi</th>
               </tr>
             </thead>
@@ -67,11 +68,36 @@
                 <td>{{ user.id }}</td>
                 <td>{{ user.username }}</td>
                 <td>{{ user.email }}</td>
-                <td>{{ user.role }}</td>
                 <td>
-                  <a href="/user/edit/{{ user.id }}" class="btn btn-primary"
-                    >Edit</a
-                  >
+                  <span class="badge bg-{% if user.role == 'Admin' %}danger{% elif user.role == 'Manager' %}warning{% else %}info{% endif %}">
+                    {{ user.role }}
+                  </span>
+                </td>
+                <td>
+                  {% if user.is_active %}
+                    <span class="badge bg-success">Active</span>
+                  {% else %}
+                    <span class="badge bg-secondary">Inactive</span>
+                  {% endif %}
+                </td>
+                <td>
+                  <div class="btn-group" role="group">
+                    <a href="/user/edit/{{ user.id }}" class="btn btn-sm btn-primary">
+                      <i class="fas fa-edit"></i>
+                    </a>
+                    {% if user.id != user.session_user_id %}
+                    <form method="POST" action="/admin/user/toggle-active/{{ user.id }}" style="display: inline-block;">
+                      {{ csrfField() | safe }}
+                      <button type="submit" class="btn btn-sm {% if user.is_active %}btn-warning{% else %}btn-success{% endif %}">
+                        {% if user.is_active %}
+                          <i class="fas fa-user-slash"></i>
+                        {% else %}
+                          <i class="fas fa-user-check"></i>
+                        {% endif %}
+                      </button>
+                    </form>
+                    {% endif %}
+                  </div>
                 </td>
               </tr>
               {% endfor %}

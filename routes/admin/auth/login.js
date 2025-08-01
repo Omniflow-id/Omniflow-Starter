@@ -3,7 +3,6 @@ const bcrypt = require("bcrypt");
 const { LOG_LEVELS, log } = require("@helpers/log");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
-const { validatePassword } = require("@helpers/passwordPolicy");
 const {
   asyncHandler,
   ValidationError,
@@ -53,6 +52,23 @@ const login = asyncHandler(async (req, res) => {
   }
 
   const user = userRows[0];
+
+  // Check if user account is active
+  if (!user.is_active) {
+    const clientIP = getClientIP(req);
+    const userAgent = getUserAgent(req);
+    await log(
+      `Inactive user attempted login: ${email}`,
+      LOG_LEVELS.WARN,
+      user.id,
+      userAgent,
+      clientIP
+    );
+    throw new AuthenticationError(
+      "Your account has been deactivated. Please contact administrator."
+    );
+  }
+
   const isValid = await bcrypt.compare(password, user.password_hash);
 
   if (!isValid) {

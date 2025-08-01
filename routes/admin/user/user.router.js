@@ -21,5 +21,10 @@ router.post(
   user.uploadNewUser
 );
 router.post("/user/create", doubleCsrfProtection, user.createNewUser);
+router.post(
+  "/user/toggle-active/:id",
+  doubleCsrfProtection,
+  user.toggleUserActive
+);
 
 module.exports = router;
