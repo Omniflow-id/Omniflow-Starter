@@ -22,7 +22,7 @@ The project uses `module-alias` for cleaner import paths:
 - `@` - Project root (.)
 - `@config` - Configuration files (./config)
 - `@db` - Database files (./db)
-- `@helpers` - Helper utilities (./helpers) 
+- `@helpers` - Helper utilities (./helpers)
 - `@middlewares` - Express middlewares (./middlewares)
 - `@routes` - Route handlers (./routes)
 - `@views` - Nunjucks templates (./views)
@@ -31,6 +31,7 @@ The project uses `module-alias` for cleaner import paths:
 ### Usage Examples
 
 **Before (relative paths):**
+
 ```js
 const { db } = require("../../../db/db");
 const { log } = require("../../../helpers/log");
@@ -38,6 +39,7 @@ const { asyncHandler } = require("../../../middlewares/errorHandler");
 ```
 
 **After (module aliases):**
+
 ```js
 const { db } = require("@db/db");
 const { log } = require("@helpers/log");
@@ -67,12 +69,13 @@ const { asyncHandler } = require("@middlewares/errorHandler");
 - **Knex.js integration**: Database migrations and seeding with proper tracking
 - **Migrations**: Located in `db/migrations/` with timestamp-based naming
 - **Seeders**: Located in `db/seeders/` for development data
-- **Default users**: 
-  - admin@omniflow.id/ChiefExecutive@12345?.
-  - manager@omniflow.id/SystemSupervisor@12345?.
-  - user@omniflow.id/BasicStaff@12345?.
+- **Default users**:
+  - admin@omniflow.id/Admin12345.
+  - manager@omniflow.id/Manager12345.
+  - user@omniflow.id/User12345.
 
 #### Connection Pool Optimization
+
 - **Environment-aware sizing**: 10 connections (dev) vs 50 connections (prod)
 - **Timeout management**: 60s acquire timeout, 60s query timeout
 - **Health monitoring**: Connection lifecycle logging and error tracking
@@ -228,21 +231,23 @@ const { asyncHandler } = require("@middlewares/errorHandler");
   - **HTTP-only Cookies**: Prevents XSS token theft
   - **Cross-origin Protection**: Strict SameSite policy in production
 - **Template Usage Examples**:
+
   ```html
   <!-- Login form -->
   <form action="/admin/login" method="post">
     {{ csrfField() | safe }}
-    <input type="email" name="email" required>
-    <input type="password" name="password" required>
+    <input type="email" name="email" required />
+    <input type="password" name="password" required />
     <button type="submit">Login</button>
   </form>
-  
+
   <!-- Alternative using global variables -->
   <form action="/protected" method="post">
-    <input type="hidden" name="_csrf" value="{{ csrf }}">
+    <input type="hidden" name="_csrf" value="{{ csrf }}" />
     <!-- form fields -->
   </form>
   ```
+
 - **Configuration Variables**:
   - `CSRF_SECRET` - Custom CSRF secret (falls back to SESSION_KEY)
   - Cookie name: `csrf-token`
@@ -262,6 +267,187 @@ const { asyncHandler } = require("@middlewares/errorHandler");
 - **File Cleanup**: Temporary files automatically cleaned after processing
 - **Template Downloads**: Generated on-demand, not stored permanently
 
+### Redis Caching System
+
+- **High-Performance Caching**: Redis-based caching with database fallback for improved performance
+- **Connection Management**: Robust Redis connection with automatic reconnection and error handling
+- **Cache Strategies**: Multiple caching patterns for different use cases
+- **Cache Invalidation**: Intelligent cache invalidation on data changes
+
+#### Redis Features
+
+- **Automatic Fallback**: Graceful degradation to database when Redis is unavailable
+- **Connection Pool**: Optimized Redis connection with retry logic and health monitoring
+- **TTL Support**: Configurable time-to-live for cache entries
+- **Pattern-based Invalidation**: Wildcard support for bulk cache invalidation
+- **Multiple Cache Types**: User-specific, admin-specific, and API caching patterns
+
+#### Cache Middleware
+
+- **Response Caching**: `cacheMiddleware` for automatic route response caching
+- **User-specific Caching**: `userCacheMiddleware` for user-specific data
+- **Admin Caching**: `adminCacheMiddleware` for admin panel data with shorter TTL
+- **API Caching**: `apiCacheMiddleware` for API endpoints with proper cache headers
+- **Cache Invalidation**: `invalidateCacheMiddleware` for automatic cache cleanup
+
+#### Cache Helper Functions
+
+- **`handleCache()`**: Primary caching function with fallback strategy and performance tracking
+- **`invalidateCache()`**: Pattern-based cache invalidation with wildcard support
+- **`setCache()`/`getCache()`**: Direct cache operations for manual cache management
+- **`flushCache()`**: Bulk cache clearing with prefix filtering
+- **`getCacheStats()`**: Cache performance monitoring and connection statistics
+- **`listKeys()`**: Cache key enumeration with pattern filtering and TTL information
+
+#### Cache Configuration
+
+**Environment Variables:**
+
+```env
+# Core Redis Settings
+REDIS_ENABLED=true                      # Enable Redis caching
+REDIS_HOST=127.0.0.1                    # Redis server host
+REDIS_PORT=6379                         # Redis server port
+REDIS_PASSWORD=                         # Redis password (optional)
+REDIS_DB=0                             # Redis database number
+
+# Advanced Configuration
+REDIS_MAX_RETRIES=5                     # Connection retry attempts
+REDIS_DEFAULT_TTL=3600                  # Default cache TTL (1 hour)
+REDIS_KEY_PREFIX=omniflow:              # Cache key prefix
+```
+
+#### Usage Examples
+
+**Basic Route Caching:**
+
+```js
+const { handleCache } = require("@helpers/cache");
+
+const getUsers = async (req, res) => {
+  const result = await handleCache({
+    key: "admin:users:list",
+    ttl: 300, // 5 minutes
+    dbQueryFn: async () => {
+      const [users] = await db.query("SELECT * FROM users");
+      return users;
+    },
+  });
+
+  res.render("users", { 
+    users: result.data,
+    cacheInfo: {
+      source: result.source,
+      duration_ms: result.duration_ms,
+    },
+  });
+};
+```
+
+**Cache Invalidation on Data Changes:**
+
+```js
+const { invalidateCache } = require("@helpers/cache");
+
+const createUser = async (req, res) => {
+  // Create user logic...
+  await db.query("INSERT INTO users...", userData);
+
+  // Invalidate related caches
+  await invalidateCache("admin:users:*", true);
+  await invalidateCache("user:*", true);
+
+  res.redirect("/admin/users");
+};
+```
+
+**Middleware Usage:**
+
+```js
+const { userCacheMiddleware } = require("@middlewares/cache");
+
+// Cache user-specific data for 30 minutes
+router.get("/profile", userCacheMiddleware({ ttl: 1800 }), getUserProfile);
+```
+
+#### Cache Management
+
+The application provides two distinct cache management interfaces:
+
+**Admin Web Interface** (`/admin/cache/*`) - **Human Interface**:
+
+- **Authentication**: Session-based (`isLoggedIn`, `isAdmin`)
+- **Purpose**: Manual cache management via web dashboard
+- **Response Format**: HTML pages with flash messages for user feedback
+- **Dual Response Support**: JSON for AJAX calls, redirects for form submissions
+- **Routes**:
+  - **GET** `/admin/cache/stats` - Cache statistics page with visual dashboard
+  - **GET** `/admin/cache/test` - Cache performance test with user feedback
+  - **GET** `/admin/cache/health` - Cache health check with status display
+  - **POST** `/admin/cache/flush` - Flush all cache with success/error messages
+  - **POST** `/admin/cache/invalidate` - Pattern-based cache invalidation with feedback
+
+**API Endpoints** (`/api/cache/*`) - **Programmatic Access**:
+
+- **Authentication**: JWT-based (`verifyJWT`) for machine-to-machine communication
+- **Purpose**: External applications, mobile apps, microservices integration
+- **Response Format**: Pure JSON responses for automated systems
+- **Extended Features**: Export/import capabilities and detailed metrics
+- **Routes**:
+  - **GET** `/api/cache/stats` - Cache statistics (JSON)
+  - **GET** `/api/cache/test` - Cache performance test (JSON)
+  - **GET** `/api/cache/health` - Cache health status (JSON)
+  - **GET** `/api/cache/metrics` - Detailed cache metrics (JSON)
+  - **GET** `/api/cache/export` - Export cache data (JSON)
+  - **POST** `/api/cache/import` - Import cache data (JSON)
+  - **POST** `/api/cache/flush` - Flush all cache (JSON)
+  - **POST** `/api/cache/invalidate` - Pattern-based invalidation (JSON)
+
+**Controller Pattern**: Both interfaces follow the controller pattern with:
+
+- `cache.controller.js` (admin) and `cache.api.controller.js` (API)
+- Clean separation between web and API logic
+- Centralized export/import from individual controller files
+
+### Cache Info Component
+
+**Global Cache Information Display**: The application provides a floating cache information component that shows cache performance metrics on all cached pages.
+
+**Implementation**: `@views/components/cache_info.njk`
+- **Floating Design**: Non-intrusive floating element in top-right corner
+- **Real-time Metrics**: Shows cache source (redis/database) and response time
+- **Global Integration**: Automatically included in `masterLayout.njk` 
+- **Color-coded Badges**: Green for cache hits, yellow for database fallback
+
+**Template Usage**: Controllers pass `cacheInfo` object:
+```js
+res.render("pages/admin/users", {
+  users: result.data,
+  cacheInfo: {
+    source: result.source,        // 'redis' or 'database'
+    duration_ms: result.duration_ms, // Response time in milliseconds
+  },
+});
+```
+
+**Visual Indicators**:
+- 🟢 **Redis Cache Hit**: Green badge with sub-millisecond response times
+- 🟡 **Database Fallback**: Yellow badge when Redis unavailable
+- ⚡ **Performance**: Real-time duration display for optimization insights
+
+### Cache Implementation Coverage
+
+**Admin Controllers with Cache**:
+- `getAllUsersPage.js` - User list with 5-minute TTL
+- `getUserOverviewPage.js` - User statistics with 5-minute TTL  
+- `getLogPage.js` - Activity logs with 2-minute TTL
+
+**Automatic Cache Invalidation**:
+- `createNewUser.js` - Invalidates `admin:users:*` and `user:*`
+- `toggleUserActive.js` - Invalidates `admin:users:*` and user-specific cache
+- `uploadNewUser.js` - Bulk invalidation after user import
+- `log.js` helper - Invalidates `admin:logs:*` after new log entries (non-blocking)
+
 ## Key Patterns
 
 ### Error Handling
@@ -278,8 +464,13 @@ const { asyncHandler } = require("@middlewares/errorHandler");
 #### Error Handling Examples:
 
 **Basic Usage:**
+
 ```js
-const { asyncHandler, ValidationError, AuthenticationError } = require("../middlewares/errorHandler");
+const {
+  asyncHandler,
+  ValidationError,
+  AuthenticationError,
+} = require("../middlewares/errorHandler");
 
 // Replace try-catch with asyncHandler
 const getUsers = asyncHandler(async (req, res) => {
@@ -289,54 +480,60 @@ const getUsers = asyncHandler(async (req, res) => {
 ```
 
 **Input Validation:**
+
 ```js
 const createUser = asyncHandler(async (req, res) => {
   const { email, username } = req.body;
-  
+
   if (!email) {
     throw new ValidationError("Email is required", "email");
   }
-  
+
   if (!username) {
     throw new ValidationError("Username is required", "username");
   }
-  
+
   // Email format validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     throw new ValidationError("Please provide a valid email address", "email");
   }
-  
+
   // Business logic...
 });
 ```
 
 **Authorization Checks:**
+
 ```js
 const deleteUser = asyncHandler(async (req, res) => {
   // Check user permissions
   if (req.session.user.role !== "Admin") {
     throw new AuthorizationError("Only admins can delete users");
   }
-  
+
   // Check if trying to delete self
   if (req.params.id === req.session.user.id) {
     throw new ValidationError("Cannot delete your own account");
   }
-  
+
   // Delete logic...
 });
 ```
 
 **Database Error Handling:**
+
 ```js
 const updateUser = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { email } = req.body;
-  
+
   try {
-    const [result] = await db.query("UPDATE users SET email = ? WHERE id = ?", [email, id]);
-    
+    const [result] = await db.query("UPDATE users SET email = ? WHERE id = ?", [
+      email,
+      id,
+    ]);
+
     if (result.affectedRows === 0) {
       throw new ValidationError("User not found");
     }
@@ -346,25 +543,26 @@ const updateUser = asyncHandler(async (req, res) => {
     }
     throw new DatabaseError(`Database operation failed: ${dbError.message}`);
   }
-  
+
   res.json({ success: true });
 });
 ```
 
 **API vs Web Response:**
+
 ```js
 const getUserProfile = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  
+
   const [users] = await db.query("SELECT * FROM users WHERE id = ?", [id]);
-  
+
   if (users.length === 0) {
     throw new ValidationError("User not found");
   }
-  
+
   // For API requests: returns JSON { success: false, error: {...} }
   // For web requests: redirects with flash message or renders error page
-  
+
   if (req.xhr || req.headers.accept?.includes("application/json")) {
     res.json({ user: users[0] });
   } else {
@@ -374,37 +572,42 @@ const getUserProfile = asyncHandler(async (req, res) => {
 ```
 
 **File Upload with Error Handling:**
+
 ```js
 const uploadFile = asyncHandler(async (req, res) => {
   if (!req.file) {
     throw new ValidationError("File upload is required");
   }
-  
+
   const allowedTypes = ["image/jpeg", "image/png", "application/pdf"];
   if (!allowedTypes.includes(req.file.mimetype)) {
     throw new ValidationError("Only JPEG, PNG, and PDF files are allowed");
   }
-  
-  if (req.file.size > 5 * 1024 * 1024) { // 5MB
+
+  if (req.file.size > 5 * 1024 * 1024) {
+    // 5MB
     throw new ValidationError("File size must be less than 5MB");
   }
-  
+
   // Process file...
 });
 ```
 
 **CSRF Error Handling:**
 The centralized error handler automatically catches CSRF token validation errors:
+
 ```js
 // Automatic handling in centralizedErrorHandler.js
 if (err.code === "EBADCSRFTOKEN") {
   statusCode = 403;
-  message = "CSRF token validation failed. Please refresh the page and try again.";
+  message =
+    "CSRF token validation failed. Please refresh the page and try again.";
   isOperational = true;
 }
 ```
 
 **CSRF Protected Routes:**
+
 ```js
 const { doubleCsrfProtection } = require("@middlewares/csrfProtection");
 
@@ -456,10 +659,12 @@ router.post("/logout", doubleCsrfProtection, auth.logout);
 **Feature-Based Validation System**: The application uses a batteries-included approach where optional features only require their environment variables when explicitly enabled.
 
 **Core Required Variables** (always validated):
+
 - `SESSION_KEY` - Session encryption key
 - `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` - MySQL connection
 
 **Basic Configuration Variables** (have defaults):
+
 - `NODE_ENV` - Environment (default: "development")
 - `APP_URL` - Application URL (default: "http://localhost")
 - `PORT` - Server port (default: 1234)
@@ -471,59 +676,76 @@ router.post("/logout", doubleCsrfProtection, auth.logout);
 Each optional feature is controlled by an enable flag and only validates its variables when enabled:
 
 #### Redis Caching (`REDIS_ENABLED=true`)
+
 **Required when enabled:**
+
 - `REDIS_HOST` - Redis server host
 - `REDIS_PORT` - Redis server port
 
 **Optional:**
+
 - `REDIS_PASSWORD` - Redis authentication password
 - `REDIS_DB` - Redis database number (default: 0)
 - `REDIS_USERNAME` - Redis ACL username
 
 #### Email Notifications (`EMAIL_ENABLED=true`)
+
 **Required when enabled:**
+
 - `SMTP_HOST` - SMTP server hostname
 - `SMTP_PORT` - SMTP server port
 - `SMTP_USER` - SMTP authentication username
 - `SMTP_PASSWORD` - SMTP authentication password
 
 **Optional:**
+
 - `SMTP_FROM_NAME` - Default sender name
 - `SMTP_FROM_EMAIL` - Default sender email address
 
 #### S3 File Storage (`S3_ENABLED=true`)
+
 **Required when enabled:**
+
 - `S3_ENDPOINT_URL` - S3-compatible endpoint URL
 - `S3_ACCESS_KEY` - S3 access key ID
 - `S3_SECRET_KEY` - S3 secret access key
 - `S3_BUCKET_NAME` - S3 bucket name
 
 **Optional:**
+
 - `S3_FOLDER_NAME` - S3 folder/prefix for file organization
 - `S3_REGION` - S3 region (if applicable)
 
 #### OpenTelemetry Monitoring (`MONITORING_ENABLED=true`)
+
 **Required when enabled:**
+
 - `OTEL_EXPORTER_OTLP_TRACES_ENDPOINT` - OTLP traces endpoint URL
 
 **Optional:**
+
 - `OTEL_SERVICE_NAME` - Service name (default: "omniflow-starter")
 - `OTEL_SERVICE_VERSION` - Service version (default: "1.0.0")
 - `OTEL_METRICS_PORT` - Prometheus metrics port (default: 9091)
 - `OTEL_METRICS_ENDPOINT` - Metrics endpoint path (default: "/metrics")
 
 #### JWT Authentication (`JWT_ENABLED=true`)
+
 **Required when enabled:**
+
 - `JWT_SECRET` - JWT signing secret key
 
 **Optional:**
+
 - `JWT_EXPIRES_IN` - Access token expiration (default: "1h")
 - `JWT_REFRESH_EXPIRES_IN` - Refresh token expiration (default: "7d")
 - `JWT_ALGORITHM` - JWT signing algorithm (default: "HS256")
 
 #### CORS Configuration (`CORS_ENABLED=true`)
+
 **Optional (all have defaults):**
-- `CORS_ORIGIN` - Allowed origins (default: "*", support comma-separated multiple origins)
+
+- `CORS_ORIGIN` - Allowed origins (default: "\*", support comma-separated multiple origins)
 - `CORS_CREDENTIALS` - Allow credentials (default: true)
 - `CORS_METHODS` - Allowed HTTP methods (default: "GET,HEAD,PUT,PATCH,POST,DELETE")
 - `CORS_ALLOWED_HEADERS` - Allowed request headers
@@ -535,6 +757,7 @@ Each optional feature is controlled by an enable flag and only validates its var
 ### Built-in Features (Always Available)
 
 **Response Compression Configuration:**
+
 - `COMPRESSION_ENABLED` - Enable/disable all compression (default: true)
 - `COMPRESSION_THRESHOLD` - Minimum response size to compress in bytes (default: 1024)
 - `COMPRESSION_LEVEL` - Gzip compression level 1-9 (default: 6)
@@ -544,11 +767,13 @@ Each optional feature is controlled by an enable flag and only validates its var
 - `BROTLI_CHUNK_SIZE` - Brotli streaming chunk size in bytes (default: 16384)
 
 **Database Connection Pool:**
+
 - `DB_CONNECTION_LIMIT` - Max simultaneous connections (default: 10 dev, 50 prod)
 - `DB_ACQUIRE_TIMEOUT` - Connection acquire timeout in ms (default: 60000)
 - `DB_QUERY_TIMEOUT` - Query timeout in ms (default: 60000)
 
 **Password Policy Configuration:**
+
 - `PASSWORD_MIN_LENGTH` - Minimum password length (default: 8)
 - `PASSWORD_MAX_LENGTH` - Maximum password length (default: 128)
 - `PASSWORD_REQUIRE_UPPERCASE` - Require uppercase letters (default: true)
@@ -561,6 +786,7 @@ Each optional feature is controlled by an enable flag and only validates its var
 - `PASSWORD_FORBIDDEN_PATTERNS` - Comma-separated forbidden words
 
 **Logging Configuration:**
+
 - `TIMEZONE` - Application timezone (default: "Asia/Jakarta")
 - `LOG_LEVEL` - Logging level (default: "info")
 - `LOG_FILE` - Log file path (default: "./logs/app.log")
@@ -575,6 +801,7 @@ Each optional feature is controlled by an enable flag and only validates its var
 4. **Helpful error messages** guide users to disable unused features or check their `.env` file
 
 **Example validation output:**
+
 ```
 🔧 [CONFIG] Enabled optional features:
    • Redis caching (REDIS_ENABLED=true)
@@ -584,6 +811,7 @@ Each optional feature is controlled by an enable flag and only validates its var
 ```
 
 **Error example:**
+
 ```
 ❌ [CONFIG] Missing required environment variables:
    REDIS_HOST (required for Redis caching)
@@ -619,9 +847,9 @@ Each optional feature is controlled by an enable flag and only validates its var
 
 ```js
 // === Side-effect imports (HARUS PALING ATAS) ===
-require("./instrument.js");        // OTEL, APM, error monitoring
-require("module-alias/register");  // Module alias registration
-require("dotenv").config();        // Environment variable loading
+require("./instrument.js"); // OTEL, APM, error monitoring
+require("module-alias/register"); // Module alias registration
+require("dotenv").config(); // Environment variable loading
 
 // === Core modules ===
 const fs = require("node:fs");
@@ -647,15 +875,17 @@ const routes = require("./routes");
 ```
 
 **Import Organization Rules**:
+
 1. **Side-effect imports** go first (instrument.js, module-alias, dotenv)
 2. **Core modules** (Node.js built-ins with `node:` prefix)
 3. **Third-party modules** (from node_modules, sorted alphabetically)
-4. **Absolute/alias imports** (using `@` aliases, sorted alphabetically)  
+4. **Absolute/alias imports** (using `@` aliases, sorted alphabetically)
 5. **Relative imports** (using `./` or `../`, sorted alphabetically)
 6. **Visual separation** with comments and blank lines between each group
 7. **Alphabetical sorting** within each group for consistency
 
 **Benefits**:
+
 - ✅ **Consistency** across all files
 - ✅ **Readability** with clear visual separation
 - ✅ **Maintainability** easy to add/remove dependencies
@@ -666,12 +896,15 @@ const routes = require("./routes");
 - **No test framework** currently configured
 - **Manual testing** via web interface and API test suite
 - **Database seeder** provides test users for development
-- **API Test Suite**: `test.html` - Comprehensive JWT API testing interface with:
-  - Token management with localStorage persistence
-  - All API endpoint testing (login, refresh, protected)
-  - CORS support for cross-origin testing
-  - Real-time response visualization
-  - Modern responsive UI with error handling
+- **JWT API Test Suite**: `examples/implement_jwt.html` - Comprehensive testing interface with:
+  - **Token Management**: localStorage persistence with automatic validation
+  - **Authentication APIs**: login, refresh, protected routes testing
+  - **Cache API Testing**: stats, performance test, flush operations (requires JWT auth)
+  - **Real-time UI**: Beautiful animations, toasts, loading states
+  - **CORS Support**: Cross-origin testing capabilities
+  - **Modern Design**: Tailwind CSS with gradient backgrounds and micro-interactions
+  - **Response Terminal**: JSON syntax highlighting with smooth scrolling
+  - **Smart Authorization**: Buttons automatically enable/disable based on login status
 
 ### Local GitHub Actions Testing
 

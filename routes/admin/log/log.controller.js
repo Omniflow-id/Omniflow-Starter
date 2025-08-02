@@ -1,12 +1,29 @@
 const Excel = require("exceljs");
 const { db } = require("@db/db");
+const { handleCache } = require("@helpers/cache");
 
 const getLogPage = async (_req, res) => {
   try {
-    const [allLogs] = await db.query("SELECT * FROM activity_logs");
+    // Use cache with 2-minute TTL for activity logs
+    const result = await handleCache({
+      key: "admin:logs:all",
+      ttl: 120, // 2 minutes
+      dbQueryFn: async () => {
+        const [allLogs] = await db.query(
+          "SELECT * FROM activity_logs ORDER BY created_at DESC"
+        );
+        return allLogs;
+      },
+    });
 
     // No need to format dates here - let the template handle it with Jakarta timezone
-    res.render("pages/admin/log/index", { logs: allLogs });
+    res.render("pages/admin/log/index", {
+      logs: result.data,
+      cacheInfo: {
+        source: result.source,
+        duration_ms: result.duration_ms,
+      },
+    });
   } catch (error) {
     console.error("Error fetching all users:", error);
     res.status(500).send("Internal Server Error");

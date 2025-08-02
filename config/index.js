@@ -28,22 +28,17 @@ const config = {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    // Connection Pool Configuration
+    // Connection Pool Configuration (MySQL2 compatible)
     connectionLimit:
       parseInt(process.env.DB_CONNECTION_LIMIT) ||
       (process.env.NODE_ENV === "production" ? 50 : 10),
-    acquireTimeout: parseInt(process.env.DB_ACQUIRE_TIMEOUT) || 60000, // 60 seconds
-    timeout: parseInt(process.env.DB_QUERY_TIMEOUT) || 60000, // 60 seconds
-    reconnect: process.env.DB_RECONNECT !== "false", // Default: true
-    // Connection Retry Configuration
-    reconnectDelay: parseInt(process.env.DB_RECONNECT_DELAY) || 2000, // 2 seconds
-    maxReconnects: parseInt(process.env.DB_MAX_RECONNECTS) || 3,
-    // Connection Health Configuration
-    keepAliveInitialDelay: parseInt(process.env.DB_KEEPALIVE_DELAY) || 0,
-    enableKeepAlive: process.env.DB_ENABLE_KEEPALIVE !== "false", // Default: true
+    queueLimit: parseInt(process.env.DB_QUEUE_LIMIT) || 0,
+    waitForConnections: true,
+    maxIdle: parseInt(process.env.DB_MAX_IDLE) || 10,
+    idleTimeout: parseInt(process.env.DB_IDLE_TIMEOUT) || 60000,
     // Advanced Settings
     multipleStatements: process.env.DB_MULTIPLE_STATEMENTS === "true", // Default: false for security
-    timezone: process.env.DB_TIMEZONE || process.env.TIMEZONE || "Asia/Jakarta",
+    timezone: "+07:00", // MySQL2 compatible timezone format
     charset: process.env.DB_CHARSET || "utf8mb4",
     // SSL Configuration (optional)
     ssl:
@@ -174,6 +169,26 @@ const config = {
     preflightContinue: process.env.CORS_PREFLIGHT_CONTINUE === "true",
     optionsSuccessStatus:
       parseInt(process.env.CORS_OPTIONS_SUCCESS_STATUS) || 204,
+  },
+
+  redis: {
+    enabled: process.env.REDIS_ENABLED === "true",
+    host: process.env.REDIS_HOST || "127.0.0.1",
+    port: parseInt(process.env.REDIS_PORT) || 6379,
+    password: process.env.REDIS_PASSWORD || undefined,
+    db: parseInt(process.env.REDIS_DB) || 0,
+    username: process.env.REDIS_USERNAME || undefined,
+    // Connection configuration
+    maxRetries: parseInt(process.env.REDIS_MAX_RETRIES) || 5,
+    retryDelayOnFailover: parseInt(process.env.REDIS_RETRY_DELAY) || 100,
+    enableReadyCheck: process.env.REDIS_READY_CHECK !== "false", // Default: true
+    maxRetriesPerRequest:
+      parseInt(process.env.REDIS_MAX_RETRIES_PER_REQUEST) || 3,
+    lazyConnect: process.env.REDIS_LAZY_CONNECT !== "false", // Default: true
+    keepAlive: parseInt(process.env.REDIS_KEEP_ALIVE) || 30000, // 30 seconds
+    // Cache configuration
+    defaultTTL: parseInt(process.env.REDIS_DEFAULT_TTL) || 3600, // 1 hour default
+    keyPrefix: process.env.REDIS_KEY_PREFIX || "omniflow:",
   },
 };
 

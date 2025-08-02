@@ -5,6 +5,7 @@ const path = require("node:path");
 // === Relative imports ===
 const { db } = require("../db/db");
 const config = require("../config");
+const { invalidateCache } = require("./cache");
 
 const LOG_LEVELS = {
   INFO: "INFO",
@@ -66,6 +67,20 @@ async function log(
       "INSERT INTO activity_logs (user_id, activity, ip_address, device_type, browser, platform, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
       [user_id, message, ip, deviceType, browser, platform, new Date()]
     );
+
+    // Invalidate logs cache after new log entry
+    // Use setImmediate to avoid blocking the log operation
+    setImmediate(async () => {
+      try {
+        await invalidateCache("admin:logs:*", true);
+      } catch (cacheErr) {
+        // Don't let cache errors affect logging
+        console.warn(
+          "Warning: Failed to invalidate logs cache:",
+          cacheErr.message
+        );
+      }
+    });
   } catch (err) {
     console.error("Error logging to database:", err);
   }

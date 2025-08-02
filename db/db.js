@@ -64,11 +64,17 @@ if (config.app.env === "development") {
 function getPoolStats() {
   return {
     totalConnections: db.pool.config.connectionLimit,
-    activeConnections: db.pool._allConnections.length,
-    idleConnections: db.pool._freeConnections.length,
-    queuedRequests: db.pool._connectionQueue.length,
-    acquireTimeout: db.pool.config.acquireTimeout,
-    queryTimeout: db.pool.config.timeout,
+    activeConnections: db.pool._allConnections
+      ? db.pool._allConnections.length
+      : 0,
+    idleConnections: db.pool._freeConnections
+      ? db.pool._freeConnections.length
+      : 0,
+    queuedRequests: db.pool._connectionQueue
+      ? db.pool._connectionQueue.length
+      : 0,
+    maxIdle: db.pool.config.maxIdle,
+    idleTimeout: db.pool.config.idleTimeout,
   };
 }
 
@@ -107,9 +113,9 @@ async function closePool() {
 if (config.app.env === "development") {
   console.log("🔧 [DB] Connection pool initialized:", {
     connectionLimit: config.database.connectionLimit,
-    acquireTimeout: config.database.acquireTimeout,
-    queryTimeout: config.database.timeout,
-    reconnect: config.database.reconnect,
+    queueLimit: config.database.queueLimit,
+    maxIdle: config.database.maxIdle,
+    idleTimeout: config.database.idleTimeout,
     environment: config.app.env,
   });
 }

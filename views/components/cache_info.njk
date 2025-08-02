@@ -1,0 +1,18 @@
+{% if cacheInfo %}
+<div class="position-fixed" style="top: 80px; right: 20px; z-index: 1040">
+  <small
+    class="text-muted bg-white px-2 py-1 rounded-pill border shadow-sm"
+    style="font-size: 0.75rem"
+  >
+    <i class="fas fa-database me-1"></i>
+    <span
+      class="badge bg-{% if cacheInfo.source == 'cache' %}success{% elif cacheInfo.source == 'redis' %}success{% else %}warning{% endif %} me-1"
+      >{{ cacheInfo.source }}</span
+    >
+    {% if cacheInfo.duration_ms !== undefined and cacheInfo.duration_ms !== null
+    %}
+    <span class="text-secondary">{{ cacheInfo.duration_ms }}ms</span>
+    {% endif %}
+  </small>
+</div>
+{% endif %}l

@@ -148,8 +148,8 @@ const authLimiter = rateLimit({
 
 // Admin operation limiter - admin-only operations
 const adminLimiter = rateLimit({
-  windowMs: 5 * 60 * 1000, // 5 minutes
-  max: 50, // limit each IP to 50 admin requests per windowMs
+  windowMs: 15 * 60 * 1000, // 5 minutes
+  max: 100, // limit each IP to 50 admin requests per windowMs
   message: {
     error:
       "Too many admin requests from this IP, please try again after 5 minutes.",

@@ -1,5 +1,6 @@
 // === Absolute / alias imports ===
 const { db } = require("@db/db");
+const { invalidateCache } = require("@helpers/cache");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
 const { log, LOG_LEVELS } = require("@helpers/log");
@@ -44,6 +45,10 @@ const toggleUserActive = async (req, res) => {
       userAgentData,
       ip
     );
+
+    // Invalidate user-related caches after status change
+    await invalidateCache("admin:users:*", true);
+    await invalidateCache(`user:${userId}:*`, true);
 
     req.flash(
       "success",

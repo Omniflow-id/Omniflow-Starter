@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 
 // === Absolute / alias imports ===
 const { db } = require("@db/db");
+const { invalidateCache } = require("@helpers/cache");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
 const { log, LOG_LEVELS } = require("@helpers/log");
@@ -103,6 +104,10 @@ const createNewUser = async (req, res) => {
       userAgentData,
       ip
     );
+
+    // Invalidate user-related caches
+    await invalidateCache("admin:users:*", true);
+    await invalidateCache("user:*", true);
 
     // Store generated password for display
     req.session.singleUserPassword = {

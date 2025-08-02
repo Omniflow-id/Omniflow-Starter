@@ -4,6 +4,7 @@ const Excel = require("exceljs");
 
 // === Absolute / alias imports ===
 const { db } = require("@db/db");
+const { invalidateCache } = require("@helpers/cache");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
 const { log, LOG_LEVELS } = require("@helpers/log");
@@ -121,6 +122,10 @@ const uploadNewUser = async (req, res) => {
 
     // Handle results and show password list
     if (successfulUsers.length > 0) {
+      // Invalidate user-related caches after bulk creation
+      await invalidateCache("admin:users:*", true);
+      await invalidateCache("user:*", true);
+
       // Store generated passwords in session for display
       req.session.generatedPasswords = successfulUsers;
 
