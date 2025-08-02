@@ -190,6 +190,26 @@ const config = {
     defaultTTL: parseInt(process.env.REDIS_DEFAULT_TTL) || 3600, // 1 hour default
     keyPrefix: process.env.REDIS_KEY_PREFIX || "omniflow:",
   },
+
+  rabbitmq: {
+    enabled: process.env.RABBITMQ_ENABLED === "true",
+    host: process.env.RABBITMQ_HOST || "localhost",
+    port: parseInt(process.env.RABBITMQ_PORT) || 5672,
+    username: process.env.RABBITMQ_USER || "guest",
+    password: process.env.RABBITMQ_PASSWORD || "guest",
+    // Connection configuration
+    maxReconnectAttempts: parseInt(process.env.RABBITMQ_MAX_RECONNECT_ATTEMPTS) || 10,
+    reconnectDelay: parseInt(process.env.RABBITMQ_RECONNECT_DELAY) || 1000,
+    // Queue configuration
+    defaultQueueOptions: {
+      durable: process.env.RABBITMQ_QUEUE_DURABLE !== "false", // Default: true
+      autoDelete: process.env.RABBITMQ_QUEUE_AUTO_DELETE === "true", // Default: false
+    },
+    // Message configuration
+    defaultMessageOptions: {
+      persistent: process.env.RABBITMQ_MESSAGE_PERSISTENT !== "false", // Default: true
+    },
+  },
 };
 
 module.exports = config;

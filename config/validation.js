@@ -55,6 +55,22 @@ const validateEnvVariables = () => {
       optional: ["JWT_EXPIRES_IN", "JWT_REFRESH_EXPIRES_IN"],
       description: "JWT authentication",
     },
+    rabbitmq: {
+      enableFlag: "RABBITMQ_ENABLED",
+      required: [], // All have defaults for development
+      optional: [
+        "RABBITMQ_HOST",
+        "RABBITMQ_PORT",
+        "RABBITMQ_USER",
+        "RABBITMQ_PASSWORD",
+        "RABBITMQ_MAX_RECONNECT_ATTEMPTS",
+        "RABBITMQ_RECONNECT_DELAY",
+        "RABBITMQ_QUEUE_DURABLE",
+        "RABBITMQ_QUEUE_AUTO_DELETE",
+        "RABBITMQ_MESSAGE_PERSISTENT",
+      ],
+      description: "RabbitMQ job queue",
+    },
   };
 
   // Variables with defaults (always optional)

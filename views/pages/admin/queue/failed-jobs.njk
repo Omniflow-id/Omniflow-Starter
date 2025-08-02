@@ -1,0 +1,173 @@
+{% extends "layout/masterLayout.njk" %}
+
+{% block title %}Failed Jobs{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+  <h1 class="mt-4">Failed Jobs</h1>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div></div>
+    <div>
+      <a href="/admin/queue" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i>Back to Queue Stats
+      </a>
+    </div>
+  </div>
+
+      {% if failedJobs.length > 0 %}
+      <div class="card">
+        <div class="card-header">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+              Failed Jobs ({{ pagination.total }} total)
+            </h5>
+            <form action="/admin/queue/retry" method="POST" class="d-inline">
+              {{ csrfField() | safe }}
+              <button type="submit" class="btn btn-warning btn-sm">
+                <i class="fas fa-redo"></i> Retry Selected
+              </button>
+            </form>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Queue</th>
+                  <th>Data</th>
+                  <th>Error</th>
+                  <th>Attempts</th>
+                  <th>Created</th>
+                  <th>Next Retry</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for job in failedJobs %}
+                <tr>
+                  <td>
+                    <code>#{{ job.id }}</code>
+                  </td>
+                  <td>
+                    <span class="badge bg-secondary">{{ job.queue }}</span>
+                  </td>
+                  <td>
+                    <button
+                      class="btn btn-sm btn-outline-info"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#job-data-{{ job.id }}"
+                    >
+                      <i class="fas fa-eye"></i> View
+                    </button>
+                    <div class="collapse mt-2" id="job-data-{{ job.id }}">
+                      <pre
+                        class="small bg-light p-2 rounded"
+                      ><code>{{ job.data | safe }}</code></pre>
+                    </div>
+                  </td>
+                  <td>
+                    <button
+                      class="btn btn-sm btn-outline-danger"
+                      data-bs-toggle="collapse"
+                      data-bs-target="#job-error-{{ job.id }}"
+                    >
+                      <i class="fas fa-exclamation-triangle"></i> Error
+                    </button>
+                    <div class="collapse mt-2" id="job-error-{{ job.id }}">
+                      <div class="alert alert-danger small mb-0">
+                        {{ job.error }}
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span
+                      class="badge {% if job.attempts >= job.max_attempts %}bg-danger{% else %}bg-warning{% endif %}"
+                    >
+                      {{ job.attempts }}/{{ job.max_attempts }}
+                    </span>
+                  </td>
+                  <td>
+                    <small>{{ job.created_at | formatDateTime }}</small>
+                  </td>
+                  <td>
+                    {% if job.retry_at %}
+                    <small>{{ job.retry_at | formatDateTime }}</small>
+                    {% else %}
+                    <small class="text-muted">-</small>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          {% if pagination.totalPages > 1 %}
+          <nav aria-label="Failed jobs pagination">
+            <ul class="pagination justify-content-center">
+              {% if pagination.currentPage > 1 %}
+              <li class="page-item">
+                <a
+                  class="page-link"
+                  href="?page={{ pagination.currentPage - 1 }}&limit={{
+                    pagination.limit
+                  }}"
+                >
+                  Previous
+                </a>
+              </li>
+              {% endif %} {% for page in range(1, pagination.totalPages + 1) %}
+              {% if page == pagination.currentPage %}
+              <li class="page-item active">
+                <span class="page-link">{{ page }}</span>
+              </li>
+              {% elif page <= 3 or page > pagination.totalPages - 3 or (page >=
+              pagination.currentPage - 1 and page <= pagination.currentPage + 1)
+              %}
+              <li class="page-item">
+                <a
+                  class="page-link"
+                  href="?page={{ page }}&limit={{ pagination.limit }}"
+                  >{{ page }}</a
+                >
+              </li>
+              {% elif page == 4 or page == pagination.totalPages - 3 %}
+              <li class="page-item disabled">
+                <span class="page-link">...</span>
+              </li>
+              {% endif %} {% endfor %} {% if pagination.currentPage <
+              pagination.totalPages %}
+              <li class="page-item">
+                <a
+                  class="page-link"
+                  href="?page={{ pagination.currentPage + 1 }}&limit={{
+                    pagination.limit
+                  }}"
+                >
+                  Next
+                </a>
+              </li>
+              {% endif %}
+            </ul>
+          </nav>
+          {% endif %}
+        </div>
+      </div>
+      {% else %}
+      <div class="card">
+        <div class="card-body text-center py-5">
+          <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
+          <h4>No Failed Jobs</h4>
+          <p class="text-muted">All jobs are processing successfully!</p>
+          <a href="/admin/queue" class="btn btn-primary">
+            <i class="fas fa-arrow-left"></i> Back to Queue Stats
+          </a>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Application Overview
 
-**Omniflow-Starter** is a Node.js ERP module starter pack built with Express.js, MySQL, and Nunjucks templating. It provides user management, role-based access control, activity logging, and Excel file processing capabilities for HRIS applications.
+**Omniflow-Starter** is a Node.js ERP module starter pack built with Express.js, MySQL, and Nunjucks templating. It provides user management, role-based access control, activity logging, Excel file processing, and enterprise-grade RabbitMQ job queue system for HRIS applications.
 
 ## Development Commands
 
@@ -448,6 +448,174 @@ res.render("pages/admin/users", {
 - `uploadNewUser.js` - Bulk invalidation after user import
 - `log.js` helper - Invalidates `admin:logs:*` after new log entries (non-blocking)
 
+### RabbitMQ Job Queue System
+
+**Enterprise-Grade Message Queue**: Production-ready job queue system built on RabbitMQ with comprehensive failure handling, monitoring, and admin management.
+
+#### Core Features
+
+- **🔄 Job Lifecycle Management**: Complete job tracking from pending → processing → completed/failed
+- **💾 Database Persistence**: Jobs stored in MySQL `jobs` table for durability and monitoring
+- **🐰 RabbitMQ Integration**: Reliable message queuing with auto-reconnection and clustering support
+- **🛡️ Circuit Breaker Pattern**: Protection against cascading failures with automatic recovery
+- **💀 Dead Letter Queue (DLQ)**: Failed message handling with 24-hour TTL and manual recovery
+- **👥 Worker Management**: Clean worker abstraction for easy scaling and maintenance
+
+#### Architecture Components
+
+**Queue Helper** (`@helpers/queue.js`):
+- **Connection Management**: Auto-reconnection with exponential backoff strategy
+- **Circuit Breaker**: RabbitMQ protection with 5-failure threshold and 1-minute recovery
+- **Database Fallback**: Job persistence even when RabbitMQ is unavailable
+- **Comprehensive Logging**: Production-ready logging with Redis-style format
+
+**Worker System** (`workers/`):
+- **WorkerManager**: Orchestrates multiple workers with centralized lifecycle management
+- **TestWorker**: Simple console.log worker for development and testing
+- **Extensible Design**: Easy to add new workers (email, notifications, reports)
+
+**Admin Management** (`/admin/queue/*`):
+- **Real-time Statistics**: Job counts by status with Redis-backed caching
+- **Failed Job Management**: View, retry, and monitor failed jobs with pagination
+- **Connection Monitoring**: RabbitMQ connection status and circuit breaker state
+- **Queue Operations**: Send test jobs, retry failed jobs, view recent activity
+
+#### Database Schema
+
+**jobs table**:
+```sql
+- id (primary key)
+- queue (string, indexed)
+- data (JSON payload)
+- status (enum: pending, processing, completed, failed)
+- attempts, max_attempts (retry logic)
+- error (failure details)
+- available_at, started_at, completed_at (timestamps)
+- created_at, updated_at (audit trail)
+```
+
+#### Configuration
+
+**Environment Variables**:
+```env
+# Core RabbitMQ Settings
+RABBITMQ_ENABLED=true
+RABBITMQ_HOST=127.0.0.1
+RABBITMQ_PORT=5672
+RABBITMQ_USER=guest
+RABBITMQ_PASSWORD=guest
+
+# Advanced Configuration
+RABBITMQ_MAX_RECONNECT_ATTEMPTS=10
+RABBITMQ_RECONNECT_DELAY=1000
+RABBITMQ_QUEUE_DURABLE=true
+RABBITMQ_QUEUE_AUTO_DELETE=false
+RABBITMQ_MESSAGE_PERSISTENT=true
+```
+
+#### Usage Examples
+
+**Sending Jobs**:
+```js
+const { sendToQueue } = require("@helpers/queue");
+
+// Simple job
+await sendToQueue("test_queue", {
+  type: "test_job",
+  message: "Hello from admin panel",
+  timestamp: new Date().toISOString(),
+  triggeredBy: req.session.user.email
+});
+
+// Job with options
+await sendToQueue("email_queue", emailData, {
+  priority: 10,
+  maxAttempts: 5
+});
+```
+
+**Creating Workers**:
+```js
+// workers/emailWorker.js
+const { consume } = require("@helpers/queue");
+
+class EmailWorker {
+  async start() {
+    await consume("email_queue", async (data) => {
+      // Process email job
+      await sendEmail(data.to, data.subject, data.body);
+    });
+  }
+}
+```
+
+**Admin Integration**:
+```js
+// Get queue statistics
+const stats = await getStats(); // { pending: 5, processing: 2, completed: 100, failed: 3 }
+
+// Get failed jobs with pagination
+const result = await getFailedJobs(page, limit);
+
+// Retry failed jobs
+const retriedCount = await retryFailedJobs(10);
+```
+
+#### Monitoring & Management
+
+**Admin Panel Features**:
+- **Queue Statistics**: Real-time job counts with cache optimization
+- **Connection Status**: RabbitMQ health with circuit breaker state monitoring
+- **Failed Job Management**: Detailed error viewing, retry functionality, bulk operations
+- **Test Job Creation**: Admin can send test jobs to verify worker functionality
+- **Cache Integration**: Queue stats cached for 2 minutes for performance
+
+**Circuit Breaker States**:
+- **CLOSED**: Normal operation, all jobs processed
+- **OPEN**: Service protection active, jobs saved to database only
+- **HALF_OPEN**: Testing recovery, limited job processing
+
+**Dead Letter Queue**:
+- **Automatic Routing**: Jobs failing 3+ times automatically moved to DLQ
+- **24-Hour TTL**: DLQ messages expire after 24 hours to prevent buildup
+- **Manual Recovery**: Admin can view and reprocess DLQ messages
+
+#### Production Deployment
+
+**Single Command Startup**:
+```bash
+npm start  # Starts server + workers automatically
+```
+
+**Graceful Shutdown**:
+- Proper RabbitMQ connection cleanup
+- Worker process termination
+- Database connection pool closure
+- 10-second force shutdown timeout
+
+**Scaling Considerations**:
+- Workers run in same process for development
+- Easy to separate workers to different processes/servers
+- RabbitMQ clustering supported for high availability
+- Database connection pooling optimized for concurrent job processing
+
+#### Integration with Existing Systems
+
+**Cache Invalidation**:
+- Queue operations invalidate `admin:queue:*` cache patterns
+- Real-time statistics updated after job status changes
+- Cache-aside pattern for optimal performance
+
+**Activity Logging**:
+- All queue operations logged to activity system
+- Job failures tracked with full error context
+- Admin actions (retry, test jobs) logged with user attribution
+
+**Error Handling**:
+- Circuit breaker failures logged with context
+- Database fallback operations tracked
+- Comprehensive error messages for admin troubleshooting
+
 ## Key Patterns
 
 ### Error Handling
@@ -687,6 +855,23 @@ Each optional feature is controlled by an enable flag and only validates its var
 - `REDIS_PASSWORD` - Redis authentication password
 - `REDIS_DB` - Redis database number (default: 0)
 - `REDIS_USERNAME` - Redis ACL username
+
+#### RabbitMQ Job Queue (`RABBITMQ_ENABLED=true`)
+
+**Required when enabled:**
+
+- `RABBITMQ_HOST` - RabbitMQ server host
+- `RABBITMQ_PORT` - RabbitMQ server port
+- `RABBITMQ_USER` - RabbitMQ authentication username
+- `RABBITMQ_PASSWORD` - RabbitMQ authentication password
+
+**Optional:**
+
+- `RABBITMQ_MAX_RECONNECT_ATTEMPTS` - Max reconnection attempts (default: 10)
+- `RABBITMQ_RECONNECT_DELAY` - Reconnection delay in ms (default: 5000)
+- `RABBITMQ_QUEUE_DURABLE` - Queue durability (default: true)
+- `RABBITMQ_QUEUE_AUTO_DELETE` - Auto-delete queues (default: false)
+- `RABBITMQ_MESSAGE_PERSISTENT` - Message persistence (default: true)
 
 #### Email Notifications (`EMAIL_ENABLED=true`)
 

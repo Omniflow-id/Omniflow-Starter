@@ -1,7 +1,15 @@
 {
   "permissions": {
-    "allow": ["Bash(git add:*)", "mcp__sequential-thinking__sequentialthinking"]
+    "allow": [
+      "Bash(git add:*)",
+      "mcp__sequential-thinking__sequentialthinking",
+      "Bash(npx knex migrate:status:*)"
+    ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["mcp-tools", "sequential-thinking", "filesystem"]
+  "enabledMcpjsonServers": [
+    "mcp-tools",
+    "sequential-thinking",
+    "filesystem"
+  ]
 }
