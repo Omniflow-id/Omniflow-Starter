@@ -198,7 +198,8 @@ const config = {
     username: process.env.RABBITMQ_USER || "guest",
     password: process.env.RABBITMQ_PASSWORD || "guest",
     // Connection configuration
-    maxReconnectAttempts: parseInt(process.env.RABBITMQ_MAX_RECONNECT_ATTEMPTS) || 10,
+    maxReconnectAttempts:
+      parseInt(process.env.RABBITMQ_MAX_RECONNECT_ATTEMPTS) || 10,
     reconnectDelay: parseInt(process.env.RABBITMQ_RECONNECT_DELAY) || 1000,
     // Queue configuration
     defaultQueueOptions: {

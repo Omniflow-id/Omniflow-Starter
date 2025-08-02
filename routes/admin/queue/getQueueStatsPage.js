@@ -1,4 +1,8 @@
-const { getConnectionStatus, getStats, getRecentFailedJobs } = require("@helpers/queue");
+const {
+  getConnectionStatus,
+  getStats,
+  getRecentFailedJobs,
+} = require("@helpers/queue");
 const { handleCache } = require("@helpers/cache");
 const { asyncHandler } = require("@middlewares/errorHandler");
 

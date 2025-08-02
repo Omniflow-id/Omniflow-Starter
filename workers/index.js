@@ -24,7 +24,7 @@ class WorkerManager {
   async start() {
     try {
       console.log("🔧 Starting Worker Manager...");
-      
+
       // Wait for RabbitMQ connection to be ready
       await this.waitForConnection();
 
@@ -33,12 +33,17 @@ class WorkerManager {
         try {
           await worker.start();
         } catch (error) {
-          console.error(`❌ Failed to start worker ${worker.constructor.name}:`, error.message);
+          console.error(
+            `❌ Failed to start worker ${worker.constructor.name}:`,
+            error.message
+          );
         }
       }
 
-      const runningWorkers = this.workers.filter(w => w.isRunning).length;
-      console.log(`✅ Worker Manager started: ${runningWorkers}/${this.workers.length} workers running`);
+      const runningWorkers = this.workers.filter((w) => w.isRunning).length;
+      console.log(
+        `✅ Worker Manager started: ${runningWorkers}/${this.workers.length} workers running`
+      );
 
       this.setupGracefulShutdown();
     } catch (error) {
@@ -49,22 +54,22 @@ class WorkerManager {
 
   async waitForConnection(maxWaitTime = 30000) {
     const startTime = Date.now();
-    
+
     while (!queueService.isConnected) {
       if (Date.now() - startTime > maxWaitTime) {
         throw new Error("Timeout waiting for RabbitMQ connection");
       }
-      
+
       console.log("⏳ Waiting for RabbitMQ connection...");
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
     }
-    
+
     console.log("🐰 RabbitMQ connection ready, starting workers...");
   }
 
   async stop() {
     if (this.isShuttingDown) return;
-    
+
     this.isShuttingDown = true;
     console.log("🛑 Stopping all workers...");
 
@@ -72,7 +77,10 @@ class WorkerManager {
       try {
         await worker.stop();
       } catch (error) {
-        console.error(`Error stopping worker ${worker.constructor.name}:`, error.message);
+        console.error(
+          `Error stopping worker ${worker.constructor.name}:`,
+          error.message
+        );
       }
     }
 
@@ -82,9 +90,9 @@ class WorkerManager {
   getStatus() {
     return {
       manager: "WorkerManager",
-      workers: this.workers.map(w => w.getStatus()),
+      workers: this.workers.map((w) => w.getStatus()),
       totalWorkers: this.workers.length,
-      runningWorkers: this.workers.filter(w => w.isRunning).length,
+      runningWorkers: this.workers.filter((w) => w.isRunning).length,
     };
   }
 

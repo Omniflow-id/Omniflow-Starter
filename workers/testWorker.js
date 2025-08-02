@@ -11,13 +11,13 @@ class TestWorker {
   async start() {
     try {
       console.log(`🧪 Starting test worker for queue: ${this.queueName}`);
-      
+
       await consume(this.queueName, async (data) => {
         console.log("🎯 JOB RECEIVED:", data);
-        
+
         // Simulate some work
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
         console.log("✅ JOB COMPLETED");
       });
 

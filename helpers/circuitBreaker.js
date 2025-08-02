@@ -9,19 +9,19 @@ class CircuitBreaker {
     this.failureThreshold = options.failureThreshold || 5;
     this.recoveryTimeout = options.recoveryTimeout || 60000; // 1 minute
     this.monitoringPeriod = options.monitoringPeriod || 10000; // 10 seconds
-    
-    this.state = 'CLOSED'; // CLOSED, OPEN, HALF_OPEN
+
+    this.state = "CLOSED"; // CLOSED, OPEN, HALF_OPEN
     this.failureCount = 0;
     this.lastFailureTime = null;
     this.successCount = 0;
-    
+
     console.log(`🔐 Circuit Breaker initialized for ${service}`);
   }
 
   async execute(operation, ...args) {
-    if (this.state === 'OPEN') {
+    if (this.state === "OPEN") {
       if (this._shouldAttemptReset()) {
-        this.state = 'HALF_OPEN';
+        this.state = "HALF_OPEN";
         console.log(`🔄 Circuit Breaker HALF_OPEN for ${this.service}`);
       } else {
         const error = new Error(`Circuit breaker is OPEN for ${this.service}`);
@@ -42,11 +42,12 @@ class CircuitBreaker {
 
   _onSuccess() {
     this.failureCount = 0;
-    
-    if (this.state === 'HALF_OPEN') {
+
+    if (this.state === "HALF_OPEN") {
       this.successCount++;
-      if (this.successCount >= 2) { // Need 2 successes to close
-        this.state = 'CLOSED';
+      if (this.successCount >= 2) {
+        // Need 2 successes to close
+        this.state = "CLOSED";
         this.successCount = 0;
         console.log(`✅ Circuit Breaker CLOSED for ${this.service}`);
       }
@@ -56,14 +57,16 @@ class CircuitBreaker {
   _onFailure() {
     this.failureCount++;
     this.lastFailureTime = Date.now();
-    
-    if (this.state === 'HALF_OPEN') {
-      this.state = 'OPEN';
+
+    if (this.state === "HALF_OPEN") {
+      this.state = "OPEN";
       this.successCount = 0;
       console.log(`❌ Circuit Breaker back to OPEN for ${this.service}`);
     } else if (this.failureCount >= this.failureThreshold) {
-      this.state = 'OPEN';
-      console.log(`🚨 Circuit Breaker OPEN for ${this.service} (${this.failureCount} failures)`);
+      this.state = "OPEN";
+      console.log(
+        `🚨 Circuit Breaker OPEN for ${this.service} (${this.failureCount} failures)`
+      );
     }
   }
 
@@ -85,7 +88,7 @@ class CircuitBreaker {
 
   // Reset circuit breaker manually (for admin panel)
   reset() {
-    this.state = 'CLOSED';
+    this.state = "CLOSED";
     this.failureCount = 0;
     this.successCount = 0;
     this.lastFailureTime = null;

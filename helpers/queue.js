@@ -13,9 +13,9 @@ class QueueService {
     this.isConnected = false;
     this.isReconnecting = false;
     this.reconnectionTimer = null;
-    
+
     // Circuit breaker for external services protection
-    this.circuitBreaker = new CircuitBreaker('RabbitMQ', {
+    this.circuitBreaker = new CircuitBreaker("RabbitMQ", {
       failureThreshold: 5,
       recoveryTimeout: 60000, // 1 minute
     });
@@ -34,7 +34,7 @@ class QueueService {
       const encodedUser = encodeURIComponent(config.rabbitmq.username);
       const encodedPassword = encodeURIComponent(config.rabbitmq.password);
       const rabbitmqUrl = `amqp://${encodedUser}:${encodedPassword}@${config.rabbitmq.host}:${config.rabbitmq.port}`;
-      
+
       console.log("RabbitMQ: Attempting to connect:", {
         url: rabbitmqUrl.replace(/\/\/.*@/, "//***:***@"),
         attempt: this.reconnectAttempts + 1,
@@ -60,7 +60,7 @@ class QueueService {
 
       await this.setupQueues();
       console.log("RabbitMQ: Ready to process jobs");
-      
+
       return true;
     } catch (error) {
       this.isConnected = false;
@@ -74,9 +74,7 @@ class QueueService {
     // Setup Dead Letter Exchange first
     await this.setupDeadLetterExchange();
 
-    const queues = [
-      "test_queue"
-    ];
+    const queues = ["test_queue"];
 
     for (const queueName of queues) {
       await this.setupQueueWithDLQ(queueName);
@@ -86,42 +84,45 @@ class QueueService {
 
   async setupDeadLetterExchange() {
     // Dead Letter Exchange
-    await this.channel.assertExchange('dlx', 'direct', { durable: true });
-    
+    await this.channel.assertExchange("dlx", "direct", { durable: true });
+
     // Dead Letter Queue
-    await this.channel.assertQueue('dead_letter_queue', {
+    await this.channel.assertQueue("dead_letter_queue", {
       durable: true,
       arguments: {
-        'x-message-ttl': 24 * 60 * 60 * 1000, // 24 hours TTL for DLQ messages
-      }
+        "x-message-ttl": 24 * 60 * 60 * 1000, // 24 hours TTL for DLQ messages
+      },
     });
-    
+
     // Bind DLQ to DLX
-    await this.channel.bindQueue('dead_letter_queue', 'dlx', 'dead');
-    
-    console.log('Dead Letter Exchange and Queue setup completed');
+    await this.channel.bindQueue("dead_letter_queue", "dlx", "dead");
+
+    console.log("Dead Letter Exchange and Queue setup completed");
   }
 
   async setupQueueWithDLQ(queueName) {
     await this.channel.assertQueue(queueName, {
       ...config.rabbitmq.defaultQueueOptions,
       arguments: {
-        'x-dead-letter-exchange': 'dlx',
-        'x-dead-letter-routing-key': 'dead',
-        'x-max-retries': 3, // Max retries before going to DLQ
-      }
+        "x-dead-letter-exchange": "dlx",
+        "x-dead-letter-routing-key": "dead",
+        "x-max-retries": 3, // Max retries before going to DLQ
+      },
     });
   }
 
   async handleConnectionError(error) {
     this.isConnected = false;
-    
+
     console.error("RabbitMQ connection error:", {
       error: error.message,
       reconnectAttempts: this.reconnectAttempts,
     });
 
-    if (!this.isReconnecting && this.reconnectAttempts < this.maxReconnectAttempts) {
+    if (
+      !this.isReconnecting &&
+      this.reconnectAttempts < this.maxReconnectAttempts
+    ) {
       this.isReconnecting = true;
       await this.reconnect();
     }
@@ -131,11 +132,14 @@ class QueueService {
     this.isConnected = false;
     this.connection = null;
     this.channel = null;
-    
+
     console.warn("RabbitMQ: Connection closed");
 
     // Schedule single reconnection attempt after delay
-    if (!this.reconnectionTimer && this.reconnectAttempts < this.maxReconnectAttempts) {
+    if (
+      !this.reconnectionTimer &&
+      this.reconnectAttempts < this.maxReconnectAttempts
+    ) {
       this.reconnectionTimer = setTimeout(() => {
         this.reconnectionTimer = null;
         if (!this.isConnected && config.rabbitmq.enabled) {
@@ -148,11 +152,14 @@ class QueueService {
 
   async reconnect() {
     this.reconnectAttempts++;
-    
+
     const delays = [1000, 2000, 5000, 10000, 30000];
-    const delay = delays[Math.min(this.reconnectAttempts - 1, delays.length - 1)];
-    
-    console.log(`RabbitMQ: Retry attempt ${this.reconnectAttempts}, waiting ${delay}ms`);
+    const delay =
+      delays[Math.min(this.reconnectAttempts - 1, delays.length - 1)];
+
+    console.log(
+      `RabbitMQ: Retry attempt ${this.reconnectAttempts}, waiting ${delay}ms`
+    );
 
     setTimeout(async () => {
       await this.connect();
@@ -161,7 +168,7 @@ class QueueService {
 
   async sendToQueue(queueName, data, options = {}) {
     let jobId = null;
-    
+
     try {
       // Save job to database as pending (unless it's a retry)
       if (!options.skipDbInsert) {
@@ -207,12 +214,12 @@ class QueueService {
         jobId: jobId,
         circuitBreaker: error.circuitBreaker || false,
       });
-      
+
       if (jobId) {
-        const errorMsg = error.circuitBreaker 
+        const errorMsg = error.circuitBreaker
           ? `Circuit breaker OPEN: ${error.message}`
           : error.message;
-        await this.updateJobStatus(jobId, 'failed', errorMsg);
+        await this.updateJobStatus(jobId, "failed", errorMsg);
       }
       return false;
     }
@@ -222,30 +229,30 @@ class QueueService {
     try {
       const updateFields = { status };
       const updateValues = [status];
-      
-      if (status === 'processing') {
-        updateFields.started_at = 'NOW()';
+
+      if (status === "processing") {
+        updateFields.started_at = "NOW()";
         updateValues.push();
-      } else if (status === 'completed') {
-        updateFields.completed_at = 'NOW()';
+      } else if (status === "completed") {
+        updateFields.completed_at = "NOW()";
         updateValues.push();
-      } else if (status === 'failed' && error) {
-        updateFields.error = '?';
+      } else if (status === "failed" && error) {
+        updateFields.error = "?";
         updateValues.push(error);
       }
-      
+
       let sql = "UPDATE jobs SET status = ?";
-      if (status === 'processing') {
+      if (status === "processing") {
         sql += ", started_at = NOW()";
-      } else if (status === 'completed') {
+      } else if (status === "completed") {
         sql += ", completed_at = NOW()";
-      } else if (status === 'failed' && error) {
+      } else if (status === "failed" && error) {
         sql += ", error = ?";
       }
       sql += " WHERE id = ?";
-      
+
       updateValues.push(jobId);
-      
+
       await db.query(sql, updateValues);
     } catch (error) {
       console.error(`Error updating job status:`, error.message);
@@ -259,53 +266,62 @@ class QueueService {
         return false;
       }
 
-      await this.channel.consume(queueName, async (msg) => {
-        if (msg !== null) {
-          let jobId = null;
-          try {
-            const data = JSON.parse(msg.content.toString());
-            jobId = data.jobId;
-            
-            console.log(`Processing message from queue ${queueName}`, {
-              queue: queueName,
-              jobId: jobId,
-              dataKeys: Object.keys(data),
-            });
+      await this.channel.consume(
+        queueName,
+        async (msg) => {
+          if (msg !== null) {
+            let jobId = null;
+            try {
+              const data = JSON.parse(msg.content.toString());
+              jobId = data.jobId;
 
-            // Update job status to processing
-            if (jobId) {
-              await this.updateJobStatus(jobId, 'processing');
-            }
+              console.log(`Processing message from queue ${queueName}`, {
+                queue: queueName,
+                jobId: jobId,
+                dataKeys: Object.keys(data),
+              });
 
-            await callback(data);
-            
-            // Update job status to completed
-            if (jobId) {
-              await this.updateJobStatus(jobId, 'completed');
-            }
-            
-            this.channel.ack(msg);
-            
-            console.log(`Message processed successfully from queue ${queueName}`);
-          } catch (error) {
-            console.error(`Error processing message from queue ${queueName}:`, {
-              error: error.message,
-              queue: queueName,
-              jobId: jobId,
-            });
+              // Update job status to processing
+              if (jobId) {
+                await this.updateJobStatus(jobId, "processing");
+              }
 
-            // Update job status to failed
-            if (jobId) {
-              await this.updateJobStatus(jobId, 'failed', error.message);
+              await callback(data);
+
+              // Update job status to completed
+              if (jobId) {
+                await this.updateJobStatus(jobId, "completed");
+              }
+
+              this.channel.ack(msg);
+
+              console.log(
+                `Message processed successfully from queue ${queueName}`
+              );
+            } catch (error) {
+              console.error(
+                `Error processing message from queue ${queueName}:`,
+                {
+                  error: error.message,
+                  queue: queueName,
+                  jobId: jobId,
+                }
+              );
+
+              // Update job status to failed
+              if (jobId) {
+                await this.updateJobStatus(jobId, "failed", error.message);
+              }
+
+              this.channel.nack(msg, false, false);
             }
-            
-            this.channel.nack(msg, false, false);
           }
+        },
+        {
+          noAck: false,
+          ...options,
         }
-      }, {
-        noAck: false,
-        ...options,
-      });
+      );
 
       console.log(`Started consuming queue ${queueName}`);
       return true;
@@ -335,7 +351,7 @@ class QueueService {
         failed: 0,
       };
 
-      results.forEach(row => {
+      results.forEach((row) => {
         stats[row.status] = parseInt(row.count);
       });
 
@@ -371,15 +387,16 @@ class QueueService {
           );
 
           const data = JSON.parse(job.data);
-          const success = await this.sendToQueue(job.queue, data, { skipDbInsert: true });
-          
+          const success = await this.sendToQueue(job.queue, data, {
+            skipDbInsert: true,
+          });
+
           if (success) {
             retried++;
           } else {
-            await db.query(
-              "UPDATE jobs SET status = 'failed' WHERE id = ?",
-              [job.id]
-            );
+            await db.query("UPDATE jobs SET status = 'failed' WHERE id = ?", [
+              job.id,
+            ]);
           }
         } catch (error) {
           await db.query(
@@ -421,7 +438,7 @@ class QueueService {
   async getFailedJobs(page = 1, limit = 20) {
     try {
       const offset = (page - 1) * limit;
-      
+
       const [jobs] = await db.query(
         `SELECT * FROM jobs 
          WHERE status = 'failed' 
@@ -476,7 +493,7 @@ class QueueService {
         return { messageCount: 0, consumerCount: 0, error: "Not connected" };
       }
 
-      const queueInfo = await this.channel.checkQueue('dead_letter_queue');
+      const queueInfo = await this.channel.checkQueue("dead_letter_queue");
       return {
         messageCount: queueInfo.messageCount,
         consumerCount: queueInfo.consumerCount,
@@ -497,27 +514,31 @@ class QueueService {
       let messageCount = 0;
 
       return new Promise((resolve) => {
-        this.channel.consume('dead_letter_queue', (msg) => {
-          if (msg && messageCount < limit) {
-            try {
-              const content = JSON.parse(msg.content.toString());
-              messages.push({
-                content,
-                properties: msg.properties,
-                fields: msg.fields,
-                timestamp: new Date(),
-              });
-              messageCount++;
-              this.channel.nack(msg, false, true); // Return to queue
-            } catch (error) {
-              console.error("Error parsing DLQ message:", error.message);
+        this.channel.consume(
+          "dead_letter_queue",
+          (msg) => {
+            if (msg && messageCount < limit) {
+              try {
+                const content = JSON.parse(msg.content.toString());
+                messages.push({
+                  content,
+                  properties: msg.properties,
+                  fields: msg.fields,
+                  timestamp: new Date(),
+                });
+                messageCount++;
+                this.channel.nack(msg, false, true); // Return to queue
+              } catch (error) {
+                console.error("Error parsing DLQ message:", error.message);
+              }
             }
-          }
 
-          if (messageCount >= limit || !msg) {
-            resolve(messages);
-          }
-        }, { noAck: false });
+            if (messageCount >= limit || !msg) {
+              resolve(messages);
+            }
+          },
+          { noAck: false }
+        );
 
         // Timeout after 5 seconds
         setTimeout(() => resolve(messages), 5000);
@@ -542,13 +563,13 @@ class QueueService {
         await this.connection.close();
       }
       this.isConnected = false;
-      
+
       // Clear reconnection timer
       if (this.reconnectionTimer) {
         clearTimeout(this.reconnectionTimer);
         this.reconnectionTimer = null;
       }
-      
+
       console.log("RabbitMQ: Connection closed gracefully");
     } catch (error) {
       console.error("RabbitMQ: Error closing connection:", error.message);
@@ -569,8 +590,10 @@ if (config.rabbitmq.enabled) {
 
 module.exports = {
   queueService,
-  sendToQueue: (queueName, data, options) => queueService.sendToQueue(queueName, data, options),
-  consume: (queueName, callback, options) => queueService.consume(queueName, callback, options),
+  sendToQueue: (queueName, data, options) =>
+    queueService.sendToQueue(queueName, data, options),
+  consume: (queueName, callback, options) =>
+    queueService.consume(queueName, callback, options),
   retryFailedJobs: (limit) => queueService.retryFailedJobs(limit),
   getConnectionStatus: () => queueService.getConnectionStatus(),
   getStats: () => queueService.getStats(),

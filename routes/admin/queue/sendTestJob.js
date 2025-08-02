@@ -17,7 +17,10 @@ const sendTestJob = asyncHandler(async (req, res) => {
     // Invalidate queue cache since stats might change
     await invalidateCache("admin:queue:*", true);
   } else {
-    req.flash("error_msg", "Failed to send test job. Check RabbitMQ connection.");
+    req.flash(
+      "error_msg",
+      "Failed to send test job. Check RabbitMQ connection."
+    );
   }
 
   res.redirect("/admin/queue");

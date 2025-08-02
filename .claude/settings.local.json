@@ -7,9 +7,5 @@
     ]
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": [
-    "mcp-tools",
-    "sequential-thinking",
-    "filesystem"
-  ]
+  "enabledMcpjsonServers": ["mcp-tools", "sequential-thinking", "filesystem"]
 }
