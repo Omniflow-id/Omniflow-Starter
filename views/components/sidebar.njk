@@ -1,7 +1,18 @@
 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
   <div class="sb-sidenav-menu">
     <div class="nav">
-      <a class="nav-link {% if url == '/admin' or url == '/admin/' %}active{% endif %}" href="/admin"> Beranda </a>
+      <a
+        class="nav-link {% if url == '/admin' or url == '/admin/' %}active{% endif %}"
+        href="/admin"
+      >
+        Beranda
+      </a>
+      <a
+        class="nav-link {% if url.includes('/admin/profile') %}active{% endif %}"
+        href="/admin/profile"
+      >
+        Profile
+      </a>
       <a
         class="nav-link {% if url.includes('/admin/overview') or url.includes('/admin/submodule') %}{% else %}collapsed{% endif %}"
         href="#"
@@ -22,8 +33,16 @@
         data-bs-parent="#sidenavAccordion"
       >
         <nav class="sb-sidenav-menu-nested nav">
-          <a class="nav-link {% if url.includes('/admin/overview') %}active{% endif %}" href="/admin/overview">Gambaran Umum</a>
-          <a class="nav-link {% if url.includes('/admin/submodule') %}active{% endif %}" href="/admin/submodule">Sub Modul</a>
+          <a
+            class="nav-link {% if url.includes('/admin/overview') %}active{% endif %}"
+            href="/admin/overview"
+            >Gambaran Umum</a
+          >
+          <a
+            class="nav-link {% if url.includes('/admin/submodule') %}active{% endif %}"
+            href="/admin/submodule"
+            >Sub Modul</a
+          >
         </nav>
       </div>
       {% if user.role in ['Admin', 'Manager'] %}
@@ -48,8 +67,16 @@
         data-bs-parent="#sidenavAccordion"
       >
         <nav class="sb-sidenav-menu-nested nav">
-          <a class="nav-link {% if url.includes('/admin/user/overview') %}active{% endif %}" href="/admin/user/overview">Gambaran Umum</a>
-          <a class="nav-link {% if url.includes('/admin/user/index') %}active{% endif %}" href="/admin/user/index">User</a>
+          <a
+            class="nav-link {% if url.includes('/admin/user/overview') %}active{% endif %}"
+            href="/admin/user/overview"
+            >Gambaran Umum</a
+          >
+          <a
+            class="nav-link {% if url.includes('/admin/user/index') %}active{% endif %}"
+            href="/admin/user/index"
+            >User</a
+          >
         </nav>
       </div>
 
@@ -72,7 +99,12 @@
       {% endif %}
 
       <!-- Log -->
-      <a class="nav-link {% if url.includes('/admin/log') %}active{% endif %}" href="/admin/log/index"> Log </a>
+      <a
+        class="nav-link {% if url.includes('/admin/log') %}active{% endif %}"
+        href="/admin/log/index"
+      >
+        Log
+      </a>
       {% endif %}
     </div>
   </div>
