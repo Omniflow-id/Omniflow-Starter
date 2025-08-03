@@ -1,6 +1,83 @@
 {% extends "layout/masterLayout.njk" %} {% block content %}
 <div class="container-fluid px-4">
-  <h1 class="mt-4">Halaman Log</h1>
+  <h1 class="mt-4">Enterprise Activity Logs</h1>
+  
+  <!-- Filters Section -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0"><i class="fas fa-filter me-2"></i>Filters</h6>
+        </div>
+        <div class="card-body">
+          <form method="GET" class="row g-3">
+            <div class="col-md-3">
+              <label for="activity_type" class="form-label">Activity Type</label>
+              <select class="form-select" id="activity_type" name="activity_type">
+                <option value="">All Types</option>
+                {% for type in filterOptions.activityTypes %}
+                <option value="{{ type }}" {% if filters.activity_type == type %}selected{% endif %}>
+                  {{ type | capitalize }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label for="action_type" class="form-label">Action Type</label>
+              <select class="form-select" id="action_type" name="action_type">
+                <option value="">All Actions</option>
+                {% for action in filterOptions.actionTypes %}
+                <option value="{{ action }}" {% if filters.action_type == action %}selected{% endif %}>
+                  {{ action | capitalize }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label for="status" class="form-label">Status</label>
+              <select class="form-select" id="status" name="status">
+                <option value="">All Status</option>
+                {% for stat in filterOptions.statuses %}
+                <option value="{{ stat }}" {% if filters.status == stat %}selected{% endif %}>
+                  {{ stat | capitalize }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label for="user_id" class="form-label">User</label>
+              <select class="form-select" id="user_id" name="user_id">
+                <option value="">All Users</option>
+                {% for user in filterOptions.users %}
+                <option value="{{ user.id }}" {% if filters.user_id == user.id|string %}selected{% endif %}>
+                  {{ user.username }}
+                </option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-2">
+              <label for="limit" class="form-label">Limit</label>
+              <select class="form-select" id="limit" name="limit">
+                <option value="100" {% if filters.limit == "100" %}selected{% endif %}>100</option>
+                <option value="500" {% if filters.limit == "500" %}selected{% endif %}>500</option>
+                <option value="1000" {% if filters.limit == "1000" or not filters.limit %}selected{% endif %}>1000</option>
+                <option value="5000" {% if filters.limit == "5000" %}selected{% endif %}>5000</option>
+              </select>
+            </div>
+            <div class="col-12">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-search me-1"></i>Apply Filters
+              </button>
+              <a href="/admin/log/index" class="btn btn-secondary ms-2">
+                <i class="fas fa-undo me-1"></i>Reset
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="row">
     <div class="col-12">
       <div class="card mb-4">
@@ -8,7 +85,10 @@
           <div
             class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2"
           >
-            <span class="mb-2 mb-sm-0">Daftar Log</span>
+            <span class="mb-2 mb-sm-0">
+              Activity Logs 
+              <span class="badge bg-info">{{ logs.length }} records</span>
+            </span>
             <div class="d-flex flex-wrap gap-2">
               <button
                 class="btn btn-info btn-sm text-white"
@@ -22,39 +102,122 @@
           </div>
         </div>
         <div class="card-body">
-          <table
-            id="datatablesSimple"
-            class="table table-striped"
-            style="width: 100%"
-          >
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>User ID</th>
-                <th>Waktu</th>
-                <th>Aktivitas</th>
-                <th>IP Address</th>
-                <th>Jenis Device</th>
-                <th>Browser</th>
-                <th>Platform</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for log in logs %}
-              <tr>
-                <td>{{ log.id }}</td>
-                <td>{{ log.user_id }}</td>
-                <td>{{ log.created_at | formatDateTime }}</td>
-                <td>{{ log.activity }}</td>
-                <td>{{ log.ip_address }}</td>
-                <td>{{ log.device_type }}</td>
-                <td>{{ log.browser }}</td>
-                <td>{{ log.platform }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+          <div class="table-responsive">
+            <table
+              id="datatablesSimple"
+              class="table table-striped"
+              style="width: 100%"
+            >
+              <thead>
+                <tr>
+                  <th width="50">ID</th>
+                  <th width="60">Type</th>
+                  <th width="80">Action</th>
+                  <th width="80">Status</th>
+                  <th width="100">User</th>
+                  <th width="300">Activity</th>
+                  <th width="120">Time</th>
+                  <th width="50">Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for log in logs %}
+                <tr data-log-id="{{ log.id }}">
+                  <td>{{ log.id }}</td>
+                  <td>
+                    {% if log.activity_type == 'user' %}
+                      <span class="badge bg-primary">User</span>
+                    {% else %}
+                      <span class="badge bg-secondary">System</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if log.action_type %}
+                      <span class="badge bg-info">{{ log.action_type | upper }}</span>
+                    {% else %}
+                      -
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if log.status == 'success' %}
+                      <span class="badge bg-success">Success</span>
+                    {% elif log.status == 'failure' %}
+                      <span class="badge bg-danger">Failure</span>
+                    {% elif log.status == 'warning' %}
+                      <span class="badge bg-warning text-dark">Warning</span>
+                    {% elif log.status == 'info' %}
+                      <span class="badge bg-info">Info</span>
+                    {% else %}
+                      <span class="badge bg-light text-dark">{{ log.status or '-' }}</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if log.username %}
+                      <div class="user-info">
+                        <strong>{{ log.username }}</strong>
+                        {% if log.user_role %}
+                          <br><small class="text-muted">{{ log.user_role }}</small>
+                        {% endif %}
+                      </div>
+                    {% else %}
+                      <span class="text-muted">-</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <div class="activity-cell">
+                      {{ log.activity }}
+                      {% if log.error_message %}
+                        <br><small class="text-danger"><i class="fas fa-exclamation-triangle"></i> {{ log.error_message }}</small>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td>
+                    <div class="time-info">
+                      {{ log.created_at | formatDateTime }}
+                      {% if log.duration_ms %}
+                        <br><small class="text-muted">{{ log.duration_ms }}ms</small>
+                      {% endif %}
+                    </div>
+                  </td>
+                  <td>
+                    <button 
+                      class="btn btn-sm btn-outline-primary btn-details" 
+                      data-bs-toggle="modal" 
+                      data-bs-target="#logDetailModal"
+                      data-log-id="{{ log.id }}"
+                      title="View Details"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
         </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detail Modal -->
+<div class="modal fade" id="logDetailModal" tabindex="-1" aria-labelledby="logDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="logDetailModalLabel">Log Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="logDetailContent">
+        <div class="text-center">
+          <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
   </div>
@@ -63,27 +226,210 @@
 {% endblock %} {% block scripts %}
 <script>
   $(document).ready(function () {
+    // Initialize DataTable with custom configuration
     $("#datatablesSimple").DataTable({
       responsive: true,
       scrollX: true,
       order: [[0, "desc"]],
+      pageLength: 25,
+      columnDefs: [
+        { targets: [7], orderable: false }, // Details column not sortable
+        { className: "text-center", targets: [0, 1, 2, 3, 7] }
+      ],
+      language: {
+        search: "Search logs:",
+        lengthMenu: "Show _MENU_ logs per page", 
+        info: "Showing _START_ to _END_ of _TOTAL_ logs",
+        infoEmpty: "No logs found",
+        infoFiltered: "(filtered from _MAX_ total logs)"
+      }
     });
+
+    // Handle detail modal
+    $('.btn-details').on('click', function() {
+      const logId = $(this).data('log-id');
+      const logRow = $(`tr[data-log-id="${logId}"]`);
+      
+      // Find log data from the current page
+      let logData = null;
+      {% for log in logs %}
+      if ({{ log.id }} == logId) {
+        logData = {{ log | dump | safe }};
+      }
+      {% endfor %}
+      
+      if (logData) {
+        displayLogDetails(logData);
+      } else {
+        $('#logDetailContent').html('<div class="alert alert-warning">Log details not found.</div>');
+      }
+    });
+
+    function displayLogDetails(log) {
+      let detailsHtml = `
+        <div class="row">
+          <div class="col-md-6">
+            <h6><i class="fas fa-info-circle me-2"></i>Basic Information</h6>
+            <table class="table table-sm">
+              <tr><td><strong>ID:</strong></td><td>${log.id}</td></tr>
+              <tr><td><strong>Activity Type:</strong></td><td>${log.activity_type}</td></tr>
+              <tr><td><strong>Action Type:</strong></td><td>${log.action_type || '-'}</td></tr>
+              <tr><td><strong>Status:</strong></td><td>${log.status}</td></tr>
+              <tr><td><strong>Resource Type:</strong></td><td>${log.resource_type || '-'}</td></tr>
+              <tr><td><strong>Resource ID:</strong></td><td>${log.resource_id || '-'}</td></tr>
+              <tr><td><strong>Request ID:</strong></td><td><small>${log.request_id || '-'}</small></td></tr>
+              <tr><td><strong>Error Code:</strong></td><td>${log.error_code || '-'}</td></tr>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <h6><i class="fas fa-globe me-2"></i>Request Information</h6>
+            <table class="table table-sm">
+              <tr><td><strong>IP Address:</strong></td><td>${log.ip_address || '-'}</td></tr>
+              <tr><td><strong>Method:</strong></td><td>${log.request_method || '-'}</td></tr>
+              <tr><td><strong>URL:</strong></td><td><small>${log.request_url || '-'}</small></td></tr>
+              <tr><td><strong>Device:</strong></td><td>${log.device_type || '-'} / ${log.browser || '-'} / ${log.platform || '-'}</td></tr>
+              <tr><td><strong>User:</strong></td><td>${log.username || '-'} (${log.user_role || '-'})</td></tr>
+              <tr><td><strong>Email:</strong></td><td>${log.user_email || '-'}</td></tr>
+            </table>
+          </div>
+        </div>
+        
+        <div class="row mt-3">
+          <div class="col-12">
+            <h6><i class="fas fa-comment me-2"></i>Activity</h6>
+            <div class="alert alert-info">${log.activity}</div>
+            ${log.error_message ? `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>${log.error_message}</div>` : ''}
+          </div>
+        </div>`;
+
+      if (log.user_agent && log.user_agent.trim()) {
+        detailsHtml += `
+        <div class="row mt-3">
+          <div class="col-12">
+            <h6><i class="fas fa-desktop me-2"></i>User Agent</h6>
+            <small class="text-muted">${log.user_agent}</small>
+          </div>
+        </div>`;
+      }
+
+      if (log.parsedMetadata) {
+        detailsHtml += `
+        <div class="row mt-3">
+          <div class="col-12">
+            <h6><i class="fas fa-database me-2"></i>Metadata</h6>
+            <pre class="bg-dark text-light p-3 rounded">${JSON.stringify(log.parsedMetadata, null, 2)}</pre>
+          </div>
+        </div>`;
+      }
+
+      detailsHtml += `
+        <div class="row mt-3">
+          <div class="col-12">
+            <h6><i class="fas fa-server me-2"></i>System Information</h6>
+            <div class="row">
+              <div class="col-md-3"><strong>Application:</strong> ${log.application || '-'}</div>
+              <div class="col-md-3"><strong>Environment:</strong> ${log.environment || '-'}</div>
+              <div class="col-md-3"><strong>Server:</strong> ${log.server_instance || '-'}</div>
+              <div class="col-md-3"><strong>Process ID:</strong> ${log.process_id || '-'}</div>
+            </div>
+            ${log.memory_usage_mb ? `<div class="mt-2"><strong>Memory Usage:</strong> ${log.memory_usage_mb} MB</div>` : ''}
+            ${log.duration_ms && log.duration_ms > 0 ? `<div class="mt-1"><strong>Duration:</strong> ${log.duration_ms} ms</div>` : ''}
+          </div>
+        </div>`;
+
+      $('#logDetailContent').html(detailsHtml);
+    }
   });
+
+  // Download with current filters
   document.getElementById("btnDownloadData").addEventListener("click", () => {
-    window.location.href = "/log/download";
+    // Get current filter values
+    const params = new URLSearchParams();
+    const activity_type = document.getElementById('activity_type').value;
+    const action_type = document.getElementById('action_type').value;
+    const status = document.getElementById('status').value;
+    const user_id = document.getElementById('user_id').value;
+    const limit = document.getElementById('limit').value;
+
+    if (activity_type) params.append('activity_type', activity_type);
+    if (action_type) params.append('action_type', action_type);
+    if (status) params.append('status', status);
+    if (user_id) params.append('user_id', user_id);
+    if (limit) params.append('limit', limit);
+
+    const downloadUrl = `/admin/log/download${params.toString() ? '?' + params.toString() : ''}`;
+    window.location.href = downloadUrl;
+    
     Toastify({
-      text: "Download berhasil! Silakan cek folder download Anda.",
+      text: "Download started! Check your downloads folder.",
       duration: 5000,
       close: true,
-      gravity: "top", // `top` or `bottom`
-      position: "right", // `left`, `center` or `right`
-      stopOnFocus: true, // Prevents dismissing of toast on hover
+      gravity: "top",
+      position: "right",
+      stopOnFocus: true,
       style: {
         background: "linear-gradient(to right, #00b09b, #96c93d)",
         marginTop: "50px",
       },
-      onClick: function () {}, // Callback after click
     }).showToast();
   });
 </script>
+
+<style>
+.user-info {
+  line-height: 1.2;
+}
+
+.activity-cell {
+  max-width: 300px;
+  word-wrap: break-word;
+}
+
+.time-info {
+  line-height: 1.2;
+}
+
+.change-item {
+  background-color: #f8f9fa;
+}
+
+.data-changes pre {
+  max-height: 200px;
+  overflow-y: auto;
+  font-size: 0.8rem;
+}
+
+.table th {
+  font-weight: 600;
+  background-color: #f8f9fa;
+  border-top: none;
+}
+
+.badge {
+  font-size: 0.75em;
+}
+
+.btn-details {
+  transition: all 0.2s ease;
+}
+
+.btn-details:hover {
+  transform: scale(1.1);
+}
+
+.collapse .card-body {
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+}
+
+@media (max-width: 768px) {
+  .activity-cell {
+    max-width: 200px;
+  }
+  
+  .user-info strong {
+    font-size: 0.9rem;
+  }
+}
+</style>
 {% endblock %}

@@ -132,11 +132,198 @@ const { asyncHandler } = require("@middlewares/errorHandler");
 - **Activity Logs**: `/admin/log/*` (view logs, export)
 - **API Endpoints**: `/api/*` (JWT-based authentication, JSON responses)
 
-### Activity Logging System
+### Enterprise-Grade Activity Logging System
 
-- All user actions logged to database and `logs/app.log`
-- Captures IP address, device type, browser, platform via user-agent parsing
-- Helper functions in `helpers/log.js`, `helpers/getClientIP.js`, `helpers/getUserAgent.js`
+**Comprehensive Audit Trail**: Production-ready logging system with enterprise-grade features for complete observability and compliance.
+
+#### Core Features
+
+- **🔄 Dual Activity Types**: User activities and system infrastructure events
+- **📊 Rich Metadata Capture**: Request tracing, device fingerprinting, performance metrics
+- **🔐 Sensitive Data Masking**: Automatic PII protection with configurable masking patterns
+- **📝 Data Change Tracking**: Before/after state capture for all database modifications
+- **🎯 UUID Request Tracing**: End-to-end request correlation across distributed systems
+- **⚡ High Performance**: Nullable schema design with strategic indexing for optimal performance
+
+#### Database Schema
+
+**Comprehensive activity_logs table**:
+```sql
+- id (primary key)
+- activity_type (enum: user, system) - Distinguishes user actions from system events
+- activity (text) - Human-readable activity description
+- action_type (string) - Structured action classification (login, create, update, delete, etc.)
+- resource_type (string) - Target resource classification (user, file, cache, queue, etc.)
+- resource_id (string) - Identifier of affected resource
+- user_id, username, user_email, user_role (nullable) - User context for user activities
+- ip_address, user_agent, device_type, browser, platform (nullable) - Request context
+- request_method, request_url, request_id (nullable) - HTTP request details
+- metadata (JSON) - Flexible additional data storage
+- status (enum: success, failure, warning, info) - Operation outcome
+- error_message, error_code (nullable) - Error details for failed operations
+- duration_ms (nullable) - Performance tracking
+- created_at (immutable audit trail)
+```
+
+#### Logging Functions
+
+**User Activity Logging**:
+```javascript
+const { logUserActivity } = require("@helpers/log");
+
+await logUserActivity({
+  activity: "User login successful",
+  actionType: ACTION_TYPES.LOGIN,
+  resourceType: RESOURCE_TYPES.USER,
+  metadata: {
+    loginMethod: "email_password",
+    sessionDuration: "24h",
+  },
+}, req);
+```
+
+**System Activity Logging**:
+```javascript
+const { logSystemActivity } = require("@helpers/log");
+
+await logSystemActivity({
+  activity: "Redis cache connected successfully",
+  metadata: {
+    eventType: "redis_connected",
+    host: config.redis.host,
+    port: config.redis.port,
+  },
+});
+```
+
+**Data Change Tracking**:
+```javascript
+await logUserActivity({
+  activity: "User account deactivated",
+  actionType: ACTION_TYPES.UPDATE,
+  resourceType: RESOURCE_TYPES.USER,
+  resourceId: userId,
+  dataChanges: {
+    before: { is_active: true, status: "active" },
+    after: { is_active: false, status: "inactive" },
+    changedFields: ["is_active"],
+  },
+}, req);
+```
+
+#### Sensitive Data Masking
+
+**Automatic PII Protection**:
+```javascript
+// Automatically masks sensitive fields
+const userData = {
+  email: "user@example.com",
+  password: "secret123",
+  phone: "08123456789",
+  ssn: "123-45-6789"
+};
+
+const masked = maskSensitiveData(userData);
+// Result: { email: "u***@example.com", password: "***", phone: "081***789", ssn: "***-**-6789" }
+```
+
+**Custom Masking Options**:
+```javascript
+const masked = maskSensitiveData(data, {
+  maskingChar: "●",
+  showFirst: 2,
+  showLast: 2,
+  customPatterns: ["api_key", "token"]
+});
+```
+
+#### Infrastructure Monitoring
+
+**System Event Coverage**:
+- **Database Pool**: Connection errors, health checks, pool statistics
+- **Redis Cache**: Connection events, errors, performance metrics
+- **RabbitMQ Queue**: Connection status, job processing, circuit breaker states
+- **Circuit Breaker**: State transitions (OPEN/CLOSED/HALF_OPEN)
+- **Application**: Startup, shutdown, configuration validation
+
+**Performance Tracking**:
+- Response time monitoring
+- Database query performance
+- Cache hit/miss ratios
+- Queue processing metrics
+- Memory usage tracking
+
+#### Admin Interface Features
+
+**Activity Log Management** (`/admin/log/*`):
+- **Advanced Filtering**: 5 filter options (activity type, action type, resource type, status, date range)
+- **Real-time Search**: Dynamic filtering with DataTables integration
+- **Detailed View**: Modal-based detailed view with metadata expansion
+- **Data Changes**: Before/after comparison visualization
+- **Export Capabilities**: CSV/Excel export with filtered results
+- **Performance**: Redis-cached results with 2-minute TTL
+
+#### Security & Compliance
+
+**Audit Trail Features**:
+- **Immutable Logs**: No update/delete operations on activity logs
+- **Request Correlation**: UUID-based request tracing across services
+- **User Attribution**: Complete user context for all actions
+- **Error Tracking**: Comprehensive error logging with stack traces
+- **Performance Monitoring**: Response time and resource usage tracking
+
+**Compliance Ready**:
+- **GDPR**: Automatic PII masking and data subject tracking
+- **SOX**: Complete audit trail with user attribution
+- **HIPAA**: Sensitive data protection and access logging
+- **ISO 27001**: Comprehensive security event logging
+
+#### Console Logging Standards
+
+**Standardized Log Format**: All console logging follows a consistent format with category tags and emoji indicators for easy visual parsing.
+
+**Log Categories & Format**:
+```
+🚀 [SERVER] - Server startup/shutdown operations
+🔧 [WORKERS] - Worker management and lifecycle
+🧪 [TEST-WORKER] - Test worker job processing
+🐰 [RABBITMQ] - RabbitMQ queue operations and connections
+🟢 [REDIS] - Redis cache operations and connections
+💾 [DATABASE] - Database pool operations and health
+🔐 [CIRCUIT-BREAKER] - Circuit breaker state changes
+🗃️ [CACHE] - Cache helper operations and performance
+🛑 [SHUTDOWN] - Graceful shutdown processes
+```
+
+**Status Indicators**:
+```
+✅ Success/Connected - Successful operations
+❌ Error/Failed - Error conditions and failures
+⚠️ Warning/Disabled - Warnings and disabled features
+🔄 Retry/Reconnect - Retry attempts and reconnections
+📤 Send/Output - Data transmission operations
+👂 Listen/Consume - Service consumers and listeners
+⚙️ Processing - Active processing operations
+😇 Graceful - Graceful shutdown operations
+💀 Force - Force shutdown/termination
+```
+
+**Example Log Outputs**:
+```
+✅ [REDIS] Connected successfully
+🐰 [RABBITMQ] Attempting connection: { attempt: 1 }
+⚙️ [RABBITMQ] Processing job from test_queue
+❌ [DATABASE] Pool error: Connection timeout
+🔄 [CIRCUIT-BREAKER] HALF_OPEN for RabbitMQ
+🛑 [SHUTDOWN] Received SIGTERM, starting graceful shutdown...
+```
+
+**Benefits**:
+- **Visual Clarity**: Easy to scan logs visually
+- **Category Filtering**: Simple to filter by component
+- **Status Recognition**: Quick status identification
+- **Debug Friendly**: Enhanced development experience
+- **Production Ready**: Clean, structured production logs
 
 ### Rate Limiting & Security
 

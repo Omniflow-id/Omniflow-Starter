@@ -1,7 +1,12 @@
 const bcrypt = require("bcrypt");
 
 const { db, getPoolStats, testConnection } = require("@db/db");
-const { log, LOG_LEVELS } = require("@helpers/log");
+const {
+  logUserActivity,
+  ACTION_TYPES,
+  RESOURCE_TYPES,
+  ACTIVITY_STATUS,
+} = require("@helpers/log");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
 const {
@@ -53,13 +58,35 @@ const loginAPI = asyncHandler(async (req, res) => {
 
   const clientIP = getClientIP(req);
   const userAgent = getUserAgent(req);
-  await log(
-    `User ${user.username} logged in via API`,
-    LOG_LEVELS.INFO,
-    user.id,
-    userAgent,
-    clientIP
-  );
+
+  await logUserActivity({
+    activity: `User logged in via API: ${user.username}`,
+    actionType: ACTION_TYPES.LOGIN,
+    resourceType: RESOURCE_TYPES.SESSION,
+    resourceId: "api_session",
+    status: ACTIVITY_STATUS.SUCCESS,
+    userId: user.id,
+    userInfo: {
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    },
+    requestInfo: {
+      ip: clientIP,
+      userAgent: userAgent.userAgent,
+      deviceType: userAgent.deviceType,
+      browser: userAgent.browser,
+      platform: userAgent.platform,
+      method: req.method,
+      url: req.originalUrl,
+    },
+    metadata: {
+      loginMethod: "api_jwt",
+      tokenGenerated: true,
+      apiEndpoint: "/api/login",
+    },
+    req,
+  });
 
   res.status(200).json({
     message: "Login successful",

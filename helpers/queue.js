@@ -3,6 +3,16 @@ const { db } = require("@db/db");
 const config = require("@config");
 const CircuitBreaker = require("./circuitBreaker");
 
+// Import system logging (lazy load to avoid circular dependency)
+let logSystemActivity = null;
+const getSystemLogger = () => {
+  if (!logSystemActivity) {
+    const { logSystemActivity: logger } = require("@helpers/log");
+    logSystemActivity = logger;
+  }
+  return logSystemActivity;
+};
+
 class QueueService {
   constructor() {
     this.connection = null;
@@ -35,7 +45,7 @@ class QueueService {
       const encodedPassword = encodeURIComponent(config.rabbitmq.password);
       const rabbitmqUrl = `amqp://${encodedUser}:${encodedPassword}@${config.rabbitmq.host}:${config.rabbitmq.port}`;
 
-      console.log("RabbitMQ: Attempting to connect:", {
+      console.log("🐰 [RABBITMQ] Attempting connection:", {
         url: rabbitmqUrl.replace(/\/\/.*@/, "//***:***@"),
         attempt: this.reconnectAttempts + 1,
       });
@@ -50,7 +60,24 @@ class QueueService {
       this.isReconnecting = false;
       this.reconnectAttempts = 0;
 
-      console.log("RabbitMQ: Connected successfully");
+      console.log("✅ [RABBITMQ] Connected successfully");
+
+      // Log system activity for RabbitMQ connection
+      const logger = getSystemLogger();
+      if (logger) {
+        logger({
+          activity: "RabbitMQ queue service connected successfully",
+          metadata: {
+            eventType: "rabbitmq_connected",
+            host: config.rabbitmq.host,
+            port: config.rabbitmq.port,
+            reconnectAttempt: this.reconnectAttempts,
+            circuitBreakerStatus: this.circuitBreaker.getStatus().state,
+          },
+        }).catch((logErr) =>
+          console.error("Failed to log RabbitMQ connect:", logErr.message)
+        );
+      }
 
       // Clear any pending reconnection timer
       if (this.reconnectionTimer) {
@@ -59,7 +86,7 @@ class QueueService {
       }
 
       await this.setupQueues();
-      console.log("RabbitMQ: Ready to process jobs");
+      console.log("🚀 [RABBITMQ] Ready to process jobs");
 
       return true;
     } catch (error) {
@@ -78,7 +105,7 @@ class QueueService {
 
     for (const queueName of queues) {
       await this.setupQueueWithDLQ(queueName);
-      console.log(`Queue ${queueName} setup completed with DLQ`);
+      console.log(`✅ [RABBITMQ] Queue ${queueName} setup completed with DLQ`);
     }
   }
 
@@ -97,7 +124,7 @@ class QueueService {
     // Bind DLQ to DLX
     await this.channel.bindQueue("dead_letter_queue", "dlx", "dead");
 
-    console.log("Dead Letter Exchange and Queue setup completed");
+    console.log("☠️ [RABBITMQ] Dead Letter Exchange and Queue setup completed");
   }
 
   async setupQueueWithDLQ(queueName) {
@@ -114,10 +141,34 @@ class QueueService {
   async handleConnectionError(error) {
     this.isConnected = false;
 
-    console.error("RabbitMQ connection error:", {
+    console.error("❌ [RABBITMQ] Connection error:", {
       error: error.message,
       reconnectAttempts: this.reconnectAttempts,
     });
+
+    // Log system activity for RabbitMQ connection errors
+    const logger = getSystemLogger();
+    if (logger) {
+      logger({
+        activity: `RabbitMQ queue service connection error: ${error.message}`,
+        errorMessage: error.message,
+        errorCode: error.code || "RABBITMQ_CONNECTION_ERROR",
+        metadata: {
+          eventType: "rabbitmq_error",
+          host: config.rabbitmq.host,
+          port: config.rabbitmq.port,
+          reconnectAttempts: this.reconnectAttempts,
+          maxReconnectAttempts: this.maxReconnectAttempts,
+          circuitBreakerStatus: this.circuitBreaker.getStatus().state,
+          severity:
+            this.reconnectAttempts >= this.maxReconnectAttempts
+              ? "critical"
+              : "error",
+        },
+      }).catch((logErr) =>
+        console.error("Failed to log RabbitMQ error:", logErr.message)
+      );
+    }
 
     if (
       !this.isReconnecting &&
@@ -133,7 +184,7 @@ class QueueService {
     this.connection = null;
     this.channel = null;
 
-    console.warn("RabbitMQ: Connection closed");
+    console.warn("⚠️ [RABBITMQ] Connection closed");
 
     // Schedule single reconnection attempt after delay
     if (
@@ -143,7 +194,7 @@ class QueueService {
       this.reconnectionTimer = setTimeout(() => {
         this.reconnectionTimer = null;
         if (!this.isConnected && config.rabbitmq.enabled) {
-          console.log("RabbitMQ: Attempting reconnection...");
+          console.log("🔄 [RABBITMQ] Attempting reconnection...");
           this.reconnect();
         }
       }, 15000); // 15 seconds delay
@@ -158,7 +209,7 @@ class QueueService {
       delays[Math.min(this.reconnectAttempts - 1, delays.length - 1)];
 
     console.log(
-      `RabbitMQ: Retry attempt ${this.reconnectAttempts}, waiting ${delay}ms`
+      `🔄 [RABBITMQ] Retry attempt ${this.reconnectAttempts}, waiting ${delay}ms`
     );
 
     setTimeout(async () => {
@@ -200,17 +251,15 @@ class QueueService {
       });
 
       if (success) {
-        console.log(`Message sent to queue ${queueName}`, {
-          queue: queueName,
+        console.log(`📤 [RABBITMQ] Message sent to ${queueName}`, {
           jobId: jobId,
           dataKeys: Object.keys(data),
         });
         return true;
       }
     } catch (error) {
-      console.error(`Error sending message to queue ${queueName}:`, {
+      console.error(`❌ [RABBITMQ] Failed to send to ${queueName}:`, {
         error: error.message,
-        queue: queueName,
         jobId: jobId,
         circuitBreaker: error.circuitBreaker || false,
       });
@@ -255,14 +304,16 @@ class QueueService {
 
       await db.query(sql, updateValues);
     } catch (error) {
-      console.error(`Error updating job status:`, error.message);
+      console.error(`❌ [RABBITMQ] Error updating job status:`, error.message);
     }
   }
 
   async consume(queueName, callback, options = {}) {
     try {
       if (!this.isConnected || !this.channel) {
-        console.error(`Cannot consume queue ${queueName}: not connected`);
+        console.error(
+          `❌ [RABBITMQ] Cannot consume ${queueName}: not connected`
+        );
         return false;
       }
 
@@ -275,8 +326,7 @@ class QueueService {
               const data = JSON.parse(msg.content.toString());
               jobId = data.jobId;
 
-              console.log(`Processing message from queue ${queueName}`, {
-                queue: queueName,
+              console.log(`⚙️ [RABBITMQ] Processing job from ${queueName}`, {
                 jobId: jobId,
                 dataKeys: Object.keys(data),
               });
@@ -295,18 +345,12 @@ class QueueService {
 
               this.channel.ack(msg);
 
-              console.log(
-                `Message processed successfully from queue ${queueName}`
-              );
+              console.log(`✅ [RABBITMQ] Job completed from ${queueName}`);
             } catch (error) {
-              console.error(
-                `Error processing message from queue ${queueName}:`,
-                {
-                  error: error.message,
-                  queue: queueName,
-                  jobId: jobId,
-                }
-              );
+              console.error(`❌ [RABBITMQ] Job failed from ${queueName}:`, {
+                error: error.message,
+                jobId: jobId,
+              });
 
               // Update job status to failed
               if (jobId) {
@@ -323,13 +367,15 @@ class QueueService {
         }
       );
 
-      console.log(`Started consuming queue ${queueName}`);
+      console.log(`👂 [RABBITMQ] Started consuming ${queueName}`);
       return true;
     } catch (error) {
-      console.error(`Error setting up consumer for queue ${queueName}:`, {
-        error: error.message,
-        queue: queueName,
-      });
+      console.error(
+        `❌ [RABBITMQ] Failed to setup consumer for ${queueName}:`,
+        {
+          error: error.message,
+        }
+      );
       return false;
     }
   }
@@ -357,7 +403,7 @@ class QueueService {
 
       return stats;
     } catch (error) {
-      console.error("Error getting job stats:", error.message);
+      console.error("❌ [RABBITMQ] Error getting job stats:", error.message);
       return {
         pending: 0,
         processing: 0,
@@ -407,12 +453,12 @@ class QueueService {
       }
 
       if (retried > 0) {
-        console.log(`Retried ${retried} failed jobs`);
+        console.log(`🔄 [RABBITMQ] Retried ${retried} failed jobs`);
       }
 
       return retried;
     } catch (error) {
-      console.error("Error retrying failed jobs:", {
+      console.error("❌ [RABBITMQ] Error retrying failed jobs:", {
         error: error.message,
       });
       return 0;
@@ -430,7 +476,10 @@ class QueueService {
       );
       return jobs;
     } catch (error) {
-      console.error("Error getting recent failed jobs:", error.message);
+      console.error(
+        "❌ [RABBITMQ] Error getting recent failed jobs:",
+        error.message
+      );
       return [];
     }
   }
@@ -464,7 +513,7 @@ class QueueService {
         },
       };
     } catch (error) {
-      console.error("Error getting failed jobs:", error.message);
+      console.error("❌ [RABBITMQ] Error getting failed jobs:", error.message);
       return {
         jobs: [],
         pagination: {
@@ -499,7 +548,7 @@ class QueueService {
         consumerCount: queueInfo.consumerCount,
       };
     } catch (error) {
-      console.error("Error getting DLQ stats:", error.message);
+      console.error("❌ [RABBITMQ] Error getting DLQ stats:", error.message);
       return { messageCount: 0, consumerCount: 0, error: error.message };
     }
   }
@@ -529,7 +578,10 @@ class QueueService {
                 messageCount++;
                 this.channel.nack(msg, false, true); // Return to queue
               } catch (error) {
-                console.error("Error parsing DLQ message:", error.message);
+                console.error(
+                  "❌ [RABBITMQ] Error parsing DLQ message:",
+                  error.message
+                );
               }
             }
 
@@ -544,7 +596,7 @@ class QueueService {
         setTimeout(() => resolve(messages), 5000);
       });
     } catch (error) {
-      console.error("Error getting DLQ messages:", error.message);
+      console.error("❌ [RABBITMQ] Error getting DLQ messages:", error.message);
       return [];
     }
   }
@@ -570,9 +622,9 @@ class QueueService {
         this.reconnectionTimer = null;
       }
 
-      console.log("RabbitMQ: Connection closed gracefully");
+      console.log("😇 [RABBITMQ] Connection closed gracefully");
     } catch (error) {
-      console.error("RabbitMQ: Error closing connection:", error.message);
+      console.error("❌ [RABBITMQ] Error closing connection:", error.message);
     }
   }
 }
@@ -582,10 +634,10 @@ const queueService = new QueueService();
 // Initialize RabbitMQ connection if enabled
 if (config.rabbitmq.enabled) {
   queueService.connect().catch((error) => {
-    console.error("RabbitMQ: Initial connection failed:", error.message);
+    console.error("❌ [RABBITMQ] Initial connection failed:", error.message);
   });
 } else {
-  console.log("RabbitMQ: Job queue is disabled");
+  console.log("⚠️ [RABBITMQ] Job queue is disabled");
 }
 
 module.exports = {

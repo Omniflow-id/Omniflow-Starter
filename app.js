@@ -16,6 +16,7 @@ const morgan = require("morgan");
 const nunjucks = require("nunjucks");
 const nunjucksDate = require("nunjucks-date-filter");
 const session = require("express-session");
+const { v4: uuidv4 } = require("uuid");
 
 // === Absolute / alias imports ===
 const {
@@ -107,6 +108,13 @@ env.addFilter("formatTime", (date, format) => {
 app.set("view engine", "njk");
 app.use(morgan("combined"));
 app.use(session(config.session));
+
+// Request ID middleware - Generate unique request ID for tracking
+app.use((req, _res, next) => {
+  req.requestId = uuidv4();
+  next();
+});
+
 app.use(cookieParser());
 app.use(flash());
 

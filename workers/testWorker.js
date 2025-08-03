@@ -10,28 +10,30 @@ class TestWorker {
 
   async start() {
     try {
-      console.log(`🧪 Starting test worker for queue: ${this.queueName}`);
+      console.log(
+        `🧪 [TEST-WORKER] Starting consumer for queue: ${this.queueName}`
+      );
 
       await consume(this.queueName, async (data) => {
-        console.log("🎯 JOB RECEIVED:", data);
+        console.log("🎯 [TEST-WORKER] Job received:", data);
 
         // Simulate some work
         await new Promise((resolve) => setTimeout(resolve, 100));
 
-        console.log("✅ JOB COMPLETED");
+        console.log("✅ [TEST-WORKER] Job completed successfully");
       });
 
       this.isRunning = true;
-      console.log(`✅ Test worker started successfully for ${this.queueName}`);
+      console.log(`✅ [TEST-WORKER] Consumer started for ${this.queueName}`);
     } catch (error) {
-      console.error("❌ Failed to start test worker:", error.message);
+      console.error("❌ [TEST-WORKER] Failed to start:", error.message);
       throw error;
     }
   }
 
   async stop() {
     this.isRunning = false;
-    console.log("🛑 Test worker stopped");
+    console.log("🛑 [TEST-WORKER] Worker stopped gracefully");
   }
 
   getStatus() {

@@ -4,6 +4,16 @@ const mysql = require("mysql2/promise");
 // === Relative imports ===
 const config = require("../config");
 
+// Import system logging (lazy load to avoid circular dependency)
+let logSystemActivity = null;
+const getSystemLogger = () => {
+  if (!logSystemActivity) {
+    const { logSystemActivity: logger } = require("@helpers/log");
+    logSystemActivity = logger;
+  }
+  return logSystemActivity;
+};
+
 /**
  * Database Connection Pool with Comprehensive Management
  *
@@ -25,37 +35,39 @@ const config = require("../config");
 // Create the connection pool using centralized config
 const db = mysql.createPool(config.database);
 
-// Connection Pool Event Monitoring
-if (config.app.env === "development") {
-  // Development logging for debugging
-  db.on("connection", (connection) => {
-    console.log(
-      `🔗 [DB] New connection established as id ${connection.threadId}`
-    );
+// Connection Pool Event Monitoring - errors only
+db.on("error", (err) => {
+  console.error("❌ [DATABASE] Pool error:", {
+    code: err.code,
+    message: err.message,
+    timestamp: new Date().toISOString(),
   });
 
-  db.on("error", (err) => {
-    console.error("❌ [DB] Database pool error:", err);
-    if (err.code === "PROTOCOL_CONNECTION_LOST") {
-      console.log("🔄 [DB] Connection lost, pool will reconnect automatically");
-    }
-  });
-
-  db.on("release", (connection) => {
-    console.log(
-      `🔓 [DB] Connection ${connection.threadId} released back to pool`
+  // Log system activity for database errors
+  const logger = getSystemLogger();
+  if (logger) {
+    logger({
+      activity: `Database pool error: ${err.message}`,
+      errorMessage: err.message,
+      errorCode: err.code || "DB_POOL_ERROR",
+      metadata: {
+        errorType: "database_pool_error",
+        environment: config.app.env,
+        mysqlErrorCode: err.errno,
+        sqlState: err.sqlState,
+        severity: err.code === "PROTOCOL_CONNECTION_LOST" ? "warning" : "error",
+      },
+    }).catch((logErr) =>
+      console.error("Failed to log DB error:", logErr.message)
     );
-  });
-} else {
-  // Production logging (errors only)
-  db.on("error", (err) => {
-    console.error("❌ [DB] Database pool error:", {
-      code: err.code,
-      message: err.message,
-      timestamp: new Date().toISOString(),
-    });
-  });
-}
+  }
+
+  if (err.code === "PROTOCOL_CONNECTION_LOST") {
+    console.log(
+      "🔄 [DATABASE] Connection lost, pool will reconnect automatically"
+    );
+  }
+});
 
 /**
  * Get connection pool statistics
@@ -89,7 +101,7 @@ async function testConnection() {
     connection.release();
     return true;
   } catch (error) {
-    console.error("❌ [DB] Connection health check failed:", error.message);
+    console.error("❌ [DATABASE] Health check failed:", error.message);
     return false;
   }
 }
@@ -100,18 +112,18 @@ async function testConnection() {
  */
 async function closePool() {
   try {
-    console.log("🔄 [DB] Closing database connection pool...");
+    console.log("🔄 [DATABASE] Closing connection pool...");
     await db.end();
-    console.log("✅ [DB] Database connection pool closed successfully");
+    console.log("✅ [DATABASE] Connection pool closed successfully");
   } catch (error) {
-    console.error("❌ [DB] Error closing database pool:", error);
+    console.error("❌ [DATABASE] Error closing pool:", error);
     throw error;
   }
 }
 
 // Log initial pool configuration
 if (config.app.env === "development") {
-  console.log("🔧 [DB] Connection pool initialized:", {
+  console.log("🔧 [DATABASE] Connection pool initialized:", {
     connectionLimit: config.database.connectionLimit,
     queueLimit: config.database.queueLimit,
     maxIdle: config.database.maxIdle,

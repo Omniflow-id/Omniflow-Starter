@@ -3,7 +3,13 @@ const { db } = require("@db/db");
 const { invalidateCache } = require("@helpers/cache");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
-const { log, LOG_LEVELS } = require("@helpers/log");
+const {
+  LOG_LEVELS,
+  logUserActivity,
+  ACTION_TYPES,
+  RESOURCE_TYPES,
+  ACTIVITY_STATUS,
+} = require("@helpers/log");
 
 const toggleUserActive = async (req, res) => {
   const userId = req.params.id;
@@ -18,9 +24,9 @@ const toggleUserActive = async (req, res) => {
       return res.redirect("/admin/user/index");
     }
 
-    // Get current user status
+    // Get current user data for change tracking
     const [users] = await db.query(
-      "SELECT username, is_active FROM users WHERE id = ?",
+      "SELECT id, username, email, full_name, role, is_active, updated_at FROM users WHERE id = ?",
       [userId]
     );
 
@@ -30,21 +36,59 @@ const toggleUserActive = async (req, res) => {
     }
 
     const targetUser = users[0];
+    const oldData = { ...targetUser };
     const newStatus = !targetUser.is_active;
+    const now = new Date().toISOString().slice(0, 19).replace("T", " ");
 
     // Update user status
-    await db.query("UPDATE users SET is_active = ? WHERE id = ?", [
-      newStatus,
-      userId,
-    ]);
-
-    await log(
-      `User ${targetUser.username} ${newStatus ? "activated" : "deactivated"} by ${req.session.user.username}`,
-      LOG_LEVELS.INFO,
-      req.session.user.id,
-      userAgentData,
-      ip
+    await db.query(
+      "UPDATE users SET is_active = ?, updated_at = ? WHERE id = ?",
+      [newStatus, now, userId]
     );
+
+    const newData = {
+      ...targetUser,
+      is_active: newStatus,
+      updated_at: now,
+    };
+
+    await logUserActivity({
+      activity: `User ${targetUser.username} ${newStatus ? "activated" : "deactivated"}`,
+      actionType: ACTION_TYPES.UPDATE,
+      resourceType: RESOURCE_TYPES.USER,
+      resourceId: userId,
+      status: ACTIVITY_STATUS.SUCCESS,
+      userId: req.session.user.id,
+      requestInfo: {
+        ip,
+        userAgent: userAgentData.userAgent,
+        deviceType: userAgentData.deviceType,
+        browser: userAgentData.browser,
+        platform: userAgentData.platform,
+        method: req.method,
+        url: req.originalUrl,
+      },
+      dataChanges: {
+        oldData,
+        newData,
+        excludeFields: ["updated_at"], // Exclude timestamp from change tracking
+        maskSensitive: true,
+      },
+      metadata: {
+        statusChange: {
+          from: targetUser.is_active ? "active" : "inactive",
+          to: newStatus ? "active" : "inactive",
+        },
+        targetUser: {
+          username: targetUser.username,
+          email: targetUser.email,
+          role: targetUser.role,
+        },
+        actionBy: req.session.user.username,
+        reason: "admin_action",
+      },
+      req,
+    });
 
     // Invalidate user-related caches after status change
     await invalidateCache("admin:users:*", true);
@@ -56,13 +100,32 @@ const toggleUserActive = async (req, res) => {
     );
     res.redirect("/admin/user/index");
   } catch (error) {
-    await log(
-      `Error toggling user active status: ${error.message}`,
-      LOG_LEVELS.ERROR,
-      req.session.user.id,
-      userAgentData,
-      ip
-    );
+    await logUserActivity({
+      activity: `Failed to toggle user active status for user ID: ${userId}`,
+      actionType: ACTION_TYPES.UPDATE,
+      resourceType: RESOURCE_TYPES.USER,
+      resourceId: userId,
+      status: ACTIVITY_STATUS.FAILURE,
+      userId: req.session.user.id,
+      requestInfo: {
+        ip,
+        userAgent: userAgentData.userAgent,
+        deviceType: userAgentData.deviceType,
+        browser: userAgentData.browser,
+        platform: userAgentData.platform,
+        method: req.method,
+        url: req.originalUrl,
+      },
+      errorMessage: error.message,
+      errorCode: error.code || "USER_STATUS_UPDATE_FAILED",
+      metadata: {
+        targetUserId: userId,
+        actionBy: req.session.user.username,
+        errorDetails: error.name,
+      },
+      req,
+      level: LOG_LEVELS.ERROR,
+    });
     req.flash("error", "An error occurred while updating user status");
     res.redirect("/admin/user/index");
   }

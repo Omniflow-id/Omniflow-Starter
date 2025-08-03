@@ -45,7 +45,9 @@ async function handleCache({
         // Cache MISS - consider logging only in debug mode if needed
       }
     } catch (err) {
-      console.error(`Redis GET error for key ${fullKey}: ${err.message}`);
+      console.error(
+        `❌ [CACHE] Redis GET error for key ${fullKey}: ${err.message}`
+      );
       cacheAvailable = false;
     }
   } else {
@@ -57,7 +59,7 @@ async function handleCache({
           ? "Cache skipped"
           : "Redis unavailable";
 
-    console.log(`Cache: Using DB fallback for key ${fullKey}: ${reason}`);
+    console.log(`🔄 [CACHE] Using DB fallback for ${fullKey}: ${reason}`);
   }
 
   // Return cached data if available
@@ -79,10 +81,10 @@ async function handleCache({
   if (cacheAvailable && data !== null && data !== undefined) {
     try {
       await redisClient.set(fullKey, JSON.stringify(data), "EX", ttl);
-      console.log(`Cache: Data cached for key: ${fullKey}, TTL: ${ttl}s`);
+      console.log(`✅ [CACHE] Data cached for ${fullKey}, TTL: ${ttl}s`);
     } catch (err) {
       console.error(
-        `Cache: Redis SET error for key ${fullKey}: ${err.message}`
+        `❌ [CACHE] Redis SET error for ${fullKey}: ${err.message}`
       );
     }
   }
@@ -108,7 +110,7 @@ async function invalidateCache(keyOrPattern, isPattern = false) {
   const redisClient = getRedis();
 
   if (!isConnected() || !redisClient) {
-    console.warn("Cache: Cannot invalidate cache - Redis not available");
+    console.warn("⚠️ [CACHE] Cannot invalidate - Redis not available");
     return 0;
   }
 
@@ -139,21 +141,21 @@ async function invalidateCache(keyOrPattern, isPattern = false) {
       if (keysToDelete.length > 0) {
         deletedCount = await redisClient.del(...keysToDelete);
         console.log(
-          `Cache: Invalidated ${deletedCount} keys matching pattern: ${fullKey}`
+          `✅ [CACHE] Invalidated ${deletedCount} keys matching pattern: ${fullKey}`
         );
       }
     } else {
       // Single key deletion
       deletedCount = await redisClient.del(fullKey);
       if (deletedCount > 0) {
-        console.log(`Cache: Invalidated cache key: ${fullKey}`);
+        console.log(`✅ [CACHE] Invalidated key: ${fullKey}`);
       }
     }
 
     return deletedCount;
   } catch (err) {
     console.error(
-      `Cache: Error invalidating cache ${keyOrPattern}: ${err.message}`
+      `❌ [CACHE] Error invalidating ${keyOrPattern}: ${err.message}`
     );
     return 0;
   }
@@ -170,17 +172,17 @@ async function setCache(key, data, ttl = config.redis.defaultTTL) {
   const redisClient = getRedis();
 
   if (!isConnected() || !redisClient) {
-    console.warn("Cache: Cannot set cache - Redis not available");
+    console.warn("⚠️ [CACHE] Cannot set - Redis not available");
     return false;
   }
 
   try {
     const fullKey = `${config.redis.keyPrefix}${key}`;
     await redisClient.set(fullKey, JSON.stringify(data), "EX", ttl);
-    console.log(`Cache: Set cache key: ${fullKey}, TTL: ${ttl}s`);
+    console.log(`✅ [CACHE] Set key: ${fullKey}, TTL: ${ttl}s`);
     return true;
   } catch (err) {
-    console.error(`Cache: Error setting cache ${key}: ${err.message}`);
+    console.error(`❌ [CACHE] Error setting ${key}: ${err.message}`);
     return false;
   }
 }
@@ -202,7 +204,7 @@ async function getCache(key) {
     const cached = await redisClient.get(fullKey);
     return cached ? JSON.parse(cached) : null;
   } catch (err) {
-    console.error(`Cache: Error getting cache ${key}: ${err.message}`);
+    console.error(`❌ [CACHE] Error getting ${key}: ${err.message}`);
     return null;
   }
 }
@@ -216,7 +218,7 @@ async function flushCache(onlyPrefixed = true) {
   const redisClient = getRedis();
 
   if (!isConnected() || !redisClient) {
-    console.warn("Cache: Cannot flush cache - Redis not available");
+    console.warn("⚠️ [CACHE] Cannot flush - Redis not available");
     return 0;
   }
 
@@ -226,17 +228,17 @@ async function flushCache(onlyPrefixed = true) {
     if (onlyPrefixed) {
       // Only delete keys with our prefix
       deletedCount = await invalidateCache(`${config.redis.keyPrefix}*`, true);
-      console.log(`Cache: Flushed ${deletedCount} prefixed cache keys`);
+      console.log(`✅ [CACHE] Flushed ${deletedCount} prefixed keys`);
     } else {
       // Flush entire Redis database (use with caution!)
       await redisClient.flushdb();
       deletedCount = -1; // Unknown count
-      console.warn("Cache: Flushed entire Redis database");
+      console.warn("⚠️ [CACHE] Flushed entire Redis database");
     }
 
     return deletedCount;
   } catch (err) {
-    console.error(`Cache: Error flushing cache: ${err.message}`);
+    console.error(`❌ [CACHE] Error flushing: ${err.message}`);
     return 0;
   }
 }
@@ -364,7 +366,7 @@ async function listKeys(pattern = "*", limit = 50) {
       prefix: config.redis.keyPrefix,
     };
   } catch (err) {
-    console.error(`Cache: Error listing keys: ${err.message}`);
+    console.error(`❌ [CACHE] Error listing keys: ${err.message}`);
     return {
       connected: false,
       keys: [],

@@ -6,7 +6,13 @@ const { db } = require("@db/db");
 const { invalidateCache } = require("@helpers/cache");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
-const { log, LOG_LEVELS } = require("@helpers/log");
+const {
+  LOG_LEVELS,
+  logUserActivity,
+  ACTION_TYPES,
+  RESOURCE_TYPES,
+  ACTIVITY_STATUS,
+} = require("@helpers/log");
 const {
   generatePredictablePassword,
   validatePassword,
@@ -35,13 +41,31 @@ const createNewUser = async (req, res) => {
     // Role validation
     const validRoles = ["Admin", "Manager", "User"];
     if (!validRoles.includes(role)) {
-      await log(
-        `Invalid role "${role}" selected by ${req.session.user.username}`,
-        LOG_LEVELS.WARN,
-        req.session.user.id,
-        userAgentData,
-        ip
-      );
+      await logUserActivity({
+        activity: `Invalid role selection attempted: ${role}`,
+        actionType: ACTION_TYPES.CREATE,
+        resourceType: RESOURCE_TYPES.USER,
+        status: ACTIVITY_STATUS.FAILURE,
+        userId: req.session.user.id,
+        requestInfo: {
+          ip,
+          userAgent: userAgentData.userAgent,
+          deviceType: userAgentData.deviceType,
+          browser: userAgentData.browser,
+          platform: userAgentData.platform,
+          method: req.method,
+          url: req.originalUrl,
+        },
+        errorMessage: "Invalid role selected",
+        errorCode: "INVALID_ROLE",
+        metadata: {
+          attemptedRole: role,
+          validRoles,
+          formData: { username, email, full_name },
+        },
+        req,
+        level: LOG_LEVELS.WARN,
+      });
       req.flash("error", "Invalid role selected");
       return res.redirect("/admin/user/index");
     }
@@ -57,13 +81,30 @@ const createNewUser = async (req, res) => {
     const passwordValidation = validatePassword(generatedPassword);
 
     if (!passwordValidation.isValid) {
-      await log(
-        `Generated password failed validation for user ${username}: ${passwordValidation.errors.join(", ")}`,
-        LOG_LEVELS.ERROR,
-        req.session.user.id,
-        userAgentData,
-        ip
-      );
+      await logUserActivity({
+        activity: `Generated password failed validation for user: ${username}`,
+        actionType: ACTION_TYPES.CREATE,
+        resourceType: RESOURCE_TYPES.USER,
+        status: ACTIVITY_STATUS.FAILURE,
+        userId: req.session.user.id,
+        requestInfo: {
+          ip,
+          userAgent: userAgentData.userAgent,
+          deviceType: userAgentData.deviceType,
+          browser: userAgentData.browser,
+          platform: userAgentData.platform,
+          method: req.method,
+          url: req.originalUrl,
+        },
+        errorMessage: "Generated password does not meet security requirements",
+        errorCode: "PASSWORD_VALIDATION_FAILED",
+        metadata: {
+          passwordErrors: passwordValidation.errors,
+          formData: { username, email, full_name, role },
+        },
+        req,
+        level: LOG_LEVELS.ERROR,
+      });
       req.flash(
         "error",
         "Generated password does not meet security requirements"
@@ -81,29 +122,81 @@ const createNewUser = async (req, res) => {
     );
 
     if (existingUser.length > 0) {
-      await log(
-        `Failed to create user - email ${email} already exists (attempted by ${req.session.user.username})`,
-        LOG_LEVELS.WARN,
-        req.session.user.id,
-        userAgentData,
-        ip
-      );
+      await logUserActivity({
+        activity: `Failed to create user - email already exists: ${email}`,
+        actionType: ACTION_TYPES.CREATE,
+        resourceType: RESOURCE_TYPES.USER,
+        status: ACTIVITY_STATUS.FAILURE,
+        userId: req.session.user.id,
+        requestInfo: {
+          ip,
+          userAgent: userAgentData.userAgent,
+          deviceType: userAgentData.deviceType,
+          browser: userAgentData.browser,
+          platform: userAgentData.platform,
+          method: req.method,
+          url: req.originalUrl,
+        },
+        errorMessage: "Email already exists in system",
+        errorCode: "EMAIL_ALREADY_EXISTS",
+        metadata: {
+          duplicateEmail: email,
+          existingUserId: existingUser[0].id,
+          formData: { username, email, full_name, role },
+        },
+        req,
+        level: LOG_LEVELS.WARN,
+      });
       req.flash("error", "Email already exists!");
       return res.redirect("/admin/user/index");
     }
 
-    await db.query(
+    const [result] = await db.query(
       "INSERT INTO users (username, email, full_name, role, password_hash, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
       [username, email, full_name, role, hashedPassword, true, now, now]
     );
 
-    await log(
-      `User ${username} (${role}) created with generated password by ${req.session.user.username}`,
-      LOG_LEVELS.INFO,
-      req.session.user.id,
-      userAgentData,
-      ip
-    );
+    const newUserId = result.insertId;
+    const createdUserData = {
+      id: newUserId,
+      username,
+      email,
+      full_name,
+      role,
+      password_hash: hashedPassword, // Will be masked
+      is_active: true,
+      created_at: now,
+      updated_at: now,
+    };
+
+    await logUserActivity({
+      activity: `Created new user: ${username} (${role})`,
+      actionType: ACTION_TYPES.CREATE,
+      resourceType: RESOURCE_TYPES.USER,
+      resourceId: newUserId.toString(),
+      status: ACTIVITY_STATUS.SUCCESS,
+      userId: req.session.user.id,
+      requestInfo: {
+        ip,
+        userAgent: userAgentData.userAgent,
+        deviceType: userAgentData.deviceType,
+        browser: userAgentData.browser,
+        platform: userAgentData.platform,
+        method: req.method,
+        url: req.originalUrl,
+      },
+      dataChanges: {
+        newData: createdUserData,
+        maskSensitive: true, // Will mask password_hash
+      },
+      metadata: {
+        creationMethod: "admin_panel",
+        passwordGenerated: true,
+        passwordPattern: "predictable",
+        generatedBy: req.session.user.username,
+      },
+      req,
+    });
 
     // Invalidate user-related caches
     await invalidateCache("admin:users:*", true);
@@ -124,13 +217,31 @@ const createNewUser = async (req, res) => {
     );
     res.redirect("/admin/user/index");
   } catch (err) {
-    await log(
-      `Failed to create user ${username}: ${err.message} (by ${req.session.user.username})`,
-      LOG_LEVELS.ERROR,
-      req.session.user.id,
-      userAgentData,
-      ip
-    );
+    await logUserActivity({
+      activity: `Failed to create user: ${username || "unknown"}`,
+      actionType: ACTION_TYPES.CREATE,
+      resourceType: RESOURCE_TYPES.USER,
+      status: ACTIVITY_STATUS.FAILURE,
+      userId: req.session.user.id,
+      requestInfo: {
+        ip,
+        userAgent: userAgentData.userAgent,
+        deviceType: userAgentData.deviceType,
+        browser: userAgentData.browser,
+        platform: userAgentData.platform,
+        method: req.method,
+        url: req.originalUrl,
+      },
+      errorMessage: err.message,
+      errorCode: err.code || "USER_CREATION_FAILED",
+      metadata: {
+        formData: { username, email, full_name, role },
+        errorDetails: err.name,
+        createdBy: req.session.user.username,
+      },
+      req,
+      level: LOG_LEVELS.ERROR,
+    });
     req.flash("error", `Error creating user: ${err.message}`);
     res.redirect("/admin/user/index");
   }

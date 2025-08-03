@@ -3,6 +3,16 @@
  * Protects external services from cascading failures
  */
 
+// Import system logging (lazy load to avoid circular dependency)
+let logSystemActivity = null;
+const getSystemLogger = () => {
+  if (!logSystemActivity) {
+    const { logSystemActivity: logger } = require("@helpers/log");
+    logSystemActivity = logger;
+  }
+  return logSystemActivity;
+};
+
 class CircuitBreaker {
   constructor(service, options = {}) {
     this.service = service;
@@ -15,14 +25,14 @@ class CircuitBreaker {
     this.lastFailureTime = null;
     this.successCount = 0;
 
-    console.log(`🔐 Circuit Breaker initialized for ${service}`);
+    console.log(`🔐 [CIRCUIT-BREAKER] Initialized for ${service}`);
   }
 
   async execute(operation, ...args) {
     if (this.state === "OPEN") {
       if (this._shouldAttemptReset()) {
         this.state = "HALF_OPEN";
-        console.log(`🔄 Circuit Breaker HALF_OPEN for ${this.service}`);
+        console.log(`🔄 [CIRCUIT-BREAKER] HALF_OPEN for ${this.service}`);
       } else {
         const error = new Error(`Circuit breaker is OPEN for ${this.service}`);
         error.circuitBreaker = true;
@@ -49,7 +59,25 @@ class CircuitBreaker {
         // Need 2 successes to close
         this.state = "CLOSED";
         this.successCount = 0;
-        console.log(`✅ Circuit Breaker CLOSED for ${this.service}`);
+        console.log(`✅ [CIRCUIT-BREAKER] CLOSED for ${this.service}`);
+
+        // Log circuit breaker state change
+        const logger = getSystemLogger();
+        if (logger) {
+          logger({
+            activity: `Circuit breaker closed for ${this.service}`,
+            metadata: {
+              eventType: "circuit_breaker_closed",
+              service: this.service,
+              previousState: "HALF_OPEN",
+              newState: "CLOSED",
+              successCount: this.successCount,
+              failureCount: this.failureCount,
+            },
+          }).catch((logErr) =>
+            console.error("Failed to log circuit breaker:", logErr.message)
+          );
+        }
       }
     }
   }
@@ -61,12 +89,49 @@ class CircuitBreaker {
     if (this.state === "HALF_OPEN") {
       this.state = "OPEN";
       this.successCount = 0;
-      console.log(`❌ Circuit Breaker back to OPEN for ${this.service}`);
+      console.log(`❌ [CIRCUIT-BREAKER] Back to OPEN for ${this.service}`);
+
+      // Log circuit breaker opened from half-open
+      const logger = getSystemLogger();
+      if (logger) {
+        logger({
+          activity: `Circuit breaker reopened for ${this.service}`,
+          metadata: {
+            eventType: "circuit_breaker_reopened",
+            service: this.service,
+            previousState: "HALF_OPEN",
+            newState: "OPEN",
+            failureCount: this.failureCount,
+            reason: "failed_during_recovery",
+          },
+        }).catch((logErr) =>
+          console.error("Failed to log circuit breaker:", logErr.message)
+        );
+      }
     } else if (this.failureCount >= this.failureThreshold) {
       this.state = "OPEN";
       console.log(
-        `🚨 Circuit Breaker OPEN for ${this.service} (${this.failureCount} failures)`
+        `🚨 [CIRCUIT-BREAKER] OPEN for ${this.service} (${this.failureCount} failures)`
       );
+
+      // Log circuit breaker opened from threshold
+      const logger = getSystemLogger();
+      if (logger) {
+        logger({
+          activity: `Circuit breaker opened for ${this.service} - threshold reached`,
+          metadata: {
+            eventType: "circuit_breaker_opened",
+            service: this.service,
+            previousState: "CLOSED",
+            newState: "OPEN",
+            failureCount: this.failureCount,
+            failureThreshold: this.failureThreshold,
+            reason: "failure_threshold_exceeded",
+          },
+        }).catch((logErr) =>
+          console.error("Failed to log circuit breaker:", logErr.message)
+        );
+      }
     }
   }
 
@@ -92,7 +157,7 @@ class CircuitBreaker {
     this.failureCount = 0;
     this.successCount = 0;
     this.lastFailureTime = null;
-    console.log(`🔄 Circuit Breaker manually reset for ${this.service}`);
+    console.log(`🔄 [CIRCUIT-BREAKER] Manually reset for ${this.service}`);
   }
 }
 

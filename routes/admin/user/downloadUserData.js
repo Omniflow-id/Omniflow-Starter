@@ -5,7 +5,13 @@ const Excel = require("exceljs");
 const { db } = require("@db/db");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
-const { log, LOG_LEVELS } = require("@helpers/log");
+const {
+  LOG_LEVELS,
+  logUserActivity,
+  ACTION_TYPES,
+  RESOURCE_TYPES,
+  ACTIVITY_STATUS,
+} = require("@helpers/log");
 
 const downloadUserData = async (req, res) => {
   try {
@@ -62,26 +68,70 @@ const downloadUserData = async (req, res) => {
     const ip = getClientIP(req);
     const userAgentData = getUserAgent(req);
 
-    await log(
-      `${req.session.user.username} DOWNLOADED USER data`,
-      LOG_LEVELS.INFO,
-      req.session.user.id,
-      userAgentData,
-      ip
-    );
+    await logUserActivity({
+      activity: "Downloaded complete user data export",
+      actionType: ACTION_TYPES.EXPORT,
+      resourceType: RESOURCE_TYPES.USER,
+      resourceId: "users_export",
+      status: ACTIVITY_STATUS.SUCCESS,
+      userId: req.session.user.id,
+      requestInfo: {
+        ip,
+        userAgent: userAgentData.userAgent,
+        deviceType: userAgentData.deviceType,
+        browser: userAgentData.browser,
+        platform: userAgentData.platform,
+        method: req.method,
+        url: req.originalUrl,
+      },
+      metadata: {
+        exportType: "complete_user_data",
+        format: "xlsx",
+        fileName: "users-data.xlsx",
+        recordsExported: users.length,
+        columnsExported: [
+          "id",
+          "username",
+          "email",
+          "full_name",
+          "role",
+          "is_active",
+        ],
+        dataSource: "users_table",
+      },
+      req,
+    });
 
     res.end();
   } catch (error) {
     const clientIP = getClientIP(req);
     const userAgent = getUserAgent(req);
 
-    await log(
-      `Kesalahan saat mengunduh data user: ${error.message}`,
-      LOG_LEVELS.ERROR,
-      req.session?.user?.id,
-      userAgent,
-      clientIP
-    );
+    await logUserActivity({
+      activity: "Failed to download user data export",
+      actionType: ACTION_TYPES.EXPORT,
+      resourceType: RESOURCE_TYPES.USER,
+      resourceId: "users_export",
+      status: ACTIVITY_STATUS.FAILURE,
+      userId: req.session?.user?.id,
+      requestInfo: {
+        ip: clientIP,
+        userAgent: userAgent.userAgent,
+        deviceType: userAgent.deviceType,
+        browser: userAgent.browser,
+        platform: userAgent.platform,
+        method: req.method,
+        url: req.originalUrl,
+      },
+      errorMessage: error.message,
+      errorCode: error.code || "USER_DATA_EXPORT_FAILED",
+      metadata: {
+        exportType: "complete_user_data",
+        errorDetails: error.name,
+      },
+      req,
+      level: LOG_LEVELS.ERROR,
+    });
 
     res.status(500).send("Internal Server Error");
   }

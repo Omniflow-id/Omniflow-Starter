@@ -9,6 +9,16 @@ const Redis = require("ioredis");
 // === Absolute / alias imports ===
 const config = require("@config");
 
+// Import system logging (lazy load to avoid circular dependency)
+let logSystemActivity = null;
+const getSystemLogger = () => {
+  if (!logSystemActivity) {
+    const { logSystemActivity: logger } = require("@helpers/log");
+    logSystemActivity = logger;
+  }
+  return logSystemActivity;
+};
+
 let redis = null;
 let isRedisConnected = false;
 let isReconnecting = false;
@@ -21,7 +31,7 @@ let reconnectionTimer = null;
 function createRedisConnection() {
   // Skip if Redis is disabled in configuration
   if (!config.redis.enabled) {
-    console.log("Redis: Redis is disabled in configuration");
+    console.log("⚠️ [REDIS] Caching is disabled in configuration");
     return null;
   }
 
@@ -63,7 +73,7 @@ function createRedisConnection() {
 
     // Connection success handler
     newRedis.on("connect", () => {
-      console.log("Redis: Connected successfully");
+      console.log("✅ [REDIS] Connected successfully");
       redis = newRedis;
       isRedisConnected = true;
       isReconnecting = false;
@@ -73,25 +83,62 @@ function createRedisConnection() {
         clearTimeout(reconnectionTimer);
         reconnectionTimer = null;
       }
+
+      // Log system activity for Redis connection
+      const logger = getSystemLogger();
+      if (logger) {
+        logger({
+          activity: "Redis cache connected successfully",
+          metadata: {
+            eventType: "redis_connected",
+            host: config.redis.host,
+            port: config.redis.port,
+            database: config.redis.db,
+            reconnectAttempts: reconnectionTimer ? "yes" : "no",
+          },
+        }).catch((logErr) =>
+          console.error("Failed to log Redis connect:", logErr.message)
+        );
+      }
     });
 
     // Ready handler (authenticated and ready to receive commands)
     newRedis.on("ready", () => {
-      console.log("Redis: Ready to accept commands");
+      console.log("🚀 [REDIS] Ready to accept commands");
       isRedisConnected = true;
     });
 
     // Error handler
     newRedis.on("error", (err) => {
-      console.error(`Redis: Connection error: ${err.message}`);
+      console.error(`❌ [REDIS] Connection error: ${err.message}`);
       redis = null;
       isRedisConnected = false;
       isReconnecting = false;
+
+      // Log system activity for Redis errors
+      const logger = getSystemLogger();
+      if (logger) {
+        logger({
+          activity: `Redis cache connection error: ${err.message}`,
+          errorMessage: err.message,
+          errorCode: err.code || "REDIS_CONNECTION_ERROR",
+          metadata: {
+            eventType: "redis_error",
+            host: config.redis.host,
+            port: config.redis.port,
+            database: config.redis.db,
+            severity: "error",
+            errorCode: err.code,
+          },
+        }).catch((logErr) =>
+          console.error("Failed to log Redis error:", logErr.message)
+        );
+      }
     });
 
     // Connection closed handler
     newRedis.on("close", () => {
-      console.warn("Redis: Connection closed");
+      console.warn("⚠️ [REDIS] Connection closed");
       redis = null;
       isRedisConnected = false;
       isReconnecting = false;
@@ -101,7 +148,7 @@ function createRedisConnection() {
         reconnectionTimer = setTimeout(() => {
           reconnectionTimer = null;
           if (!isRedisConnected && config.redis.enabled) {
-            console.log("Redis: Attempting reconnection...");
+            console.log("🔄 [REDIS] Attempting reconnection...");
             createRedisConnection();
           }
         }, 15000); // 15 seconds delay
@@ -110,7 +157,7 @@ function createRedisConnection() {
 
     // End handler (connection terminated)
     newRedis.on("end", () => {
-      console.warn("Redis: Connection ended");
+      console.warn("⚠️ [REDIS] Connection ended");
       redis = null;
       isRedisConnected = false;
       isReconnecting = false;
@@ -119,14 +166,14 @@ function createRedisConnection() {
     // Attempt initial connection
     if (config.redis.lazyConnect) {
       newRedis.connect().catch((err) => {
-        console.error(`Redis: Initial connection failed: ${err.message}`);
+        console.error(`❌ [REDIS] Initial connection failed: ${err.message}`);
         isReconnecting = false;
       });
     }
 
     return newRedis;
   } catch (error) {
-    console.error(`Redis: Failed to initialize: ${error.message}`);
+    console.error(`❌ [REDIS] Failed to initialize: ${error.message}`);
     redis = null;
     isRedisConnected = false;
     isReconnecting = false;
@@ -158,9 +205,9 @@ async function closeRedis() {
   if (redis) {
     try {
       await redis.quit();
-      console.log("Redis: Connection closed gracefully");
+      console.log("😇 [REDIS] Connection closed gracefully");
     } catch (err) {
-      console.error(`Redis: Error closing connection: ${err.message}`);
+      console.error(`❌ [REDIS] Error closing connection: ${err.message}`);
     } finally {
       redis = null;
       isRedisConnected = false;
@@ -194,7 +241,7 @@ function getRedisStats() {
 if (config.redis.enabled) {
   createRedisConnection();
 } else {
-  console.log("Redis: Redis caching is disabled");
+  console.log("⚠️ [REDIS] Caching is disabled");
 }
 
 module.exports = {

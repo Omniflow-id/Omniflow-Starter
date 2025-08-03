@@ -1,4 +1,10 @@
-const { log, LOG_LEVELS } = require("../helpers/log");
+const {
+  logUserActivity,
+  LOG_LEVELS,
+  ACTIVITY_STATUS,
+  ACTION_TYPES,
+  RESOURCE_TYPES,
+} = require("../helpers/log");
 const { getClientIP } = require("../helpers/getClientIP");
 const { getUserAgent } = require("../helpers/getUserAgent");
 
@@ -77,17 +83,64 @@ const centralizedErrorHandler = async (err, req, res, _next) => {
     isOperational = false;
   }
 
-  // Log error based on severity
+  // Log error using enhanced logging system
   const logLevel = statusCode >= 500 ? LOG_LEVELS.ERROR : LOG_LEVELS.WARN;
+  const status =
+    statusCode >= 500 ? ACTIVITY_STATUS.FAILURE : ACTIVITY_STATUS.WARNING;
 
   // Clean logging for CSRF errors (no stack trace needed)
   const isCsrfError =
     err.code === "EBADCSRFTOKEN" || err.message === "invalid csrf token";
-  const logMessage = `${req.method} ${req.originalUrl} - ${statusCode} - ${message}${
-    !isCsrfError && err.stack ? ` - Stack: ${err.stack}` : ""
-  }`;
 
-  await log(logMessage, logLevel, userId, userAgent, clientIP);
+  // Determine action and resource type based on error
+  let actionType = ACTION_TYPES.READ; // Default
+  let resourceType = RESOURCE_TYPES.SYSTEM;
+
+  if (req.method === "POST") actionType = ACTION_TYPES.CREATE;
+  else if (req.method === "PUT" || req.method === "PATCH")
+    actionType = ACTION_TYPES.UPDATE;
+  else if (req.method === "DELETE") actionType = ACTION_TYPES.DELETE;
+
+  if (req.originalUrl.includes("/user")) resourceType = RESOURCE_TYPES.USER;
+  else if (req.originalUrl.includes("/cache"))
+    resourceType = RESOURCE_TYPES.CACHE;
+  else if (req.originalUrl.includes("/queue"))
+    resourceType = RESOURCE_TYPES.QUEUE;
+
+  await logUserActivity({
+    activity: `Error: ${req.method} ${req.originalUrl} - ${statusCode} ${message}`,
+    actionType,
+    resourceType,
+    status,
+    userId,
+    requestInfo: {
+      ip: clientIP,
+      userAgent: userAgent.deviceType,
+      browser: userAgent.browser,
+      platform: userAgent.platform,
+      method: req.method,
+      url: req.originalUrl,
+    },
+    errorMessage: message,
+    errorCode: err.code || err.name || "UNKNOWN_ERROR",
+    metadata: {
+      statusCode,
+      isOperational,
+      isCsrfError,
+      originalError: err.name,
+      userSession: req.session?.user
+        ? {
+            userId: req.session.user.id,
+            username: req.session.user.username,
+            role: req.session.user.role,
+          }
+        : null,
+      ...(process.env.NODE_ENV === "development" &&
+        !isCsrfError && { stack: err.stack }),
+    },
+    req,
+    level: logLevel,
+  });
 
   // Don't log stack trace for CSRF errors (too verbose) and in production for security
   if (isCsrfError) {

@@ -1,4 +1,9 @@
-const { LOG_LEVELS, log } = require("@helpers/log");
+const {
+  logUserActivity,
+  ACTION_TYPES,
+  RESOURCE_TYPES,
+  ACTIVITY_STATUS,
+} = require("@helpers/log");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
 
@@ -6,16 +11,37 @@ const logout = async (req, res) => {
   const user = req.session.user;
 
   if (user) {
-    // Use middleware to log logout
+    // Log logout activity
     const clientIP = getClientIP(req);
     const userAgent = getUserAgent(req);
-    await log(
-      `Pengguna keluar: ${user.username}`,
-      LOG_LEVELS.INFO,
-      req.session?.user?.id || user.id,
-      userAgent,
-      clientIP
-    );
+
+    await logUserActivity({
+      activity: `User logged out: ${user.username}`,
+      actionType: ACTION_TYPES.LOGOUT,
+      resourceType: RESOURCE_TYPES.SESSION,
+      resourceId: req.session.id,
+      status: ACTIVITY_STATUS.SUCCESS,
+      userId: user.id,
+      userInfo: {
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+      requestInfo: {
+        ip: clientIP,
+        userAgent: userAgent.userAgent,
+        deviceType: userAgent.deviceType,
+        browser: userAgent.browser,
+        platform: userAgent.platform,
+        method: req.method,
+        url: req.originalUrl,
+      },
+      metadata: {
+        logoutMethod: "manual",
+        sessionId: req.session.id,
+      },
+      req,
+    });
   }
 
   req.session.destroy((err) => {

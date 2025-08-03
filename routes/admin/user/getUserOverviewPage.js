@@ -3,7 +3,13 @@ const { db } = require("@db/db");
 const { handleCache } = require("@helpers/cache");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
-const { log, LOG_LEVELS } = require("@helpers/log");
+const {
+  LOG_LEVELS,
+  logUserActivity,
+  ACTION_TYPES,
+  RESOURCE_TYPES,
+  ACTIVITY_STATUS,
+} = require("@helpers/log");
 
 const getUserOverviewPage = async (req, res) => {
   try {
@@ -43,13 +49,34 @@ const getUserOverviewPage = async (req, res) => {
     const clientIP = getClientIP(req);
     const userAgent = getUserAgent(req);
 
-    await log(
-      `Kesalahan saat mengambil statistik user: ${error.message}`,
-      LOG_LEVELS.ERROR,
-      req.session?.user?.id,
-      userAgent,
-      clientIP
-    );
+    await logUserActivity({
+      activity: "Failed to load user overview/statistics page",
+      actionType: ACTION_TYPES.READ,
+      resourceType: RESOURCE_TYPES.USER,
+      resourceId: "users_overview",
+      status: ACTIVITY_STATUS.FAILURE,
+      userId: req.session?.user?.id,
+      requestInfo: {
+        ip: clientIP,
+        userAgent: userAgent.userAgent,
+        deviceType: userAgent.deviceType,
+        browser: userAgent.browser,
+        platform: userAgent.platform,
+        method: req.method,
+        url: req.originalUrl,
+      },
+      errorMessage: error.message,
+      errorCode: error.code || "USER_OVERVIEW_LOAD_FAILED",
+      metadata: {
+        pageType: "users_overview",
+        cacheEnabled: true,
+        cacheTTL: 300,
+        statsRequested: ["totalUsers", "roleStats"],
+        errorDetails: error.name,
+      },
+      req,
+      level: LOG_LEVELS.ERROR,
+    });
 
     res.status(500).send("Internal Server Error");
   }

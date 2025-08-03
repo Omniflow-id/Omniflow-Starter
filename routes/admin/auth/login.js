@@ -1,6 +1,12 @@
 const { db } = require("@db/db");
 const bcrypt = require("bcrypt");
-const { LOG_LEVELS, log } = require("@helpers/log");
+const {
+  LOG_LEVELS,
+  logUserActivity,
+  ACTION_TYPES,
+  RESOURCE_TYPES,
+  ACTIVITY_STATUS,
+} = require("@helpers/log");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
 const {
@@ -40,13 +46,30 @@ const login = asyncHandler(async (req, res) => {
     // Log failed login attempt
     const clientIP = getClientIP(req);
     const userAgent = getUserAgent(req);
-    await log(
-      `Percobaan login gagal untuk email: ${email}`,
-      LOG_LEVELS.WARN,
-      req.session?.user?.id || null,
-      userAgent,
-      clientIP
-    );
+
+    await logUserActivity({
+      activity: `Failed login attempt - email not found: ${email}`,
+      actionType: ACTION_TYPES.LOGIN,
+      resourceType: RESOURCE_TYPES.SESSION,
+      status: ACTIVITY_STATUS.FAILURE,
+      requestInfo: {
+        ip: clientIP,
+        userAgent: userAgent.userAgent,
+        deviceType: userAgent.deviceType,
+        browser: userAgent.browser,
+        platform: userAgent.platform,
+        method: req.method,
+        url: req.originalUrl,
+      },
+      errorMessage: "Email not found in system",
+      errorCode: "EMAIL_NOT_FOUND",
+      metadata: {
+        attemptedEmail: email,
+        loginMethod: "password",
+      },
+      req,
+      level: LOG_LEVELS.WARN,
+    });
 
     throw new AuthenticationError("Invalid email or password");
   }
@@ -57,13 +80,37 @@ const login = asyncHandler(async (req, res) => {
   if (!user.is_active) {
     const clientIP = getClientIP(req);
     const userAgent = getUserAgent(req);
-    await log(
-      `Inactive user attempted login: ${email}`,
-      LOG_LEVELS.WARN,
-      user.id,
-      userAgent,
-      clientIP
-    );
+
+    await logUserActivity({
+      activity: `Inactive user attempted login: ${user.username}`,
+      actionType: ACTION_TYPES.LOGIN,
+      resourceType: RESOURCE_TYPES.SESSION,
+      status: ACTIVITY_STATUS.FAILURE,
+      userId: user.id,
+      userInfo: {
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+      requestInfo: {
+        ip: clientIP,
+        userAgent: userAgent.userAgent,
+        deviceType: userAgent.deviceType,
+        browser: userAgent.browser,
+        platform: userAgent.platform,
+        method: req.method,
+        url: req.originalUrl,
+      },
+      errorMessage: "User account is deactivated",
+      errorCode: "ACCOUNT_DEACTIVATED",
+      metadata: {
+        accountStatus: "inactive",
+        loginMethod: "password",
+      },
+      req,
+      level: LOG_LEVELS.WARN,
+    });
+
     throw new AuthenticationError(
       "Your account has been deactivated. Please contact administrator."
     );
@@ -75,13 +122,36 @@ const login = asyncHandler(async (req, res) => {
     // Log invalid password attempt
     const clientIP = getClientIP(req);
     const userAgent = getUserAgent(req);
-    await log(
-      `Percobaan password salah untuk pengguna: ${user.username}`,
-      LOG_LEVELS.WARN,
-      req.session?.user?.id || user.id,
-      userAgent,
-      clientIP
-    );
+
+    await logUserActivity({
+      activity: `Failed login attempt - invalid password for user: ${user.username}`,
+      actionType: ACTION_TYPES.LOGIN,
+      resourceType: RESOURCE_TYPES.SESSION,
+      status: ACTIVITY_STATUS.FAILURE,
+      userId: user.id,
+      userInfo: {
+        username: user.username,
+        email: user.email,
+        role: user.role,
+      },
+      requestInfo: {
+        ip: clientIP,
+        userAgent: userAgent.userAgent,
+        deviceType: userAgent.deviceType,
+        browser: userAgent.browser,
+        platform: userAgent.platform,
+        method: req.method,
+        url: req.originalUrl,
+      },
+      errorMessage: "Invalid password provided",
+      errorCode: "INVALID_PASSWORD",
+      metadata: {
+        loginMethod: "password",
+        accountStatus: "active",
+      },
+      req,
+      level: LOG_LEVELS.WARN,
+    });
 
     throw new AuthenticationError("Invalid email or password");
   }
@@ -97,13 +167,35 @@ const login = asyncHandler(async (req, res) => {
   // Log successful login
   const clientIP = getClientIP(req);
   const userAgent = getUserAgent(req);
-  await log(
-    `Pengguna berhasil masuk: ${user.username}`,
-    LOG_LEVELS.INFO,
-    req.session?.user?.id || user.id,
-    userAgent,
-    clientIP
-  );
+
+  await logUserActivity({
+    activity: `User successfully logged in: ${user.username}`,
+    actionType: ACTION_TYPES.LOGIN,
+    resourceType: RESOURCE_TYPES.SESSION,
+    resourceId: req.session.id,
+    status: ACTIVITY_STATUS.SUCCESS,
+    userId: user.id,
+    userInfo: {
+      username: user.username,
+      email: user.email,
+      role: user.role,
+    },
+    requestInfo: {
+      ip: clientIP,
+      userAgent: userAgent.userAgent,
+      deviceType: userAgent.deviceType,
+      browser: userAgent.browser,
+      platform: userAgent.platform,
+      method: req.method,
+      url: req.originalUrl,
+    },
+    metadata: {
+      loginMethod: "password",
+      sessionId: req.session.id,
+      previousLogin: user.last_login,
+    },
+    req,
+  });
 
   req.flash("success", "Berhasil login!");
   res.redirect("/admin");

@@ -5,7 +5,13 @@ const Excel = require("exceljs");
 const { db } = require("@db/db");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
-const { log, LOG_LEVELS } = require("@helpers/log");
+const {
+  LOG_LEVELS,
+  logUserActivity,
+  ACTION_TYPES,
+  RESOURCE_TYPES,
+  ACTIVITY_STATUS,
+} = require("@helpers/log");
 
 const downloadUserTemplate = async (req, res) => {
   try {
@@ -90,24 +96,62 @@ const downloadUserTemplate = async (req, res) => {
     const ip = getClientIP(req);
     const userAgentData = getUserAgent(req);
 
-    await log(
-      `User ${req.session?.user?.username} downloaded user template (4-column format with auto-generated passwords)`,
-      LOG_LEVELS.INFO,
-      req.session?.user?.id,
-      userAgentData,
-      ip
-    );
+    await logUserActivity({
+      activity:
+        "Downloaded user template (4-column format with auto-generated passwords)",
+      actionType: ACTION_TYPES.DOWNLOAD,
+      resourceType: RESOURCE_TYPES.FILE,
+      resourceId: "user_template.xlsx",
+      status: ACTIVITY_STATUS.SUCCESS,
+      userId: req.session?.user?.id,
+      requestInfo: {
+        ip,
+        userAgent: userAgentData.userAgent,
+        deviceType: userAgentData.deviceType,
+        browser: userAgentData.browser,
+        platform: userAgentData.platform,
+        method: req.method,
+        url: req.originalUrl,
+      },
+      metadata: {
+        templateType: "user_template",
+        format: "xlsx",
+        columnsCount: 4,
+        passwordGeneration: "auto",
+        availableRoles: roles,
+        fileSize: "template_only",
+      },
+      req,
+    });
   } catch (err) {
     const ip = getClientIP(req);
     const userAgentData = getUserAgent(req);
 
-    await log(
-      `Kesalahan saat mengunduh template user: ${err.message}`,
-      LOG_LEVELS.ERROR,
-      req.session?.user?.id,
-      userAgentData,
-      ip
-    );
+    await logUserActivity({
+      activity: "Failed to download user template",
+      actionType: ACTION_TYPES.DOWNLOAD,
+      resourceType: RESOURCE_TYPES.FILE,
+      resourceId: "user_template.xlsx",
+      status: ACTIVITY_STATUS.FAILURE,
+      userId: req.session?.user?.id,
+      requestInfo: {
+        ip,
+        userAgent: userAgentData.userAgent,
+        deviceType: userAgentData.deviceType,
+        browser: userAgentData.browser,
+        platform: userAgentData.platform,
+        method: req.method,
+        url: req.originalUrl,
+      },
+      errorMessage: err.message,
+      errorCode: err.code || "TEMPLATE_DOWNLOAD_FAILED",
+      metadata: {
+        templateType: "user_template",
+        errorDetails: err.name,
+      },
+      req,
+      level: LOG_LEVELS.ERROR,
+    });
 
     res.status(500).send("Internal Server Error");
   }

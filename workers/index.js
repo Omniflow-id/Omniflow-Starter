@@ -23,7 +23,7 @@ class WorkerManager {
 
   async start() {
     try {
-      console.log("🔧 Starting Worker Manager...");
+      console.log("🔧 [WORKERS] Starting Worker Manager...");
 
       // Wait for RabbitMQ connection to be ready
       await this.waitForConnection();
@@ -34,7 +34,7 @@ class WorkerManager {
           await worker.start();
         } catch (error) {
           console.error(
-            `❌ Failed to start worker ${worker.constructor.name}:`,
+            `❌ [WORKERS] Failed to start ${worker.constructor.name}:`,
             error.message
           );
         }
@@ -42,12 +42,15 @@ class WorkerManager {
 
       const runningWorkers = this.workers.filter((w) => w.isRunning).length;
       console.log(
-        `✅ Worker Manager started: ${runningWorkers}/${this.workers.length} workers running`
+        `✅ [WORKERS] Manager started: ${runningWorkers}/${this.workers.length} workers running`
       );
 
       this.setupGracefulShutdown();
     } catch (error) {
-      console.error("❌ Failed to start Worker Manager:", error.message);
+      console.error(
+        "❌ [WORKERS] Failed to start Worker Manager:",
+        error.message
+      );
       throw error;
     }
   }
@@ -60,31 +63,31 @@ class WorkerManager {
         throw new Error("Timeout waiting for RabbitMQ connection");
       }
 
-      console.log("⏳ Waiting for RabbitMQ connection...");
+      console.log("⏳ [WORKERS] Waiting for RabbitMQ connection...");
       await new Promise((resolve) => setTimeout(resolve, 1000));
     }
 
-    console.log("🐰 RabbitMQ connection ready, starting workers...");
+    console.log("🐰 [WORKERS] RabbitMQ connection ready, starting workers...");
   }
 
   async stop() {
     if (this.isShuttingDown) return;
 
     this.isShuttingDown = true;
-    console.log("🛑 Stopping all workers...");
+    console.log("🛑 [WORKERS] Stopping all workers...");
 
     for (const worker of this.workers) {
       try {
         await worker.stop();
       } catch (error) {
         console.error(
-          `Error stopping worker ${worker.constructor.name}:`,
+          `❌ [WORKERS] Error stopping ${worker.constructor.name}:`,
           error.message
         );
       }
     }
 
-    console.log("✅ All workers stopped");
+    console.log("✅ [WORKERS] All workers stopped gracefully");
   }
 
   getStatus() {
@@ -98,7 +101,7 @@ class WorkerManager {
 
   setupGracefulShutdown() {
     const shutdown = async (signal) => {
-      console.log(`\n🛑 Workers received ${signal}, shutting down...`);
+      console.log(`\n🛑 [WORKERS] Received ${signal}, shutting down...`);
       await this.stop();
     };
 
@@ -115,7 +118,7 @@ const workerManager = new WorkerManager();
 // Allow running as standalone script
 if (require.main === module) {
   workerManager.start().catch((error) => {
-    console.error("❌ Worker Manager startup failed:", error);
+    console.error("❌ [WORKERS] Manager startup failed:", error.message);
     process.exit(1);
   });
 }

@@ -7,7 +7,13 @@ const { db } = require("@db/db");
 const { invalidateCache } = require("@helpers/cache");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
-const { log, LOG_LEVELS } = require("@helpers/log");
+const {
+  LOG_LEVELS,
+  logUserActivity,
+  ACTION_TYPES,
+  RESOURCE_TYPES,
+  ACTIVITY_STATUS,
+} = require("@helpers/log");
 const { generatePredictablePassword } = require("@helpers/passwordPolicy");
 
 const uploadNewUser = async (req, res) => {
@@ -111,13 +117,35 @@ const uploadNewUser = async (req, res) => {
         generatedPassword: user.password,
       });
 
-      await log(
-        `User ${user.username} - ${user.role} created with generated password by ${req.session.user.username}`,
-        LOG_LEVELS.INFO,
-        req.session.user.id,
-        userAgentData,
-        ip
-      );
+      // Individual user creation log (keep simple for bulk operations)
+      await logUserActivity({
+        activity: `Bulk upload - Created user: ${user.username} (${user.role})`,
+        actionType: ACTION_TYPES.CREATE,
+        resourceType: RESOURCE_TYPES.USER,
+        resourceId: "bulk_upload",
+        status: ACTIVITY_STATUS.SUCCESS,
+        userId: req.session.user.id,
+        requestInfo: {
+          ip,
+          userAgent: userAgentData.userAgent,
+          deviceType: userAgentData.deviceType,
+          browser: userAgentData.browser,
+          platform: userAgentData.platform,
+          method: req.method,
+          url: req.originalUrl,
+        },
+        metadata: {
+          creationMethod: "bulk_upload",
+          newUser: {
+            username: user.username,
+            email: user.email,
+            role: user.role,
+          },
+          passwordGenerated: true,
+          uploadedBy: req.session.user.username,
+        },
+        req,
+      });
     }
 
     // Handle results and show password list
@@ -125,6 +153,41 @@ const uploadNewUser = async (req, res) => {
       // Invalidate user-related caches after bulk creation
       await invalidateCache("admin:users:*", true);
       await invalidateCache("user:*", true);
+
+      // Log bulk upload summary
+      await logUserActivity({
+        activity: `Bulk upload completed - ${successfulUsers.length} users created successfully`,
+        actionType: ACTION_TYPES.IMPORT,
+        resourceType: RESOURCE_TYPES.USER,
+        resourceId: "bulk_upload_summary",
+        status: ACTIVITY_STATUS.SUCCESS,
+        userId: req.session.user.id,
+        requestInfo: {
+          ip,
+          userAgent: userAgentData.userAgent,
+          deviceType: userAgentData.deviceType,
+          browser: userAgentData.browser,
+          platform: userAgentData.platform,
+          method: req.method,
+          url: req.originalUrl,
+        },
+        metadata: {
+          uploadSummary: {
+            totalAttempted: users.length,
+            successfullyCreated: successfulUsers.length,
+            duplicatesSkipped: duplicateEmails.length,
+            duplicateEmails: duplicateEmails,
+          },
+          fileInfo: {
+            originalName: req.file?.originalname,
+            fileSize: req.file?.size,
+            mimeType: req.file?.mimetype,
+          },
+          uploadedBy: req.session.user.username,
+          passwordGeneration: "auto_from_fullname",
+        },
+        req,
+      });
 
       // Store generated passwords in session for display
       req.session.generatedPasswords = successfulUsers;
@@ -154,13 +217,37 @@ const uploadNewUser = async (req, res) => {
 
     return res.redirect("/admin/user/index");
   } catch (err) {
-    await log(
-      `Error creating users from Excel: ${err.message}`,
-      LOG_LEVELS.ERROR,
-      req.session.user.id,
-      userAgentData,
-      ip
-    );
+    await logUserActivity({
+      activity: "Failed to process bulk user upload",
+      actionType: ACTION_TYPES.IMPORT,
+      resourceType: RESOURCE_TYPES.USER,
+      resourceId: "bulk_upload_failed",
+      status: ACTIVITY_STATUS.FAILURE,
+      userId: req.session.user.id,
+      requestInfo: {
+        ip,
+        userAgent: userAgentData.userAgent,
+        deviceType: userAgentData.deviceType,
+        browser: userAgentData.browser,
+        platform: userAgentData.platform,
+        method: req.method,
+        url: req.originalUrl,
+      },
+      errorMessage: err.message,
+      errorCode: err.code || "BULK_UPLOAD_FAILED",
+      metadata: {
+        fileInfo: {
+          originalName: req.file?.originalname,
+          fileSize: req.file?.size,
+          mimeType: req.file?.mimetype,
+        },
+        uploadedBy: req.session.user.username,
+        errorDetails: err.name,
+      },
+      req,
+      level: LOG_LEVELS.ERROR,
+    });
+
     req.flash(
       "error",
       `An error occurred while processing the file: ${err.message}`
