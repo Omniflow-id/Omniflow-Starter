@@ -6,16 +6,16 @@ function testEncryption() {
   try {
     console.log("Testing encryption...");
     console.log("Using ENCRYPTION_KEY:", process.env.ENCRYPTION_KEY);
-    
+
     const originalText = "user@example.com";
     console.log("Original text:", originalText);
-    
+
     const encrypted = encrypt(originalText);
     console.log("Encrypted:", encrypted);
-    
+
     const decrypted = decrypt(encrypted);
     console.log("Decrypted:", decrypted);
-    
+
     if (decrypted === originalText) {
       console.log("✅ Test passed successfully!");
     } else {
