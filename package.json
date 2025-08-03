@@ -11,7 +11,25 @@
     "lint": "biome lint ."
   },
   "keywords": [
-    "HRIS"
+    "HRIS",
+    "Stock Management",
+    "Sales Management",
+    "Accounting",
+    "PoS",
+    "Customers",
+    "CRM: Customer Management",
+    "Project Management",
+    "Marketing",
+    "LMS",
+    "Payment Gateway",
+    "Inventory",
+    "AI",
+    "Administration",
+    "Manufacturing",
+    "Supply Chain",
+    "Procurement",
+    "Asset Management",
+    "Analytics"
   ],
   "author": "Eric Julianto",
   "license": "MIT",
