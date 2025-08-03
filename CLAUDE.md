@@ -86,6 +86,14 @@ const { asyncHandler } = require("@middlewares/errorHandler");
 ### Authentication & Authorization
 
 - **Session-based auth** with 24-hour timeout for web interface
+- **Sliding Session Timeout**: Implements an optimal session timeout strategy to enhance user experience.
+  - **Automatic Renewal**: Session lifetime is automatically extended with any user activity (e.g., clicks, keypresses), preventing unexpected logouts for active users.
+  - **Client-Side Warning**: A warning modal appears 2 minutes before the session expires due to inactivity, giving the user a chance to extend it.
+  - **Keep-Alive Endpoint**: A dedicated `/api/session/keep-alive` endpoint allows the client to silently refresh the session without a full page reload.
+  - **Configuration**:
+    - Enabled via `rolling: true` in the `express-session` configuration (`config/index.js`).
+    - Session duration is controlled by the `SESSION_TIMEOUT_HOURS` environment variable.
+    - Client-side timers and modal logic are handled in `public/js/session-timeout.js`.
 - **JWT Authentication** for API endpoints with access/refresh tokens
 - **Three roles**: Admin (full access), Manager (limited admin), User (basic)
 - **Web Middleware**: `isLoggedIn` (auth check), `isAdmin` (admin-only routes)

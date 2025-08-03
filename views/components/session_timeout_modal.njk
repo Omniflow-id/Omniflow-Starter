@@ -1,0 +1,24 @@
+<!-- Session Timeout Modal -->
+<div class="modal fade" id="sessionTimeoutModal" tabindex="-1" aria-labelledby="sessionTimeoutModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="sessionTimeoutModalLabel">
+          <i class="fas fa-clock me-2"></i>Session Timeout Warning
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" disabled></button>
+      </div>
+      <div class="modal-body">
+        <p>Your session is about to expire due to inactivity.</p>
+        <p>You will be logged out in <strong id="sessionTimeoutCountdown" class="text-danger">120</strong> seconds.</p>
+        <p>Do you want to extend your session?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" id="logoutSessionBtn">Logout</button>
+        <button type="button" class="btn btn-primary" id="extendSessionBtn">
+          <i class="fas fa-sync-alt me-2"></i>Extend Session
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -17,6 +17,7 @@ const config = {
     secret: process.env.SESSION_KEY,
     resave: false,
     saveUninitialized: false,
+    rolling: true, // Reset session timeout on each request to implement sliding sessions
     cookie: {
       maxAge: (process.env.SESSION_TIMEOUT_HOURS || 24) * 60 * 60 * 1000, // Default 24 hours
       secure: process.env.NODE_ENV === "production",
