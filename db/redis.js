@@ -8,6 +8,7 @@ const Redis = require("ioredis");
 
 // === Absolute / alias imports ===
 const config = require("@config");
+const { notifyRedisError } = require("@helpers/beepbot");
 
 // Import system logging (lazy load to avoid circular dependency)
 let logSystemActivity = null;
@@ -115,25 +116,18 @@ function createRedisConnection() {
       isRedisConnected = false;
       isReconnecting = false;
 
-      // Log system activity for Redis errors
-      const logger = getSystemLogger();
-      if (logger) {
-        logger({
-          activity: `Redis cache connection error: ${err.message}`,
-          errorMessage: err.message,
-          errorCode: err.code || "REDIS_CONNECTION_ERROR",
-          metadata: {
-            eventType: "redis_error",
-            host: config.redis.host,
-            port: config.redis.port,
-            database: config.redis.db,
-            severity: "error",
-            errorCode: err.code,
-          },
-        }).catch((logErr) =>
-          console.error("Failed to log Redis error:", logErr.message)
+      // Send BeepBot notification for Redis errors
+      notifyRedisError(err, {
+        host: config.redis.host,
+        port: config.redis.port,
+        database: config.redis.db,
+        environment: process.env.NODE_ENV,
+      }).catch((notifyErr) => {
+        console.error(
+          "❌ [BEEPBOT] Failed to send Redis error notification:",
+          notifyErr.message
         );
-      }
+      });
     });
 
     // Connection closed handler

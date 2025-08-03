@@ -7,6 +7,7 @@ const os = require("node:os");
 const { db } = require("../db/db");
 const config = require("../config");
 const { invalidateCache } = require("./cache");
+const { notifyDatabaseError } = require("./beepbot");
 
 const LOG_LEVELS = {
   INFO: "INFO",
@@ -422,6 +423,21 @@ async function logActivity(options = {}) {
     });
   } catch (err) {
     console.error("Error logging to database:", err);
+
+    // Send BeepBot notification for database logging errors
+    if (err.code?.startsWith("ER_")) {
+      notifyDatabaseError(err, {
+        operation: "activity_logging",
+        activityType: activityType,
+        originalActivity: activity,
+        environment: process.env.NODE_ENV,
+      }).catch((notifyErr) => {
+        console.error(
+          "❌ [BEEPBOT] Failed to send database logging error notification:",
+          notifyErr.message
+        );
+      });
+    }
   }
 }
 

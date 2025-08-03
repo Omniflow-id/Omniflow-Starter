@@ -71,6 +71,12 @@ const validateEnvVariables = () => {
       ],
       description: "RabbitMQ job queue",
     },
+    beepbot: {
+      enableFlag: "BEEPBOT_ENABLED",
+      required: ["BEEPBOT_SECRET"],
+      optional: ["BEEPBOT_CHAT_ID"],
+      description: "BeepBot notifications",
+    },
   };
 
   // Variables with defaults (always optional)

@@ -7,6 +7,7 @@ const http = require("node:http");
 // === Relative imports ===
 const app = require("./app");
 const config = require("./config");
+const { notifyAppStartup, notifyAppShutdown } = require("@helpers/beepbot");
 
 const PORT = config.app.port;
 const server = http.createServer(app);
@@ -28,6 +29,21 @@ const start = () => {
           console.error("❌ [WORKERS] Failed to start:", error.message);
         }
       }
+
+      // Send startup success notification
+      notifyAppStartup({
+        port: PORT,
+        environment: process.env.NODE_ENV,
+        rabbitMQEnabled: config.rabbitmq.enabled,
+        redisEnabled: config.redis.enabled,
+        jwtEnabled: config.jwt.enabled,
+        version: process.env.npm_package_version || "1.0.0",
+      }).catch((notifyErr) => {
+        console.error(
+          "❌ [BEEPBOT] Failed to send startup notification:",
+          notifyErr.message
+        );
+      });
     });
   } catch (error) {
     console.error(`❌ [SERVER] Failed to start:`, error.message);
@@ -42,6 +58,19 @@ async function gracefulShutdown(signal) {
   console.log(
     `\n🛑 [SHUTDOWN] Received ${signal}, starting graceful shutdown...`
   );
+
+  // Send shutdown notification
+  notifyAppShutdown({
+    signal: signal,
+    reason: "graceful_shutdown",
+    uptime: Math.round(process.uptime()),
+    environment: process.env.NODE_ENV,
+  }).catch((notifyErr) => {
+    console.error(
+      "❌ [BEEPBOT] Failed to send shutdown notification:",
+      notifyErr.message
+    );
+  });
 
   server.close(async () => {
     console.log("📴 [SERVER] HTTP server closed gracefully");

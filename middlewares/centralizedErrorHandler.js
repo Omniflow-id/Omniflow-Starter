@@ -7,6 +7,7 @@ const {
 } = require("../helpers/log");
 const { getClientIP } = require("../helpers/getClientIP");
 const { getUserAgent } = require("../helpers/getUserAgent");
+const { notifyDatabaseError, notifyError } = require("@helpers/beepbot");
 
 // Custom error classes
 class AppError extends Error {
@@ -81,6 +82,40 @@ const centralizedErrorHandler = async (err, req, res, _next) => {
     statusCode = 500;
     message = "Database operation failed";
     isOperational = false;
+
+    // Send BeepBot notification for database errors
+    notifyDatabaseError(err, {
+      route: `${req.method} ${req.originalUrl}`,
+      userAgent: req.get("User-Agent"),
+      ip: clientIP,
+      userId: userId,
+      environment: process.env.NODE_ENV,
+    }).catch((notifyErr) => {
+      console.error(
+        "❌ [BEEPBOT] Failed to send database error notification:",
+        notifyErr.message
+      );
+    });
+  }
+
+  // Send BeepBot notification for HTTP 500+ errors
+  if (statusCode >= 500 && !err.code?.startsWith("ER_")) {
+    // Avoid duplicate notifications for database errors (already handled above)
+    notifyError(`HTTP ${statusCode} error: ${message}`, "application", {
+      route: `${req.method} ${req.originalUrl}`,
+      statusCode: statusCode,
+      userAgent: req.get("User-Agent"),
+      ip: clientIP,
+      userId: userId,
+      errorType: err.name || "UnknownError",
+      isOperational: isOperational,
+      environment: process.env.NODE_ENV,
+    }).catch((notifyErr) => {
+      console.error(
+        "❌ [BEEPBOT] Failed to send HTTP error notification:",
+        notifyErr.message
+      );
+    });
   }
 
   // Log error using enhanced logging system

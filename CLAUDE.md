@@ -824,6 +824,167 @@ npm start  # Starts server + workers automatically
 - Database fallback operations tracked
 - Comprehensive error messages for admin troubleshooting
 
+### BeepBot Critical Notification System
+
+**Enterprise-Grade External Alerting**: Production-ready notification system for critical system failures via BeepBot service, providing immediate alerts when internal logging systems are unavailable.
+
+#### Core Features
+
+- **🚨 Critical System Monitoring**: Real-time alerts for database, Redis, and RabbitMQ failures
+- **📱 External Notification Service**: Independent of internal systems (database, file logging)
+- **🌏 Jakarta Timezone**: Localized timestamps for Indonesian operations
+- **🔄 No Circular Dependencies**: BeepBot operates independently when database is down
+- **⚡ Immediate Alerts**: Direct Telegram notifications for system administrators
+- **🎯 Rich Context**: Comprehensive error details, environment info, and metadata
+
+#### Notification Coverage
+
+**Database Errors** (`@helpers/beepbot.js`):
+- Connection pool errors and failures
+- Query execution errors (authentication, timeout)
+- Health check failures
+- Database logging system failures
+
+**Redis Connection Errors** (`db/redis.js`):
+- Connection failures and authentication errors
+- Network timeouts and reconnection issues
+- Redis service unavailability
+
+**RabbitMQ Connection Errors** (`helpers/queue.js`):
+- Connection failures and authentication errors
+- Circuit breaker state changes (OPEN/CLOSED/HALF_OPEN)
+- Maximum retry attempts exceeded
+
+**Application Lifecycle** (`server.js`):
+- **Startup Success**: Application start with environment and feature info
+- **Graceful Shutdown**: Application shutdown with uptime and reason
+
+**HTTP Application Errors** (`middlewares/centralizedErrorHandler.js`):
+- HTTP 500+ status code errors
+- Route and user context information
+- Error classification and operational status
+
+#### Configuration
+
+**Environment Variables**:
+```env
+# BeepBot Notifications
+BEEPBOT_ENABLED=true                    # Enable BeepBot notifications
+BEEPBOT_SECRET="your_beepbot_secret"    # BeepBot API authentication secret
+BEEPBOT_CHAT_ID=1185624008             # Telegram chat ID (optional, has default)
+```
+
+**Validation**: BeepBot configuration is validated at startup via `config/validation.js` with feature-based approach - only validates variables when `BEEPBOT_ENABLED=true`.
+
+#### Usage Examples
+
+**Database Error Notification**:
+```javascript
+const { notifyDatabaseError } = require("@helpers/beepbot");
+
+// Automatic notification on database connection errors
+db.on("error", (err) => {
+  notifyDatabaseError(err, {
+    environment: config.app.env,
+    host: config.database.host,
+    database: config.database.database,
+    connectionLimit: config.database.connectionLimit,
+  }).catch((notifyErr) => {
+    console.error("❌ [BEEPBOT] Failed to send database error notification:", notifyErr.message);
+  });
+});
+```
+
+**Application Startup Notification**:
+```javascript
+const { notifyAppStartup } = require("@helpers/beepbot");
+
+// Send startup success notification
+notifyAppStartup({
+  port: PORT,
+  environment: process.env.NODE_ENV,
+  rabbitMQEnabled: config.rabbitmq.enabled,
+  redisEnabled: config.redis.enabled,
+  jwtEnabled: config.jwt.enabled,
+  version: process.env.npm_package_version || "1.0.0",
+}).catch((notifyErr) => {
+  console.error("❌ [BEEPBOT] Failed to send startup notification:", notifyErr.message);
+});
+```
+
+**Custom Error Notifications**:
+```javascript
+const { notifyError, notifyCritical } = require("@helpers/beepbot");
+
+// General error notification
+await notifyError("Custom error message", "component_name", {
+  errorCode: "CUSTOM_ERROR",
+  userId: req.session?.user?.id,
+  environment: process.env.NODE_ENV,
+});
+
+// Critical system failure
+await notifyCritical("Critical system failure", "system", {
+  severity: "high",
+  affectedUsers: 1000,
+  downtime: "5 minutes",
+});
+```
+
+#### Notification Levels & Format
+
+**Notification Levels**:
+- 🚨 **Critical**: Database connection failures, system-wide issues
+- ❌ **Error**: Redis/RabbitMQ errors, HTTP 500+ errors
+- ⚠️ **Warning**: Graceful shutdowns, non-critical issues
+- ✅ **Success**: Application startup, recovery events
+- ℹ️ **Info**: General system information
+
+**Message Format**:
+```
+🚨 OMNIFLOW ALERT
+
+Level: CRITICAL
+Component: database
+Time: 04/08/2025, 01.43.53
+Environment: production
+
+Message:
+Database connection failed: Access denied for user 'root'@'localhost'
+
+Details:
+• errorCode: ER_ACCESS_DENIED_ERROR
+• host: localhost
+• database: omniflow_starter
+• environment: production
+```
+
+#### Integration Points
+
+**Automatic Integration**: BeepBot notifications are automatically integrated into:
+- Database connection pool error handlers (`db/db.js`)
+- Redis connection error handlers (`db/redis.js`)  
+- RabbitMQ connection error handlers (`helpers/queue.js`)
+- Database logging failure fallback (`helpers/log.js`)
+- HTTP error handler for 500+ status codes (`middlewares/centralizedErrorHandler.js`)
+- Application startup/shutdown lifecycle (`server.js`)
+
+**Smart Deduplication**: Prevents duplicate notifications for the same error (e.g., database errors don't trigger both database handler and HTTP handler notifications).
+
+**Fallback Strategy**: BeepBot operates independently of internal logging systems:
+1. **Console logging** always works (local/development)
+2. **BeepBot notifications** work when database is down
+3. **Database logging** works when database is available
+
+#### Production Benefits
+
+- **Zero Downtime Monitoring**: Get alerted even when database/logging systems fail
+- **Immediate Response**: Critical failures trigger instant Telegram notifications
+- **Rich Context**: Full error details, environment info, and system state
+- **Operational Insights**: Application lifecycle events (startup, shutdown, uptime)
+- **Team Coordination**: Centralized notifications for DevOps/SRE teams
+- **Compliance Ready**: Comprehensive error tracking and incident documentation
+
 ## Key Patterns
 
 ### Error Handling

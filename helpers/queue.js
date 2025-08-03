@@ -2,6 +2,7 @@ const amqp = require("amqplib");
 const { db } = require("@db/db");
 const config = require("@config");
 const CircuitBreaker = require("./circuitBreaker");
+const { notifyRabbitMQError } = require("@helpers/beepbot");
 
 // Import system logging (lazy load to avoid circular dependency)
 let logSystemActivity = null;
@@ -146,29 +147,24 @@ class QueueService {
       reconnectAttempts: this.reconnectAttempts,
     });
 
-    // Log system activity for RabbitMQ connection errors
-    const logger = getSystemLogger();
-    if (logger) {
-      logger({
-        activity: `RabbitMQ queue service connection error: ${error.message}`,
-        errorMessage: error.message,
-        errorCode: error.code || "RABBITMQ_CONNECTION_ERROR",
-        metadata: {
-          eventType: "rabbitmq_error",
-          host: config.rabbitmq.host,
-          port: config.rabbitmq.port,
-          reconnectAttempts: this.reconnectAttempts,
-          maxReconnectAttempts: this.maxReconnectAttempts,
-          circuitBreakerStatus: this.circuitBreaker.getStatus().state,
-          severity:
-            this.reconnectAttempts >= this.maxReconnectAttempts
-              ? "critical"
-              : "error",
-        },
-      }).catch((logErr) =>
-        console.error("Failed to log RabbitMQ error:", logErr.message)
+    // Send BeepBot notification for RabbitMQ errors
+    notifyRabbitMQError(error, {
+      host: config.rabbitmq.host,
+      port: config.rabbitmq.port,
+      reconnectAttempts: this.reconnectAttempts,
+      maxReconnectAttempts: this.maxReconnectAttempts,
+      circuitBreakerStatus: this.circuitBreaker.getStatus().state,
+      severity:
+        this.reconnectAttempts >= this.maxReconnectAttempts
+          ? "critical"
+          : "error",
+      environment: process.env.NODE_ENV,
+    }).catch((notifyErr) => {
+      console.error(
+        "❌ [BEEPBOT] Failed to send RabbitMQ error notification:",
+        notifyErr.message
       );
-    }
+    });
 
     if (
       !this.isReconnecting &&

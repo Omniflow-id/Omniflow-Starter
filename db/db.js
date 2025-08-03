@@ -3,16 +3,7 @@ const mysql = require("mysql2/promise");
 
 // === Relative imports ===
 const config = require("../config");
-
-// Import system logging (lazy load to avoid circular dependency)
-let logSystemActivity = null;
-const getSystemLogger = () => {
-  if (!logSystemActivity) {
-    const { logSystemActivity: logger } = require("@helpers/log");
-    logSystemActivity = logger;
-  }
-  return logSystemActivity;
-};
+const { notifyDatabaseError } = require("@helpers/beepbot");
 
 /**
  * Database Connection Pool with Comprehensive Management
@@ -43,24 +34,18 @@ db.on("error", (err) => {
     timestamp: new Date().toISOString(),
   });
 
-  // Log system activity for database errors
-  const logger = getSystemLogger();
-  if (logger) {
-    logger({
-      activity: `Database pool error: ${err.message}`,
-      errorMessage: err.message,
-      errorCode: err.code || "DB_POOL_ERROR",
-      metadata: {
-        errorType: "database_pool_error",
-        environment: config.app.env,
-        mysqlErrorCode: err.errno,
-        sqlState: err.sqlState,
-        severity: err.code === "PROTOCOL_CONNECTION_LOST" ? "warning" : "error",
-      },
-    }).catch((logErr) =>
-      console.error("Failed to log DB error:", logErr.message)
+  // Send BeepBot notification for critical database errors
+  notifyDatabaseError(err, {
+    environment: config.app.env,
+    host: config.database.host,
+    database: config.database.database,
+    connectionLimit: config.database.connectionLimit,
+  }).catch((notifyErr) => {
+    console.error(
+      "❌ [BEEPBOT] Failed to send database error notification:",
+      notifyErr.message
     );
-  }
+  });
 
   if (err.code === "PROTOCOL_CONNECTION_LOST") {
     console.log(
@@ -102,6 +87,18 @@ async function testConnection() {
     return true;
   } catch (error) {
     console.error("❌ [DATABASE] Health check failed:", error.message);
+
+    // Notify BeepBot of health check failure
+    notifyDatabaseError(error, {
+      operation: "health_check",
+      environment: config.app.env,
+    }).catch((notifyErr) => {
+      console.error(
+        "❌ [BEEPBOT] Failed to send health check error notification:",
+        notifyErr.message
+      );
+    });
+
     return false;
   }
 }
