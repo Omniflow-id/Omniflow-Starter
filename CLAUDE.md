@@ -68,7 +68,20 @@ const { asyncHandler } = require("@middlewares/errorHandler");
 - **Main tables**: `users` (with full_name field) and `activity_logs`
 - **Knex.js integration**: Database migrations and seeding with proper tracking
 - **Migrations**: Located in `db/migrations/` with timestamp-based naming
-- **Seeders**: Located in `db/seeders/` for development data
+
+### Seeder Strategy
+
+The project uses a comprehensive seeder management strategy for populating the database with initial data, designed for safety and consistency.
+
+- **Master Seeder**: A single entry point `db/seeders/index.js` orchestrates the entire seeding process. This is the only file Knex executes.
+- **Controlled Execution Order**: The master seeder calls individual seeder files from the `db/seeders/data/` directory in a specific, controlled order, preventing foreign key constraint errors.
+- **Idempotent & Destructive**: The seeding process is idempotent, meaning it can be run multiple times without causing errors. It achieves this by being **destructive**—it completely wipes all data from relevant tables (`.del()`) before inserting fresh data.
+- **Development-Focused**: This "clean slate" approach is ideal for development, ensuring a consistent and predictable database state for testing.
+- **Production Safety**: **Warning:** Running `npx knex seed:run` on a production database is **highly destructive and will result in complete data loss** for the seeded tables. This command should only be used for initial setup on an empty database or in development environments.
+- **Adding New Seeders**:
+  1. Create a new seeder file in `db/seeders/data/`.
+  2. Require and call the new seeder function within `db/seeders/index.js` in the correct sequence.
+
 - **Default users**:
   - admin@omniflow.id/Admin12345.
   - manager@omniflow.id/Manager12345.

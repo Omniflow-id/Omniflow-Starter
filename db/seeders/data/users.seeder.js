@@ -1,14 +1,13 @@
 const bcrypt = require("bcrypt");
 
 /**
+ * Seed the users table with default admin, manager, and user accounts.
+ * This seeder is idempotent and can be run multiple times safely.
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
-exports.seed = async (knex) => {
-  // Deletes ALL existing entries
-  await knex("users").del();
-
-  // Hash passwords with policy-compliant patterns (avoid username conflicts)
+const seedUsers = async (knex) => {
+  // Hash passwords with policy-compliant patterns
   const adminPassword = await bcrypt.hash("Admin12345.", 10);
   const managerPassword = await bcrypt.hash("SystemSupervisor@12345?.", 10);
   const userPassword = await bcrypt.hash("BasicStaff@12345?.", 10);
@@ -40,3 +39,6 @@ exports.seed = async (knex) => {
     },
   ]);
 };
+
+// Export the seed function for the master seeder
+module.exports = { seedUsers };
