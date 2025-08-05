@@ -17,9 +17,10 @@ const downloadUserData = async (req, res) => {
   try {
     // Query database untuk mendapatkan semua user
     const [users] = await db.query(`
-      SELECT id, username, email, full_name, role, is_active
-      FROM users
-      ORDER BY id
+      SELECT u.id, u.username, u.email, u.full_name, r.role_name as role, u.is_active
+      FROM users u
+      LEFT JOIN roles r ON u.role_id = r.role_id
+      ORDER BY u.id
     `);
 
     // Buat workbook dan worksheet baru

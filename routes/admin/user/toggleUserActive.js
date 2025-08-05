@@ -26,7 +26,7 @@ const toggleUserActive = async (req, res) => {
 
     // Get current user data for change tracking
     const [users] = await db.query(
-      "SELECT id, username, email, full_name, role, is_active, updated_at FROM users WHERE id = ?",
+      "SELECT u.id, u.username, u.email, u.full_name, r.role_name as role, u.is_active, u.updated_at FROM users u LEFT JOIN roles r ON u.role_id = r.role_id WHERE u.id = ? AND u.deleted_at IS NULL",
       [userId]
     );
 

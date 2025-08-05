@@ -1,4 +1,7 @@
 const { seedUsers } = require("./data/users.seeder.js");
+const { seedRoles } = require("./data/roles.js");
+const { seedPermissions } = require("./data/permissions.js");
+const { seedRolePermissions } = require("./data/rolePermissions.js");
 
 /**
  * Master seeder file to control the order of data seeding.
@@ -13,16 +16,27 @@ exports.seed = async (knex) => {
   console.log("Cleaning up database...");
   await knex("activity_logs").del();
   await knex("jobs").del();
-  // Now we can safely delete from the users table.
+  await knex("user_permissions").del();
+  await knex("role_permissions").del();
   await knex("users").del();
+  await knex("permissions").del();
+  await knex("roles").del();
 
   // --- 2. SEEDING PHASE ---
   // The order of execution is critical. Add new seeders here in the correct sequence.
   console.log("Seeding data...");
-  // For example, if users have roles, seed roles before users.
-  // await seedRoles(knex);
+
+  // 1. Seed roles first (users depend on roles)
+  await seedRoles();
+
+  // 2. Seed permissions
+  await seedPermissions();
+
+  // 3. Seed role_permissions mapping
+  await seedRolePermissions();
+
+  // 4. Seed users (depends on roles)
   await seedUsers(knex);
-  // await seedProducts(knex);
 
   console.log("Database seeding completed successfully.");
 };

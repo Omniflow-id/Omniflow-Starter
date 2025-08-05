@@ -1,0 +1,323 @@
+{% extends "layout/masterLayout.njk" %} {% block title %}{{ title }}{% endblock
+%} {% block content %}
+<div class="container-fluid px-4">
+  <h1 class="mt-4">{{ title }}</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+    <li class="breadcrumb-item">
+      <a href="/admin/permissions">Permissions</a>
+    </li>
+    <li class="breadcrumb-item active">Roles & Permissions</li>
+  </ol>
+
+  <!-- Alert Messages -->
+  <div id="alertContainer"></div>
+
+  <!-- Add Role Button -->
+  <div class="mb-4">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#roleModal">
+      <i class="fas fa-plus me-1"></i> Create New Role
+    </button>
+  </div>
+
+  <!-- Roles Management -->
+  <div class="row">
+    {% for role in roles %}
+    <div class="col-lg-4 mb-4">
+      <div class="card h-100">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="fas fa-users me-2"></i>
+            {{ role.role_name }}
+          </h5>
+          <div>
+            <button class="btn btn-sm btn-light me-2" data-bs-toggle="modal" data-bs-target="#roleModal" data-role-id="{{ role.role_id }}" data-role-name="{{ role.role_name }}" data-role-description="{{ role.description }}">
+              <i class="fas fa-edit"></i>
+            </button>
+            <form action="/admin/roles/{{ role.role_id }}/delete" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this role?');">
+              {{ csrfField() | safe }}
+              <button type="submit" class="btn btn-sm btn-danger">
+                <i class="fas fa-trash"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+        <div class="card-body">
+          <p class="card-text">{{ role.description }}</p>
+          <h6 class="card-title mb-3">
+            Assigned Permissions
+            <span class="badge bg-secondary">{{
+              role.permissions.length
+            }}</span>
+          </h6>
+
+          <form
+            id="roleForm{{ role.role_id }}"
+            data-role-id="{{ role.role_id }}"
+            data-role-name="{{ role.role_name }}"
+          >
+            <div
+              class="permission-list"
+              style="max-height: 300px; overflow-y: auto"
+            >
+              {% for permission in allPermissions %}
+              <div class="form-check mb-2">
+                {% set isChecked = false %}
+                {% for rolePerm in role.permissions %}
+                  {% if rolePerm.permission_id == permission.permission_id %}
+                    {% set isChecked = true %}
+                  {% endif %}
+                {% endfor %}
+                <input class="form-check-input" type="checkbox" value="{{
+                  permission.permission_id
+                }}" id="role{{ role.role_id }}_perm{{
+                  permission.permission_id
+                }}" name="permissions" {% if isChecked %}checked{% endif %} >
+                <label
+                  class="form-check-label"
+                  for="role{{ role.role_id }}_perm{{
+                    permission.permission_id
+                  }}"
+                >
+                  <strong>{{ permission.permission_name }}</strong>
+                  <small class="text-muted d-block">{{
+                    permission.description
+                  }}</small>
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+          </form>
+        </div>
+        <div class="card-footer">
+          <button
+            type="button"
+            class="btn btn-success btn-sm update-permissions-btn"
+            data-role-id="{{ role.role_id }}"
+            data-role-name="{{ role.role_name }}"
+          >
+            <i class="fas fa-save me-1"></i>
+            Update Permissions
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm ms-2 select-all-btn"
+            data-role-id="{{ role.role_id }}"
+          >
+            <i class="fas fa-check-double me-1"></i>
+            Select All
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-danger btn-sm ms-1 clear-all-btn"
+            data-role-id="{{ role.role_id }}"
+          >
+            <i class="fas fa-times me-1"></i>
+            Clear All
+          </button>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if roles.length == 0 %}
+  <div class="text-center py-5">
+    <i class="fas fa-users fa-3x text-gray-300 mb-3"></i>
+    <h5 class="text-gray-500">No roles found</h5>
+    <p class="text-gray-400">
+      Please contact system administrator to set up user roles.
+    </p>
+  </div>
+  {% endif %}
+
+  <!-- Role Modal -->
+<div class="modal fade" id="roleModal" tabindex="-1" aria-labelledby="roleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="roleModalLabel">Create Role</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="roleForm" action="/admin/roles" method="POST">
+        {{ csrfField() | safe }}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="role_name" class="form-label">Role Name</label>
+            <input type="text" class="form-control" id="role_name" name="role_name" required>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save Role</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+  <!-- Summary Statistics -->
+  <div class="card mt-4">
+    <div class="card-header">
+      <i class="fas fa-chart-bar me-1"></i>
+      Permission Distribution Summary
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-4">
+          <h6>Total Roles</h6>
+          <h3 class="text-primary">{{ roles.length }}</h3>
+        </div>
+        <div class="col-md-4">
+          <h6>Total Permissions</h6>
+          <h3 class="text-success">{{ allPermissions.length }}</h3>
+        </div>
+        <div class="col-md-4">
+          <h6>Most Privileged Role</h6>
+          {% set maxRole = roles | sort(attribute="permissions.length",
+          reverse=true) | first %}
+          <h3 class="text-warning">
+            {% if maxRole %}
+            {{ maxRole.role_name }} ({{ maxRole.permissions.length }}) {% else
+            %} None {% endif %}
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const alertContainer = document.getElementById("alertContainer");
+
+    // Show alert function
+    function showAlert(message, type = "success") {
+      const alertDiv = document.createElement("div");
+      alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+      alertDiv.innerHTML = `
+      ${message}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    `;
+      alertContainer.appendChild(alertDiv);
+
+      // Auto-dismiss after 5 seconds
+      setTimeout(() => {
+        if (alertDiv.parentNode) {
+          alertDiv.remove();
+        }
+      }, 5000);
+    }
+
+    // Role Modal Logic
+    const roleModal = document.getElementById('roleModal');
+    roleModal.addEventListener('show.bs.modal', function (event) {
+      const button = event.relatedTarget;
+      const roleId = button.getAttribute('data-role-id');
+      const form = document.getElementById('roleForm');
+      const modalTitle = roleModal.querySelector('.modal-title');
+
+      if (roleId) {
+        modalTitle.textContent = 'Edit Role';
+        form.action = `/admin/roles/${roleId}/update`;
+        document.getElementById('role_name').value = button.getAttribute('data-role-name');
+        document.getElementById('description').value = button.getAttribute('data-role-description');
+      } else {
+        modalTitle.textContent = 'Create New Role';
+        form.action = '/admin/roles';
+        form.reset();
+      }
+    });
+
+    // Update permissions handlers
+    document.querySelectorAll(".update-permissions-btn").forEach((btn) => {
+      btn.addEventListener("click", async function () {
+        const roleId = this.dataset.roleId;
+        const roleName = this.dataset.roleName;
+        const form = document.getElementById(`roleForm${roleId}`);
+        const checkedBoxes = form.querySelectorAll(
+          'input[name="permissions"]:checked'
+        );
+        const permissionIds = Array.from(checkedBoxes).map((cb) =>
+          parseInt(cb.value)
+        );
+
+        // Show loading state
+        const originalText = this.innerHTML;
+        this.innerHTML =
+          '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
+        this.disabled = true;
+
+        try {
+          const csrfToken = document
+            .querySelector('meta[name="csrf-token"]')
+            ?.getAttribute("content");
+
+          const response = await fetch(
+            `/admin/roles/${roleId}/permissions`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+                "x-csrf-token": csrfToken,
+              },
+              body: JSON.stringify({ permissionIds }),
+            }
+          );
+
+          const result = await response.json();
+
+          if (result.success) {
+            showAlert(
+              `<i class="fas fa-check me-2"></i>Successfully updated permissions for <strong>${roleName}</strong>`,
+              "success"
+            );
+          } else {
+            showAlert(
+              `<i class="fas fa-exclamation-triangle me-2"></i>Failed to update permissions: ${
+                result.error || "Unknown error"
+              }`,
+              "danger"
+            );
+          }
+        } catch (error) {
+          console.error("Error updating permissions:", error);
+          showAlert(
+            `<i class="fas fa-exclamation-triangle me-2"></i>Network error occurred while updating permissions`,
+            "danger"
+          );
+        } finally {
+          // Restore button state
+          this.innerHTML = originalText;
+          this.disabled = false;
+        }
+      });
+    });
+
+    // Select all permissions
+    document.querySelectorAll(".select-all-btn").forEach((btn) => {
+      btn.addEventListener("click", function () {
+        const roleId = this.dataset.roleId;
+        const form = document.getElementById(`roleForm${roleId}`);
+        const checkboxes = form.querySelectorAll('input[name="permissions"]');
+        checkboxes.forEach((cb) => (cb.checked = true));
+      });
+    });
+
+    // Clear all permissions
+    document.querySelectorAll(".clear-all-btn").forEach((btn) => {
+      btn.addEventListener("click", function () {
+        const roleId = this.dataset.roleId;
+        const form = document.getElementById(`roleForm${roleId}`);
+        const checkboxes = form.querySelectorAll('input[name="permissions"]');
+        checkboxes.forEach((cb) => (cb.checked = false));
+      });
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,96 @@
+Instruksi: Buat Sistem RBAC Granular Permissions (Express.js + MySQL)
+
+Goal:
+Bangun sistem Role-Based Access Control (RBAC) dengan granular permissions di Express.js. Permissions disimpan di MySQL database. Setiap request endpoint akan dicek apakah user memiliki permission tertentu.
+
+Database Tables (MySQL):
+1. users (user_id INT PK, name VARCHAR, role_id INT FK)
+2. roles (role_id INT PK, role_name VARCHAR)
+3. permissions (permission_id INT PK, permission_name VARCHAR)
+4. role_permissions (role_id INT FK, permission_id INT FK)
+5. (Optional) user_permissions (user_id INT FK, permission_id INT FK) → Untuk override permission khusus user tertentu.
+
+Seed Data Contoh:
+Roles:
+- Admin Marketing
+- Admin Finance
+- Manager HR
+- User
+
+Permissions:
+- view_blog
+- manage_blog
+- view_finance
+- approve_leave
+- view_payslip
+
+role_permissions Mapping:
+Admin Marketing → manage_blog
+Admin Finance → view_finance
+Manager HR → approve_leave
+User → view_blog
+
+Express.js Middleware:
+
+1. isAuthenticated
+Mengecek apakah user sudah login (cek session).
+function isAuthenticated(req, res, next) {
+  if (req.session && req.session.user) {
+    next();
+  } else {
+    res.status(401).send("Unauthorized: Please login");
+  }
+}
+
+2. checkPermission(permissionName)
+Mengecek apakah user punya permission tertentu dari session.
+function checkPermission(requiredPermission) {
+  return (req, res, next) => {
+    const userPermissions = req.session.permissions || [];
+    if (userPermissions.includes(requiredPermission)) {
+      next();
+    } else {
+      res.status(403).send("Forbidden: No Access");
+    }
+  };
+}
+
+Session Permission Load (Saat Login):
+1. Saat user login, ambil role_id dari tabel users.
+2. Query semua permissions user dari tabel role_permissions (dan user_permissions jika ada).
+3. Simpan list permissions di req.session.permissions (array of strings).
+
+Contoh:
+req.session.permissions = ['view_blog', 'manage_blog'];
+
+Route Mapping:
+Semua user login boleh akses
+app.get("/my-profile", isAuthenticated, (req, res) => {
+  res.send("My Profile Page");
+});
+
+Hanya user dengan permission manage_blog
+app.get("/blog/manage", isAuthenticated, checkPermission("manage_blog"), (req, res) => {
+  res.send("Manage Blog");
+});
+
+Hanya user dengan permission view_finance
+app.get("/finance/report", isAuthenticated, checkPermission("view_finance"), (req, res) => {
+  res.send("Finance Report");
+});
+
+Hanya user dengan permission approve_leave
+app.post("/leave/approve", isAuthenticated, checkPermission("approve_leave"), (req, res) => {
+  res.send("Leave Approved");
+});
+
+Rules:
+Endpoint /my-profile → isAuthenticated
+Endpoint /blog/manage → isAuthenticated + checkPermission("manage_blog")
+Endpoint /finance/report → isAuthenticated + checkPermission("view_finance")
+Endpoint /leave/approve → isAuthenticated + checkPermission("approve_leave")
+
+Catatan Tambahan:
+- Jangan hardcode "role == admin" di logic akses.
+- Middleware hanya periksa apakah user punya permission yang dibutuhkan.
+- Permissions bisa dikelola fleksibel di DB tanpa ubah logic backend.

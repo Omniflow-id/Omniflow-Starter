@@ -1,0 +1,202 @@
+{% extends "layout/masterLayout.njk" %} {% block title %}{{ title }}{% endblock
+%} {% block content %}
+<div class="container-fluid px-4">
+  <h1 class="mt-4">{{ title }}</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+    <li class="breadcrumb-item active">Permissions</li>
+  </ol>
+
+  <!-- Add Permission Button -->
+  <div class="mb-4">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#permissionModal">
+      <i class="fas fa-plus me-1"></i> Create New Permission
+    </button>
+  </div>
+
+  <!-- Permissions List -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <i class="fas fa-key me-1"></i>
+      All System Permissions
+    </div>
+    <div class="card-body">
+      <div class="row">
+        {% for permission in allPermissions %}
+        <div class="col-md-6 col-lg-4 mb-3">
+          <div class="card border-left-primary h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="small text-gray-500">Permission</div>
+                  <div class="font-weight-bold text-primary">
+                    {{ permission.permission_name }}
+                  </div>
+                  <div class="text-xs text-gray-600 mt-1">
+                    {{ permission.description }}
+                  </div>
+                </div>
+                <div>
+                  <button class="btn btn-sm btn-light me-2" data-bs-toggle="modal" data-bs-target="#permissionModal" data-permission-id="{{ permission.permission_id }}" data-permission-name="{{ permission.permission_name }}" data-permission-description="{{ permission.description }}">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <form action="/admin/permissions/{{ permission.permission_id }}/delete" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this permission?');">
+                    {{ csrfField() | safe }}
+                    <button type="submit" class="btn btn-sm btn-danger">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </form>
+                </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {% if allPermissions.length == 0 %}
+      <div class="text-center py-4">
+        <i class="fas fa-key fa-3x text-gray-300 mb-3"></i>
+        <p class="text-gray-500">No permissions found</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Permission Modal -->
+<div class="modal fade" id="permissionModal" tabindex="-1" aria-labelledby="permissionModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="permissionModalLabel">Create Permission</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form id="permissionForm" action="/admin/permissions" method="POST">
+        {{ csrfField() | safe }}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="permission_name" class="form-label">Permission Name</label>
+            <input type="text" class="form-control" id="permission_name" name="permission_name" required>
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">Description</label>
+            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save Permission</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+  <!-- Quick Stats -->
+  <div class="row">
+    <div class="col-xl-3 col-md-6">
+      <div class="card bg-primary text-white mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="small">Total Permissions</div>
+              <div class="font-weight-bold">{{ allPermissions.length }}</div>
+            </div>
+            <div>
+              <i class="fas fa-key fa-2x"></i>
+            </div>
+          </div>
+        </div>
+        <div
+          class="card-footer d-flex align-items-center justify-content-between"
+        >
+          <a
+            class="small text-white stretched-link"
+            href="/admin/roles"
+          >
+            Manage Role Permissions
+          </a>
+          <div class="small text-white">
+            <i class="fas fa-angle-right"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="card bg-success text-white mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="small">System Permissions</div>
+              <div class="font-weight-bold">
+                {{ allPermissions | selectattr("permission_name", "match", "^manage_") | list | length }}
+              </div>
+            </div>
+            <div>
+              <i class="fas fa-cogs fa-2x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="card bg-info text-white mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="small">View Permissions</div>
+              <div class="font-weight-bold">
+                {{ allPermissions | selectattr("permission_name", "match", "^view_") | list | length }}
+              </div>
+            </div>
+            <div>
+              <i class="fas fa-eye fa-2x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+      <div class="card bg-warning text-white mb-4">
+        <div class="card-body">
+          <div class="d-flex justify-content-between">
+            <div>
+              <div class="small">Action Permissions</div>
+              <div class="font-weight-bold">
+                {{ allPermissions | selectattr("permission_name", "match", "^approve_") | list | length }}
+              </div>
+            </div>
+            <div>
+              <i class="fas fa-check-circle fa-2x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const permissionModal = document.getElementById('permissionModal');
+    permissionModal.addEventListener('show.bs.modal', function (event) {
+      const button = event.relatedTarget;
+      const permissionId = button.getAttribute('data-permission-id');
+      const form = document.getElementById('permissionForm');
+      const modalTitle = permissionModal.querySelector('.modal-title');
+
+      if (permissionId) {
+        modalTitle.textContent = 'Edit Permission';
+        form.action = `/admin/permissions/${permissionId}/update`;
+        document.getElementById('permission_name').value = button.getAttribute('data-permission-name');
+        document.getElementById('description').value = button.getAttribute('data-permission-description');
+      } else {
+        modalTitle.textContent = 'Create New Permission';
+        form.action = '/admin/permissions';
+        form.reset();
+      }
+    });
+  });
+</script>
+{% endblock %}

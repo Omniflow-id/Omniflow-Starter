@@ -39,6 +39,14 @@ const uploadNewUser = async (req, res) => {
     const users = [];
     const duplicateEmails = [];
 
+    const [roles] = await db.query(
+      "SELECT role_id, role_name FROM roles WHERE deleted_at IS NULL"
+    );
+    const roleMap = roles.reduce((map, role) => {
+      map[role.role_name] = role.role_id;
+      return map;
+    }, {});
+
     worksheet.eachRow((row, rowNumber) => {
       const rowValues = row.values.filter(Boolean);
 
@@ -47,15 +55,15 @@ const uploadNewUser = async (req, res) => {
       }
 
       if (rowValues.length >= 4) {
-        const [name, email, full_name, role] = rowValues.map((value) => {
+        const [name, email, full_name, roleName] = rowValues.map((value) => {
           if (value && typeof value === "object" && value.text) {
             return value.text;
           }
           return value;
         });
 
-        if (name && email && full_name && role) {
-          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (name && email && full_name && roleName) {
+          const emailRegex = /^[^S@]+@[^S@]+\.[^S@]+$/;
           if (emailRegex.test(email)) {
             // Generate predictable password from full name
             const generatedPassword = generatePredictablePassword(full_name);
@@ -65,7 +73,7 @@ const uploadNewUser = async (req, res) => {
                 username: name,
                 email,
                 full_name,
-                role,
+                role_id: roleMap[roleName],
                 password: generatedPassword,
               });
             }

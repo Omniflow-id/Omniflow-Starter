@@ -7,6 +7,8 @@ const { uploadNewUser } = require("./uploadNewUser");
 const { createNewUser } = require("./createNewUser");
 const { toggleUserActive } = require("./toggleUserActive");
 const { showGeneratedPasswordsPage } = require("./showGeneratedPasswordsPage");
+const { getUserPermissionsPage } = require("./getUserPermissionsPage");
+const { updateUserPermissions } = require("./updateUserPermissions");
 
 module.exports = {
   getUserOverviewPage,
@@ -17,4 +19,6 @@ module.exports = {
   createNewUser,
   toggleUserActive,
   showGeneratedPasswordsPage,
+  getUserPermissionsPage,
+  updateUserPermissions,
 };

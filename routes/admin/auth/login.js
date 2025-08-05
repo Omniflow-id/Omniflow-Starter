@@ -37,7 +37,15 @@ const login = asyncHandler(async (req, res) => {
 
   let userRows;
   try {
-    [userRows] = await db.query("SELECT * FROM users WHERE email = ?", [email]);
+    [userRows] = await db.query(
+      `
+      SELECT u.*, r.role_name 
+      FROM users u 
+      LEFT JOIN roles r ON u.role_id = r.role_id 
+      WHERE u.email = ? AND u.deleted_at IS NULL
+    `,
+      [email]
+    );
   } catch (dbError) {
     throw new DatabaseError(`Database query failed: ${dbError.message}`);
   }
@@ -90,7 +98,7 @@ const login = asyncHandler(async (req, res) => {
       userInfo: {
         username: user.username,
         email: user.email,
-        role: user.role,
+        role: user.role_name,
       },
       requestInfo: {
         ip: clientIP,
@@ -132,7 +140,7 @@ const login = asyncHandler(async (req, res) => {
       userInfo: {
         username: user.username,
         email: user.email,
-        role: user.role,
+        role: user.role_name,
       },
       requestInfo: {
         ip: clientIP,
@@ -156,13 +164,74 @@ const login = asyncHandler(async (req, res) => {
     throw new AuthenticationError("Invalid email or password");
   }
 
-  // Set session
+  // Load user permissions with flexible override system
+  let userPermissions = [];
+
+  try {
+    // Get base permissions from role_permissions
+    const [rolePermissions] = await db.query(
+      `
+      SELECT DISTINCT p.permission_name 
+      FROM permissions p 
+      JOIN role_permissions rp ON p.permission_id = rp.permission_id 
+      WHERE rp.role_id = ? AND p.deleted_at IS NULL
+    `,
+      [user.role_id]
+    );
+
+    // Get user-specific permission overrides (both grants and revokes)
+    const [userPermissionOverrides] = await db.query(
+      `
+      SELECT DISTINCT p.permission_name, up.is_revoked
+      FROM permissions p
+      JOIN user_permissions up ON p.permission_id = up.permission_id
+      WHERE up.user_id = ? AND p.deleted_at IS NULL
+    `,
+      [user.id]
+    );
+
+    // Start with role permissions
+    const basePermissions = new Set(
+      rolePermissions.map((p) => p.permission_name)
+    );
+
+    // Apply user-specific grants (additional permissions)
+    const grantedPermissions = userPermissionOverrides
+      .filter((p) => !p.is_revoked)
+      .map((p) => p.permission_name);
+
+    // Apply user-specific revokes (remove role permissions)
+    const revokedPermissions = userPermissionOverrides
+      .filter((p) => p.is_revoked)
+      .map((p) => p.permission_name);
+
+    // Add grants to base permissions
+    grantedPermissions.forEach((permission) => basePermissions.add(permission));
+
+    // Remove revokes from base permissions
+    revokedPermissions.forEach((permission) =>
+      basePermissions.delete(permission)
+    );
+
+    userPermissions = Array.from(basePermissions);
+  } catch (permissionError) {
+    console.error(
+      "❌ [LOGIN] Error loading user permissions:",
+      permissionError.message
+    );
+    // Continue login without permissions - permissions will be empty array
+  }
+
+  // Set session with permissions
   req.session.user = {
     id: user.id,
     username: user.username,
     email: user.email,
-    role: user.role,
+    role_id: user.role_id,
   };
+
+  // Store permissions in session
+  req.session.permissions = userPermissions;
 
   // Log successful login
   const clientIP = getClientIP(req);

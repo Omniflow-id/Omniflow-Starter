@@ -87,6 +87,11 @@
                     <a href="/user/edit/{{ user.id }}" class="btn btn-sm btn-primary">
                       <i class="fas fa-edit"></i>
                     </a>
+                    {% if hasPermission(permissions, 'manage_permissions') %}
+                    <a href="/admin/user/{{ user.id }}/permissions" class="btn btn-sm btn-info" title="Manage User Permissions">
+                      <i class="fas fa-key"></i>
+                    </a>
+                    {% endif %}
                     {% if user.id != user.session_user_id %}
                     <form method="POST" action="/admin/user/toggle-active/{{ user.id }}" style="display: inline-block;">
                       {{ csrfField() | safe }}
@@ -227,11 +232,11 @@
           </div>
           <div class="mb-3">
             <label for="role" class="form-label">Role:</label>
-            <select class="form-control" id="role" name="role" required>
+            <select class="form-control" id="role" name="role_id" required>
               <option value="">Pilih Role</option>
-              <option value="Admin">Admin</option>
-              <option value="Manager">Manager</option>
-              <option value="User">User</option>
+              {% for role in roles %}
+              <option value="{{ role.role_id }}">{{ role.role_name }}</option>
+              {% endfor %}
             </select>
           </div>
         </div>

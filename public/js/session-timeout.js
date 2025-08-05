@@ -50,21 +50,56 @@ window.addEventListener("DOMContentLoaded", (event) => {
   };
 
   const submitLogoutForm = () => {
-    const csrfToken = document
-      .querySelector('meta[name="csrf-token"]')
-      .getAttribute("content");
-    const form = document.createElement("form");
-    form.method = "POST";
-    form.action = "/admin/logout"; // Kept as per your instruction
+    try {
+      const csrfTokenElement = document.querySelector('meta[name="csrf-token"]');
+      const csrfToken = csrfTokenElement?.getAttribute("content");
+      
+      // If no CSRF token, use GET logout
+      if (!csrfTokenElement || !csrfToken) {
+        console.warn("CSRF token not available, using GET logout");
+        window.location.href = "/admin/logout";
+        return;
+      }
 
-    const csrfInput = document.createElement("input");
-    csrfInput.type = "hidden";
-    csrfInput.name = "_csrf";
-    csrfInput.value = csrfToken;
+      // Try POST logout with CSRF token
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "/admin/logout";
 
-    form.appendChild(csrfInput);
-    document.body.appendChild(form);
-    form.submit();
+      const csrfInput = document.createElement("input");
+      csrfInput.type = "hidden";
+      csrfInput.name = "_csrf";
+      csrfInput.value = csrfToken;
+
+      form.appendChild(csrfInput);
+      document.body.appendChild(form);
+      
+      // Set up fallback timeout
+      const fallbackTimer = setTimeout(() => {
+        if (!document.hidden) {
+          console.warn("POST logout taking too long, falling back to GET logout");
+          window.location.href = "/admin/logout";
+        }
+      }, 2000); // 2 second timeout
+
+      // Handle form submission errors
+      form.addEventListener('error', function(e) {
+        clearTimeout(fallbackTimer);
+        console.warn("POST logout failed, falling back to GET logout");
+        window.location.href = "/admin/logout";
+      });
+
+      // Clear fallback timer if page unloads (successful logout)
+      window.addEventListener('beforeunload', function() {
+        clearTimeout(fallbackTimer);
+      });
+
+      form.submit();
+    } catch (error) {
+      console.error("Error during logout form submission:", error);
+      // Fallback: GET logout
+      window.location.href = "/admin/logout";
+    }
   };
 
   const extendSession = () => {
@@ -73,10 +108,15 @@ window.addEventListener("DOMContentLoaded", (event) => {
       document.activeElement.blur();
     }
 
+    const csrfToken = document
+      .querySelector('meta[name="csrf-token"]')
+      ?.getAttribute("content");
+
     fetch("/api/session/keep-alive", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "x-csrf-token": csrfToken,
       },
     })
       .then((res) => {

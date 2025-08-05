@@ -69,6 +69,16 @@ env.addFilter("date", nunjucksDate);
 env.addGlobal("currentYear", new Date().getFullYear()); // Add current year as global
 env.addGlobal("marked", marked);
 
+// Add template helper functions
+const {
+  hasPermission,
+  hasAnyPermission,
+  hasAllPermissions,
+} = require("./helpers/templateHelpers");
+env.addGlobal("hasPermission", hasPermission);
+env.addGlobal("hasAnyPermission", hasAnyPermission);
+env.addGlobal("hasAllPermissions", hasAllPermissions);
+
 // Add formatRupiah filter
 env.addFilter("formatRupiah", (amount) => {
   if (!amount && amount !== 0) return "Rp 0";
@@ -122,6 +132,7 @@ app.use(flash());
 app.use(csrfGlobalMiddleware);
 app.use((req, res, next) => {
   res.locals.user = req.session.user;
+  res.locals.permissions = req.session.permissions || [];
   res.locals.url = req.originalUrl;
   res.locals.success_msg = req.flash("success");
   res.locals.error_msg = req.flash("error");

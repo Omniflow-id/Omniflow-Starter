@@ -19,53 +19,31 @@ const {
 } = require("@helpers/passwordPolicy");
 
 const createNewUser = async (req, res) => {
-  const { username, email, full_name, role } = req.body;
+  const { username, email, full_name, role_id } = req.body;
 
   const ip = getClientIP(req);
   const userAgentData = getUserAgent(req);
 
   try {
     // Input validation
-    if (!username || !email || !full_name || !role) {
+    if (!username || !email || !full_name || !role_id) {
       req.flash("error", "All fields are required");
       return res.redirect("/admin/user/index");
     }
 
     // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[^S@]+@[^S@]+\.[^S@]+$/;
     if (!emailRegex.test(email)) {
       req.flash("error", "Please provide a valid email address");
       return res.redirect("/admin/user/index");
     }
 
     // Role validation
-    const validRoles = ["Admin", "Manager", "User"];
-    if (!validRoles.includes(role)) {
-      await logUserActivity({
-        activity: `Invalid role selection attempted: ${role}`,
-        actionType: ACTION_TYPES.CREATE,
-        resourceType: RESOURCE_TYPES.USER,
-        status: ACTIVITY_STATUS.FAILURE,
-        userId: req.session.user.id,
-        requestInfo: {
-          ip,
-          userAgent: userAgentData.userAgent,
-          deviceType: userAgentData.deviceType,
-          browser: userAgentData.browser,
-          platform: userAgentData.platform,
-          method: req.method,
-          url: req.originalUrl,
-        },
-        errorMessage: "Invalid role selected",
-        errorCode: "INVALID_ROLE",
-        metadata: {
-          attemptedRole: role,
-          validRoles,
-          formData: { username, email, full_name },
-        },
-        req,
-        level: LOG_LEVELS.WARN,
-      });
+    const [roles] = await db.query(
+      "SELECT role_id FROM roles WHERE role_id = ? AND deleted_at IS NULL",
+      [role_id]
+    );
+    if (roles.length === 0) {
       req.flash("error", "Invalid role selected");
       return res.redirect("/admin/user/index");
     }
@@ -100,7 +78,7 @@ const createNewUser = async (req, res) => {
         errorCode: "PASSWORD_VALIDATION_FAILED",
         metadata: {
           passwordErrors: passwordValidation.errors,
-          formData: { username, email, full_name, role },
+          formData: { username, email, full_name, role_id },
         },
         req,
         level: LOG_LEVELS.ERROR,
@@ -142,7 +120,7 @@ const createNewUser = async (req, res) => {
         metadata: {
           duplicateEmail: email,
           existingUserId: existingUser[0].id,
-          formData: { username, email, full_name, role },
+          formData: { username, email, full_name, role_id },
         },
         req,
         level: LOG_LEVELS.WARN,
@@ -152,8 +130,8 @@ const createNewUser = async (req, res) => {
     }
 
     const [result] = await db.query(
-      "INSERT INTO users (username, email, full_name, role, password_hash, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-      [username, email, full_name, role, hashedPassword, true, now, now]
+      "INSERT INTO users (username, email, full_name, role_id, password_hash, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+      [username, email, full_name, role_id, hashedPassword, true, now, now]
     );
 
     const newUserId = result.insertId;
@@ -162,7 +140,7 @@ const createNewUser = async (req, res) => {
       username,
       email,
       full_name,
-      role,
+      role_id,
       password_hash: hashedPassword, // Will be masked
       is_active: true,
       created_at: now,
@@ -170,7 +148,7 @@ const createNewUser = async (req, res) => {
     };
 
     await logUserActivity({
-      activity: `Created new user: ${username} (${role})`,
+      activity: `Created new user: ${username} (role_id: ${role_id})`,
       actionType: ACTION_TYPES.CREATE,
       resourceType: RESOURCE_TYPES.USER,
       resourceId: newUserId.toString(),
@@ -207,7 +185,7 @@ const createNewUser = async (req, res) => {
       username: username,
       email: email,
       full_name: full_name,
-      role: role,
+      role_id: role_id,
       generatedPassword: generatedPassword,
     };
 
@@ -235,7 +213,7 @@ const createNewUser = async (req, res) => {
       errorMessage: err.message,
       errorCode: err.code || "USER_CREATION_FAILED",
       metadata: {
-        formData: { username, email, full_name, role },
+        formData: { username, email, full_name, role_id },
         errorDetails: err.name,
         createdBy: req.session.user.username,
       },

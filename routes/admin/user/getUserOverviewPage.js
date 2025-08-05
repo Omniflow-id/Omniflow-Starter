@@ -25,9 +25,10 @@ const getUserOverviewPage = async (req, res) => {
 
         // Get count of users by role
         const [roleStats] = await db.query(`
-          SELECT role, COUNT(*) as count 
-          FROM users 
-          GROUP BY role
+          SELECT r.role_name, COUNT(u.id) as count 
+          FROM users u
+          JOIN roles r ON u.role_id = r.role_id
+          GROUP BY r.role_name
         `);
 
         return {

@@ -21,7 +21,7 @@ const getUserProfilePage = asyncHandler(async (req, res) => {
     ttl: 300, // 5 minutes
     dbQueryFn: async () => {
       const [users] = await db.query(
-        "SELECT id, username, email, full_name, role, is_active, created_at FROM users WHERE id = ?",
+        "SELECT u.id, u.username, u.email, u.full_name, r.role_name as role, u.is_active, u.created_at FROM users u LEFT JOIN roles r ON u.role_id = r.role_id WHERE u.id = ? AND u.deleted_at IS NULL",
         [userID]
       );
 

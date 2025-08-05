@@ -9,15 +9,20 @@ exports.up = (knex) =>
     table.string("email", 255).notNullable().unique();
     table.string("password_hash", 255).notNullable();
     table.string("full_name", 255).notNullable();
-    table
-      .enum("role", ["Admin", "Manager", "User"])
-      .notNullable()
-      .defaultTo("User");
+    table.integer("role_id").unsigned().notNullable();
     table.boolean("is_active").notNullable().defaultTo(true);
     table.timestamp("created_at").defaultTo(knex.fn.now());
     table
       .timestamp("updated_at")
       .defaultTo(knex.raw("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"));
+    table.timestamp("deleted_at").nullable(); // Soft delete
+
+    // Foreign key constraint
+    table
+      .foreign("role_id")
+      .references("role_id")
+      .inTable("roles")
+      .onDelete("RESTRICT");
   });
 
 /**

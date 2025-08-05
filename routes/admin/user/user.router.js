@@ -3,6 +3,7 @@ const router = express.Router();
 const multer = require("multer");
 const { uploadLimiter, exportLimiter } = require("@middlewares/rateLimiter");
 const { doubleCsrfProtection } = require("@middlewares/csrfProtection");
+const { checkPermission } = require("@middlewares/checkPermission");
 
 const user = require("./user.controller");
 
@@ -43,6 +44,19 @@ router.post(
   "/user/toggle-active/:id",
   doubleCsrfProtection,
   user.toggleUserActive
+);
+
+// User permissions management routes
+router.get(
+  "/user/:userId/permissions",
+  checkPermission("manage_permissions"),
+  user.getUserPermissionsPage
+);
+router.post(
+  "/user/:userId/permissions",
+  checkPermission("manage_permissions"),
+  doubleCsrfProtection,
+  user.updateUserPermissions
 );
 
 module.exports = router;

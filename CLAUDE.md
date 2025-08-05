@@ -82,6 +82,12 @@ The project uses a comprehensive seeder management strategy for populating the d
   1. Create a new seeder file in `db/seeders/data/`.
   2. Require and call the new seeder function within `db/seeders/index.js` in the correct sequence.
 
+- **RBAC Seeder Integration**: The RBAC system includes comprehensive seeders:
+  - `permissions.js` - Seeds all system permissions with descriptions
+  - `roles.js` - Seeds Admin, Manager, User roles
+  - `rolePermissions.js` - Maps permissions to roles based on access levels
+  - **Execution Order**: permissions → roles → rolePermissions (enforced by foreign key constraints)
+
 - **Default users**:
   - admin@omniflow.id/Admin12345.
   - manager@omniflow.id/Manager12345.
@@ -103,13 +109,14 @@ The project uses a comprehensive seeder management strategy for populating the d
   - **Automatic Renewal**: Session lifetime is automatically extended with any user activity (e.g., clicks, keypresses), preventing unexpected logouts for active users.
   - **Client-Side Warning**: A warning modal appears 2 minutes before the session expires due to inactivity, giving the user a chance to extend it.
   - **Keep-Alive Endpoint**: A dedicated `/api/session/keep-alive` endpoint allows the client to silently refresh the session without a full page reload.
+  - **CSRF Protection**: Keep-alive endpoint now protected with `doubleCsrfProtection` middleware
   - **Configuration**:
     - Enabled via `rolling: true` in the `express-session` configuration (`config/index.js`).
     - Session duration is controlled by the `SESSION_TIMEOUT_HOURS` environment variable.
     - Client-side timers and modal logic are handled in `public/js/session-timeout.js`.
 - **JWT Authentication** for API endpoints with access/refresh tokens
-- **Three roles**: Admin (full access), Manager (limited admin), User (basic)
-- **Web Middleware**: `isLoggedIn` (auth check), `isAdmin` (admin-only routes)
+- **Role-Based Access Control (RBAC)**: Comprehensive permission system with granular access control
+- **Web Middleware**: `isLoggedIn` (auth check), `isAdmin` (admin-only routes), `checkPermission` (permission-based access)
 - **API Middleware**: `verifyJWT` (access token), `verifyRefreshToken` (refresh token)
 - **Web Routes**: `/admin/login` and `/admin/logout`
 - **API Routes**: `/api/login`, `/api/refresh`, `/api/protected`
@@ -129,6 +136,189 @@ The project uses a comprehensive seeder management strategy for populating the d
 - **Generated Password Display**: Admin interface shows generated passwords for communication
 - **Policy Configuration**: Environment variables for customizable password requirements
 - **Login Protection**: Automatic password complexity validation during authentication
+
+### Flexible Permission Override System (PBAC + RBAC)
+
+**Enterprise-Grade Permission Management**: Revolutionary permission system combining Role-Based Access Control (RBAC) with Permission-Based Access Control (PBAC) featuring user-specific permission overrides.
+
+#### Core Components
+
+- **🔐 Role-Based Permissions**: Flexible role-based system with granular permission assignment
+- **👥 User Permission Overrides**: Direct user-level permission grants and revokes that override role permissions
+- **🎯 Flexible Override Logic**: Users can both gain additional permissions and lose role permissions
+- **🔄 Dynamic UI**: Permission-based menu visibility with real-time override visualization
+- **⚡ Performance Optimized**: Redis-cached permission lookups with override calculation
+- **🛡️ Security-First**: Minimal default role permissions with granular override capabilities
+
+#### Revolutionary Permission Logic
+
+**Permission Calculation Formula**:
+```
+Final User Permissions = (Role Permissions + User Grants) - User Revokes
+```
+
+**Real-World Example**:
+- **Manager Role** has `view_users`, `view_logs`, `view_profile` permissions
+- **Admin can grant** `manage_users` permission to specific manager
+- **Admin can revoke** `view_users` permission from specific manager
+- **Result**: That manager gets `manage_users`, `view_logs`, `view_profile` but loses `view_users`
+
+#### Database Schema
+
+**Enhanced RBAC + PBAC Tables**:
+```sql
+roles table:
+- role_id (primary key)
+- role_name (unique)
+- description
+- created_at, updated_at, deleted_at (soft delete)
+
+permissions table:
+- permission_id (primary key) 
+- permission_name (unique)
+- description
+- created_at, updated_at, deleted_at (soft delete)
+
+role_permissions table:
+- role_id, permission_id (composite primary key)
+- created_at
+
+user_permissions table (Enhanced):
+- id (auto-increment primary key)
+- user_id, permission_id, is_revoked
+- is_revoked (boolean: false=grant, true=revoke)
+- created_at, updated_at
+- UNIQUE KEY (user_id, permission_id, is_revoked)
+```
+
+#### Permission System Features
+
+**Built-in Permissions**:
+- `view_users` - View user accounts and information
+- `manage_users` - Create, edit, and delete user accounts
+- `manage_permissions` - Manage roles and permissions system
+- `view_logs` - View system activity logs and audit trail
+- `manage_cache` - Manage system cache and performance
+- `manage_queue` - Manage job queues and background tasks
+- `view_profile` - View and edit own user profile
+
+**Default Role Mappings** (configured via seeders):
+```javascript
+// Admin - Full system access
+Admin: [
+  "view_users", "manage_users", "manage_permissions", 
+  "manage_cache", "manage_queue", "view_logs", "view_profile"
+]
+
+// Manager - User management and monitoring
+Manager: [
+  "view_users", "manage_users", "view_logs", "view_profile"
+]
+
+// User - Basic profile access only
+User: [
+  "view_profile"
+]
+```
+
+**Permission Middleware**:
+```javascript
+const { checkPermission } = require("@middlewares/checkPermission");
+
+// Protect routes with specific permissions
+router.get("/admin/users", isLoggedInAndActive, checkPermission("view_users"), getUsersPage);
+router.post("/admin/users", isLoggedInAndActive, checkPermission("manage_users"), createUser);
+```
+
+**Template Helpers**:
+```html
+<!-- Conditional rendering based on permissions -->
+{% if hasPermission(permissions, 'manage_users') %}
+  <button>Create User</button>
+{% endif %}
+
+<!-- Multiple permission check -->
+{% if hasAnyPermission(permissions, ['view_users', 'manage_users']) %}
+  <a href="/admin/users">Users</a>
+{% endif %}
+```
+
+#### Admin Interface
+
+**Roles Management** (`/admin/roles`):
+- **Interactive Role Cards**: Visual role management with permission assignment
+- **Real-time Permission Updates**: AJAX-powered permission assignment without page reload
+- **Batch Operations**: Select all, clear all, and bulk permission management
+- **Permission Analytics**: Statistics showing most privileged roles and permission distribution
+
+**Permissions Management** (`/admin/permissions`):
+- **Permission CRUD**: Create, update, delete permissions with validation
+- **Permission Categories**: Visual grouping by permission types (view_, manage_, approve_)
+- **Quick Statistics**: Real-time counts of system, view, and action permissions
+- **Cross-linking**: Direct navigation between permissions and roles management
+
+#### Route Structure & Navigation
+
+**Admin Routes**:
+- `/admin/permissions` - All permissions management
+- `/admin/roles` - Roles & permissions assignment
+- Both routes protected by `manage_permissions` permission
+
+**Dynamic Sidebar**: Permission-based navigation visibility with proper state management:
+```html
+{% if hasPermission(permissions, 'manage_permissions') %}
+  <!-- Permissions dropdown with both routes -->
+  <a href="/admin/permissions">All Permissions</a>
+  <a href="/admin/roles">Roles & Permissions</a>
+{% endif %}
+```
+
+#### Security & Performance
+
+**Security Features**:
+- **Permission Validation**: Server-side permission checks on all protected routes
+- **CSRF Protection**: All permission management forms protected with CSRF tokens
+- **Audit Logging**: All permission changes logged with full context and user attribution
+- **Soft Deletes**: Safe permission/role deletion with data retention
+
+**Performance Optimization**:
+- **Redis Caching**: Permission lookups cached for 5-minute TTL
+- **Batch Loading**: Efficient permission loading with JOIN queries
+- **Cache Invalidation**: Automatic cache cleanup on permission changes
+
+#### Integration Examples
+
+**Controller Usage**:
+```javascript
+const getRolesPage = asyncHandler(async (req, res) => {
+  const result = await handleCache({
+    key: "admin:permissions:roles",
+    ttl: 300,
+    dbQueryFn: async () => {
+      // Load roles with permissions
+      const roles = await getRolesWithPermissions();
+      return { roles, allPermissions };
+    },
+  });
+
+  res.render("pages/admin/permissions/roles", {
+    roles: result.data.roles,
+    allPermissions: result.data.allPermissions,
+    permissions: req.session.permissions, // For template helpers
+  });
+});
+```
+
+**Middleware Integration**:
+```javascript
+// Automatic permission loading for all admin routes
+app.use("/admin", async (req, res, next) => {
+  if (req.session.user) {
+    req.session.permissions = await getUserPermissions(req.session.user.id);
+  }
+  next();
+});
+```
 
 ### User Account Management
 
@@ -150,8 +340,13 @@ The project uses a comprehensive seeder management strategy for populating the d
 - **Public**: `/` (client landing)
 - **Admin Web**: `/admin/*` (dashboard, user management, logs)
 - **User Management**: `/admin/user/*` (CRUD, Excel import/export)
+- **Permissions Management**: `/admin/permissions/*` (permission CRUD operations)
+- **Roles Management**: `/admin/roles/*` (role management, permission assignment)
 - **Activity Logs**: `/admin/log/*` (view logs, export)
+- **Cache Management**: `/admin/cache/*` (cache statistics, operations)
+- **Queue Management**: `/admin/queue/*` (job monitoring, failed jobs)
 - **API Endpoints**: `/api/*` (JWT-based authentication, JSON responses)
+- **Session API**: `/api/session/*` (CSRF-protected session management)
 
 ### Enterprise-Grade Activity Logging System
 
@@ -456,10 +651,26 @@ const masked = maskSensitiveData(data, {
   </form>
   ```
 
+- **API Integration**: AJAX requests supported via `X-CSRF-Token` header for seamless frontend integration
+- **Session Timeout Protection**: Keep-alive endpoint (`/api/session/keep-alive`) now CSRF-protected
 - **Configuration Variables**:
   - `CSRF_SECRET` - Custom CSRF secret (falls back to SESSION_KEY)
   - Cookie name: `csrf-token`
   - Token extraction from: `req.body._csrf` or `req.headers['x-csrf-token']`
+
+**AJAX Integration Example**:
+```javascript
+// Automatic CSRF token inclusion for fetch requests
+const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content");
+
+fetch("/api/session/keep-alive", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "X-CSRF-Token": csrfToken,
+  },
+});
+```
 
 ### File Processing & Storage
 
@@ -1168,10 +1379,16 @@ router.post("/logout", doubleCsrfProtection, auth.logout);
   - `currentYear` - Current year for footer/copyright
   - `marked` - Markdown parser for content rendering
   - `user` - Current logged-in user (via middleware)
+  - `permissions` - User permissions array for access control
   - `url` - Current request URL for navigation highlighting
   - `success_msg`/`error_msg` - Flash messages for user feedback
   - `csrf`/`csrfToken` - CSRF token for form protection
-  - `csrfField()` - Helper function to generate CSRF hidden input field
+
+- **Template Helper Functions**:
+  - `csrfField()` - Generates CSRF hidden input field for forms
+  - `hasPermission(permissions, permission)` - Checks if user has specific permission
+  - `hasAnyPermission(permissions, permissionArray)` - Checks if user has any of the specified permissions
+  - `hasAllPermissions(permissions, permissionArray)` - Checks if user has all of the specified permissions
 
 - **Custom Filters**:
   - `formatRupiah(amount)` - Formats numbers as Indonesian Rupiah currency
@@ -1179,6 +1396,32 @@ router.post("/logout", doubleCsrfProtection, auth.logout);
   - `formatDate(date, format)` - Formats date only with configurable timezone (default: "DD MMMM YYYY")
   - `formatTime(date, format)` - Formats time only with configurable timezone (default: "HH:mm:ss")
   - `date` - Standard date filter with YYYY default format
+
+**Permission-Based Navigation Examples**:
+```html
+<!-- Single permission check -->
+{% if hasPermission(permissions, 'manage_permissions') %}
+  <div class="nav-dropdown">
+    <a href="/admin/permissions">All Permissions</a>
+    <a href="/admin/roles">Roles & Permissions</a>
+  </div>
+{% endif %}
+
+<!-- Any permission check (OR logic) -->
+{% if hasAnyPermission(permissions, ['view_users', 'manage_users']) %}
+  <a href="/admin/users">User Management</a>
+{% endif %}
+
+<!-- All permissions check (AND logic) -->
+{% if hasAllPermissions(permissions, ['manage_users', 'view_logs']) %}
+  <button>Advanced User Analytics</button>
+{% endif %}
+```
+
+**Helper Functions Implementation** (`@helpers/templateHelpers.js`):
+- **Null-safe**: All helpers check for null/undefined permissions arrays
+- **Type validation**: Validates input parameters before processing
+- **Performance optimized**: Uses native JavaScript array methods for fast lookups
 
 ## Configuration System
 

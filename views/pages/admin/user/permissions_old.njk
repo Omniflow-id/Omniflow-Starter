@@ -1,0 +1,315 @@
+{% extends "layout/masterLayout.njk" %} 
+{% block title %}{{ title }}{% endblock %} 
+{% block content %}
+<div class="container-fluid px-4">
+  <h1 class="mt-4">{{ title }}</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="/admin/user/index">Users</a></li>
+    <li class="breadcrumb-item active">User Permissions</li>
+  </ol>
+
+  <!-- Alert Messages -->
+  <div id="alertContainer"></div>
+
+  <!-- User Info Card -->
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">
+        <i class="fas fa-user me-2"></i>
+        User Information
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <table class="table table-borderless">
+            <tr>
+              <td><strong>Full Name:</strong></td>
+              <td>{{ user.full_name }}</td>
+            </tr>
+            <tr>
+              <td><strong>Username:</strong></td>
+              <td>{{ user.username }}</td>
+            </tr>
+            <tr>
+              <td><strong>Email:</strong></td>
+              <td>{{ user.email }}</td>
+            </tr>
+            <tr>
+              <td><strong>Role:</strong></td>
+              <td>
+                <span class="badge bg-info">{{ user.role_name }}</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Permissions Management -->
+  <div class="row">
+    <!-- Role Permissions (Read-only) -->
+    <div class="col-lg-6 mb-4">
+      <div class="card h-100">
+        <div class="card-header bg-info text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-users me-2"></i>
+            Role Permissions
+            <span class="badge bg-light text-dark ms-2">{{ rolePermissions.length }}</span>
+          </h5>
+          <small>Inherited from {{ user.role_name }} role (read-only)</small>
+          {% if rolePermissions.length == 0 %}
+          <div class="alert alert-warning mt-2 mb-0">
+            <i class="fas fa-info-circle me-1"></i>
+            <strong>No role permissions:</strong> This role has minimal permissions. 
+            Use direct permissions below to grant access.
+          </div>
+          {% endif %}
+        </div>
+        <div class="card-body">
+          {% if rolePermissions.length > 0 %}
+            <div class="permission-list" style="max-height: 400px; overflow-y: auto">
+              {% for permission in rolePermissions %}
+                <div class="form-check mb-2">
+                  <input class="form-check-input" type="checkbox" 
+                         checked disabled 
+                         id="role_perm_{{ permission.permission_id }}">
+                  <label class="form-check-label text-muted" 
+                         for="role_perm_{{ permission.permission_id }}">
+                    <strong>{{ permission.permission_name }}</strong>
+                    <small class="d-block">From role inheritance</small>
+                  </label>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-users fa-3x text-muted mb-3"></i>
+              <p class="text-muted">No role permissions assigned</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Direct User Permissions (Editable) -->
+    <div class="col-lg-6 mb-4">
+      <div class="card h-100">
+        <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+          <div>
+            <h5 class="mb-0">
+              <i class="fas fa-user-plus me-2"></i>
+              Direct User Permissions
+              <span class="badge bg-light text-dark ms-2" id="userPermCount">{{ userPermissions.length }}</span>
+            </h5>
+            <small>Additional permissions for this user only</small>
+          </div>
+        </div>
+        <div class="card-body">
+          <form id="userPermissionsForm" data-user-id="{{ user.id }}" data-user-name="{{ user.full_name }}">
+            <div class="permission-list" style="max-height: 400px; overflow-y: auto">
+              {% for permission in allPermissions %}
+                {% set isRolePermission = false %}
+                {% for rolePerm in rolePermissions %}
+                  {% if rolePerm.permission_id == permission.permission_id %}
+                    {% set isRolePermission = true %}
+                  {% endif %}
+                {% endfor %}
+                
+                {% set isUserPermission = false %}
+                {% for userPerm in userPermissions %}
+                  {% if userPerm.permission_id == permission.permission_id %}
+                    {% set isUserPermission = true %}
+                  {% endif %}
+                {% endfor %}
+
+                <div class="form-check mb-2">
+                  <input class="form-check-input" 
+                         type="checkbox" 
+                         value="{{ permission.permission_id }}"
+                         id="user_perm_{{ permission.permission_id }}" 
+                         name="permissions" 
+                         {% if isUserPermission %}checked{% endif %}
+                         {% if isRolePermission %}disabled{% endif %}>
+                  <label class="form-check-label {% if isRolePermission %}text-muted{% endif %}" 
+                         for="user_perm_{{ permission.permission_id }}">
+                    <strong>{{ permission.permission_name }}</strong>
+                    <small class="text-muted d-block">{{ permission.description }}</small>
+                    {% if isRolePermission %}
+                      <small class="text-info d-block">Already granted by role</small>
+                    {% endif %}
+                  </label>
+                </div>
+              {% endfor %}
+            </div>
+          </form>
+        </div>
+        <div class="card-footer">
+          <button type="button" 
+                  class="btn btn-success btn-sm" 
+                  id="updatePermissionsBtn">
+            <i class="fas fa-save me-1"></i>
+            Update User Permissions
+          </button>
+          <button type="button" 
+                  class="btn btn-outline-secondary btn-sm ms-2" 
+                  id="selectAllBtn">
+            <i class="fas fa-check-double me-1"></i>
+            Select All Available
+          </button>
+          <button type="button" 
+                  class="btn btn-outline-danger btn-sm ms-1" 
+                  id="clearAllBtn">
+            <i class="fas fa-times me-1"></i>
+            Clear All
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Statistics -->
+  <div class="card mt-4">
+    <div class="card-header">
+      <i class="fas fa-chart-bar me-1"></i>
+      Permission Summary
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-3">
+          <h6>Total Effective Permissions</h6>
+          <h3 class="text-primary" id="totalPerms">
+            {{ (rolePermissions | length) + (userPermissions | length) }}
+          </h3>
+        </div>
+        <div class="col-md-3">
+          <h6>From Role</h6>
+          <h3 class="text-info">{{ rolePermissions.length }}</h3>
+        </div>
+        <div class="col-md-3">
+          <h6>Direct Permissions</h6>
+          <h3 class="text-success" id="directPerms">{{ userPermissions.length }}</h3>
+        </div>
+        <div class="col-md-3">
+          <h6>Available to Assign</h6>
+          <h3 class="text-warning">
+            {{ allPermissions.length - rolePermissions.length }}
+          </h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const alertContainer = document.getElementById("alertContainer");
+    const form = document.getElementById("userPermissionsForm");
+    const updateBtn = document.getElementById("updatePermissionsBtn");
+    const selectAllBtn = document.getElementById("selectAllBtn");
+    const clearAllBtn = document.getElementById("clearAllBtn");
+
+    // Show alert function
+    function showAlert(message, type = "success") {
+      const alertDiv = document.createElement("div");
+      alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+      alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      alertContainer.appendChild(alertDiv);
+
+      // Auto-dismiss after 5 seconds
+      setTimeout(() => {
+        if (alertDiv.parentNode) {
+          alertDiv.remove();
+        }
+      }, 5000);
+    }
+
+    // Update permissions count
+    function updateCounts() {
+      const checkedBoxes = form.querySelectorAll('input[name="permissions"]:checked:not([disabled])');
+      document.getElementById('userPermCount').textContent = checkedBoxes.length;
+      document.getElementById('directPerms').textContent = checkedBoxes.length;
+      
+      const roleCount = {{ rolePermissions.length }};
+      document.getElementById('totalPerms').textContent = roleCount + checkedBoxes.length;
+    }
+
+    // Update permissions handler
+    updateBtn.addEventListener("click", async function () {
+      const userId = form.dataset.userId;
+      const userName = form.dataset.userName;
+      const checkedBoxes = form.querySelectorAll('input[name="permissions"]:checked:not([disabled])');
+      const permissionIds = Array.from(checkedBoxes).map((cb) => parseInt(cb.value));
+
+      // Show loading state
+      const originalText = this.innerHTML;
+      this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
+      this.disabled = true;
+
+      try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content");
+        
+        const response = await fetch(`/admin/user/${userId}/permissions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-csrf-token": csrfToken,
+          },
+          body: JSON.stringify({ permissionIds }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          showAlert(
+            `<i class="fas fa-check me-2"></i>Successfully updated permissions for <strong>${userName}</strong>`,
+            "success"
+          );
+          updateCounts();
+        } else {
+          showAlert(
+            `<i class="fas fa-exclamation-triangle me-2"></i>Failed to update permissions: ${
+              result.error || "Unknown error"
+            }`,
+            "danger"
+          );
+        }
+      } catch (error) {
+        console.error("Error updating permissions:", error);
+        showAlert(
+          `<i class="fas fa-exclamation-triangle me-2"></i>Network error occurred while updating permissions`,
+          "danger"
+        );
+      } finally {
+        // Restore button state
+        this.innerHTML = originalText;
+        this.disabled = false;
+      }
+    });
+
+    // Select all available permissions (not disabled)
+    selectAllBtn.addEventListener("click", function () {
+      const checkboxes = form.querySelectorAll('input[name="permissions"]:not([disabled])');
+      checkboxes.forEach((cb) => (cb.checked = true));
+      updateCounts();
+    });
+
+    // Clear all user permissions
+    clearAllBtn.addEventListener("click", function () {
+      const checkboxes = form.querySelectorAll('input[name="permissions"]:not([disabled])');
+      checkboxes.forEach((cb) => (cb.checked = false));
+      updateCounts();
+    });
+
+    // Update counts when checkboxes change
+    form.addEventListener("change", updateCounts);
+  });
+</script>
+{% endblock %}

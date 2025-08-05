@@ -286,7 +286,12 @@ async function logActivity(options = {}) {
   if (userId && (!userInfo.username || !userInfo.email || !userInfo.role)) {
     try {
       const [rows] = await db.query(
-        "SELECT username, email, role FROM users WHERE id = ?",
+        `
+        SELECT u.username, u.email, r.role_name as role 
+        FROM users u 
+        LEFT JOIN roles r ON u.role_id = r.role_id 
+        WHERE u.id = ? AND u.deleted_at IS NULL
+      `,
         [userId]
       );
       if (rows.length > 0) {

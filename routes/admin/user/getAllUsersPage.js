@@ -19,14 +19,17 @@ const getAllUsersPage = async (req, res) => {
       ttl: 300, // 5 minutes
       dbQueryFn: async () => {
         const [users] = await db.query(
-          "SELECT id, username, email, full_name, role, is_active FROM users ORDER BY id"
+          "SELECT u.id, u.username, u.email, u.full_name, r.role_name as role, u.is_active FROM users u LEFT JOIN roles r ON u.role_id = r.role_id WHERE u.deleted_at IS NULL ORDER BY u.id"
         );
-        return users;
+        const [roles] = await db.query(
+          "SELECT role_id, role_name FROM roles WHERE deleted_at IS NULL ORDER BY role_name"
+        );
+        return { users, roles };
       },
     });
 
     // Add session user ID to prevent self-deactivation
-    const usersWithSessionInfo = result.data.map((user) => ({
+    const usersWithSessionInfo = result.data.users.map((user) => ({
       ...user,
       session_user_id: req.session.user.id,
     }));
@@ -34,6 +37,7 @@ const getAllUsersPage = async (req, res) => {
     // Add cache info to template data for debugging
     res.render("pages/admin/user/index", {
       users: usersWithSessionInfo,
+      roles: result.data.roles,
       cacheInfo: {
         source: result.source,
         duration_ms: result.duration_ms,

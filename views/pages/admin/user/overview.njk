@@ -15,10 +15,10 @@
     {% for stat in roleStats %}
     <div class="col-md-3 mb-4">
       <div
-        class="card h-100 {% if stat.role == 'admin' %}bg-danger{% elif stat.role == 'manager' %}bg-success{% else %}bg-info{% endif %} text-white"
+        class="card h-100 {% if stat.role_name == 'Admin' %}bg-danger{% elif stat.role_name == 'Manager' %}bg-success{% else %}bg-info{% endif %} text-white"
       >
         <div class="card-body">
-          <h5 class="card-title">Total {{ stat.role | title }}</h5>
+          <h5 class="card-title">Total {{ stat.role_name | title }}</h5>
           <h2 class="display-4">{{ stat.count }}</h2>
         </div>
       </div>

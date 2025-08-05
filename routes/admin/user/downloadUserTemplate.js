@@ -17,7 +17,7 @@ const downloadUserTemplate = async (req, res) => {
   try {
     // Query database untuk mendapatkan role yang tersedia
     const [roleResults] = await db.query(
-      "SELECT DISTINCT role FROM users ORDER BY role"
+      "SELECT DISTINCT r.role_name as role FROM roles r ORDER BY r.role_name"
     );
     const availableRoles = roleResults.map((row) => row.role);
 

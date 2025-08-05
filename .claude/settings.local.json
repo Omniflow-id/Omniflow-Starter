@@ -3,7 +3,8 @@
     "allow": [
       "Bash(git add:*)",
       "mcp__sequential-thinking__sequentialthinking",
-      "Bash(npx knex migrate:status:*)"
+      "Bash(npx knex migrate:status:*)",
+      "Bash(npx knex migrate:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

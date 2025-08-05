@@ -45,8 +45,8 @@
           >
         </nav>
       </div>
-      {% if user.role in ['Admin', 'Manager'] %}
-      <!-- User -->
+      {% if hasAnyPermission(permissions, ['view_users', 'manage_users']) %}
+      <!-- User Management - Based on permissions -->
       <a
         class="nav-link {% if url.includes('/admin/user') %}{% else %}collapsed{% endif %}"
         href="#"
@@ -79,17 +79,56 @@
           >
         </nav>
       </div>
+      {% endif %}
 
-      {% if user.role == 'Admin' %}
-      <!-- Cache -->
+      {% if hasPermission(permissions, 'manage_permissions') %}
+      <!-- Permissions Management - Based on permissions -->
+      <a
+        class="nav-link {% if url.includes('/admin/permissions') or url.includes('/admin/roles') %}{% else %}collapsed{% endif %}"
+        href="#"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapseLayoutsPermissions"
+        aria-expanded="{% if url.includes('/admin/permissions') or url.includes('/admin/roles') %}true{% else %}false{% endif %}"
+        aria-controls="collapseLayoutsPermissions"
+      >
+        Permissions
+        <div class="sb-sidenav-collapse-arrow">
+          <i class="fas fa-angle-down"></i>
+        </div>
+      </a>
+      <div
+        class="collapse {% if url.includes('/admin/permissions') or url.includes('/admin/roles') %}show{% endif %}"
+        id="collapseLayoutsPermissions"
+        aria-labelledby="headingOne"
+        data-bs-parent="#sidenavAccordion"
+      >
+        <nav class="sb-sidenav-menu-nested nav">
+          <a
+            class="nav-link {% if url.includes('/admin/permissions') and not url.includes('/admin/roles') %}active{% endif %}"
+            href="/admin/permissions"
+            >All Permissions</a
+          >
+          <a
+            class="nav-link {% if url.includes('/admin/roles') %}active{% endif %}"
+            href="/admin/roles"
+            >Roles & Permissions</a
+          >
+        </nav>
+      </div>
+      {% endif %}
+
+      {% if hasPermission(permissions, 'manage_cache') %}
+      <!-- Cache Management - Based on permissions -->
       <a
         class="nav-link {% if url.includes('/admin/cache') %}active{% endif %}"
         href="/admin/cache/stats"
       >
         Cache
       </a>
+      {% endif %}
 
-      <!-- Queue -->
+      {% if hasPermission(permissions, 'manage_queue') %}
+      <!-- Queue Management - Based on permissions -->
       <a
         class="nav-link {% if url.includes('/admin/queue') %}active{% endif %}"
         href="/admin/queue"
@@ -98,7 +137,8 @@
       </a>
       {% endif %}
 
-      <!-- Log -->
+      {% if hasPermission(permissions, 'view_logs') %}
+      <!-- Activity Logs - Based on permissions -->
       <a
         class="nav-link {% if url.includes('/admin/log') %}active{% endif %}"
         href="/admin/log/index"

@@ -1,13 +1,13 @@
 const express = require("express");
 const { doubleCsrfProtection } = require("@middlewares/csrfProtection");
 const { isLoggedIn } = require("@middlewares/isLoggedIn");
-const { isAdmin } = require("@middlewares/isAdmin");
+const { checkPermission } = require("@middlewares/checkPermission");
 const controller = require("./queue.controller");
 
 const router = express.Router();
 
 router.use(isLoggedIn);
-router.use(isAdmin);
+router.use(checkPermission("manage_queue"));
 
 router.get("/", controller.getQueueStatsPage);
 router.get("/failed", controller.getFailedJobsPage);

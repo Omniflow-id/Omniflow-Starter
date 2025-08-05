@@ -1,0 +1,451 @@
+{% extends "layout/masterLayout.njk" %} 
+{% block title %}{{ title }}{% endblock %} 
+{% block content %}
+<div class="container-fluid px-4">
+  <h1 class="mt-4">{{ title }}</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="/admin/user/index">Users</a></li>
+    <li class="breadcrumb-item active">User Permissions</li>
+  </ol>
+
+  <!-- Alert Messages -->
+  <div id="alertContainer"></div>
+
+  <!-- User Info Card -->
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">
+        <i class="fas fa-user me-2"></i>
+        User Information
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <table class="table table-borderless">
+            <tr>
+              <td><strong>Full Name:</strong></td>
+              <td>{{ user.full_name }}</td>
+            </tr>
+            <tr>
+              <td><strong>Username:</strong></td>
+              <td>{{ user.username }}</td>
+            </tr>
+            <tr>
+              <td><strong>Email:</strong></td>
+              <td>{{ user.email }}</td>
+            </tr>
+            <tr>
+              <td><strong>Role:</strong></td>
+              <td>
+                <span class="badge bg-info">{{ user.role_name }}</span>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Permission Override System Explanation -->
+  <div class="card mb-4">
+    <div class="card-header bg-warning text-dark">
+      <h5 class="mb-0">
+        <i class="fas fa-info-circle me-2"></i>
+        Permission Override System
+      </h5>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-12">
+          <p class="mb-2"><strong>How it works:</strong></p>
+          <ul class="mb-0">
+            <li><strong>Role Permissions:</strong> Base permissions inherited from the <span class="badge bg-info">{{ user.role_name }}</span> role</li>
+            <li><strong>User Overrides:</strong> You can grant additional permissions or revoke role permissions for this specific user</li>
+            <li><strong>Final Result:</strong> (Role Permissions + User Grants) - User Revokes = Effective Permissions</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Permissions Management -->
+  <div class="card">
+    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+      <div>
+        <h5 class="mb-0">
+          <i class="fas fa-shield-alt me-2"></i>
+          Permission Management
+          <span class="badge bg-light text-dark ms-2" id="effectivePermCount">{{ effectivePermissions.length }}</span>
+        </h5>
+        <small>Manage all permissions for {{ user.full_name }}</small>
+      </div>
+    </div>
+    <div class="card-body">
+      <form id="userPermissionsForm" data-user-id="{{ user.id }}" data-user-name="{{ user.full_name }}">
+        <div class="row">
+          <div class="col-12">
+            <div class="permission-list" style="max-height: 500px; overflow-y: auto">
+              {% for permission in allPermissions %}
+                {% set isRolePermission = false %}
+                {% set isUserPermission = false %}
+                {% set isEffective = false %}
+                
+                {% for rolePerm in rolePermissions %}
+                  {% if rolePerm.permission_id == permission.permission_id %}
+                    {% set isRolePermission = true %}
+                  {% endif %}
+                {% endfor %}
+                
+                {% for userPerm in userPermissions %}
+                  {% if userPerm.permission_id == permission.permission_id %}
+                    {% set isUserPermission = true %}
+                  {% endif %}
+                {% endfor %}
+
+                {% for effectivePerm in effectivePermissions %}
+                  {% if effectivePerm == permission.permission_name %}
+                    {% set isEffective = true %}
+                  {% endif %}
+                {% endfor %}
+
+                <div class="permission-item mb-3 p-3 border rounded {% if isEffective %}bg-light{% endif %}">
+                  <div class="row align-items-center">
+                    <div class="col-md-6">
+                      <div class="form-check">
+                        <input class="form-check-input permission-checkbox" 
+                               type="checkbox" 
+                               value="{{ permission.permission_id }}"
+                               id="perm_{{ permission.permission_id }}" 
+                               name="permissions" 
+                               {% if isEffective %}checked{% endif %}
+                               data-is-role="{% if isRolePermission %}true{% else %}false{% endif %}"
+                               data-is-user="{% if isUserPermission %}true{% else %}false{% endif %}">
+                        <label class="form-check-label" for="perm_{{ permission.permission_id }}">
+                          <strong>{{ permission.permission_name }}</strong>
+                          <small class="text-muted d-block">{{ permission.description }}</small>
+                        </label>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="permission-status">
+                        {% if isRolePermission %}
+                          <span class="badge bg-info me-1">
+                            <i class="fas fa-users me-1"></i>Role
+                          </span>
+                        {% endif %}
+                        {% if isUserPermission %}
+                          <span class="badge bg-success me-1">
+                            <i class="fas fa-user-plus me-1"></i>User Grant
+                          </span>
+                        {% endif %}
+                        {% if not isEffective and (isRolePermission or isUserPermission) %}
+                          <span class="badge bg-danger me-1">
+                            <i class="fas fa-user-minus me-1"></i>Revoked
+                          </span>
+                        {% endif %}
+                        {% if not isRolePermission and not isUserPermission %}
+                          <span class="badge bg-secondary me-1">
+                            <i class="fas fa-minus me-1"></i>Not Assigned
+                          </span>
+                        {% endif %}
+                      </div>
+                      <div class="permission-action mt-1">
+                        <small class="text-muted" id="action_{{ permission.permission_id }}">
+                          {% if isRolePermission and isEffective %}
+                            Inherited from role
+                          {% elif isRolePermission and not isEffective %}
+                            Role permission (revoked by user)
+                          {% elif not isRolePermission and isEffective %}
+                            Additional user permission
+                          {% else %}
+                            Not granted
+                          {% endif %}
+                        </small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="card-footer">
+        <button type="button" 
+                class="btn btn-success btn-sm" 
+                id="updatePermissionsBtn">
+          <i class="fas fa-save me-1"></i>
+          Update User Permissions
+        </button>
+        <button type="button" 
+                class="btn btn-outline-secondary btn-sm ms-2" 
+                id="selectAllBtn">
+          <i class="fas fa-check-double me-1"></i>
+          Grant All
+        </button>
+        <button type="button" 
+                class="btn btn-outline-danger btn-sm ms-1" 
+                id="revokeAllBtn">
+          <i class="fas fa-times me-1"></i>
+          Revoke All
+        </button>
+        <button type="button" 
+                class="btn btn-outline-info btn-sm ms-1" 
+                id="resetToRoleBtn">
+          <i class="fas fa-undo me-1"></i>
+          Reset to Role Defaults
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Statistics -->
+  <div class="card mt-4">
+    <div class="card-header">
+      <i class="fas fa-chart-bar me-1"></i>
+      Permission Summary
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-3">
+          <h6>Effective Permissions</h6>
+          <h3 class="text-primary" id="totalPerms">{{ effectivePermissions.length }}</h3>
+        </div>
+        <div class="col-md-3">
+          <h6>From Role</h6>
+          <h3 class="text-info">{{ rolePermissions.length }}</h3>
+        </div>
+        <div class="col-md-3">
+          <h6>User Grants</h6>
+          <h3 class="text-success" id="userGrants">{{ userGrants.length }}</h3>
+        </div>
+        <div class="col-md-3">
+          <h6>User Revokes</h6>
+          <h3 class="text-danger" id="userRevokes">{{ userRevokes.length }}</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 
+
+{% block scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const alertContainer = document.getElementById("alertContainer");
+    const form = document.getElementById("userPermissionsForm");
+    const updateBtn = document.getElementById("updatePermissionsBtn");
+    const selectAllBtn = document.getElementById("selectAllBtn");
+    const revokeAllBtn = document.getElementById("revokeAllBtn");
+    const resetToRoleBtn = document.getElementById("resetToRoleBtn");
+
+    // Initial data for calculations
+    const initialRolePermissions = {{ rolePermissions | dump | safe }};
+    const initialUserPermissions = {{ userPermissions | dump | safe }};
+
+    // Show alert function
+    function showAlert(message, type = "success") {
+      const alertDiv = document.createElement("div");
+      alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+      alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      `;
+      alertContainer.appendChild(alertDiv);
+
+      // Auto-dismiss after 5 seconds
+      setTimeout(() => {
+        if (alertDiv.parentNode) {
+          alertDiv.remove();
+        }
+      }, 5000);
+    }
+
+    // Update permission status display
+    function updatePermissionStatus(permissionId, isChecked, isRole, isUser) {
+      const actionElement = document.getElementById(`action_${permissionId}`);
+      const permissionItem = document.querySelector(`#perm_${permissionId}`).closest('.permission-item');
+      
+      if (isChecked) {
+        permissionItem.classList.add('bg-light');
+        if (isRole && !isUser) {
+          actionElement.textContent = 'Inherited from role';
+        } else if (isRole && isUser) {
+          actionElement.textContent = 'Role permission (confirmed by user)';
+        } else if (!isRole && isUser) {
+          actionElement.textContent = 'Additional user permission';
+        } else {
+          actionElement.textContent = 'Granted by user';
+        }
+      } else {
+        permissionItem.classList.remove('bg-light');
+        if (isRole) {
+          actionElement.textContent = 'Role permission (revoked by user)';
+        } else {
+          actionElement.textContent = 'Not granted';
+        }
+      }
+    }
+
+    // Update counts
+    function updateCounts() {
+      const checkedBoxes = form.querySelectorAll('.permission-checkbox:checked');
+      const effectiveCount = checkedBoxes.length;
+      
+      let userGrantCount = 0;
+      let userRevokeCount = 0;
+      
+      form.querySelectorAll('.permission-checkbox').forEach(cb => {
+        const isRole = cb.dataset.isRole === 'true';
+        const isChecked = cb.checked;
+        
+        if (!isRole && isChecked) {
+          userGrantCount++; // User granted a non-role permission
+        } else if (isRole && !isChecked) {
+          userRevokeCount++; // User revoked a role permission
+        }
+      });
+      
+      document.getElementById('totalPerms').textContent = effectiveCount;
+      document.getElementById('userGrants').textContent = userGrantCount;
+      document.getElementById('userRevokes').textContent = userRevokeCount;
+      document.getElementById('effectivePermCount').textContent = effectiveCount;
+    }
+
+    // Handle checkbox changes
+    form.addEventListener('change', function(e) {
+      if (e.target.classList.contains('permission-checkbox')) {
+        const permissionId = e.target.value;
+        const isChecked = e.target.checked;
+        const isRole = e.target.dataset.isRole === 'true';
+        const isUser = e.target.dataset.isUser === 'true';
+        
+        updatePermissionStatus(permissionId, isChecked, isRole, isUser);
+        updateCounts();
+      }
+    });
+
+    // Update permissions handler
+    updateBtn.addEventListener("click", async function () {
+      const userId = form.dataset.userId;
+      const userName = form.dataset.userName;
+      
+      // Calculate grants and revokes
+      const grants = [];
+      const revokes = [];
+      
+      form.querySelectorAll('.permission-checkbox').forEach(cb => {
+        const permissionId = parseInt(cb.value);
+        const isRole = cb.dataset.isRole === 'true';
+        const isChecked = cb.checked;
+        
+        if (!isRole && isChecked) {
+          grants.push(permissionId); // Grant non-role permission
+        } else if (isRole && !isChecked) {
+          revokes.push(permissionId); // Revoke role permission
+        }
+      });
+
+      // Send both grants and revokes
+
+      // Show loading state
+      const originalText = this.innerHTML;
+      this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
+      this.disabled = true;
+
+      try {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content");
+        
+        const response = await fetch(`/admin/user/${userId}/permissions`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-csrf-token": csrfToken,
+          },
+          body: JSON.stringify({ grants, revokes }),
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+          showAlert(
+            `<i class="fas fa-check me-2"></i>Successfully updated permissions for <strong>${userName}</strong>`,
+            "success"
+          );
+          
+          // Show success with revoke/grant counts
+          if (revokes.length > 0 || grants.length > 0) {
+            showAlert(
+              `<i class="fas fa-check me-2"></i>Successfully updated permissions: ${grants.length} granted, ${revokes.length} revoked`,
+              "success"
+            );
+          }
+          
+          updateCounts();
+        } else {
+          showAlert(
+            `<i class="fas fa-exclamation-triangle me-2"></i>Failed to update permissions: ${
+              result.error || "Unknown error"
+            }`,
+            "danger"
+          );
+        }
+      } catch (error) {
+        console.error("Error updating permissions:", error);
+        showAlert(
+          `<i class="fas fa-exclamation-triangle me-2"></i>Network error occurred while updating permissions`,
+          "danger"
+        );
+      } finally {
+        // Restore button state
+        this.innerHTML = originalText;
+        this.disabled = false;
+      }
+    });
+
+    // Grant all permissions
+    selectAllBtn.addEventListener("click", function () {
+      const checkboxes = form.querySelectorAll('.permission-checkbox');
+      checkboxes.forEach((cb) => {
+        cb.checked = true;
+        const permissionId = cb.value;
+        const isRole = cb.dataset.isRole === 'true';
+        const isUser = cb.dataset.isUser === 'true';
+        updatePermissionStatus(permissionId, true, isRole, isUser);
+      });
+      updateCounts();
+    });
+
+    // Revoke all permissions
+    revokeAllBtn.addEventListener("click", function () {
+      const checkboxes = form.querySelectorAll('.permission-checkbox');
+      checkboxes.forEach((cb) => {
+        cb.checked = false;
+        const permissionId = cb.value;
+        const isRole = cb.dataset.isRole === 'true';
+        const isUser = cb.dataset.isUser === 'true';
+        updatePermissionStatus(permissionId, false, isRole, isUser);
+      });
+      updateCounts();
+    });
+
+    // Reset to role defaults
+    resetToRoleBtn.addEventListener("click", function () {
+      const checkboxes = form.querySelectorAll('.permission-checkbox');
+      checkboxes.forEach((cb) => {
+        const isRole = cb.dataset.isRole === 'true';
+        cb.checked = isRole; // Check only role permissions
+        const permissionId = cb.value;
+        const isUser = cb.dataset.isUser === 'true';
+        updatePermissionStatus(permissionId, isRole, isRole, isUser);
+      });
+      updateCounts();
+    });
+
+    // Initialize counts
+    updateCounts();
+  });
+</script>
+{% endblock %}
