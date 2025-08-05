@@ -249,7 +249,9 @@ const uploadNewUser = async (req, res) => {
             if (emailResult.success) {
               emailsSent++;
               console.log(
-                `✅ [BULK-UPLOAD] Welcome email sent to ${user.email} via ${emailResult.method || "fallback"}`
+                `✅ [BULK-UPLOAD] Welcome email sent to ${user.email} via ${
+                  emailResult.method || "fallback"
+                }`
               );
             } else {
               emailsFailed++;
