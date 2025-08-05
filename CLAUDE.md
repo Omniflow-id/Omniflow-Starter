@@ -105,6 +105,14 @@ The project uses a comprehensive seeder management strategy for populating the d
 ### Authentication & Authorization
 
 - **Session-based auth** with 24-hour timeout for web interface
+- **2FA Email OTP System**: Enterprise-grade two-factor authentication with email-based OTP
+  - **Non-blocking Email Delivery**: Queue-based email system using RabbitMQ for <200ms response time
+  - **Beautiful HTML Templates**: Professional email templates with security messaging and branding
+  - **Development Bypass**: `DEV_2FA_BYPASS=true` environment variable for easier development testing
+  - **Session-based OTP Storage**: Temporary 2FA state stored in express-session with 5-minute expiration
+  - **Auto-submit OTP Interface**: Modern OTP input page with real-time countdown and keyboard shortcuts
+  - **Fallback Resilience**: Automatic fallback to synchronous email when RabbitMQ unavailable
+  - **Comprehensive Logging**: All 2FA events logged to activity system with full audit trail
 - **Sliding Session Timeout**: Implements an optimal session timeout strategy to enhance user experience.
   - **Automatic Renewal**: Session lifetime is automatically extended with any user activity (e.g., clicks, keypresses), preventing unexpected logouts for active users.
   - **Client-Side Warning**: A warning modal appears 2 minutes before the session expires due to inactivity, giving the user a chance to extend it.
@@ -118,7 +126,7 @@ The project uses a comprehensive seeder management strategy for populating the d
 - **Role-Based Access Control (RBAC)**: Comprehensive permission system with granular access control
 - **Web Middleware**: `isLoggedIn` (auth check), `isAdmin` (admin-only routes), `checkPermission` (permission-based access)
 - **API Middleware**: `verifyJWT` (access token), `verifyRefreshToken` (refresh token)
-- **Web Routes**: `/admin/login` and `/admin/logout`
+- **Web Routes**: `/admin/login`, `/admin/logout`, `/admin/verify-otp` (2FA verification)
 - **API Routes**: `/api/login`, `/api/refresh`, `/api/protected`
 
 ### Password Policy System
@@ -989,6 +997,8 @@ res.render("pages/admin/users", {
 - **Comprehensive Logging**: Production-ready logging with Redis-style format
 
 **Worker System** (`workers/`):
+- **EmailWorker**: Professional email processing with support for multiple email types (OTP, welcome emails)
+- **Non-blocking Email Operations**: Queue-based email sending for optimal performance
 - **WorkerManager**: Orchestrates multiple workers with centralized lifecycle management
 - **TestWorker**: Simple console.log worker for development and testing
 - **Extensible Design**: Easy to add new workers (email, notifications, reports)
@@ -1598,6 +1608,7 @@ Each optional feature is controlled by an enable flag and only validates its var
 
 - `SMTP_FROM_NAME` - Default sender name
 - `SMTP_FROM_EMAIL` - Default sender email address
+- `DEV_2FA_BYPASS` - Development bypass for 2FA (default: false)
 
 #### S3 File Storage (`S3_ENABLED=true`)
 

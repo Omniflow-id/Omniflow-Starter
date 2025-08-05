@@ -77,6 +77,16 @@ const config = {
       "http://localhost:4318/v1/traces",
   },
 
+  email: {
+    enabled: process.env.EMAIL_ENABLED === "true",
+    host: process.env.SMTP_HOST,
+    port: parseInt(process.env.SMTP_PORT) || 587,
+    user: process.env.SMTP_USER,
+    password: process.env.SMTP_PASSWORD,
+    fromName: process.env.SMTP_FROM_NAME || "Omniflow Starter",
+    fromEmail: process.env.SMTP_FROM_EMAIL,
+  },
+
   s3: {
     endpointUrl: process.env.S3_ENDPOINT_URL,
     accessKey: process.env.S3_ACCESS_KEY,

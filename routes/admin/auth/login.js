@@ -10,6 +10,12 @@ const {
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
 const {
+  generateOTP,
+  createOTPSession,
+  isDevelopmentBypass,
+} = require("@helpers/emailOTP");
+const { sendEmailSmart } = require("@helpers/queuedEmail");
+const {
   asyncHandler,
   ValidationError,
   AuthenticationError,
@@ -164,7 +170,116 @@ const login = asyncHandler(async (req, res) => {
     throw new AuthenticationError("Invalid email or password");
   }
 
-  // Load user permissions with flexible override system
+  // Check if 2FA bypass is enabled for development
+  if (isDevelopmentBypass()) {
+    console.log("🔧 [2FA] Development bypass enabled - skipping OTP");
+
+    // Load user permissions and complete login directly
+    const userPermissions = await loadUserPermissions(user);
+
+    // Set session with permissions
+    req.session.user = {
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role_id: user.role_id,
+    };
+    req.session.permissions = userPermissions;
+
+    // Log successful login
+    await logSuccessfulLogin(user, req);
+
+    req.flash("success", "Berhasil login! (Development mode)");
+    return res.redirect("/admin");
+  }
+
+  // 2FA Flow: Generate and send OTP
+  try {
+    const otp = generateOTP();
+    const otpSession = createOTPSession(user, otp);
+
+    // Store OTP session data
+    req.session.pending2FA = otpSession;
+
+    // Send OTP email via queue (non-blocking)
+    const emailResult = await sendEmailSmart(
+      "otp_email",
+      user.email,
+      otp,
+      user.full_name,
+      {
+        metadata: {
+          userId: user.id,
+          loginAttempt: true,
+          ipAddress: getClientIP(req),
+          userAgent: getUserAgent(req).userAgent,
+        },
+      }
+    );
+
+    if (!emailResult.success) {
+      console.error("❌ [2FA] Failed to queue OTP email:", emailResult.error);
+      // Don't throw error - allow user to proceed and retry if needed
+      console.warn(
+        "⚠️ [2FA] Proceeding without email confirmation - user can request resend"
+      );
+    }
+
+    // Log OTP generation
+    const clientIP = getClientIP(req);
+    const userAgent = getUserAgent(req);
+
+    await logUserActivity({
+      activity: `OTP generated and sent to user: ${user.username}`,
+      actionType: ACTION_TYPES.LOGIN,
+      resourceType: RESOURCE_TYPES.SESSION,
+      status: ACTIVITY_STATUS.INFO,
+      userId: user.id,
+      userInfo: {
+        username: user.username,
+        email: user.email,
+        role: user.role_name,
+      },
+      requestInfo: {
+        ip: clientIP,
+        userAgent: userAgent.userAgent,
+        deviceType: userAgent.deviceType,
+        browser: userAgent.browser,
+        platform: userAgent.platform,
+        method: req.method,
+        url: req.originalUrl,
+      },
+      metadata: {
+        loginMethod: "2fa_otp",
+        otpExpiry: new Date(otpSession.expiresAt).toISOString(),
+        emailQueued: emailResult.queued || false,
+        emailMessageId: emailResult.messageId || null,
+      },
+      req,
+    });
+
+    // Flash message based on email result
+    if (emailResult.success && emailResult.queued) {
+      req.flash(
+        "info",
+        "OTP telah dikirim ke email Anda. Silakan periksa inbox dan masukkan kode OTP."
+      );
+    } else {
+      req.flash(
+        "warning",
+        "OTP berhasil dibuat. Email sedang dikirim - silakan cek inbox Anda dan masukkan kode OTP di bawah."
+      );
+    }
+
+    res.redirect("/admin/verify-otp");
+  } catch (otpError) {
+    console.error("❌ [2FA] OTP generation/sending failed:", otpError.message);
+    throw new AuthenticationError("Failed to generate OTP. Please try again.");
+  }
+});
+
+// Helper function to load user permissions
+const loadUserPermissions = async (user) => {
   let userPermissions = [];
 
   try {
@@ -222,18 +337,11 @@ const login = asyncHandler(async (req, res) => {
     // Continue login without permissions - permissions will be empty array
   }
 
-  // Set session with permissions
-  req.session.user = {
-    id: user.id,
-    username: user.username,
-    email: user.email,
-    role_id: user.role_id,
-  };
+  return userPermissions;
+};
 
-  // Store permissions in session
-  req.session.permissions = userPermissions;
-
-  // Log successful login
+// Helper function to log successful login
+const logSuccessfulLogin = async (user, req) => {
   const clientIP = getClientIP(req);
   const userAgent = getUserAgent(req);
 
@@ -247,7 +355,7 @@ const login = asyncHandler(async (req, res) => {
     userInfo: {
       username: user.username,
       email: user.email,
-      role: user.role,
+      role: user.role_name,
     },
     requestInfo: {
       ip: clientIP,
@@ -259,16 +367,13 @@ const login = asyncHandler(async (req, res) => {
       url: req.originalUrl,
     },
     metadata: {
-      loginMethod: "password",
+      loginMethod: isDevelopmentBypass() ? "password_dev" : "2fa_complete",
       sessionId: req.session.id,
       previousLogin: user.last_login,
     },
     req,
   });
-
-  req.flash("success", "Berhasil login!");
-  res.redirect("/admin");
-});
+};
 
 module.exports = {
   login,

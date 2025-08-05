@@ -1,96 +1,81 @@
-Instruksi: Buat Sistem RBAC Granular Permissions (Express.js + MySQL)
+Instruksi Implementasi 2FA Email OTP (Admin Login)
 
-Goal:
-Bangun sistem Role-Based Access Control (RBAC) dengan granular permissions di Express.js. Permissions disimpan di MySQL database. Setiap request endpoint akan dicek apakah user memiliki permission tertentu.
+1. Environment Variables
+------------------------
+Tambahkan variable berikut di .env file:
 
-Database Tables (MySQL):
-1. users (user_id INT PK, name VARCHAR, role_id INT FK)
-2. roles (role_id INT PK, role_name VARCHAR)
-3. permissions (permission_id INT PK, permission_name VARCHAR)
-4. role_permissions (role_id INT FK, permission_id INT FK)
-5. (Optional) user_permissions (user_id INT FK, permission_id INT FK) → Untuk override permission khusus user tertentu.
+# SMTP Configuration (sesuaikan)
+SMTP_USER=youremail@gmail.com
+SMTP_PASS=your-email-password-or-app-password
 
-Seed Data Contoh:
-Roles:
-- Admin Marketing
-- Admin Finance
-- Manager HR
-- User
+# Dev Mode Bypass
+DEV_2FA_BYPASS=true    # Ubah ke false di production
 
-Permissions:
-- view_blog
-- manage_blog
-- view_finance
-- approve_leave
-- view_payslip
+2. Install Dependencies
+------------------------
+npm install nodemailer
 
-role_permissions Mapping:
-Admin Marketing → manage_blog
-Admin Finance → view_finance
-Manager HR → approve_leave
-User → view_blog
+3. Modify Login Flow
+------------------------
+Di file login.js (controller login admin):
+- Setelah password valid, tambahkan:
+  a. Jika DEV_2FA_BYPASS === true:
+     - Langsung set req.session.user dan redirect ke /admin (tanpa OTP)
+  b. Jika DEV_2FA_BYPASS === false:
+     - Generate 6-digit OTP.
+     - Kirim OTP ke email admin via Nodemailer.
+     - Simpan OTP dan expired time di req.session.pending2FA.
+     - Redirect ke /admin/verify-otp (halaman input OTP).
 
-Express.js Middleware:
+4. OTP Verification Route
+------------------------
+Buat route GET /admin/verify-otp:
+  - Cek apakah req.session.pending2FA ada, jika tidak, redirect ke /login.
+  - Render form input OTP.
 
-1. isAuthenticated
-Mengecek apakah user sudah login (cek session).
-function isAuthenticated(req, res, next) {
-  if (req.session && req.session.user) {
-    next();
-  } else {
-    res.status(401).send("Unauthorized: Please login");
-  }
-}
+Buat route POST /admin/verify-otp:
+  a. Jika DEV_2FA_BYPASS === true:
+     - Langsung set req.session.user dan redirect ke /admin.
+  b. Jika DEV_2FA_BYPASS === false:
+     - Validasi OTP dengan req.session.pending2FA.otp.
+     - Cek apakah OTP expired.
+     - Jika valid, set req.session.user, hapus pending2FA, redirect ke /admin.
+     - Jika salah, berikan error dan redirect ulang ke /admin/verify-otp.
 
-2. checkPermission(permissionName)
-Mengecek apakah user punya permission tertentu dari session.
-function checkPermission(requiredPermission) {
-  return (req, res, next) => {
-    const userPermissions = req.session.permissions || [];
-    if (userPermissions.includes(requiredPermission)) {
-      next();
-    } else {
-      res.status(403).send("Forbidden: No Access");
-    }
+5. OTP Generation & Email Sending
+------------------------
+Buat function helper untuk:
+  - Generate random 6-digit OTP.
+  - Kirim email via Nodemailer dengan subject "Your OTP Code".
+
+6. Session Structure
+------------------------
+Session sementara yang digunakan:
+  req.session.pending2FA = {
+    userId: user.id,
+    email: user.email,
+    otp: '123456',
+    expiresAt: <timestamp>, // expired time in ms
   };
-}
 
-Session Permission Load (Saat Login):
-1. Saat user login, ambil role_id dari tabel users.
-2. Query semua permissions user dari tabel role_permissions (dan user_permissions jika ada).
-3. Simpan list permissions di req.session.permissions (array of strings).
+Session setelah OTP sukses:
+  req.session.user = {
+    id: user.id,
+    username: user.username,
+    email: user.email,
+    role: user.role,
+  };
 
-Contoh:
-req.session.permissions = ['view_blog', 'manage_blog'];
+7. Development Tips
+------------------------
+- Selama development, aktifkan DEV_2FA_BYPASS=true agar tidak perlu OTP setiap kali login.
+- Di production, pastikan DEV_2FA_BYPASS=false untuk mengaktifkan OTP email.
 
-Route Mapping:
-Semua user login boleh akses
-app.get("/my-profile", isAuthenticated, (req, res) => {
-  res.send("My Profile Page");
-});
+8. Security Notes
+------------------------
+- OTP hanya berlaku 5 menit dan sekali pakai.
+- Jangan kirim OTP di URL (hanya via email).
+- Simpan OTP di session (in-memory) atau Redis jika ingin lebih scalable.
+- Rate limit endpoint OTP jika ada public exposure (optional).
+- Saat production, pertimbangkan upgrade ke TOTP (Google Authenticator) untuk level keamanan lebih tinggi.
 
-Hanya user dengan permission manage_blog
-app.get("/blog/manage", isAuthenticated, checkPermission("manage_blog"), (req, res) => {
-  res.send("Manage Blog");
-});
-
-Hanya user dengan permission view_finance
-app.get("/finance/report", isAuthenticated, checkPermission("view_finance"), (req, res) => {
-  res.send("Finance Report");
-});
-
-Hanya user dengan permission approve_leave
-app.post("/leave/approve", isAuthenticated, checkPermission("approve_leave"), (req, res) => {
-  res.send("Leave Approved");
-});
-
-Rules:
-Endpoint /my-profile → isAuthenticated
-Endpoint /blog/manage → isAuthenticated + checkPermission("manage_blog")
-Endpoint /finance/report → isAuthenticated + checkPermission("view_finance")
-Endpoint /leave/approve → isAuthenticated + checkPermission("approve_leave")
-
-Catatan Tambahan:
-- Jangan hardcode "role == admin" di logic akses.
-- Middleware hanya periksa apakah user punya permission yang dibutuhkan.
-- Permissions bisa dikelola fleksibel di DB tanpa ubah logic backend.

@@ -4,6 +4,7 @@ const { queueService } = require("@helpers/queue");
 
 // Import all workers
 const TestWorker = require("./testWorker");
+const EmailWorker = require("./emailWorker");
 
 class WorkerManager {
   constructor() {
@@ -16,8 +17,8 @@ class WorkerManager {
     // Register all workers here
     this.workers = [
       new TestWorker(),
-      // new EmailWorker(), // Future workers
-      // new NotificationWorker(),
+      new EmailWorker(),
+      // new NotificationWorker(), // Future workers
     ];
   }
 

@@ -102,7 +102,7 @@ class QueueService {
     // Setup Dead Letter Exchange first
     await this.setupDeadLetterExchange();
 
-    const queues = ["test_queue"];
+    const queues = ["test_queue", "email_queue"];
 
     for (const queueName of queues) {
       await this.setupQueueWithDLQ(queueName);

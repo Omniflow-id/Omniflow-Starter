@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <meta name="description" content="Verify OTP - Omniflow Admin" />
+    <meta name="author" content="" />
+    <title>Verify OTP - Omniflow</title>
+    <link rel="icon" href="/img/logo.png" />
+    <link href="/css/styles.css" rel="stylesheet" />
+    <script src="/js/font-awesome-all.js"></script>
+    <style>
+      /* Custom styles for OTP input */
+      #otp:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+      }
+      
+      /* Countdown animation */
+      @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.7; }
+        100% { opacity: 1; }
+      }
+      
+      .countdown-warning {
+        animation: pulse 1s infinite;
+        color: #dc3545 !important;
+      }
+      
+      /* Button loading state */
+      .btn-loading {
+        position: relative;
+        pointer-events: none;
+      }
+      
+      .btn-loading::after {
+        content: "";
+        position: absolute;
+        width: 1rem;
+        height: 1rem;
+        margin: auto;
+        border: 2px solid transparent;
+        border-top-color: currentColor;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        right: 0;
+      }
+      
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid">
+      {% include "components/alert_flash_message.njk" %}
+      <div class="row justify-content-center align-items-center min-vh-100">
+  <div class="col-md-6 col-lg-5">
+    <div class="card shadow-lg border-0">
+      <div class="card-body p-5">
+        <!-- Header -->
+        <div class="text-center mb-4">
+          <div class="mb-3">
+            <i class="fas fa-shield-alt text-primary" style="font-size: 3rem;"></i>
+          </div>
+          <h2 class="card-title fw-bold text-primary mb-2">Verify Your Identity</h2>
+          <p class="text-muted">
+            We've sent a 6-digit OTP code to your email:
+            <br><strong class="text-primary">{{ userEmail }}</strong>
+          </p>
+        </div>
+
+        <!-- Development Mode Notice -->
+        {% if isDevelopment %}
+        <div class="alert alert-warning border-0 shadow-sm mb-4">
+          <div class="d-flex align-items-center">
+            <i class="fas fa-code me-2"></i>
+            <div>
+              <strong>Development Mode</strong><br>
+              <small>You can enter any 6-digit code or leave empty to bypass OTP verification.</small>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Countdown Timer -->
+        <div class="alert alert-info border-0 shadow-sm mb-4">
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+              <i class="fas fa-clock me-2"></i>
+              <span>Code expires in:</span>
+            </div>
+            <div class="fw-bold text-primary">
+              <span id="countdown">{{ timeRemaining }}</span>s
+            </div>
+          </div>
+          <div class="progress mt-2" style="height: 4px;">
+            <div class="progress-bar bg-primary" id="countdown-bar" style="width: 100%"></div>
+          </div>
+        </div>
+
+        <!-- OTP Form -->
+        <form action="/admin/verify-otp" method="post" id="otpForm">
+          {{ csrfField() | safe }}
+          
+          <div class="mb-4">
+            <label for="otp" class="form-label fw-semibold">
+              <i class="fas fa-key me-1"></i>
+              Enter OTP Code
+            </label>
+            <input 
+              type="text" 
+              class="form-control form-control-lg text-center fw-bold" 
+              id="otp" 
+              name="otp" 
+              placeholder="000000"
+              maxlength="6"
+              pattern="[0-9]{6}"
+              style="letter-spacing: 0.5rem; font-size: 1.5rem;"
+              {% if not isDevelopment %}required{% endif %}
+              autocomplete="one-time-code"
+            >
+            <div class="form-text text-center">
+              {% if isDevelopment %}
+                <i class="fas fa-info-circle me-1"></i>
+                Development mode: Any 6-digit code works, or leave empty to bypass
+              {% else %}
+                <i class="fas fa-info-circle me-1"></i>
+                Please check your email inbox and spam folder
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="d-grid gap-2 mb-4">
+            <button type="submit" class="btn btn-primary btn-lg shadow-sm" id="verifyBtn">
+              <i class="fas fa-check-circle me-2"></i>
+              Verify OTP
+            </button>
+          </div>
+        </form>
+
+        <!-- Resend/Back Links -->
+        <div class="text-center">
+          <p class="text-muted mb-2">Didn't receive the code?</p>
+          <div class="d-flex gap-3 justify-content-center flex-wrap">
+            <a href="/admin/login" class="btn btn-outline-secondary btn-sm">
+              <i class="fas fa-arrow-left me-1"></i>
+              Back to Login
+            </a>
+            <button type="button" class="btn btn-outline-primary btn-sm" id="resendBtn" disabled>
+              <i class="fas fa-paper-plane me-1"></i>
+              Resend Code
+            </button>
+          </div>
+          <small class="text-muted d-block mt-2">
+            <i class="fas fa-info-circle me-1"></i>
+            Resend available after code expires
+          </small>
+        </div>
+
+        <!-- Security Notice -->
+        <div class="mt-4 p-3 bg-light rounded-3">
+          <div class="d-flex align-items-start">
+            <i class="fas fa-shield-alt text-success me-2 mt-1"></i>
+            <div>
+              <small class="text-muted">
+                <strong>Security Notice:</strong> This OTP is valid for 5 minutes and can only be used once. 
+                If you didn't request this login, please contact your administrator immediately.
+              </small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Custom styles for OTP input */
+  #otp:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+  }
+  
+  /* Countdown animation */
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+  }
+  
+  .countdown-warning {
+    animation: pulse 1s infinite;
+    color: #dc3545 !important;
+  }
+  
+  /* Button loading state */
+  .btn-loading {
+    position: relative;
+    pointer-events: none;
+  }
+  
+  .btn-loading::after {
+    content: "";
+    position: absolute;
+    width: 1rem;
+    height: 1rem;
+    margin: auto;
+    border: 2px solid transparent;
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const countdownElement = document.getElementById('countdown');
+  const countdownBar = document.getElementById('countdown-bar');
+  const otpInput = document.getElementById('otp');
+  const verifyBtn = document.getElementById('verifyBtn');
+  const resendBtn = document.getElementById('resendBtn');
+  const otpForm = document.getElementById('otpForm');
+  
+  let timeRemaining = {{ timeRemaining }};
+  const initialTime = timeRemaining;
+  
+  // Focus on OTP input
+  otpInput.focus();
+  
+  // Auto-format OTP input (numbers only)
+  otpInput.addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+    if (value.length > 6) value = value.slice(0, 6); // Limit to 6 digits
+    e.target.value = value;
+    
+    // Auto-submit when 6 digits entered (only in production)
+    {% if not isDevelopment %}
+    if (value.length === 6) {
+      setTimeout(() => {
+        otpForm.submit();
+      }, 500);
+    }
+    {% endif %}
+  });
+  
+  // Handle form submission
+  otpForm.addEventListener('submit', function(e) {
+    verifyBtn.classList.add('btn-loading');
+    verifyBtn.innerHTML = '<span class="visually-hidden">Verifying...</span>';
+  });
+  
+  // Countdown timer
+  const countdown = setInterval(() => {
+    timeRemaining--;
+    countdownElement.textContent = timeRemaining;
+    
+    // Update progress bar
+    const percentage = (timeRemaining / initialTime) * 100;
+    countdownBar.style.width = percentage + '%';
+    
+    // Change color when time is running out
+    if (timeRemaining <= 30) {
+      countdownElement.classList.add('countdown-warning');
+      countdownBar.classList.remove('bg-primary');
+      countdownBar.classList.add('bg-warning');
+    }
+    
+    if (timeRemaining <= 10) {
+      countdownBar.classList.remove('bg-warning');
+      countdownBar.classList.add('bg-danger');
+    }
+    
+    // When time expires
+    if (timeRemaining <= 0) {
+      clearInterval(countdown);
+      countdownElement.textContent = '0';
+      countdownElement.classList.add('countdown-warning');
+      
+      // Disable form and show expiry message
+      otpInput.disabled = true;
+      verifyBtn.disabled = true;
+      verifyBtn.innerHTML = '<i class="fas fa-times-circle me-2"></i>Code Expired';
+      verifyBtn.classList.remove('btn-primary');
+      verifyBtn.classList.add('btn-danger');
+      
+      // Enable resend button
+      resendBtn.disabled = false;
+      resendBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i>Login Again';
+      resendBtn.onclick = () => window.location.href = '/admin/login';
+      
+      // Show alert
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'alert alert-danger border-0 shadow-sm mt-3';
+      alertDiv.innerHTML = `
+        <div class="d-flex align-items-center">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <div>
+            <strong>Code Expired!</strong><br>
+            <small>Please return to the login page to request a new OTP code.</small>
+          </div>
+        </div>
+      `;
+      otpForm.appendChild(alertDiv);
+    }
+  }, 1000);
+  
+  // Keyboard shortcuts
+  document.addEventListener('keydown', function(e) {
+    // ESC to go back to login
+    if (e.key === 'Escape') {
+      window.location.href = '/admin/login';
+    }
+    
+    // Enter to submit (if form is valid)
+    if (e.key === 'Enter' && otpInput.value.length >= ({{ 'isDevelopment' if isDevelopment else '6' }})) {
+      otpForm.submit();
+    }
+  });
+  
+  // Paste handling for OTP
+  otpInput.addEventListener('paste', function(e) {
+    e.preventDefault();
+    const paste = (e.clipboardData || window.clipboardData).getData('text');
+    const otpCode = paste.replace(/\D/g, '').slice(0, 6);
+    otpInput.value = otpCode;
+    
+    // Auto-submit if 6 digits pasted (only in production)
+    {% if not isDevelopment %}
+    if (otpCode.length === 6) {
+      setTimeout(() => {
+        otpForm.submit();
+      }, 500);
+    }
+    {% endif %}
+  });
+});
+</script>
+      </div>
+    </div>
+      </div>
+    </div>
+  </body>
+</html>
