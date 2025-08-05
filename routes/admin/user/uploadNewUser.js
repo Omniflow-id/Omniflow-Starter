@@ -15,6 +15,7 @@ const {
   ACTIVITY_STATUS,
 } = require("@helpers/log");
 const { generatePredictablePassword } = require("@helpers/passwordPolicy");
+const { sendEmailSmart } = require("@helpers/queuedEmail");
 
 const uploadNewUser = async (req, res) => {
   const ip = getClientIP(req);
@@ -103,12 +104,12 @@ const uploadNewUser = async (req, res) => {
 
       const hashedPassword = await bcrypt.hash(user.password, 10);
       await db.query(
-        "INSERT INTO users (username, email, full_name, role, password_hash, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO users (username, email, full_name, role_id, password_hash, is_active, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
         [
           user.username,
           user.email,
           user.full_name,
-          user.role,
+          user.role_id,
           hashedPassword,
           true,
           now,
@@ -121,13 +122,13 @@ const uploadNewUser = async (req, res) => {
         username: user.username,
         email: user.email,
         full_name: user.full_name,
-        role: user.role,
+        role_id: user.role_id,
         generatedPassword: user.password,
       });
 
       // Individual user creation log (keep simple for bulk operations)
       await logUserActivity({
-        activity: `Bulk upload - Created user: ${user.username} (${user.role})`,
+        activity: `Bulk upload - Created user: ${user.username} (role_id: ${user.role_id})`,
         actionType: ACTION_TYPES.CREATE,
         resourceType: RESOURCE_TYPES.USER,
         resourceId: "bulk_upload",
@@ -147,7 +148,7 @@ const uploadNewUser = async (req, res) => {
           newUser: {
             username: user.username,
             email: user.email,
-            role: user.role,
+            role_id: user.role_id,
           },
           passwordGenerated: true,
           uploadedBy: req.session.user.username,
@@ -217,7 +218,103 @@ const uploadNewUser = async (req, res) => {
       }
 
       // Redirect to password display page
-      return res.redirect("/admin/user/passwords");
+      res.redirect("/admin/user/passwords");
+
+      // Send welcome emails in background (fire-and-forget for bulk)
+      setImmediate(async () => {
+        let emailsSent = 0;
+        let emailsFailed = 0;
+
+        console.log(
+          `📧 [BULK-UPLOAD] Starting to send ${successfulUsers.length} welcome emails in background`
+        );
+
+        for (const user of successfulUsers) {
+          try {
+            const emailResult = await sendEmailSmart(
+              "welcome_email",
+              user.email,
+              user.full_name,
+              user.generatedPassword,
+              {
+                metadata: {
+                  bulkUpload: true,
+                  createdBy: req.session.user.id,
+                  ipAddress: ip,
+                  userAgent: userAgentData.userAgent,
+                },
+              }
+            );
+
+            if (emailResult.success) {
+              emailsSent++;
+              console.log(
+                `✅ [BULK-UPLOAD] Welcome email sent to ${user.email} via ${emailResult.method || "fallback"}`
+              );
+            } else {
+              emailsFailed++;
+              console.error(
+                `❌ [BULK-UPLOAD] Welcome email failed for ${user.email}:`,
+                emailResult.error
+              );
+            }
+
+            // Small delay between emails to avoid overwhelming SMTP server
+            await new Promise((resolve) => setTimeout(resolve, 100));
+          } catch (error) {
+            emailsFailed++;
+            console.error(
+              `❌ [BULK-UPLOAD] Welcome email error for ${user.email}:`,
+              error.message
+            );
+          }
+        }
+
+        // Log bulk email summary
+        await logUserActivity({
+          activity: `Bulk welcome emails completed - ${emailsSent} sent, ${emailsFailed} failed`,
+          actionType: ACTION_TYPES.IMPORT,
+          resourceType: RESOURCE_TYPES.USER,
+          resourceId: "bulk_welcome_emails",
+          status:
+            emailsFailed === 0
+              ? ACTIVITY_STATUS.SUCCESS
+              : ACTIVITY_STATUS.WARNING,
+          userId: req.session.user.id,
+          requestInfo: {
+            ip,
+            userAgent: userAgentData.userAgent,
+            deviceType: userAgentData.deviceType,
+            browser: userAgentData.browser,
+            platform: userAgentData.platform,
+            method: req.method,
+            url: req.originalUrl,
+          },
+          metadata: {
+            bulkWelcomeEmails: {
+              totalUsers: successfulUsers.length,
+              emailsSent: emailsSent,
+              emailsFailed: emailsFailed,
+              successRate:
+                ((emailsSent / successfulUsers.length) * 100).toFixed(1) + "%",
+            },
+            backgroundProcessing: true,
+            uploadedBy: req.session.user.username,
+          },
+          req,
+        }).catch((logError) => {
+          console.error(
+            "❌ [BULK-UPLOAD] Failed to log welcome email summary:",
+            logError.message
+          );
+        });
+
+        console.log(
+          `📊 [BULK-UPLOAD] Welcome email summary: ${emailsSent} sent, ${emailsFailed} failed`
+        );
+      });
+
+      return;
     } else {
       req.flash(
         "error",

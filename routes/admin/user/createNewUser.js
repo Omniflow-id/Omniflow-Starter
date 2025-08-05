@@ -17,6 +17,7 @@ const {
   generatePredictablePassword,
   validatePassword,
 } = require("@helpers/passwordPolicy");
+const { sendEmailSmart } = require("@helpers/queuedEmail");
 
 const createNewUser = async (req, res) => {
   const { username, email, full_name, role_id } = req.body;
@@ -191,9 +192,80 @@ const createNewUser = async (req, res) => {
 
     req.flash(
       "success",
-      `User created successfully! Generated password: ${generatedPassword}`
+      `User created successfully! Generated password: ${generatedPassword}. Welcome email is being sent.`
     );
     res.redirect("/admin/user/index");
+
+    // Send welcome email in background (fire-and-forget)
+    setImmediate(async () => {
+      try {
+        const emailResult = await sendEmailSmart(
+          "welcome_email",
+          email,
+          full_name,
+          generatedPassword,
+          {
+            metadata: {
+              userId: newUserId,
+              createdBy: req.session.user.id,
+              ipAddress: ip,
+              userAgent: userAgentData.userAgent,
+            },
+          }
+        );
+
+        // Log background email result
+        await logUserActivity({
+          activity: `Welcome email ${emailResult.success ? "sent successfully" : "failed to send"} for new user: ${username}`,
+          actionType: ACTION_TYPES.CREATE,
+          resourceType: RESOURCE_TYPES.USER,
+          resourceId: newUserId.toString(),
+          status: emailResult.success
+            ? ACTIVITY_STATUS.SUCCESS
+            : ACTIVITY_STATUS.FAILURE,
+          userId: req.session.user.id,
+          requestInfo: {
+            ip,
+            userAgent: userAgentData.userAgent,
+            deviceType: userAgentData.deviceType,
+            browser: userAgentData.browser,
+            platform: userAgentData.platform,
+            method: req.method,
+            url: req.originalUrl,
+          },
+          metadata: {
+            emailResult: emailResult.success ? "sent" : "failed",
+            emailMethod: emailResult.method || "fallback",
+            backgroundProcessing: true,
+            emailMessageId: emailResult.messageId || null,
+            error: emailResult.error || null,
+            welcomeEmailType: "new_user_creation",
+          },
+          req,
+        }).catch((logError) => {
+          console.error(
+            "❌ [USER-CREATE] Failed to log welcome email result:",
+            logError.message
+          );
+        });
+
+        if (!emailResult.success) {
+          console.error(
+            "❌ [USER-CREATE] Background welcome email failed:",
+            emailResult.error
+          );
+        } else {
+          console.log(
+            `✅ [USER-CREATE] Welcome email sent to ${email} via ${emailResult.method || "fallback"}`
+          );
+        }
+      } catch (error) {
+        console.error(
+          "❌ [USER-CREATE] Background welcome email processing failed:",
+          error.message
+        );
+      }
+    });
   } catch (err) {
     await logUserActivity({
       activity: `Failed to create user: ${username || "unknown"}`,
