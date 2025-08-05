@@ -11,6 +11,25 @@ const config = {
     url: process.env.APP_URL || "http://localhost",
     port: process.env.PORT || 1234,
     env: process.env.NODE_ENV || "development",
+    // Dynamic URL generator for emails and links
+    getFullUrl: function () {
+      const baseUrl = this.url;
+      const port = this.port;
+      const env = this.env;
+
+      // Production: use APP_URL as-is (should include https and domain)
+      if (env === "production") {
+        return baseUrl;
+      }
+
+      // Development: add port if localhost
+      if (baseUrl.includes("localhost") || baseUrl.includes("127.0.0.1")) {
+        return `${baseUrl}:${port}`;
+      }
+
+      // Default: return baseUrl as-is
+      return baseUrl;
+    },
   },
 
   session: {

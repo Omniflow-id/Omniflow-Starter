@@ -190,7 +190,7 @@ Thank you for using Omniflow Starter!
                 </div>
 
                 <p style="text-align: center;">
-                  <a href="${config.app.url}/admin/login" class="btn">Login to Omniflow Admin</a>
+                  <a href="${config.app.getFullUrl()}/admin/login" class="btn">Login to Omniflow Admin</a>
                 </p>
 
                 <p>If you have any questions, please contact your system administrator.</p>
@@ -216,7 +216,7 @@ Temporary Password: ${tempPassword}
 
 Please change your password after your first login for security reasons.
 
-Login URL: ${config.app.url}/admin/login
+Login URL: ${config.app.getFullUrl()}/admin/login
 
 Thank you for using Omniflow Starter!
         `,

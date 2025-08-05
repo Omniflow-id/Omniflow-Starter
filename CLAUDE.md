@@ -1556,7 +1556,9 @@ router.post("/logout", doubleCsrfProtection, auth.logout);
 **Basic Configuration Variables** (have defaults):
 
 - `NODE_ENV` - Environment (default: "development")
-- `APP_URL` - Application URL (default: "http://localhost")
+- `APP_URL` - Application base URL for emails and links (default: "http://localhost")
+  - **Development**: Port automatically added (e.g., `http://localhost:1234`)
+  - **Production**: Use full HTTPS URL without port (e.g., `https://yourdomain.com`)
 - `PORT` - Server port (default: 1234)
 - `CSRF_SECRET` - CSRF token secret (falls back to SESSION_KEY)
 - `SESSION_TIMEOUT_HOURS` - Session timeout in hours (default: 24)
