@@ -1,5 +1,9 @@
 // === Third-party modules ===
-const { S3Client, PutObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
+const {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} = require("@aws-sdk/client-s3");
 const multer = require("multer");
 const fs = require("node:fs");
 const path = require("node:path");
@@ -32,7 +36,7 @@ const storage = multer.memoryStorage();
 const fileFilter = (_req, file, cb) => {
   const allowedTypes = [
     "image/jpeg",
-    "image/png", 
+    "image/png",
     "image/gif",
     "image/webp",
     "application/pdf",
@@ -42,12 +46,14 @@ const fileFilter = (_req, file, cb) => {
     "application/msword", // .doc
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document", // .docx
   ];
-  
+
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
     cb(
-      new Error("Invalid file type. Only images, PDFs, Excel files, and Word documents are allowed."),
+      new Error(
+        "Invalid file type. Only images, PDFs, Excel files, and Word documents are allowed."
+      ),
       false
     );
   }
@@ -73,13 +79,13 @@ async function uploadFileToS3(fileOrBuffer, filename, mimetype) {
     if (Buffer.isBuffer(fileOrBuffer)) {
       // If buffer, use directly
       fileContent = fileOrBuffer;
-    } else if (fileOrBuffer && fileOrBuffer.path) {
+    } else if (fileOrBuffer?.path) {
       // If file from disk, read file and save path to delete later
       fileContent = fs.readFileSync(fileOrBuffer.path);
       fileToDelete = fileOrBuffer.path;
       filename = fileOrBuffer.filename;
       mimetype = fileOrBuffer.mimetype;
-    } else if (fileOrBuffer && fileOrBuffer.buffer) {
+    } else if (fileOrBuffer?.buffer) {
       // If file from multer memoryStorage
       fileContent = fileOrBuffer.buffer;
       filename = fileOrBuffer.originalname
@@ -92,8 +98,8 @@ async function uploadFileToS3(fileOrBuffer, filename, mimetype) {
       );
     }
 
-    const key = config.s3.folderName 
-      ? `${config.s3.folderName}/${filename}` 
+    const key = config.s3.folderName
+      ? `${config.s3.folderName}/${filename}`
       : filename;
 
     await s3Client.send(
@@ -119,7 +125,7 @@ async function uploadFileToS3(fileOrBuffer, filename, mimetype) {
     };
   } catch (error) {
     // Delete local file if error occurs and file still exists
-    if (fileOrBuffer && fileOrBuffer.path && fs.existsSync(fileOrBuffer.path)) {
+    if (fileOrBuffer?.path && fs.existsSync(fileOrBuffer.path)) {
       fs.unlinkSync(fileOrBuffer.path);
     }
     throw error;
@@ -128,22 +134,18 @@ async function uploadFileToS3(fileOrBuffer, filename, mimetype) {
 
 // Helper to delete file from S3
 async function deleteFileFromS3(filename) {
-  try {
-    const key = config.s3.folderName 
-      ? `${config.s3.folderName}/${filename}` 
-      : filename;
+  const key = config.s3.folderName
+    ? `${config.s3.folderName}/${filename}`
+    : filename;
 
-    await s3Client.send(
-      new DeleteObjectCommand({
-        Bucket: config.s3.bucketName,
-        Key: key,
-      })
-    );
+  await s3Client.send(
+    new DeleteObjectCommand({
+      Bucket: config.s3.bucketName,
+      Key: key,
+    })
+  );
 
-    return true;
-  } catch (error) {
-    throw error;
-  }
+  return true;
 }
 
 // Helper to upload multiple files
