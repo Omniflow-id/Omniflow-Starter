@@ -144,20 +144,52 @@ const fallbackToSyncEmail = async (emailType, ...args) => {
   }
 };
 
-// Smart email sending with fallback
+// Smart email sending with timeout-based fallback
 const sendEmailSmart = async (emailType, ...args) => {
   // Check if RabbitMQ is enabled and connected
   const { queueService } = require("@helpers/queue");
 
   if (config.rabbitmq.enabled && queueService.isConnected) {
-    // Use queue-based approach
-    switch (emailType) {
-      case "otp_email":
-        return await queueOTPEmail(...args);
-      case "welcome_email":
-        return await queueWelcomeEmail(...args);
-      default:
-        return await queueEmail({ type: emailType, ...args[0] }, args[1]);
+    // Use queue-based approach with timeout
+    try {
+      const queueTimeout = parseInt(process.env.EMAIL_QUEUE_TIMEOUT) || 150;
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Queue timeout")), queueTimeout)
+      );
+
+      let queuePromise;
+      switch (emailType) {
+        case "otp_email":
+          queuePromise = queueOTPEmail(...args);
+          break;
+        case "welcome_email":
+          queuePromise = queueWelcomeEmail(...args);
+          break;
+        default:
+          queuePromise = queueEmail({ type: emailType, ...args[0] }, args[1]);
+      }
+
+      // Race between queue operation and timeout
+      const result = await Promise.race([queuePromise, timeoutPromise]);
+
+      console.log(
+        "⚡ [QUEUED-EMAIL] Queue operation successful within timeout"
+      );
+      return { ...result, method: "queue" };
+    } catch (error) {
+      if (error.message === "Queue timeout") {
+        console.warn(
+          `⏱️ [QUEUED-EMAIL] Queue timeout (>${queueTimeout}ms), falling back to synchronous email`
+        );
+      } else {
+        console.warn(
+          "⚠️ [QUEUED-EMAIL] Queue error, falling back to synchronous email:",
+          error.message
+        );
+      }
+
+      // Fallback to sync email
+      return await fallbackToSyncEmail(emailType, ...args);
     }
   } else {
     // Fallback to synchronous approach

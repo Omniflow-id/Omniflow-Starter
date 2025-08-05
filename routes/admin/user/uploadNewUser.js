@@ -203,7 +203,11 @@ const uploadNewUser = async (req, res) => {
       if (duplicateEmails.length > 0) {
         req.flash(
           "success",
-          `${successfulUsers.length} users created successfully! Some duplicate emails were skipped: ${duplicateEmails.join(", ")}`
+          `${
+            successfulUsers.length
+          } users created successfully! Some duplicate emails were skipped: ${duplicateEmails.join(
+            ", "
+          )}`
         );
       } else {
         req.flash(
@@ -218,7 +222,9 @@ const uploadNewUser = async (req, res) => {
       req.flash(
         "error",
         duplicateEmails.length > 0
-          ? `All users skipped due to duplicate emails: ${duplicateEmails.join(", ")}`
+          ? `All users skipped due to duplicate emails: ${duplicateEmails.join(
+              ", "
+            )}`
           : "No users were created"
       );
     }

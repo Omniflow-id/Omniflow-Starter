@@ -201,31 +201,7 @@ const login = asyncHandler(async (req, res) => {
     // Store OTP session data
     req.session.pending2FA = otpSession;
 
-    // Send OTP email via queue (non-blocking)
-    const emailResult = await sendEmailSmart(
-      "otp_email",
-      user.email,
-      otp,
-      user.full_name,
-      {
-        metadata: {
-          userId: user.id,
-          loginAttempt: true,
-          ipAddress: getClientIP(req),
-          userAgent: getUserAgent(req).userAgent,
-        },
-      }
-    );
-
-    if (!emailResult.success) {
-      console.error("❌ [2FA] Failed to queue OTP email:", emailResult.error);
-      // Don't throw error - allow user to proceed and retry if needed
-      console.warn(
-        "⚠️ [2FA] Proceeding without email confirmation - user can request resend"
-      );
-    }
-
-    // Log OTP generation
+    // Log OTP generation (before email to ensure fast response)
     const clientIP = getClientIP(req);
     const userAgent = getUserAgent(req);
 
@@ -252,26 +228,95 @@ const login = asyncHandler(async (req, res) => {
       metadata: {
         loginMethod: "2fa_otp",
         otpExpiry: new Date(otpSession.expiresAt).toISOString(),
-        emailQueued: emailResult.queued || false,
-        emailMessageId: emailResult.messageId || null,
+        immediateResponse: true,
       },
       req,
     });
 
-    // Flash message based on email result
-    if (emailResult.success && emailResult.queued) {
-      req.flash(
-        "info",
-        "OTP telah dikirim ke email Anda. Silakan periksa inbox dan masukkan kode OTP."
-      );
-    } else {
-      req.flash(
-        "warning",
-        "OTP berhasil dibuat. Email sedang dikirim - silakan cek inbox Anda dan masukkan kode OTP di bawah."
-      );
-    }
+    // Flash message for immediate response
+    req.flash(
+      "info",
+      "OTP telah dibuat. Email sedang dikirim - silakan cek inbox Anda dan masukkan kode OTP di bawah."
+    );
 
+    // IMMEDIATE REDIRECT - User gets OTP page instantly (<50ms)
     res.redirect("/admin/verify-otp");
+
+    // Send OTP email in background (fire-and-forget)
+    setImmediate(async () => {
+      try {
+        const emailResult = await sendEmailSmart(
+          "otp_email",
+          user.email,
+          otp,
+          user.full_name,
+          {
+            metadata: {
+              userId: user.id,
+              loginAttempt: true,
+              ipAddress: clientIP,
+              userAgent: userAgent.userAgent,
+            },
+          }
+        );
+
+        // Log background email result
+        await logUserActivity({
+          activity: `OTP email ${emailResult.success ? "sent successfully" : "failed to send"}: ${user.username}`,
+          actionType: ACTION_TYPES.LOGIN,
+          resourceType: RESOURCE_TYPES.SESSION,
+          status: emailResult.success
+            ? ACTIVITY_STATUS.SUCCESS
+            : ACTIVITY_STATUS.FAILURE,
+          userId: user.id,
+          userInfo: {
+            username: user.username,
+            email: user.email,
+            role: user.role_name,
+          },
+          requestInfo: {
+            ip: clientIP,
+            userAgent: userAgent.userAgent,
+            deviceType: userAgent.deviceType,
+            browser: userAgent.browser,
+            platform: userAgent.platform,
+            method: req.method,
+            url: req.originalUrl,
+          },
+          metadata: {
+            emailResult: emailResult.success ? "sent" : "failed",
+            emailMethod: emailResult.method || "fallback",
+            backgroundProcessing: true,
+            emailMessageId: emailResult.messageId || null,
+            error: emailResult.error || null,
+          },
+          req,
+        }).catch((logError) => {
+          console.error(
+            "❌ [2FA] Failed to log background email result:",
+            logError.message
+          );
+        });
+
+        if (!emailResult.success) {
+          console.error(
+            "❌ [2FA] Background OTP email failed:",
+            emailResult.error
+          );
+        } else {
+          console.log(
+            `✅ [2FA] Background OTP email sent via ${emailResult.method || "fallback"} in background`
+          );
+        }
+      } catch (error) {
+        console.error(
+          "❌ [2FA] Background email processing failed:",
+          error.message
+        );
+      }
+    });
+
+    return; // Response already sent
   } catch (otpError) {
     console.error("❌ [2FA] OTP generation/sending failed:", otpError.message);
     throw new AuthenticationError("Failed to generate OTP. Please try again.");
