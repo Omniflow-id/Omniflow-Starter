@@ -675,16 +675,116 @@ fetch("/api/session/keep-alive", {
 ### File Processing & Storage
 
 - **Excel Operations**: Dynamic template generation using ExcelJS (no static templates)
-- **File Storage**: Store only filename in database, actual files will be configured for S3
+- **File Storage**: Store only filename in database, actual files stored in S3-compatible storage
 - **Upload Processing**: Multer for file uploads with automatic cleanup
 - **Template Generation**: Excel templates created dynamically with current database schema
 
+### S3 Upload Helper System
+
+**Multi-Provider S3 Storage**: Production-ready file upload system with S3-compatible storage support for AWS S3, Cloudflare R2, DigitalOcean Spaces, and other S3-compatible providers.
+
+#### Core Features
+
+- **🌍 Multi-Provider Support**: AWS S3, Cloudflare R2, DigitalOcean Spaces, MinIO
+- **📁 File Type Validation**: Images, PDFs, Excel files, Word documents with configurable filters
+- **🔄 Multiple Upload Strategies**: Buffer, disk file, or multer memoryStorage support
+- **🎯 Automatic Filename Generation**: Prevents naming conflicts with timestamp-based naming
+- **🧹 Automatic Cleanup**: Local file deletion after successful upload
+- **📊 Batch Processing**: Multiple file uploads with comprehensive error handling
+- **🗑️ Delete Support**: Remove files from S3 bucket programmatically
+
+#### Configuration
+
+**Environment Variables:**
+```env
+S3_ENABLED=true                    # Enable S3 storage
+S3_ENDPOINT_URL=your-s3-endpoint   # S3-compatible endpoint URL
+S3_ACCESS_KEY=your-access-key      # S3 access key ID
+S3_SECRET_KEY=your-secret-key      # S3 secret access key
+S3_BUCKET_NAME=your-bucket-name    # Target S3 bucket
+S3_FOLDER_NAME=uploads             # Optional folder prefix
+S3_REGION=us-east-1               # Optional AWS region
+```
+
+#### Usage Examples
+
+**Single File Upload:**
+```javascript
+const { uploadFileToS3, upload } = require("@helpers/uploadToS3");
+
+// Via multer middleware
+router.post("/upload", upload.single("file"), async (req, res) => {
+  const result = await uploadFileToS3(req.file);
+  // result: { filename, key, url, size }
+});
+
+// Direct buffer upload
+const result = await uploadFileToS3(fileBuffer, "document.pdf", "application/pdf");
+```
+
+**Multiple File Upload:**
+```javascript
+// Batch upload with error handling
+router.post("/upload-multiple", upload.array("files", 10), async (req, res) => {
+  const results = await uploadMultipleFilesToS3(req.files);
+  // results: { successful: [], failed: [], totalUploaded, totalFailed }
+});
+```
+
+**File Deletion:**
+```javascript
+const { deleteFileFromS3 } = require("@helpers/uploadToS3");
+
+// Delete file by filename
+await deleteFileFromS3("document_1723567890_123456789.pdf");
+```
+
+#### Provider Configuration Examples
+
+**AWS S3:**
+```env
+S3_ENDPOINT_URL="https://s3.amazonaws.com"
+S3_REGION="us-east-1"
+```
+
+**Cloudflare R2:**
+```env
+S3_ENDPOINT_URL="https://your-account-id.r2.cloudflarestorage.com"
+```
+
+**DigitalOcean Spaces:**
+```env
+S3_ENDPOINT_URL="https://sgp1.digitaloceanspaces.com"
+```
+
+#### File Type Support
+
+**Supported File Types:**
+- **Images**: JPEG, PNG, GIF, WebP
+- **Documents**: PDF, Word (.doc/.docx), Excel (.xls/.xlsx), CSV
+- **Configurable**: Easy to extend with additional MIME types
+
+**File Size Limits:**
+- **Default**: 10MB per file, 20 files maximum per request
+- **Configurable**: Adjustable via multer configuration
+
+#### Integration with Existing Systems
+
+**Database Integration**: Store file references (filename, key, URL) in database while actual files reside in S3.
+
+**Cache Integration**: File upload operations can invalidate relevant cache patterns for immediate UI updates.
+
+**Activity Logging**: All file operations (upload, delete) are automatically logged to the activity system with comprehensive metadata.
+
+**Error Handling**: Comprehensive error handling with automatic local file cleanup on failures.
+
 ### File Storage Strategy
 
-- **Database**: Store only filename/path references
-- **S3 Configuration**: Ready for dynamic S3 integration using environment variables
+- **Database**: Store only filename/path references and metadata
+- **S3 Storage**: Actual files stored in S3-compatible cloud storage
 - **File Cleanup**: Temporary files automatically cleaned after processing
 - **Template Downloads**: Generated on-demand, not stored permanently
+- **URL Generation**: Full S3 URLs provided for direct file access
 
 ### Redis Caching System
 
