@@ -7,7 +7,7 @@ const getOverviewPage = (_req, res) => {
 };
 
 const getSubModulePage = (_req, res) => {
-  res.render("pages/admin/index/subModule");
+  res.render("pages/admin/index/submodule");
 };
 
 module.exports = {
