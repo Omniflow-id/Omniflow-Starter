@@ -297,8 +297,7 @@ const uploadNewUser = async (req, res) => {
               totalUsers: successfulUsers.length,
               emailsSent: emailsSent,
               emailsFailed: emailsFailed,
-              successRate:
-                ((emailsSent / successfulUsers.length) * 100).toFixed(1) + "%",
+              successRate: `${((emailsSent / successfulUsers.length) * 100).toFixed(1)}%`,
             },
             backgroundProcessing: true,
             uploadedBy: req.session.user.username,

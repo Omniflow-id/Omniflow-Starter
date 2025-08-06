@@ -14,7 +14,7 @@ const {
   ACTIVITY_STATUS,
 } = require("@helpers/log");
 const { validatePassword } = require("@helpers/passwordPolicy");
-const { asyncHandler, ValidationError } = require("@middlewares/errorHandler");
+const { asyncHandler } = require("@middlewares/errorHandler");
 
 const getChangePasswordPage = asyncHandler(async (req, res) => {
   res.render("pages/admin/userProfile/changePassword", {
@@ -127,7 +127,10 @@ const changePassword = asyncHandler(async (req, res) => {
       level: LOG_LEVELS.WARN,
     });
 
-    req.flash("error", `Password requirements not met: ${passwordValidation.errors.join(", ")}`);
+    req.flash(
+      "error",
+      `Password requirements not met: ${passwordValidation.errors.join(", ")}`
+    );
     return res.redirect("/admin/change-password");
   }
 
