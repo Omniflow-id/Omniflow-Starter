@@ -12,7 +12,8 @@
       "!**/node_modules/**",
       "!**/public/**",
       "!**/logs/**",
-      "!**/*.min.js"
+      "!**/*.min.js",
+      "!**/documentation/**"
     ]
   },
   "formatter": {

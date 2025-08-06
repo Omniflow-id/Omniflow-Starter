@@ -1,0 +1,543 @@
+{
+  "config": {
+    "indexing": "full",
+    "lang": ["en"],
+    "min_search_length": 3,
+    "prebuild_index": false,
+    "separator": "[\\s\\-]+"
+  },
+  "docs": [
+    {
+      "location": "index.html",
+      "text": "Omniflow-Starter Documentation \u00b6 Welcome to Omniflow-Starter , a comprehensive Node.js ERP module starter pack built with Express.js, MySQL, and Nunjucks templating. This documentation will guide you through setting up, configuring, and extending the application. What is Omniflow-Starter? \u00b6 Omniflow-Starter is a production-ready enterprise application foundation that provides: User Management & Authentication - Role-based access control with 2FA Activity Logging - Comprehensive audit trail system Job Queue System - RabbitMQ-based background processing Caching Layer - Redis integration for performance optimization File Processing - S3-compatible storage with Excel operations Security Features - CSRF protection, rate limiting, bot protection Quick Navigation \u00b6 Getting Started - Installation and setup guide Configuration - Environment variables and feature configuration Architecture - System architecture and design patterns Features - Detailed feature documentation Key Features at a Glance \u00b6 \ud83d\udd10 Authentication & Authorization \u00b6 Session-based authentication with JWT API support Role-Based Access Control (RBAC) with granular permissions Two-Factor Authentication (2FA) with email OTP User account management with active/inactive status \ud83d\udcca Enterprise Monitoring \u00b6 Comprehensive activity logging system Redis-based caching with performance metrics RabbitMQ job queue monitoring OpenTelemetry integration for observability \ud83d\ude80 Performance & Scalability \u00b6 Connection pool optimization for MySQL Automatic response compression (Brotli + Gzip) Rate limiting with multiple tiers Circuit breaker pattern for external services \ud83d\udee1\ufe0f Security & Protection \u00b6 CSRF protection with Laravel-style token handling Multi-layer bot protection Advanced rate limiting Sensitive data masking in logs \ud83d\udcc1 File Management \u00b6 S3-compatible file storage (AWS S3, Cloudflare R2, DigitalOcean Spaces) Excel file processing and template generation Bulk user import/export capabilities Technology Stack \u00b6 Backend : Node.js with Express.js framework Database : MySQL with Knex.js query builder Templating : Nunjucks with Bootstrap + Alpine.js Caching : Redis with intelligent fallback Queue : RabbitMQ for background job processing Storage : S3-compatible cloud storage Monitoring : OpenTelemetry with custom metrics Getting Help \u00b6 If you need assistance with Omniflow-Starter: Check the relevant documentation section Review the CLAUDE.md file for development guidance Look at the example files in the project Check the configuration validation messages for setup issues Start with the Getting Started guide to begin your journey with Omniflow-Starter!",
+      "title": "Home"
+    },
+    {
+      "location": "index.html#omniflow-starter-documentation",
+      "text": "Welcome to Omniflow-Starter , a comprehensive Node.js ERP module starter pack built with Express.js, MySQL, and Nunjucks templating. This documentation will guide you through setting up, configuring, and extending the application.",
+      "title": "Omniflow-Starter Documentation"
+    },
+    {
+      "location": "index.html#what-is-omniflow-starter",
+      "text": "Omniflow-Starter is a production-ready enterprise application foundation that provides: User Management & Authentication - Role-based access control with 2FA Activity Logging - Comprehensive audit trail system Job Queue System - RabbitMQ-based background processing Caching Layer - Redis integration for performance optimization File Processing - S3-compatible storage with Excel operations Security Features - CSRF protection, rate limiting, bot protection",
+      "title": "What is Omniflow-Starter?"
+    },
+    {
+      "location": "index.html#quick-navigation",
+      "text": "Getting Started - Installation and setup guide Configuration - Environment variables and feature configuration Architecture - System architecture and design patterns Features - Detailed feature documentation",
+      "title": "Quick Navigation"
+    },
+    {
+      "location": "index.html#key-features-at-a-glance",
+      "text": "",
+      "title": "Key Features at a Glance"
+    },
+    {
+      "location": "index.html#authentication-authorization",
+      "text": "Session-based authentication with JWT API support Role-Based Access Control (RBAC) with granular permissions Two-Factor Authentication (2FA) with email OTP User account management with active/inactive status",
+      "title": "\ud83d\udd10 Authentication &amp; Authorization"
+    },
+    {
+      "location": "index.html#enterprise-monitoring",
+      "text": "Comprehensive activity logging system Redis-based caching with performance metrics RabbitMQ job queue monitoring OpenTelemetry integration for observability",
+      "title": "\ud83d\udcca Enterprise Monitoring"
+    },
+    {
+      "location": "index.html#performance-scalability",
+      "text": "Connection pool optimization for MySQL Automatic response compression (Brotli + Gzip) Rate limiting with multiple tiers Circuit breaker pattern for external services",
+      "title": "\ud83d\ude80 Performance &amp; Scalability"
+    },
+    {
+      "location": "index.html#security-protection",
+      "text": "CSRF protection with Laravel-style token handling Multi-layer bot protection Advanced rate limiting Sensitive data masking in logs",
+      "title": "\ud83d\udee1\ufe0f Security &amp; Protection"
+    },
+    {
+      "location": "index.html#file-management",
+      "text": "S3-compatible file storage (AWS S3, Cloudflare R2, DigitalOcean Spaces) Excel file processing and template generation Bulk user import/export capabilities",
+      "title": "\ud83d\udcc1 File Management"
+    },
+    {
+      "location": "index.html#technology-stack",
+      "text": "Backend : Node.js with Express.js framework Database : MySQL with Knex.js query builder Templating : Nunjucks with Bootstrap + Alpine.js Caching : Redis with intelligent fallback Queue : RabbitMQ for background job processing Storage : S3-compatible cloud storage Monitoring : OpenTelemetry with custom metrics",
+      "title": "Technology Stack"
+    },
+    {
+      "location": "index.html#getting-help",
+      "text": "If you need assistance with Omniflow-Starter: Check the relevant documentation section Review the CLAUDE.md file for development guidance Look at the example files in the project Check the configuration validation messages for setup issues Start with the Getting Started guide to begin your journey with Omniflow-Starter!",
+      "title": "Getting Help"
+    },
+    { "location": "api.html", "text": "", "title": "Api" },
+    {
+      "location": "architecture.html",
+      "text": "Architecture \u00b6 Omniflow-Starter follows a modular, layered architecture designed for scalability, maintainability, and enterprise-grade features. Project Structure \u00b6 \u251c\u2500\u2500 server.js # Application entry point \u251c\u2500\u2500 app.js # Express configuration \u251c\u2500\u2500 instrument.js # OpenTelemetry monitoring \u251c\u2500\u2500 config/ # Configuration management \u251c\u2500\u2500 db/ # Database layer \u251c\u2500\u2500 routes/ # Route handlers \u251c\u2500\u2500 controllers/ # Business logic \u251c\u2500\u2500 middlewares/ # Express middlewares \u251c\u2500\u2500 helpers/ # Utility functions \u251c\u2500\u2500 views/ # Nunjucks templates \u251c\u2500\u2500 public/ # Static files \u2514\u2500\u2500 workers/ # Background job processors Module Aliases \u00b6 Clean import paths using module-alias : // Instead of relative paths const { db } = require ( \"../../../db/db\" ); // Use aliases const { db } = require ( \"@db/db\" ); Available aliases: - @ - Project root - @config - Configuration files - @db - Database files - @helpers - Helper utilities - @middlewares - Express middlewares - @routes - Route handlers - @views - Nunjucks templates - @public - Static files Application Layers \u00b6 Entry Layer \u00b6 server.js - Server startup and graceful shutdown app.js - Express app configuration and middleware setup instrument.js - OpenTelemetry initialization Configuration Layer \u00b6 config/index.js - Centralized configuration config/development.js - Development overrides config/production.js - Production overrides config/validation.js - Environment validation Database Layer \u00b6 db/db.js - MySQL connection pool management db/redis.js - Redis caching client db/migrations/ - Database schema versions db/seeders/ - Development data population Route Layer \u00b6 routes/admin/ - Admin web interface routes routes/api/ - REST API endpoints routes/client/ - Public client routes Controller Layer \u00b6 controllers/admin/ - Admin business logic controllers/api/ - API business logic Follows single responsibility principle Middleware Layer \u00b6 middlewares/errorHandler.js - Centralized error handling middlewares/auth.js - Authentication & authorization middlewares/rateLimiter.js - Rate limiting protection middlewares/botProtection.js - Anti-bot security middlewares/csrfProtection.js - CSRF token validation Helper Layer \u00b6 helpers/log.js - Activity logging system helpers/cache.js - Redis caching utilities helpers/queue.js - RabbitMQ job queue helpers/beepbot.js - Critical alerting system View Layer \u00b6 views/layouts/ - Nunjucks layout templates views/pages/ - Page-specific templates views/components/ - Reusable components Worker Layer \u00b6 workers/emailWorker.js - Email job processor workers/testWorker.js - Development job testing workers/workerManager.js - Worker lifecycle management Data Flow \u00b6 Web Request Flow \u00b6 Request \u2192 Rate Limiter \u2192 Bot Protection \u2192 CSRF \u2192 Auth \u2192 Controller \u2192 Response API Request Flow \u00b6 Request \u2192 Rate Limiter \u2192 CORS \u2192 JWT Auth \u2192 Controller \u2192 JSON Response Background Job Flow \u00b6 Job Created \u2192 RabbitMQ Queue \u2192 Worker Process \u2192 Database Update \u2192 Activity Log Cache Flow \u00b6 Request \u2192 Cache Check \u2192 Redis/Database \u2192 Cache Update \u2192 Response Database Design \u00b6 Core Tables \u00b6 users - User accounts with role-based access roles - User role definitions permissions - System permission definitions role_permissions - Role-to-permission mappings user_permissions - User-specific permission overrides activity_logs - Comprehensive audit trail jobs - Background job queue persistence Key Features \u00b6 Connection Pooling - Environment-aware pool sizing Migration System - Knex.js schema versioning Seeder Management - Controlled data population Soft Deletes - Data retention for audit compliance Security Architecture \u00b6 Multi-Layer Protection \u00b6 Rate Limiting - Multi-tier request throttling Bot Protection - Automated threat detection CSRF Protection - Cross-site request forgery prevention Authentication - Session + JWT dual system Authorization - Flexible RBAC + PBAC permissions Data Protection \u00b6 Sensitive Data Masking - Automatic PII protection Request Tracing - UUID-based correlation Activity Logging - Complete audit trail Error Handling - Security-aware error responses Performance Architecture \u00b6 Caching Strategy \u00b6 Redis Layer - High-performance in-memory caching Database Fallback - Graceful degradation Pattern Invalidation - Intelligent cache cleanup TTL Management - Configurable expiration Compression \u00b6 Brotli + Gzip - Dual-algorithm compression Content-Type Aware - Selective compression Streaming Support - Memory-efficient processing Connection Management \u00b6 Database Pooling - Optimized connection reuse Redis Clustering - High-availability support RabbitMQ Persistence - Reliable message delivery Monitoring Architecture \u00b6 Application Monitoring \u00b6 OpenTelemetry - Distributed tracing Activity Logging - Business event tracking Performance Metrics - Response time monitoring Error Tracking - Comprehensive error capture External Alerting \u00b6 BeepBot Integration - Critical failure notifications Jakarta Timezone - Localized timestamps Independent Operation - Works when database is down Scalability Considerations \u00b6 Horizontal Scaling \u00b6 Stateless Design - No server-side state dependencies Session Store - Externalized session management Job Queue - Distributed background processing File Storage - S3-compatible cloud storage Vertical Scaling \u00b6 Connection Pooling - Efficient resource utilization Caching Layers - Reduced database load Compression - Bandwidth optimization Lazy Loading - On-demand resource loading Development Workflow \u00b6 Code Organization \u00b6 Import Standards - Consistent module organization Error Handling - Centralized error management Template Patterns - Reusable component structure Testing Strategy - Manual + automated testing Quality Assurance \u00b6 Biome Linting - Code quality enforcement Environment Validation - Configuration verification Security Scanning - Automated vulnerability detection Performance Monitoring - Real-time metrics tracking",
+      "title": "Architecture"
+    },
+    {
+      "location": "architecture.html#architecture",
+      "text": "Omniflow-Starter follows a modular, layered architecture designed for scalability, maintainability, and enterprise-grade features.",
+      "title": "Architecture"
+    },
+    {
+      "location": "architecture.html#project-structure",
+      "text": "\u251c\u2500\u2500 server.js # Application entry point \u251c\u2500\u2500 app.js # Express configuration \u251c\u2500\u2500 instrument.js # OpenTelemetry monitoring \u251c\u2500\u2500 config/ # Configuration management \u251c\u2500\u2500 db/ # Database layer \u251c\u2500\u2500 routes/ # Route handlers \u251c\u2500\u2500 controllers/ # Business logic \u251c\u2500\u2500 middlewares/ # Express middlewares \u251c\u2500\u2500 helpers/ # Utility functions \u251c\u2500\u2500 views/ # Nunjucks templates \u251c\u2500\u2500 public/ # Static files \u2514\u2500\u2500 workers/ # Background job processors",
+      "title": "Project Structure"
+    },
+    {
+      "location": "architecture.html#module-aliases",
+      "text": "Clean import paths using module-alias : // Instead of relative paths const { db } = require ( \"../../../db/db\" ); // Use aliases const { db } = require ( \"@db/db\" ); Available aliases: - @ - Project root - @config - Configuration files - @db - Database files - @helpers - Helper utilities - @middlewares - Express middlewares - @routes - Route handlers - @views - Nunjucks templates - @public - Static files",
+      "title": "Module Aliases"
+    },
+    {
+      "location": "architecture.html#application-layers",
+      "text": "",
+      "title": "Application Layers"
+    },
+    {
+      "location": "architecture.html#entry-layer",
+      "text": "server.js - Server startup and graceful shutdown app.js - Express app configuration and middleware setup instrument.js - OpenTelemetry initialization",
+      "title": "Entry Layer"
+    },
+    {
+      "location": "architecture.html#configuration-layer",
+      "text": "config/index.js - Centralized configuration config/development.js - Development overrides config/production.js - Production overrides config/validation.js - Environment validation",
+      "title": "Configuration Layer"
+    },
+    {
+      "location": "architecture.html#database-layer",
+      "text": "db/db.js - MySQL connection pool management db/redis.js - Redis caching client db/migrations/ - Database schema versions db/seeders/ - Development data population",
+      "title": "Database Layer"
+    },
+    {
+      "location": "architecture.html#route-layer",
+      "text": "routes/admin/ - Admin web interface routes routes/api/ - REST API endpoints routes/client/ - Public client routes",
+      "title": "Route Layer"
+    },
+    {
+      "location": "architecture.html#controller-layer",
+      "text": "controllers/admin/ - Admin business logic controllers/api/ - API business logic Follows single responsibility principle",
+      "title": "Controller Layer"
+    },
+    {
+      "location": "architecture.html#middleware-layer",
+      "text": "middlewares/errorHandler.js - Centralized error handling middlewares/auth.js - Authentication & authorization middlewares/rateLimiter.js - Rate limiting protection middlewares/botProtection.js - Anti-bot security middlewares/csrfProtection.js - CSRF token validation",
+      "title": "Middleware Layer"
+    },
+    {
+      "location": "architecture.html#helper-layer",
+      "text": "helpers/log.js - Activity logging system helpers/cache.js - Redis caching utilities helpers/queue.js - RabbitMQ job queue helpers/beepbot.js - Critical alerting system",
+      "title": "Helper Layer"
+    },
+    {
+      "location": "architecture.html#view-layer",
+      "text": "views/layouts/ - Nunjucks layout templates views/pages/ - Page-specific templates views/components/ - Reusable components",
+      "title": "View Layer"
+    },
+    {
+      "location": "architecture.html#worker-layer",
+      "text": "workers/emailWorker.js - Email job processor workers/testWorker.js - Development job testing workers/workerManager.js - Worker lifecycle management",
+      "title": "Worker Layer"
+    },
+    {
+      "location": "architecture.html#data-flow",
+      "text": "",
+      "title": "Data Flow"
+    },
+    {
+      "location": "architecture.html#web-request-flow",
+      "text": "Request \u2192 Rate Limiter \u2192 Bot Protection \u2192 CSRF \u2192 Auth \u2192 Controller \u2192 Response",
+      "title": "Web Request Flow"
+    },
+    {
+      "location": "architecture.html#api-request-flow",
+      "text": "Request \u2192 Rate Limiter \u2192 CORS \u2192 JWT Auth \u2192 Controller \u2192 JSON Response",
+      "title": "API Request Flow"
+    },
+    {
+      "location": "architecture.html#background-job-flow",
+      "text": "Job Created \u2192 RabbitMQ Queue \u2192 Worker Process \u2192 Database Update \u2192 Activity Log",
+      "title": "Background Job Flow"
+    },
+    {
+      "location": "architecture.html#cache-flow",
+      "text": "Request \u2192 Cache Check \u2192 Redis/Database \u2192 Cache Update \u2192 Response",
+      "title": "Cache Flow"
+    },
+    {
+      "location": "architecture.html#database-design",
+      "text": "",
+      "title": "Database Design"
+    },
+    {
+      "location": "architecture.html#core-tables",
+      "text": "users - User accounts with role-based access roles - User role definitions permissions - System permission definitions role_permissions - Role-to-permission mappings user_permissions - User-specific permission overrides activity_logs - Comprehensive audit trail jobs - Background job queue persistence",
+      "title": "Core Tables"
+    },
+    {
+      "location": "architecture.html#key-features",
+      "text": "Connection Pooling - Environment-aware pool sizing Migration System - Knex.js schema versioning Seeder Management - Controlled data population Soft Deletes - Data retention for audit compliance",
+      "title": "Key Features"
+    },
+    {
+      "location": "architecture.html#security-architecture",
+      "text": "",
+      "title": "Security Architecture"
+    },
+    {
+      "location": "architecture.html#multi-layer-protection",
+      "text": "Rate Limiting - Multi-tier request throttling Bot Protection - Automated threat detection CSRF Protection - Cross-site request forgery prevention Authentication - Session + JWT dual system Authorization - Flexible RBAC + PBAC permissions",
+      "title": "Multi-Layer Protection"
+    },
+    {
+      "location": "architecture.html#data-protection",
+      "text": "Sensitive Data Masking - Automatic PII protection Request Tracing - UUID-based correlation Activity Logging - Complete audit trail Error Handling - Security-aware error responses",
+      "title": "Data Protection"
+    },
+    {
+      "location": "architecture.html#performance-architecture",
+      "text": "",
+      "title": "Performance Architecture"
+    },
+    {
+      "location": "architecture.html#caching-strategy",
+      "text": "Redis Layer - High-performance in-memory caching Database Fallback - Graceful degradation Pattern Invalidation - Intelligent cache cleanup TTL Management - Configurable expiration",
+      "title": "Caching Strategy"
+    },
+    {
+      "location": "architecture.html#compression",
+      "text": "Brotli + Gzip - Dual-algorithm compression Content-Type Aware - Selective compression Streaming Support - Memory-efficient processing",
+      "title": "Compression"
+    },
+    {
+      "location": "architecture.html#connection-management",
+      "text": "Database Pooling - Optimized connection reuse Redis Clustering - High-availability support RabbitMQ Persistence - Reliable message delivery",
+      "title": "Connection Management"
+    },
+    {
+      "location": "architecture.html#monitoring-architecture",
+      "text": "",
+      "title": "Monitoring Architecture"
+    },
+    {
+      "location": "architecture.html#application-monitoring",
+      "text": "OpenTelemetry - Distributed tracing Activity Logging - Business event tracking Performance Metrics - Response time monitoring Error Tracking - Comprehensive error capture",
+      "title": "Application Monitoring"
+    },
+    {
+      "location": "architecture.html#external-alerting",
+      "text": "BeepBot Integration - Critical failure notifications Jakarta Timezone - Localized timestamps Independent Operation - Works when database is down",
+      "title": "External Alerting"
+    },
+    {
+      "location": "architecture.html#scalability-considerations",
+      "text": "",
+      "title": "Scalability Considerations"
+    },
+    {
+      "location": "architecture.html#horizontal-scaling",
+      "text": "Stateless Design - No server-side state dependencies Session Store - Externalized session management Job Queue - Distributed background processing File Storage - S3-compatible cloud storage",
+      "title": "Horizontal Scaling"
+    },
+    {
+      "location": "architecture.html#vertical-scaling",
+      "text": "Connection Pooling - Efficient resource utilization Caching Layers - Reduced database load Compression - Bandwidth optimization Lazy Loading - On-demand resource loading",
+      "title": "Vertical Scaling"
+    },
+    {
+      "location": "architecture.html#development-workflow",
+      "text": "",
+      "title": "Development Workflow"
+    },
+    {
+      "location": "architecture.html#code-organization",
+      "text": "Import Standards - Consistent module organization Error Handling - Centralized error management Template Patterns - Reusable component structure Testing Strategy - Manual + automated testing",
+      "title": "Code Organization"
+    },
+    {
+      "location": "architecture.html#quality-assurance",
+      "text": "Biome Linting - Code quality enforcement Environment Validation - Configuration verification Security Scanning - Automated vulnerability detection Performance Monitoring - Real-time metrics tracking",
+      "title": "Quality Assurance"
+    },
+    {
+      "location": "configuration.html",
+      "text": "Configuration \u00b6 Omniflow-Starter uses a feature-based configuration system where optional features only require their environment variables when explicitly enabled. Core Configuration \u00b6 These variables are always required: # Database Connection (Required) DB_HOST=localhost DB_USER=root DB_PASSWORD=your_password DB_NAME=omniflow_starter # Session Security (Required) SESSION_KEY=your-very-long-random-secret-key-at-least-32-characters Basic Configuration \u00b6 These have sensible defaults: # Application NODE_ENV=development # Environment: development/production PORT=1234 # Server port APP_URL=http://localhost # Base URL for emails/links # Security CSRF_SECRET=optional # Falls back to SESSION_KEY SESSION_TIMEOUT_HOURS=24 # Session timeout in hours # Timezone TIMEZONE=Asia/Jakarta # Application timezone Optional Features \u00b6 Redis Caching System \u00b6 Enable high-performance caching: REDIS_ENABLED=true # Enable Redis caching REDIS_HOST=127.0.0.1 # Redis server host REDIS_PORT=6379 # Redis server port REDIS_PASSWORD= # Redis password (optional) REDIS_DB=0 # Redis database number RabbitMQ Job Queue System \u00b6 Enable background job processing: RABBITMQ_ENABLED=true # Enable RabbitMQ RABBITMQ_HOST=127.0.0.1 # RabbitMQ server host RABBITMQ_PORT=5672 # RabbitMQ server port RABBITMQ_USER=guest # RabbitMQ username RABBITMQ_PASSWORD=guest # RabbitMQ password # Advanced RabbitMQ Configuration RABBITMQ_MAX_RECONNECT_ATTEMPTS=10 # Max reconnection attempts RABBITMQ_RECONNECT_DELAY=5000 # Reconnection delay (ms) RABBITMQ_QUEUE_DURABLE=true # Queue durability RABBITMQ_MESSAGE_PERSISTENT=true # Message persistence Email Notifications with 2FA \u00b6 Enable email system with two-factor authentication: EMAIL_ENABLED = true # Enable email system SMTP_HOST = smtp . gmail . com # SMTP server host SMTP_PORT = 587 # SMTP server port SMTP_USER = your - email @gmail . com # SMTP username SMTP_PASSWORD = your - app - password # SMTP password ( use app password for Gmail ) # Optional Email Settings SMTP_FROM_NAME = Omniflow System # Default sender name SMTP_FROM_EMAIL = your - email @gmail . com # Default sender email DEV_2FA_BYPASS = true # Bypass 2 FA in development S3 File Storage \u00b6 Enable cloud file storage (supports AWS S3, Cloudflare R2, DigitalOcean Spaces): S3_ENABLED = true # Enable S3 storage S3_ENDPOINT_URL = https : // s3 . amazonaws . com # S3 endpoint URL S3_ACCESS_KEY = your - access - key # S3 access key S3_SECRET_KEY = your - secret - key # S3 secret key S3_BUCKET_NAME = your - bucket - name # S3 bucket name # Optional S3 Settings S3_FOLDER_NAME = uploads # Folder prefix in bucket S3_REGION = us - east - 1 # AWS region (if applicable) JWT API Authentication \u00b6 Enable JWT-based API authentication: JWT_ENABLED=true # Enable JWT authentication JWT_SECRET=your-jwt-secret-key # JWT signing secret # Optional JWT Settings JWT_EXPIRES_IN=1h # Access token expiration JWT_REFRESH_EXPIRES_IN=7d # Refresh token expiration JWT_ALGORITHM=HS256 # JWT signing algorithm OpenTelemetry Monitoring \u00b6 Enable application monitoring and tracing: MONITORING_ENABLED = true # Enable monitoring OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = your - otel - endpoint # OTLP traces endpoint # Optional Monitoring Settings OTEL_SERVICE_NAME = omniflow - starter # Service name OTEL_SERVICE_VERSION = 1.0 . 0 # Service version OTEL_METRICS_PORT = 9091 # Prometheus metrics port OTEL_METRICS_ENDPOINT =/ metrics # Metrics endpoint path BeepBot Critical Notifications \u00b6 Enable external alerting for system failures: BEEPBOT_ENABLED=true # Enable BeepBot notifications BEEPBOT_SECRET=your-beepbot-secret # BeepBot API secret BEEPBOT_CHAT_ID=1185624008 # Telegram chat ID (optional) CORS Configuration \u00b6 Enable CORS for API endpoints: CORS_ENABLED=true # Enable CORS CORS_ORIGIN=* # Allowed origins (comma-separated) CORS_CREDENTIALS=true # Allow credentials CORS_METHODS=GET,HEAD,PUT,PATCH,POST,DELETE # Allowed methods CORS_MAX_AGE=86400 # Preflight cache duration Built-in Features \u00b6 Response Compression \u00b6 These are always available and enabled by default: COMPRESSION_ENABLED=true # Enable/disable compression COMPRESSION_THRESHOLD=1024 # Minimum size to compress (bytes) COMPRESSION_LEVEL=6 # Gzip compression level (1-9) BROTLI_ENABLED=true # Enable Brotli compression BROTLI_QUALITY=4 # Brotli quality level (0-11) Database Connection Pool \u00b6 DB_CONNECTION_LIMIT=10 # Max connections (10 dev, 50 prod) DB_ACQUIRE_TIMEOUT=60000 # Connection acquire timeout (ms) DB_QUERY_TIMEOUT=60000 # Query timeout (ms) Password Policy \u00b6 PASSWORD_MIN_LENGTH=8 # Minimum password length PASSWORD_MAX_LENGTH=128 # Maximum password length PASSWORD_REQUIRE_UPPERCASE=true # Require uppercase letters PASSWORD_REQUIRE_LOWERCASE=true # Require lowercase letters PASSWORD_REQUIRE_NUMBERS=true # Require numbers PASSWORD_REQUIRE_SYMBOLS=true # Require special characters PASSWORD_MAX_REPEATING=3 # Max consecutive identical chars Environment-Specific Overrides \u00b6 Development \u00b6 Debug logging enabled HTTPS not required for cookies Seeding allowed Production \u00b6 Secure cookies enabled HTTPS required Seeding disabled for safety Configuration Validation \u00b6 The application validates all environment variables at startup: Core variables are always checked Feature variables are only validated when enabled Helpful error messages guide you to fix configuration issues Example validation output: \ud83d\udd27 [ CONFIG ] Enabled optional features : \u2022 Redis caching ( REDIS_ENABLED = true ) \u2022 Email notifications ( EMAIL_ENABLED = true ) \u2705 [ CONFIG ] Validation passed ( 2 optional features enabled )",
+      "title": "Configuration"
+    },
+    {
+      "location": "configuration.html#configuration",
+      "text": "Omniflow-Starter uses a feature-based configuration system where optional features only require their environment variables when explicitly enabled.",
+      "title": "Configuration"
+    },
+    {
+      "location": "configuration.html#core-configuration",
+      "text": "These variables are always required: # Database Connection (Required) DB_HOST=localhost DB_USER=root DB_PASSWORD=your_password DB_NAME=omniflow_starter # Session Security (Required) SESSION_KEY=your-very-long-random-secret-key-at-least-32-characters",
+      "title": "Core Configuration"
+    },
+    {
+      "location": "configuration.html#basic-configuration",
+      "text": "These have sensible defaults: # Application NODE_ENV=development # Environment: development/production PORT=1234 # Server port APP_URL=http://localhost # Base URL for emails/links # Security CSRF_SECRET=optional # Falls back to SESSION_KEY SESSION_TIMEOUT_HOURS=24 # Session timeout in hours # Timezone TIMEZONE=Asia/Jakarta # Application timezone",
+      "title": "Basic Configuration"
+    },
+    {
+      "location": "configuration.html#optional-features",
+      "text": "",
+      "title": "Optional Features"
+    },
+    {
+      "location": "configuration.html#redis-caching-system",
+      "text": "Enable high-performance caching: REDIS_ENABLED=true # Enable Redis caching REDIS_HOST=127.0.0.1 # Redis server host REDIS_PORT=6379 # Redis server port REDIS_PASSWORD= # Redis password (optional) REDIS_DB=0 # Redis database number",
+      "title": "Redis Caching System"
+    },
+    {
+      "location": "configuration.html#rabbitmq-job-queue-system",
+      "text": "Enable background job processing: RABBITMQ_ENABLED=true # Enable RabbitMQ RABBITMQ_HOST=127.0.0.1 # RabbitMQ server host RABBITMQ_PORT=5672 # RabbitMQ server port RABBITMQ_USER=guest # RabbitMQ username RABBITMQ_PASSWORD=guest # RabbitMQ password # Advanced RabbitMQ Configuration RABBITMQ_MAX_RECONNECT_ATTEMPTS=10 # Max reconnection attempts RABBITMQ_RECONNECT_DELAY=5000 # Reconnection delay (ms) RABBITMQ_QUEUE_DURABLE=true # Queue durability RABBITMQ_MESSAGE_PERSISTENT=true # Message persistence",
+      "title": "RabbitMQ Job Queue System"
+    },
+    {
+      "location": "configuration.html#email-notifications-with-2fa",
+      "text": "Enable email system with two-factor authentication: EMAIL_ENABLED = true # Enable email system SMTP_HOST = smtp . gmail . com # SMTP server host SMTP_PORT = 587 # SMTP server port SMTP_USER = your - email @gmail . com # SMTP username SMTP_PASSWORD = your - app - password # SMTP password ( use app password for Gmail ) # Optional Email Settings SMTP_FROM_NAME = Omniflow System # Default sender name SMTP_FROM_EMAIL = your - email @gmail . com # Default sender email DEV_2FA_BYPASS = true # Bypass 2 FA in development",
+      "title": "Email Notifications with 2FA"
+    },
+    {
+      "location": "configuration.html#s3-file-storage",
+      "text": "Enable cloud file storage (supports AWS S3, Cloudflare R2, DigitalOcean Spaces): S3_ENABLED = true # Enable S3 storage S3_ENDPOINT_URL = https : // s3 . amazonaws . com # S3 endpoint URL S3_ACCESS_KEY = your - access - key # S3 access key S3_SECRET_KEY = your - secret - key # S3 secret key S3_BUCKET_NAME = your - bucket - name # S3 bucket name # Optional S3 Settings S3_FOLDER_NAME = uploads # Folder prefix in bucket S3_REGION = us - east - 1 # AWS region (if applicable)",
+      "title": "S3 File Storage"
+    },
+    {
+      "location": "configuration.html#jwt-api-authentication",
+      "text": "Enable JWT-based API authentication: JWT_ENABLED=true # Enable JWT authentication JWT_SECRET=your-jwt-secret-key # JWT signing secret # Optional JWT Settings JWT_EXPIRES_IN=1h # Access token expiration JWT_REFRESH_EXPIRES_IN=7d # Refresh token expiration JWT_ALGORITHM=HS256 # JWT signing algorithm",
+      "title": "JWT API Authentication"
+    },
+    {
+      "location": "configuration.html#opentelemetry-monitoring",
+      "text": "Enable application monitoring and tracing: MONITORING_ENABLED = true # Enable monitoring OTEL_EXPORTER_OTLP_TRACES_ENDPOINT = your - otel - endpoint # OTLP traces endpoint # Optional Monitoring Settings OTEL_SERVICE_NAME = omniflow - starter # Service name OTEL_SERVICE_VERSION = 1.0 . 0 # Service version OTEL_METRICS_PORT = 9091 # Prometheus metrics port OTEL_METRICS_ENDPOINT =/ metrics # Metrics endpoint path",
+      "title": "OpenTelemetry Monitoring"
+    },
+    {
+      "location": "configuration.html#beepbot-critical-notifications",
+      "text": "Enable external alerting for system failures: BEEPBOT_ENABLED=true # Enable BeepBot notifications BEEPBOT_SECRET=your-beepbot-secret # BeepBot API secret BEEPBOT_CHAT_ID=1185624008 # Telegram chat ID (optional)",
+      "title": "BeepBot Critical Notifications"
+    },
+    {
+      "location": "configuration.html#cors-configuration",
+      "text": "Enable CORS for API endpoints: CORS_ENABLED=true # Enable CORS CORS_ORIGIN=* # Allowed origins (comma-separated) CORS_CREDENTIALS=true # Allow credentials CORS_METHODS=GET,HEAD,PUT,PATCH,POST,DELETE # Allowed methods CORS_MAX_AGE=86400 # Preflight cache duration",
+      "title": "CORS Configuration"
+    },
+    {
+      "location": "configuration.html#built-in-features",
+      "text": "",
+      "title": "Built-in Features"
+    },
+    {
+      "location": "configuration.html#response-compression",
+      "text": "These are always available and enabled by default: COMPRESSION_ENABLED=true # Enable/disable compression COMPRESSION_THRESHOLD=1024 # Minimum size to compress (bytes) COMPRESSION_LEVEL=6 # Gzip compression level (1-9) BROTLI_ENABLED=true # Enable Brotli compression BROTLI_QUALITY=4 # Brotli quality level (0-11)",
+      "title": "Response Compression"
+    },
+    {
+      "location": "configuration.html#database-connection-pool",
+      "text": "DB_CONNECTION_LIMIT=10 # Max connections (10 dev, 50 prod) DB_ACQUIRE_TIMEOUT=60000 # Connection acquire timeout (ms) DB_QUERY_TIMEOUT=60000 # Query timeout (ms)",
+      "title": "Database Connection Pool"
+    },
+    {
+      "location": "configuration.html#password-policy",
+      "text": "PASSWORD_MIN_LENGTH=8 # Minimum password length PASSWORD_MAX_LENGTH=128 # Maximum password length PASSWORD_REQUIRE_UPPERCASE=true # Require uppercase letters PASSWORD_REQUIRE_LOWERCASE=true # Require lowercase letters PASSWORD_REQUIRE_NUMBERS=true # Require numbers PASSWORD_REQUIRE_SYMBOLS=true # Require special characters PASSWORD_MAX_REPEATING=3 # Max consecutive identical chars",
+      "title": "Password Policy"
+    },
+    {
+      "location": "configuration.html#environment-specific-overrides",
+      "text": "",
+      "title": "Environment-Specific Overrides"
+    },
+    {
+      "location": "configuration.html#development",
+      "text": "Debug logging enabled HTTPS not required for cookies Seeding allowed",
+      "title": "Development"
+    },
+    {
+      "location": "configuration.html#production",
+      "text": "Secure cookies enabled HTTPS required Seeding disabled for safety",
+      "title": "Production"
+    },
+    {
+      "location": "configuration.html#configuration-validation",
+      "text": "The application validates all environment variables at startup: Core variables are always checked Feature variables are only validated when enabled Helpful error messages guide you to fix configuration issues Example validation output: \ud83d\udd27 [ CONFIG ] Enabled optional features : \u2022 Redis caching ( REDIS_ENABLED = true ) \u2022 Email notifications ( EMAIL_ENABLED = true ) \u2705 [ CONFIG ] Validation passed ( 2 optional features enabled )",
+      "title": "Configuration Validation"
+    },
+    {
+      "location": "features.html",
+      "text": "Omniflow-Starter Documentation \u00b6 Node.js ERP Module Starter Pack with Express.js, MySQL, and Nunjucks Overview \u00b6 Omniflow-Starter is a production-ready ERP starter pack built with Express.js, MySQL, and Nunjucks templating. It provides comprehensive user management, flexible permission system, enterprise-grade activity logging, and modular architecture for rapid development. Quick Start \u00b6 npm install cp .env.example .env # Configure database and session key npm run dev Server runs on port 1234 (or PORT env var) Development Commands \u00b6 Start server : npm start or npm run dev Code formatting : npm run format (Biome formatter + linter with auto-fix) Code linting : npm run lint (Biome linter check only) No build process - static files served directly from public/ Key Features \u00b6 \ud83d\udd10 Authentication & Security \u00b6 Session-based authentication with 24-hour timeout 2FA Email OTP System with non-blocking queue-based delivery JWT Authentication for API endpoints Flexible Permission Override System (PBAC + RBAC) Multi-tier rate limiting and bot protection CSRF protection with Laravel-style implementation \ud83d\udcca Activity Logging \u00b6 Enterprise-Grade Activity Logging System Comprehensive audit trail with metadata capture Sensitive data masking (PII protection) Request tracing with UUID correlation Performance monitoring integration \u26a1 Performance & Caching \u00b6 Redis Caching System with database fallback Pattern-based cache invalidation Response compression (Brotli + Gzip) Database connection pooling optimization \ud83d\udc30 Job Queue System \u00b6 RabbitMQ Job Queue System with circuit breaker Dead letter queue handling Admin management interface Background job processing \ud83d\udcc1 File Processing \u00b6 Excel operations with dynamic template generation S3 upload helper with multi-provider support Multer integration with file type validation \ud83d\udea8 Monitoring & Alerts \u00b6 BeepBot Critical Notification System OpenTelemetry monitoring integration External alerting for system failures Architecture \u00b6 Entry Points \u00b6 server.js - Server startup app.js - Express configuration and middleware setup instrument.js - OpenTelemetry monitoring initialization Database Layer \u00b6 MySQL with optimized connection pooling Environment-aware pool sizing and monitoring Knex.js integration for migrations and seeding Main tables: users and activity_logs Module Aliases \u00b6 The project uses module-alias for cleaner import paths: const { db } = require ( \"@db/db\" ); const { log } = require ( \"@helpers/log\" ); const { asyncHandler } = require ( \"@middlewares/errorHandler\" ); Available aliases: @ - Project root @config - Configuration files @db - Database files @helpers - Helper utilities @middlewares - Express middlewares @routes - Route handlers @views - Nunjucks templates @public - Static files Route Structure \u00b6 Public : / (client landing) Admin Web : /admin/* (dashboard, user management) User Management : /admin/user/* (CRUD, Excel import/export) Activity Logs : /admin/log/* (view logs, export) Cache Management : /admin/cache/* (cache operations) Queue Management : /admin/queue/* (job monitoring) API Endpoints : /api/* (JWT-based, JSON responses) Feature Toggle System \u00b6 All advanced features are optional and environment-based: # Core features ( always enabled ) DB_HOST = localhost SESSION_KEY = your - secret - key # Optional : Redis caching system REDIS_ENABLED = true REDIS_HOST = localhost # Optional : RabbitMQ job queue RABBITMQ_ENABLED = true RABBITMQ_HOST = localhost # Optional : Email notifications with 2 FA OTP EMAIL_ENABLED = true SMTP_HOST = smtp . gmail . com # Optional : S3 file storage S3_ENABLED = true S3_ENDPOINT_URL = your - s3 - endpoint Default Users \u00b6 After running database seeds: admin@omniflow.id / Admin12345. manager@omniflow.id / Manager12345. user@omniflow.id / User12345. License \u00b6 MIT",
+      "title": "Omniflow-Starter Documentation"
+    },
+    {
+      "location": "features.html#omniflow-starter-documentation",
+      "text": "Node.js ERP Module Starter Pack with Express.js, MySQL, and Nunjucks",
+      "title": "Omniflow-Starter Documentation"
+    },
+    {
+      "location": "features.html#overview",
+      "text": "Omniflow-Starter is a production-ready ERP starter pack built with Express.js, MySQL, and Nunjucks templating. It provides comprehensive user management, flexible permission system, enterprise-grade activity logging, and modular architecture for rapid development.",
+      "title": "Overview"
+    },
+    {
+      "location": "features.html#quick-start",
+      "text": "npm install cp .env.example .env # Configure database and session key npm run dev Server runs on port 1234 (or PORT env var)",
+      "title": "Quick Start"
+    },
+    {
+      "location": "features.html#development-commands",
+      "text": "Start server : npm start or npm run dev Code formatting : npm run format (Biome formatter + linter with auto-fix) Code linting : npm run lint (Biome linter check only) No build process - static files served directly from public/",
+      "title": "Development Commands"
+    },
+    {
+      "location": "features.html#key-features",
+      "text": "",
+      "title": "Key Features"
+    },
+    {
+      "location": "features.html#authentication-security",
+      "text": "Session-based authentication with 24-hour timeout 2FA Email OTP System with non-blocking queue-based delivery JWT Authentication for API endpoints Flexible Permission Override System (PBAC + RBAC) Multi-tier rate limiting and bot protection CSRF protection with Laravel-style implementation",
+      "title": "\ud83d\udd10 Authentication &amp; Security"
+    },
+    {
+      "location": "features.html#activity-logging",
+      "text": "Enterprise-Grade Activity Logging System Comprehensive audit trail with metadata capture Sensitive data masking (PII protection) Request tracing with UUID correlation Performance monitoring integration",
+      "title": "\ud83d\udcca Activity Logging"
+    },
+    {
+      "location": "features.html#performance-caching",
+      "text": "Redis Caching System with database fallback Pattern-based cache invalidation Response compression (Brotli + Gzip) Database connection pooling optimization",
+      "title": "\u26a1 Performance &amp; Caching"
+    },
+    {
+      "location": "features.html#job-queue-system",
+      "text": "RabbitMQ Job Queue System with circuit breaker Dead letter queue handling Admin management interface Background job processing",
+      "title": "\ud83d\udc30 Job Queue System"
+    },
+    {
+      "location": "features.html#file-processing",
+      "text": "Excel operations with dynamic template generation S3 upload helper with multi-provider support Multer integration with file type validation",
+      "title": "\ud83d\udcc1 File Processing"
+    },
+    {
+      "location": "features.html#monitoring-alerts",
+      "text": "BeepBot Critical Notification System OpenTelemetry monitoring integration External alerting for system failures",
+      "title": "\ud83d\udea8 Monitoring &amp; Alerts"
+    },
+    {
+      "location": "features.html#architecture",
+      "text": "",
+      "title": "Architecture"
+    },
+    {
+      "location": "features.html#entry-points",
+      "text": "server.js - Server startup app.js - Express configuration and middleware setup instrument.js - OpenTelemetry monitoring initialization",
+      "title": "Entry Points"
+    },
+    {
+      "location": "features.html#database-layer",
+      "text": "MySQL with optimized connection pooling Environment-aware pool sizing and monitoring Knex.js integration for migrations and seeding Main tables: users and activity_logs",
+      "title": "Database Layer"
+    },
+    {
+      "location": "features.html#module-aliases",
+      "text": "The project uses module-alias for cleaner import paths: const { db } = require ( \"@db/db\" ); const { log } = require ( \"@helpers/log\" ); const { asyncHandler } = require ( \"@middlewares/errorHandler\" ); Available aliases: @ - Project root @config - Configuration files @db - Database files @helpers - Helper utilities @middlewares - Express middlewares @routes - Route handlers @views - Nunjucks templates @public - Static files",
+      "title": "Module Aliases"
+    },
+    {
+      "location": "features.html#route-structure",
+      "text": "Public : / (client landing) Admin Web : /admin/* (dashboard, user management) User Management : /admin/user/* (CRUD, Excel import/export) Activity Logs : /admin/log/* (view logs, export) Cache Management : /admin/cache/* (cache operations) Queue Management : /admin/queue/* (job monitoring) API Endpoints : /api/* (JWT-based, JSON responses)",
+      "title": "Route Structure"
+    },
+    {
+      "location": "features.html#feature-toggle-system",
+      "text": "All advanced features are optional and environment-based: # Core features ( always enabled ) DB_HOST = localhost SESSION_KEY = your - secret - key # Optional : Redis caching system REDIS_ENABLED = true REDIS_HOST = localhost # Optional : RabbitMQ job queue RABBITMQ_ENABLED = true RABBITMQ_HOST = localhost # Optional : Email notifications with 2 FA OTP EMAIL_ENABLED = true SMTP_HOST = smtp . gmail . com # Optional : S3 file storage S3_ENABLED = true S3_ENDPOINT_URL = your - s3 - endpoint",
+      "title": "Feature Toggle System"
+    },
+    {
+      "location": "features.html#default-users",
+      "text": "After running database seeds: admin@omniflow.id / Admin12345. manager@omniflow.id / Manager12345. user@omniflow.id / User12345.",
+      "title": "Default Users"
+    },
+    { "location": "features.html#license", "text": "MIT", "title": "License" },
+    {
+      "location": "getting-started.html",
+      "text": "Getting Started \u00b6 This guide will help you set up and run Omniflow-Starter on your local development environment. Prerequisites \u00b6 Node.js 16+ MySQL 5.7+ or 8.0+ npm or yarn Installation \u00b6 Clone the repository bash git clone <repository-url> cd omniflow-starter Install dependencies bash npm install Environment configuration bash cp .env.example .env Configure your .env file ```env # Database (Required) DB_HOST=localhost DB_USER=root DB_PASSWORD=your_password DB_NAME=omniflow_starter # Session (Required) SESSION_KEY=your-very-long-random-secret-key # Application NODE_ENV=development PORT=1234 ``` Create database sql CREATE DATABASE omniflow_starter; Run database migrations bash npx knex migrate:latest Seed the database (optional for development) bash npx knex seed:run Start the development server bash npm run dev The application will be available at http://localhost:1234 Default Login Credentials \u00b6 After running the seeder, you can login with these accounts: Admin : admin@omniflow.id / Admin12345. Manager : manager@omniflow.id / Manager12345. User : user@omniflow.id / User12345. Optional Features Setup \u00b6 Redis Caching \u00b6 REDIS_ENABLED=true REDIS_HOST=localhost REDIS_PORT=6379 RabbitMQ Job Queue \u00b6 RABBITMQ_ENABLED=true RABBITMQ_HOST=localhost RABBITMQ_PORT=5672 RABBITMQ_USER=guest RABBITMQ_PASSWORD=guest Email Notifications \u00b6 EMAIL_ENABLED = true SMTP_HOST = smtp . gmail . com SMTP_PORT = 587 SMTP_USER = your - email @gmail . com SMTP_PASSWORD = your - app - password DEV_2FA_BYPASS = true S3 File Storage \u00b6 S3_ENABLED = true S3_ENDPOINT_URL = https : // s3 . amazonaws . com S3_ACCESS_KEY = your - access - key S3_SECRET_KEY = your - secret - key S3_BUCKET_NAME = your - bucket Development Workflow \u00b6 Code formatting : npm run format Code linting : npm run lint Database migrations : npx knex migrate:make migration_name Database rollback : npx knex migrate:rollback Common Issues \u00b6 Database Connection Error \u00b6 Check MySQL is running Verify database credentials in .env Ensure database exists Port Already in Use \u00b6 Change PORT in .env file Or kill the process using the port Session Issues \u00b6 Ensure SESSION_KEY is set in .env Clear browser cookies and restart server Next Steps \u00b6 Explore the API Documentation Learn about Configuration Check out Architecture",
+      "title": "Getting Started"
+    },
+    {
+      "location": "getting-started.html#getting-started",
+      "text": "This guide will help you set up and run Omniflow-Starter on your local development environment.",
+      "title": "Getting Started"
+    },
+    {
+      "location": "getting-started.html#prerequisites",
+      "text": "Node.js 16+ MySQL 5.7+ or 8.0+ npm or yarn",
+      "title": "Prerequisites"
+    },
+    {
+      "location": "getting-started.html#installation",
+      "text": "Clone the repository bash git clone <repository-url> cd omniflow-starter Install dependencies bash npm install Environment configuration bash cp .env.example .env Configure your .env file ```env # Database (Required) DB_HOST=localhost DB_USER=root DB_PASSWORD=your_password DB_NAME=omniflow_starter # Session (Required) SESSION_KEY=your-very-long-random-secret-key # Application NODE_ENV=development PORT=1234 ``` Create database sql CREATE DATABASE omniflow_starter; Run database migrations bash npx knex migrate:latest Seed the database (optional for development) bash npx knex seed:run Start the development server bash npm run dev The application will be available at http://localhost:1234",
+      "title": "Installation"
+    },
+    {
+      "location": "getting-started.html#default-login-credentials",
+      "text": "After running the seeder, you can login with these accounts: Admin : admin@omniflow.id / Admin12345. Manager : manager@omniflow.id / Manager12345. User : user@omniflow.id / User12345.",
+      "title": "Default Login Credentials"
+    },
+    {
+      "location": "getting-started.html#optional-features-setup",
+      "text": "",
+      "title": "Optional Features Setup"
+    },
+    {
+      "location": "getting-started.html#redis-caching",
+      "text": "REDIS_ENABLED=true REDIS_HOST=localhost REDIS_PORT=6379",
+      "title": "Redis Caching"
+    },
+    {
+      "location": "getting-started.html#rabbitmq-job-queue",
+      "text": "RABBITMQ_ENABLED=true RABBITMQ_HOST=localhost RABBITMQ_PORT=5672 RABBITMQ_USER=guest RABBITMQ_PASSWORD=guest",
+      "title": "RabbitMQ Job Queue"
+    },
+    {
+      "location": "getting-started.html#email-notifications",
+      "text": "EMAIL_ENABLED = true SMTP_HOST = smtp . gmail . com SMTP_PORT = 587 SMTP_USER = your - email @gmail . com SMTP_PASSWORD = your - app - password DEV_2FA_BYPASS = true",
+      "title": "Email Notifications"
+    },
+    {
+      "location": "getting-started.html#s3-file-storage",
+      "text": "S3_ENABLED = true S3_ENDPOINT_URL = https : // s3 . amazonaws . com S3_ACCESS_KEY = your - access - key S3_SECRET_KEY = your - secret - key S3_BUCKET_NAME = your - bucket",
+      "title": "S3 File Storage"
+    },
+    {
+      "location": "getting-started.html#development-workflow",
+      "text": "Code formatting : npm run format Code linting : npm run lint Database migrations : npx knex migrate:make migration_name Database rollback : npx knex migrate:rollback",
+      "title": "Development Workflow"
+    },
+    {
+      "location": "getting-started.html#common-issues",
+      "text": "",
+      "title": "Common Issues"
+    },
+    {
+      "location": "getting-started.html#database-connection-error",
+      "text": "Check MySQL is running Verify database credentials in .env Ensure database exists",
+      "title": "Database Connection Error"
+    },
+    {
+      "location": "getting-started.html#port-already-in-use",
+      "text": "Change PORT in .env file Or kill the process using the port",
+      "title": "Port Already in Use"
+    },
+    {
+      "location": "getting-started.html#session-issues",
+      "text": "Ensure SESSION_KEY is set in .env Clear browser cookies and restart server",
+      "title": "Session Issues"
+    },
+    {
+      "location": "getting-started.html#next-steps",
+      "text": "Explore the API Documentation Learn about Configuration Check out Architecture",
+      "title": "Next Steps"
+    }
+  ]
+}

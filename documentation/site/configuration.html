@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <link rel="canonical" href="http://localhost:1234/docs/configuration.html">
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <title>Configuration - Omniflow-Starter Documentation</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/fontawesome.min.css" rel="stylesheet">
+        <link href="css/brands.min.css" rel="stylesheet">
+        <link href="css/solid.min.css" rel="stylesheet">
+        <link href="css/v4-font-face.min.css" rel="stylesheet">
+        <link href="css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/sql.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">Omniflow-Starter Documentation</a>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#configuration" class="nav-link">Configuration</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#core-configuration" class="nav-link">Core Configuration</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#basic-configuration" class="nav-link">Basic Configuration</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#optional-features" class="nav-link">Optional Features</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#built-in-features" class="nav-link">Built-in Features</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#environment-specific-overrides" class="nav-link">Environment-Specific Overrides</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#configuration-validation" class="nav-link">Configuration Validation</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h1>
+<p>Omniflow-Starter uses a feature-based configuration system where optional features only require their environment variables when explicitly enabled.</p>
+<h2 id="core-configuration">Core Configuration<a class="headerlink" href="#core-configuration" title="Permanent link">&para;</a></h2>
+<p>These variables are always required:</p>
+<div class="codehilite"><pre><span></span><code><span class="gh">#</span> Database Connection (Required)
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=your_password
+DB_NAME=omniflow_starter
+
+<span class="gh">#</span> Session Security (Required)
+SESSION_KEY=your-very-long-random-secret-key-at-least-32-characters
+</code></pre></div>
+
+<h2 id="basic-configuration">Basic Configuration<a class="headerlink" href="#basic-configuration" title="Permanent link">&para;</a></h2>
+<p>These have sensible defaults:</p>
+<div class="codehilite"><pre><span></span><code><span class="gh">#</span> Application
+NODE_ENV=development          # Environment: development/production
+PORT=1234                    # Server port
+APP_URL=http://localhost     # Base URL for emails/links
+
+<span class="gh">#</span> Security
+CSRF_SECRET=optional         # Falls back to SESSION_KEY
+SESSION_TIMEOUT_HOURS=24     # Session timeout in hours
+
+<span class="gh">#</span> Timezone
+TIMEZONE=Asia/Jakarta        # Application timezone
+</code></pre></div>
+
+<h2 id="optional-features">Optional Features<a class="headerlink" href="#optional-features" title="Permanent link">&para;</a></h2>
+<h3 id="redis-caching-system">Redis Caching System<a class="headerlink" href="#redis-caching-system" title="Permanent link">&para;</a></h3>
+<p>Enable high-performance caching:</p>
+<div class="codehilite"><pre><span></span><code>REDIS_ENABLED=true           # Enable Redis caching
+REDIS_HOST=127.0.0.1        # Redis server host
+REDIS_PORT=6379             # Redis server port
+REDIS_PASSWORD=             # Redis password (optional)
+REDIS_DB=0                  # Redis database number
+</code></pre></div>
+
+<h3 id="rabbitmq-job-queue-system">RabbitMQ Job Queue System<a class="headerlink" href="#rabbitmq-job-queue-system" title="Permanent link">&para;</a></h3>
+<p>Enable background job processing:</p>
+<div class="codehilite"><pre><span></span><code>RABBITMQ_ENABLED=true                    # Enable RabbitMQ
+RABBITMQ_HOST=127.0.0.1                 # RabbitMQ server host
+RABBITMQ_PORT=5672                      # RabbitMQ server port
+RABBITMQ_USER=guest                     # RabbitMQ username
+RABBITMQ_PASSWORD=guest                 # RabbitMQ password
+
+<span class="gh">#</span> Advanced RabbitMQ Configuration
+RABBITMQ_MAX_RECONNECT_ATTEMPTS=10      # Max reconnection attempts
+RABBITMQ_RECONNECT_DELAY=5000           # Reconnection delay (ms)
+RABBITMQ_QUEUE_DURABLE=true             # Queue durability
+RABBITMQ_MESSAGE_PERSISTENT=true        # Message persistence
+</code></pre></div>
+
+<h3 id="email-notifications-with-2fa">Email Notifications with 2FA<a class="headerlink" href="#email-notifications-with-2fa" title="Permanent link">&para;</a></h3>
+<p>Enable email system with two-factor authentication:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">EMAIL_ENABLED</span><span class="o">=</span><span class="k">true</span><span class="w">                      </span><span class="err">#</span><span class="w"> </span><span class="n">Enable</span><span class="w"> </span><span class="n">email</span><span class="w"> </span><span class="k">system</span>
+<span class="n">SMTP_HOST</span><span class="o">=</span><span class="n">smtp</span><span class="p">.</span><span class="n">gmail</span><span class="p">.</span><span class="n">com</span><span class="w">               </span><span class="err">#</span><span class="w"> </span><span class="n">SMTP</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="k">host</span>
+<span class="n">SMTP_PORT</span><span class="o">=</span><span class="mi">587</span><span class="w">                          </span><span class="err">#</span><span class="w"> </span><span class="n">SMTP</span><span class="w"> </span><span class="n">server</span><span class="w"> </span><span class="n">port</span>
+<span class="n">SMTP_USER</span><span class="o">=</span><span class="n">your</span><span class="o">-</span><span class="n">email</span><span class="nv">@gmail</span><span class="p">.</span><span class="n">com</span><span class="w">         </span><span class="err">#</span><span class="w"> </span><span class="n">SMTP</span><span class="w"> </span><span class="n">username</span>
+<span class="n">SMTP_PASSWORD</span><span class="o">=</span><span class="n">your</span><span class="o">-</span><span class="n">app</span><span class="o">-</span><span class="n">password</span><span class="w">        </span><span class="err">#</span><span class="w"> </span><span class="n">SMTP</span><span class="w"> </span><span class="n">password</span><span class="w"> </span><span class="p">(</span><span class="k">use</span><span class="w"> </span><span class="n">app</span><span class="w"> </span><span class="n">password</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Gmail</span><span class="p">)</span>
+
+<span class="err">#</span><span class="w"> </span><span class="n">Optional</span><span class="w"> </span><span class="n">Email</span><span class="w"> </span><span class="n">Settings</span>
+<span class="n">SMTP_FROM_NAME</span><span class="o">=</span><span class="n">Omniflow</span><span class="w"> </span><span class="k">System</span><span class="w">         </span><span class="err">#</span><span class="w"> </span><span class="k">Default</span><span class="w"> </span><span class="n">sender</span><span class="w"> </span><span class="n">name</span>
+<span class="n">SMTP_FROM_EMAIL</span><span class="o">=</span><span class="n">your</span><span class="o">-</span><span class="n">email</span><span class="nv">@gmail</span><span class="p">.</span><span class="n">com</span><span class="w">   </span><span class="err">#</span><span class="w"> </span><span class="k">Default</span><span class="w"> </span><span class="n">sender</span><span class="w"> </span><span class="n">email</span>
+<span class="n">DEV_2FA_BYPASS</span><span class="o">=</span><span class="k">true</span><span class="w">                    </span><span class="err">#</span><span class="w"> </span><span class="n">Bypass</span><span class="w"> </span><span class="mi">2</span><span class="n">FA</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">development</span>
+</code></pre></div>
+
+<h3 id="s3-file-storage">S3 File Storage<a class="headerlink" href="#s3-file-storage" title="Permanent link">&para;</a></h3>
+<p>Enable cloud file storage (supports AWS S3, Cloudflare R2, DigitalOcean Spaces):</p>
+<div class="codehilite"><pre><span></span><code><span class="n">S3_ENABLED</span><span class="o">=</span><span class="bp">true</span><span class="w">                         </span><span class="c1"># Enable S3 storage</span>
+<span class="n">S3_ENDPOINT_URL</span><span class="o">=</span><span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">s3</span><span class="o">.</span><span class="n">amazonaws</span><span class="o">.</span><span class="n">com</span><span class="w"> </span><span class="c1"># S3 endpoint URL</span>
+<span class="n">S3_ACCESS_KEY</span><span class="o">=</span><span class="n">your</span><span class="o">-</span><span class="n">access</span><span class="o">-</span><span class="n">key</span><span class="w">          </span><span class="c1"># S3 access key</span>
+<span class="n">S3_SECRET_KEY</span><span class="o">=</span><span class="n">your</span><span class="o">-</span><span class="n">secret</span><span class="o">-</span><span class="n">key</span><span class="w">          </span><span class="c1"># S3 secret key</span>
+<span class="n">S3_BUCKET_NAME</span><span class="o">=</span><span class="n">your</span><span class="o">-</span><span class="n">bucket</span><span class="o">-</span><span class="n">name</span><span class="w">        </span><span class="c1"># S3 bucket name</span>
+
+<span class="c1"># Optional S3 Settings</span>
+<span class="n">S3_FOLDER_NAME</span><span class="o">=</span><span class="n">uploads</span><span class="w">                  </span><span class="c1"># Folder prefix in bucket</span>
+<span class="n">S3_REGION</span><span class="o">=</span><span class="n">us</span><span class="o">-</span><span class="n">east</span><span class="o">-</span><span class="mi">1</span><span class="w">                    </span><span class="c1"># AWS region (if applicable)</span>
+</code></pre></div>
+
+<h3 id="jwt-api-authentication">JWT API Authentication<a class="headerlink" href="#jwt-api-authentication" title="Permanent link">&para;</a></h3>
+<p>Enable JWT-based API authentication:</p>
+<div class="codehilite"><pre><span></span><code>JWT_ENABLED=true                        # Enable JWT authentication
+JWT_SECRET=your-jwt-secret-key         # JWT signing secret
+
+<span class="gh">#</span> Optional JWT Settings
+JWT_EXPIRES_IN=1h                      # Access token expiration
+JWT_REFRESH_EXPIRES_IN=7d              # Refresh token expiration
+JWT_ALGORITHM=HS256                    # JWT signing algorithm
+</code></pre></div>
+
+<h3 id="opentelemetry-monitoring">OpenTelemetry Monitoring<a class="headerlink" href="#opentelemetry-monitoring" title="Permanent link">&para;</a></h3>
+<p>Enable application monitoring and tracing:</p>
+<div class="codehilite"><pre><span></span><code><span class="n">MONITORING_ENABLED</span><span class="o">=</span><span class="n">true</span>                                    <span class="o">#</span> <span class="n">Enable</span> <span class="n">monitoring</span>
+<span class="n">OTEL_EXPORTER_OTLP_TRACES_ENDPOINT</span><span class="o">=</span><span class="n">your</span><span class="o">-</span><span class="n">otel</span><span class="o">-</span><span class="n">endpoint</span>    <span class="o">#</span> <span class="n">OTLP</span> <span class="n">traces</span> <span class="n">endpoint</span>
+
+<span class="o">#</span> <span class="n">Optional</span> <span class="n">Monitoring</span> <span class="n">Settings</span>
+<span class="n">OTEL_SERVICE_NAME</span><span class="o">=</span><span class="n">omniflow</span><span class="o">-</span><span class="n">starter</span>                        <span class="o">#</span> <span class="n">Service</span> <span class="n">name</span>
+<span class="n">OTEL_SERVICE_VERSION</span><span class="o">=</span><span class="mf">1.0</span><span class="p">.</span><span class="mi">0</span>                               <span class="o">#</span> <span class="n">Service</span> <span class="n">version</span>
+<span class="n">OTEL_METRICS_PORT</span><span class="o">=</span><span class="mi">9091</span>                                   <span class="o">#</span> <span class="n">Prometheus</span> <span class="n">metrics</span> <span class="n">port</span>
+<span class="n">OTEL_METRICS_ENDPOINT</span><span class="o">=/</span><span class="n">metrics</span>                           <span class="o">#</span> <span class="n">Metrics</span> <span class="n">endpoint</span> <span class="n">path</span>
+</code></pre></div>
+
+<h3 id="beepbot-critical-notifications">BeepBot Critical Notifications<a class="headerlink" href="#beepbot-critical-notifications" title="Permanent link">&para;</a></h3>
+<p>Enable external alerting for system failures:</p>
+<div class="codehilite"><pre><span></span><code>BEEPBOT_ENABLED=true                    # Enable BeepBot notifications
+BEEPBOT_SECRET=your-beepbot-secret     # BeepBot API secret
+BEEPBOT_CHAT_ID=1185624008             # Telegram chat ID (optional)
+</code></pre></div>
+
+<h3 id="cors-configuration">CORS Configuration<a class="headerlink" href="#cors-configuration" title="Permanent link">&para;</a></h3>
+<p>Enable CORS for API endpoints:</p>
+<div class="codehilite"><pre><span></span><code>CORS_ENABLED=true                       # Enable CORS
+CORS_ORIGIN=*                          # Allowed origins (comma-separated)
+CORS_CREDENTIALS=true                  # Allow credentials
+CORS_METHODS=GET,HEAD,PUT,PATCH,POST,DELETE  # Allowed methods
+CORS_MAX_AGE=86400                     # Preflight cache duration
+</code></pre></div>
+
+<h2 id="built-in-features">Built-in Features<a class="headerlink" href="#built-in-features" title="Permanent link">&para;</a></h2>
+<h3 id="response-compression">Response Compression<a class="headerlink" href="#response-compression" title="Permanent link">&para;</a></h3>
+<p>These are always available and enabled by default:</p>
+<div class="codehilite"><pre><span></span><code>COMPRESSION_ENABLED=true               # Enable/disable compression
+COMPRESSION_THRESHOLD=1024             # Minimum size to compress (bytes)
+COMPRESSION_LEVEL=6                    # Gzip compression level (1-9)
+BROTLI_ENABLED=true                   # Enable Brotli compression
+BROTLI_QUALITY=4                      # Brotli quality level (0-11)
+</code></pre></div>
+
+<h3 id="database-connection-pool">Database Connection Pool<a class="headerlink" href="#database-connection-pool" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><code>DB_CONNECTION_LIMIT=10                 # Max connections (10 dev, 50 prod)
+DB_ACQUIRE_TIMEOUT=60000              # Connection acquire timeout (ms)
+DB_QUERY_TIMEOUT=60000                # Query timeout (ms)
+</code></pre></div>
+
+<h3 id="password-policy">Password Policy<a class="headerlink" href="#password-policy" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><code>PASSWORD_MIN_LENGTH=8                  # Minimum password length
+PASSWORD_MAX_LENGTH=128                # Maximum password length
+PASSWORD_REQUIRE_UPPERCASE=true        # Require uppercase letters
+PASSWORD_REQUIRE_LOWERCASE=true        # Require lowercase letters
+PASSWORD_REQUIRE_NUMBERS=true          # Require numbers
+PASSWORD_REQUIRE_SYMBOLS=true          # Require special characters
+PASSWORD_MAX_REPEATING=3               # Max consecutive identical chars
+</code></pre></div>
+
+<h2 id="environment-specific-overrides">Environment-Specific Overrides<a class="headerlink" href="#environment-specific-overrides" title="Permanent link">&para;</a></h2>
+<h3 id="development">Development<a class="headerlink" href="#development" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Debug logging enabled</li>
+<li>HTTPS not required for cookies</li>
+<li>Seeding allowed</li>
+</ul>
+<h3 id="production">Production<a class="headerlink" href="#production" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Secure cookies enabled</li>
+<li>HTTPS required</li>
+<li>Seeding disabled for safety</li>
+</ul>
+<h2 id="configuration-validation">Configuration Validation<a class="headerlink" href="#configuration-validation" title="Permanent link">&para;</a></h2>
+<p>The application validates all environment variables at startup:</p>
+<ul>
+<li><strong>Core variables</strong> are always checked</li>
+<li><strong>Feature variables</strong> are only validated when enabled</li>
+<li><strong>Helpful error messages</strong> guide you to fix configuration issues</li>
+</ul>
+<p>Example validation output:</p>
+<div class="codehilite"><pre><span></span><code><span class="err">🔧</span><span class="w"> </span><span class="o">[</span><span class="n">CONFIG</span><span class="o">]</span><span class="w"> </span><span class="n">Enabled</span><span class="w"> </span><span class="n">optional</span><span class="w"> </span><span class="nl">features</span><span class="p">:</span>
+<span class="w">   </span><span class="err">•</span><span class="w"> </span><span class="n">Redis</span><span class="w"> </span><span class="n">caching</span><span class="w"> </span><span class="p">(</span><span class="n">REDIS_ENABLED</span><span class="o">=</span><span class="k">true</span><span class="p">)</span>
+<span class="w">   </span><span class="err">•</span><span class="w"> </span><span class="n">Email</span><span class="w"> </span><span class="n">notifications</span><span class="w"> </span><span class="p">(</span><span class="n">EMAIL_ENABLED</span><span class="o">=</span><span class="k">true</span><span class="p">)</span>
+
+<span class="err">✅</span><span class="w"> </span><span class="o">[</span><span class="n">CONFIG</span><span class="o">]</span><span class="w"> </span><span class="n">Validation</span><span class="w"> </span><span class="n">passed</span><span class="w"> </span><span class="p">(</span><span class="mi">2</span><span class="w"> </span><span class="n">optional</span><span class="w"> </span><span class="n">features</span><span class="w"> </span><span class="n">enabled</span><span class="p">)</span>
+</code></pre></div></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = ".",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="js/base.js"></script>
+        <script src="search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

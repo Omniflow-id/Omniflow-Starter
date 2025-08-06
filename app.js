@@ -57,6 +57,14 @@ app.use(generalLimiter);
 app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "./public")));
+
+// Serve MkDocs documentation (development only)
+if (process.env.NODE_ENV === "development") {
+  app.use(
+    "/docs",
+    express.static(path.join(__dirname, "documentation", "site"))
+  );
+}
 const env = nunjucks.configure("views", {
   autoescape: true,
   express: app,

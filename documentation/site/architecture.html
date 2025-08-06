@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        <link rel="canonical" href="http://localhost:1234/docs/architecture.html">
+        <link rel="shortcut icon" href="img/favicon.ico">
+        <title>Architecture - Omniflow-Starter Documentation</title>
+        <link href="css/bootstrap.min.css" rel="stylesheet">
+        <link href="css/fontawesome.min.css" rel="stylesheet">
+        <link href="css/brands.min.css" rel="stylesheet">
+        <link href="css/solid.min.css" rel="stylesheet">
+        <link href="css/v4-font-face.min.css" rel="stylesheet">
+        <link href="css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/javascript.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/bash.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/json.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/sql.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+            <div class="container">
+                <a class="navbar-brand" href="index.html">Omniflow-Starter Documentation</a>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" data-bs-toggle="modal" data-bs-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="1"><a href="#architecture" class="nav-link">Architecture</a>
+              <ul class="nav flex-column">
+            <li class="nav-item" data-bs-level="2"><a href="#project-structure" class="nav-link">Project Structure</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#module-aliases" class="nav-link">Module Aliases</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#application-layers" class="nav-link">Application Layers</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#data-flow" class="nav-link">Data Flow</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#database-design" class="nav-link">Database Design</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#security-architecture" class="nav-link">Security Architecture</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#performance-architecture" class="nav-link">Performance Architecture</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#monitoring-architecture" class="nav-link">Monitoring Architecture</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#scalability-considerations" class="nav-link">Scalability Considerations</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            <li class="nav-item" data-bs-level="2"><a href="#development-workflow" class="nav-link">Development Workflow</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<h1 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h1>
+<p>Omniflow-Starter follows a modular, layered architecture designed for scalability, maintainability, and enterprise-grade features.</p>
+<h2 id="project-structure">Project Structure<a class="headerlink" href="#project-structure" title="Permanent link">&para;</a></h2>
+<div class="codehilite"><pre><span></span><code>├── server.js              # Application entry point
+├── app.js                 # Express configuration
+├── instrument.js          # OpenTelemetry monitoring
+├── config/                # Configuration management
+├── db/                    # Database layer
+├── routes/                # Route handlers
+├── controllers/           # Business logic
+├── middlewares/           # Express middlewares
+├── helpers/               # Utility functions
+├── views/                 # Nunjucks templates
+├── public/                # Static files
+└── workers/               # Background job processors
+</code></pre></div>
+
+<h2 id="module-aliases">Module Aliases<a class="headerlink" href="#module-aliases" title="Permanent link">&para;</a></h2>
+<p>Clean import paths using <code>module-alias</code>:</p>
+<div class="codehilite"><pre><span></span><code><span class="c1">// Instead of relative paths</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">db</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s2">&quot;../../../db/db&quot;</span><span class="p">);</span>
+
+<span class="c1">// Use aliases</span>
+<span class="kd">const</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">db</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">require</span><span class="p">(</span><span class="s2">&quot;@db/db&quot;</span><span class="p">);</span>
+</code></pre></div>
+
+<p>Available aliases:
+- <code>@</code> - Project root
+- <code>@config</code> - Configuration files
+- <code>@db</code> - Database files<br />
+- <code>@helpers</code> - Helper utilities
+- <code>@middlewares</code> - Express middlewares
+- <code>@routes</code> - Route handlers
+- <code>@views</code> - Nunjucks templates
+- <code>@public</code> - Static files</p>
+<h2 id="application-layers">Application Layers<a class="headerlink" href="#application-layers" title="Permanent link">&para;</a></h2>
+<h3 id="entry-layer">Entry Layer<a class="headerlink" href="#entry-layer" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>server.js</strong> - Server startup and graceful shutdown</li>
+<li><strong>app.js</strong> - Express app configuration and middleware setup</li>
+<li><strong>instrument.js</strong> - OpenTelemetry initialization</li>
+</ul>
+<h3 id="configuration-layer">Configuration Layer<a class="headerlink" href="#configuration-layer" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>config/index.js</strong> - Centralized configuration</li>
+<li><strong>config/development.js</strong> - Development overrides</li>
+<li><strong>config/production.js</strong> - Production overrides</li>
+<li><strong>config/validation.js</strong> - Environment validation</li>
+</ul>
+<h3 id="database-layer">Database Layer<a class="headerlink" href="#database-layer" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>db/db.js</strong> - MySQL connection pool management</li>
+<li><strong>db/redis.js</strong> - Redis caching client</li>
+<li><strong>db/migrations/</strong> - Database schema versions</li>
+<li><strong>db/seeders/</strong> - Development data population</li>
+</ul>
+<h3 id="route-layer">Route Layer<a class="headerlink" href="#route-layer" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>routes/admin/</strong> - Admin web interface routes</li>
+<li><strong>routes/api/</strong> - REST API endpoints</li>
+<li><strong>routes/client/</strong> - Public client routes</li>
+</ul>
+<h3 id="controller-layer">Controller Layer<a class="headerlink" href="#controller-layer" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>controllers/admin/</strong> - Admin business logic</li>
+<li><strong>controllers/api/</strong> - API business logic</li>
+<li>Follows single responsibility principle</li>
+</ul>
+<h3 id="middleware-layer">Middleware Layer<a class="headerlink" href="#middleware-layer" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>middlewares/errorHandler.js</strong> - Centralized error handling</li>
+<li><strong>middlewares/auth.js</strong> - Authentication &amp; authorization</li>
+<li><strong>middlewares/rateLimiter.js</strong> - Rate limiting protection</li>
+<li><strong>middlewares/botProtection.js</strong> - Anti-bot security</li>
+<li><strong>middlewares/csrfProtection.js</strong> - CSRF token validation</li>
+</ul>
+<h3 id="helper-layer">Helper Layer<a class="headerlink" href="#helper-layer" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>helpers/log.js</strong> - Activity logging system</li>
+<li><strong>helpers/cache.js</strong> - Redis caching utilities</li>
+<li><strong>helpers/queue.js</strong> - RabbitMQ job queue</li>
+<li><strong>helpers/beepbot.js</strong> - Critical alerting system</li>
+</ul>
+<h3 id="view-layer">View Layer<a class="headerlink" href="#view-layer" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>views/layouts/</strong> - Nunjucks layout templates</li>
+<li><strong>views/pages/</strong> - Page-specific templates</li>
+<li><strong>views/components/</strong> - Reusable components</li>
+</ul>
+<h3 id="worker-layer">Worker Layer<a class="headerlink" href="#worker-layer" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>workers/emailWorker.js</strong> - Email job processor</li>
+<li><strong>workers/testWorker.js</strong> - Development job testing</li>
+<li><strong>workers/workerManager.js</strong> - Worker lifecycle management</li>
+</ul>
+<h2 id="data-flow">Data Flow<a class="headerlink" href="#data-flow" title="Permanent link">&para;</a></h2>
+<h3 id="web-request-flow">Web Request Flow<a class="headerlink" href="#web-request-flow" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><code>Request → Rate Limiter → Bot Protection → CSRF → Auth → Controller → Response
+</code></pre></div>
+
+<h3 id="api-request-flow">API Request Flow<a class="headerlink" href="#api-request-flow" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><code>Request → Rate Limiter → CORS → JWT Auth → Controller → JSON Response
+</code></pre></div>
+
+<h3 id="background-job-flow">Background Job Flow<a class="headerlink" href="#background-job-flow" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><code>Job Created → RabbitMQ Queue → Worker Process → Database Update → Activity Log
+</code></pre></div>
+
+<h3 id="cache-flow">Cache Flow<a class="headerlink" href="#cache-flow" title="Permanent link">&para;</a></h3>
+<div class="codehilite"><pre><span></span><code>Request → Cache Check → Redis/Database → Cache Update → Response
+</code></pre></div>
+
+<h2 id="database-design">Database Design<a class="headerlink" href="#database-design" title="Permanent link">&para;</a></h2>
+<h3 id="core-tables">Core Tables<a class="headerlink" href="#core-tables" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>users</strong> - User accounts with role-based access</li>
+<li><strong>roles</strong> - User role definitions</li>
+<li><strong>permissions</strong> - System permission definitions  </li>
+<li><strong>role_permissions</strong> - Role-to-permission mappings</li>
+<li><strong>user_permissions</strong> - User-specific permission overrides</li>
+<li><strong>activity_logs</strong> - Comprehensive audit trail</li>
+<li><strong>jobs</strong> - Background job queue persistence</li>
+</ul>
+<h3 id="key-features">Key Features<a class="headerlink" href="#key-features" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Connection Pooling</strong> - Environment-aware pool sizing</li>
+<li><strong>Migration System</strong> - Knex.js schema versioning</li>
+<li><strong>Seeder Management</strong> - Controlled data population</li>
+<li><strong>Soft Deletes</strong> - Data retention for audit compliance</li>
+</ul>
+<h2 id="security-architecture">Security Architecture<a class="headerlink" href="#security-architecture" title="Permanent link">&para;</a></h2>
+<h3 id="multi-layer-protection">Multi-Layer Protection<a class="headerlink" href="#multi-layer-protection" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Rate Limiting</strong> - Multi-tier request throttling</li>
+<li><strong>Bot Protection</strong> - Automated threat detection</li>
+<li><strong>CSRF Protection</strong> - Cross-site request forgery prevention</li>
+<li><strong>Authentication</strong> - Session + JWT dual system</li>
+<li><strong>Authorization</strong> - Flexible RBAC + PBAC permissions</li>
+</ol>
+<h3 id="data-protection">Data Protection<a class="headerlink" href="#data-protection" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Sensitive Data Masking</strong> - Automatic PII protection</li>
+<li><strong>Request Tracing</strong> - UUID-based correlation</li>
+<li><strong>Activity Logging</strong> - Complete audit trail</li>
+<li><strong>Error Handling</strong> - Security-aware error responses</li>
+</ul>
+<h2 id="performance-architecture">Performance Architecture<a class="headerlink" href="#performance-architecture" title="Permanent link">&para;</a></h2>
+<h3 id="caching-strategy">Caching Strategy<a class="headerlink" href="#caching-strategy" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Redis Layer</strong> - High-performance in-memory caching</li>
+<li><strong>Database Fallback</strong> - Graceful degradation</li>
+<li><strong>Pattern Invalidation</strong> - Intelligent cache cleanup</li>
+<li><strong>TTL Management</strong> - Configurable expiration</li>
+</ul>
+<h3 id="compression">Compression<a class="headerlink" href="#compression" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Brotli + Gzip</strong> - Dual-algorithm compression</li>
+<li><strong>Content-Type Aware</strong> - Selective compression</li>
+<li><strong>Streaming Support</strong> - Memory-efficient processing</li>
+</ul>
+<h3 id="connection-management">Connection Management<a class="headerlink" href="#connection-management" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Database Pooling</strong> - Optimized connection reuse</li>
+<li><strong>Redis Clustering</strong> - High-availability support</li>
+<li><strong>RabbitMQ Persistence</strong> - Reliable message delivery</li>
+</ul>
+<h2 id="monitoring-architecture">Monitoring Architecture<a class="headerlink" href="#monitoring-architecture" title="Permanent link">&para;</a></h2>
+<h3 id="application-monitoring">Application Monitoring<a class="headerlink" href="#application-monitoring" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>OpenTelemetry</strong> - Distributed tracing</li>
+<li><strong>Activity Logging</strong> - Business event tracking</li>
+<li><strong>Performance Metrics</strong> - Response time monitoring</li>
+<li><strong>Error Tracking</strong> - Comprehensive error capture</li>
+</ul>
+<h3 id="external-alerting">External Alerting<a class="headerlink" href="#external-alerting" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>BeepBot Integration</strong> - Critical failure notifications</li>
+<li><strong>Jakarta Timezone</strong> - Localized timestamps</li>
+<li><strong>Independent Operation</strong> - Works when database is down</li>
+</ul>
+<h2 id="scalability-considerations">Scalability Considerations<a class="headerlink" href="#scalability-considerations" title="Permanent link">&para;</a></h2>
+<h3 id="horizontal-scaling">Horizontal Scaling<a class="headerlink" href="#horizontal-scaling" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Stateless Design</strong> - No server-side state dependencies</li>
+<li><strong>Session Store</strong> - Externalized session management</li>
+<li><strong>Job Queue</strong> - Distributed background processing</li>
+<li><strong>File Storage</strong> - S3-compatible cloud storage</li>
+</ul>
+<h3 id="vertical-scaling">Vertical Scaling<a class="headerlink" href="#vertical-scaling" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Connection Pooling</strong> - Efficient resource utilization</li>
+<li><strong>Caching Layers</strong> - Reduced database load</li>
+<li><strong>Compression</strong> - Bandwidth optimization</li>
+<li><strong>Lazy Loading</strong> - On-demand resource loading</li>
+</ul>
+<h2 id="development-workflow">Development Workflow<a class="headerlink" href="#development-workflow" title="Permanent link">&para;</a></h2>
+<h3 id="code-organization">Code Organization<a class="headerlink" href="#code-organization" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Import Standards</strong> - Consistent module organization</li>
+<li><strong>Error Handling</strong> - Centralized error management</li>
+<li><strong>Template Patterns</strong> - Reusable component structure</li>
+<li><strong>Testing Strategy</strong> - Manual + automated testing</li>
+</ul>
+<h3 id="quality-assurance">Quality Assurance<a class="headerlink" href="#quality-assurance" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Biome Linting</strong> - Code quality enforcement</li>
+<li><strong>Environment Validation</strong> - Configuration verification</li>
+<li><strong>Security Scanning</strong> - Automated vulnerability detection</li>
+<li><strong>Performance Monitoring</strong> - Real-time metrics tracking</li>
+</ul></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = ".",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="js/base.js"></script>
+        <script src="search/main.js"></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="searchModalLabel">Search</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>From here you can search these documents. Enter your search terms below.</p>
+                <form>
+                    <div class="form-group">
+                        <input type="search" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results" data-no-results-text="No results found"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>

@@ -1,0 +1,28 @@
+site_name: Omniflow-Starter Documentation
+site_description: Node.js ERP Module Starter Pack with Express.js, MySQL, and Nunjucks
+site_url: http://localhost:1234/docs
+use_directory_urls: false
+
+nav:
+  - Home: "index.md"
+
+theme:
+  name: mkdocs
+  nav_style: dark
+  highlightjs: true
+  hljs_languages:
+    - javascript
+    - bash
+    - json
+    - sql
+
+markdown_extensions:
+  - codehilite:
+      linenums: false
+  - toc:
+      permalink: true
+  - admonition
+  - def_list
+  - footnotes
+  - meta
+  - tables
