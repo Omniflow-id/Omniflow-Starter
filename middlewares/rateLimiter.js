@@ -9,10 +9,32 @@ const { log, LOG_LEVELS } = require("@helpers/log");
 // Custom key generator to handle trust proxy issues
 const getKeyGenerator = () => {
   return (req) => {
-    // Try to get real IP, fallback to connection IP
-    return (
-      getClientIP(req) || req.connection.remoteAddress || req.ip || "unknown"
-    );
+    try {
+      // Try to get real IP using helper
+      let ip = getClientIP(req);
+
+      // Fallback chain if helper fails
+      if (!ip) {
+        ip =
+          req.ip ||
+          req.connection?.remoteAddress ||
+          req.socket?.remoteAddress ||
+          (req.connection?.socket
+            ? req.connection.socket.remoteAddress
+            : null) ||
+          "unknown";
+      }
+
+      // Normalize IPv6 mapped IPv4 addresses (::ffff:192.168.1.1 -> 192.168.1.1)
+      if (typeof ip === "string" && ip.startsWith("::ffff:")) {
+        ip = ip.substring(7);
+      }
+
+      return ip;
+    } catch (error) {
+      console.error("KeyGenerator error:", error);
+      return "unknown";
+    }
   };
 };
 
