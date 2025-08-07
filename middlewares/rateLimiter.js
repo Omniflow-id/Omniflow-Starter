@@ -10,7 +10,9 @@ const { log, LOG_LEVELS } = require("@helpers/log");
 const getKeyGenerator = () => {
   return (req) => {
     // Try to get real IP, fallback to connection IP
-    return getClientIP(req) || req.connection.remoteAddress || req.ip || 'unknown';
+    return (
+      getClientIP(req) || req.connection.remoteAddress || req.ip || "unknown"
+    );
   };
 };
 
