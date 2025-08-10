@@ -1,0 +1,146 @@
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: omniflow_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: omniflow_starter
+      MYSQL_USER: omniflow
+      MYSQL_PASSWORD: omniflow123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d
+    networks:
+      - omniflow_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 10s
+      retries: 10
+      interval: 5s
+      start_period: 30s
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: omniflow_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - omniflow_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      timeout: 3s
+      retries: 5
+      interval: 5s
+
+  # RabbitMQ Message Queue
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: omniflow_rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin123
+    ports:
+      - "5672:5672"    # AMQP port
+      - "15672:15672"  # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - omniflow_network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      timeout: 10s
+      retries: 5
+      interval: 10s
+      start_period: 30s
+
+  # Node.js Application
+  app:
+    build: .
+    container_name: omniflow_app
+    environment:
+      NODE_ENV: production
+      PORT: 1234
+      
+      # Database Configuration
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: omniflow
+      DB_PASSWORD: omniflow123
+      DB_NAME: omniflow_starter
+      DB_CONNECTION_LIMIT: 50
+      
+      # Redis Configuration
+      REDIS_ENABLED: true
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      
+      # RabbitMQ Configuration
+      RABBITMQ_ENABLED: true
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USER: admin
+      RABBITMQ_PASSWORD: admin123
+      
+      # Session & Security
+      SESSION_KEY: your-super-secret-session-key-change-this-in-production
+      CSRF_SECRET: your-csrf-secret-key-change-this
+      
+      # Application Settings
+      APP_URL: http://localhost:1234
+      SESSION_TIMEOUT_HOURS: 24
+      TIMEZONE: Asia/Jakarta
+      
+      # Optional Features (disabled by default in Docker)
+      EMAIL_ENABLED: false
+      S3_ENABLED: false
+      JWT_ENABLED: false
+      MONITORING_ENABLED: false
+      BEEPBOT_ENABLED: false
+      
+      # CORS Configuration
+      CORS_ENABLED: true
+      CORS_ORIGIN: "*"
+      CORS_CREDENTIALS: true
+      
+      # Development Settings
+      DEV_2FA_BYPASS: true
+      
+    ports:
+      - "1234:1234"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+    networks:
+      - omniflow_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1234/health"]
+      timeout: 10s
+      retries: 3
+      interval: 30s
+      start_period: 60s
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+  rabbitmq_data:
+    driver: local
+
+networks:
+  omniflow_network:
+    driver: bridge

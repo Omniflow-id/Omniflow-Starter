@@ -9,3 +9,4 @@ logs/app.log
 .secrets
 my.secrets
 *.secrets
+.env.bak

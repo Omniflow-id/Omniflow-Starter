@@ -181,6 +181,7 @@ const login = asyncHandler(async (req, res) => {
     req.session.user = {
       id: user.id,
       username: user.username,
+      full_name: user.full_name,
       email: user.email,
       role_id: user.role_id,
     };

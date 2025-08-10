@@ -6,43 +6,13 @@ const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
 const { log, LOG_LEVELS } = require("@helpers/log");
 
-// Custom key generator to handle trust proxy issues
-const getKeyGenerator = () => {
-  return (req) => {
-    try {
-      // Try to get real IP using helper
-      let ip = getClientIP(req);
-
-      // Fallback chain if helper fails
-      if (!ip) {
-        ip =
-          req.ip ||
-          req.connection?.remoteAddress ||
-          req.socket?.remoteAddress ||
-          (req.connection?.socket
-            ? req.connection.socket.remoteAddress
-            : null) ||
-          "unknown";
-      }
-
-      // Normalize IPv6 mapped IPv4 addresses (::ffff:192.168.1.1 -> 192.168.1.1)
-      if (typeof ip === "string" && ip.startsWith("::ffff:")) {
-        ip = ip.substring(7);
-      }
-
-      return ip;
-    } catch (error) {
-      console.error("KeyGenerator error:", error);
-      return "unknown";
-    }
-  };
-};
+// Use express-rate-limit's built-in IP key generator for proper IPv6 handling
+// const keyGenerator = rateLimit.default?.keyGenerator || ((req) => req.ip);
 
 // Basic rate limiter - general requests
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
-  keyGenerator: getKeyGenerator(),
   message: {
     error: "Too many requests from this IP, please try again after 15 minutes.",
   },
@@ -121,7 +91,6 @@ const generalLimiter = rateLimit({
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // limit each IP to 5 login attempts per windowMs
-  keyGenerator: getKeyGenerator(),
   message: {
     error:
       "Too many login attempts from this IP, please try again after 15 minutes.",
@@ -184,7 +153,6 @@ const authLimiter = rateLimit({
 const adminLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 5 minutes
   max: 100, // limit each IP to 50 admin requests per windowMs
-  keyGenerator: getKeyGenerator(),
   message: {
     error:
       "Too many admin requests from this IP, please try again after 5 minutes.",
@@ -245,7 +213,6 @@ const adminLimiter = rateLimit({
 const uploadLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10, // limit each IP to 10 file uploads per windowMs
-  keyGenerator: getKeyGenerator(),
   message: {
     error:
       "Too many file uploads from this IP, please try again after 15 minutes.",
@@ -299,7 +266,6 @@ const uploadLimiter = rateLimit({
 const exportLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes
   max: 20, // limit each IP to 20 exports per windowMs
-  keyGenerator: getKeyGenerator(),
   message: {
     error:
       "Too many export requests from this IP, please try again after 5 minutes.",

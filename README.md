@@ -4,13 +4,45 @@ Node.js ERP Module Starter Pack with Express.js, MySQL, and Nunjucks
 ## Overview
 Production-ready ERP starter with comprehensive user management, flexible permission system, enterprise-grade activity logging, and modular architecture for rapid development.
 
-## Quick Start
+## 🚀 Quick Start
+
+### **Full Docker Development (Recommended)**
+Complete containerized environment with live reload:
+
 ```bash
-npm install
-cp .env.example .env
-# Configure database and session key
-npm run dev
+# Clone and setup
+git clone <your-repo>
+cd omniflow-starter
+
+# Start all services with Docker
+npm run docker:dev:build    # Build & start (first time)
+npm run docker:dev:logs     # Monitor logs
+
+# Daily development
+npm run docker:dev          # Start (fast, no rebuild)
 ```
+
+### **Hybrid Development (Alternative)**
+Native Node.js with Docker services:
+
+```bash
+# Setup environment  
+nix develop                 # Enter Nix shell
+npm install                 # Install dependencies
+npm run docker:dev          # Start services only (MySQL, Redis, RabbitMQ)
+npm run dev                 # Run app with nodemon (native)
+```
+
+### **Access Points & Default Users**
+- **App**: http://localhost:1234
+- **RabbitMQ Management**: http://localhost:15672 (admin/admin123)
+
+**🔐 Default Users** (auto-created by Docker):
+- **Admin**: admin@omniflow.id / Admin12345.
+- **Manager**: manager@omniflow.id / Manager12345.  
+- **User**: user@omniflow.id / User12345.
+
+**✨ Auto Setup**: Docker handles database migrations and seeding automatically!
 
 ## Development Roadmap
 

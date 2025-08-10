@@ -1,0 +1,125 @@
+# ==================================
+# Multi-stage Dockerfile for Omniflow-Starter
+# Supports both development and production builds
+# ==================================
+
+# Base stage - common dependencies
+FROM node:22-alpine AS base
+
+WORKDIR /app
+
+# Install system dependencies for native modules
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    curl \
+    dumb-init \
+    netcat-openbsd
+
+# Copy package files
+COPY package*.json ./
+
+# ================================== 
+# Development stage
+# ==================================
+FROM base AS development
+
+# Install all dependencies (including devDependencies)
+RUN npm ci && npm cache clean --force
+
+# Install nodemon globally for development
+RUN npm install -g nodemon
+
+# Copy application code
+COPY . .
+
+# Copy and set permissions for entrypoint script
+COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Create necessary directories
+RUN mkdir -p logs uploads
+
+# Set proper permissions
+RUN chown -R node:node /app
+
+# Switch to non-root user
+USER node
+
+# Expose port
+EXPOSE 1234
+
+# Development health check (less strict)
+HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=2 \
+    CMD curl -f http://localhost:1234/health || exit 1
+
+# Set entrypoint for database initialization
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+# Development command - use nodemon
+CMD ["nodemon", "--no-deprecation", "server.js"]
+
+# ================================== 
+# Production dependencies stage
+# ==================================
+FROM base AS prod-deps
+
+# Install only production dependencies
+RUN npm ci --only=production && npm cache clean --force
+
+# Install PM2 globally for production
+RUN npm install -g pm2
+
+# ==================================
+# Production stage  
+# ==================================
+FROM node:22-alpine AS production
+
+WORKDIR /app
+
+# Install runtime dependencies only
+RUN apk add --no-cache \
+    curl \
+    dumb-init \
+    netcat-openbsd
+
+# Copy PM2 from prod-deps stage
+COPY --from=prod-deps /usr/local/lib/node_modules/pm2 /usr/local/lib/node_modules/pm2
+COPY --from=prod-deps /usr/local/bin/pm2 /usr/local/bin/pm2
+
+# Copy production dependencies
+COPY --from=prod-deps /app/node_modules ./node_modules
+COPY --from=prod-deps /app/package*.json ./
+
+# Copy application code
+COPY . .
+
+# Copy PM2 ecosystem file
+COPY ecosystem.config.js ./
+
+# Copy and set permissions for entrypoint script
+COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# Create necessary directories
+RUN mkdir -p logs uploads
+
+# Set proper permissions
+RUN chown -R node:node /app
+
+# Switch to non-root user
+USER node
+
+# Expose port
+EXPOSE 1234
+
+# Production health check (more robust)
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:1234/health || exit 1
+
+# Set entrypoint for database initialization
+ENTRYPOINT ["docker-entrypoint.sh"]
+
+# Production command - use PM2
+CMD ["dumb-init", "pm2-runtime", "start", "ecosystem.config.js"]

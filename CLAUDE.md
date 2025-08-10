@@ -8,10 +8,26 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Development Commands
 
-- **Start server**: `npm start` or `npm run dev` (runs on port 1234 or PORT env var)
+### **Docker Development (Recommended)**
+- **Full Docker start**: `npm run docker:dev:build` (first time with build)
+- **Daily development**: `npm run docker:dev` (start without rebuild)
+- **Monitor logs**: `npm run docker:dev:logs` (real-time app logs)
+- **Stop services**: `npm run docker:dev:down` (stop all containers)
+
+### **Alternative Development**
+- **Native development**: `npm run dev` (nodemon with hot reload)
+- **Start server**: `npm start` (production mode)
+
+### **Code Quality**
 - **Code formatting**: `npm run format` (Biome formatter + linter with auto-fix)
 - **Code linting**: `npm run lint` (Biome linter check only)
 - **No build process** - static files served directly from public/
+
+### **Docker Services**
+- **MySQL**: localhost:3306 (omniflow/omniflow123)
+- **Redis**: localhost:6379 (caching)
+- **RabbitMQ**: localhost:5672 (jobs), localhost:15672 (management UI)
+- **App**: localhost:1234 (main application)
 
 ## Module Aliases
 
