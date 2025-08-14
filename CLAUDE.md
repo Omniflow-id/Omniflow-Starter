@@ -1509,6 +1509,7 @@ router.post("/logout", doubleCsrfProtection, auth.logout);
 - Nunjucks templates with layout inheritance
 - Bootstrap + Alpine.js + HTMX for modern interactions
 - DataTables for advanced table functionality
+- **Chart.js** for data visualization and charting (default charting library)
 - Component-based template structure in `views/components/`
 
 ### Nunjucks Configuration (app.js)
@@ -1561,6 +1562,121 @@ router.post("/logout", doubleCsrfProtection, auth.logout);
 - **Null-safe**: All helpers check for null/undefined permissions arrays
 - **Type validation**: Validates input parameters before processing
 - **Performance optimized**: Uses native JavaScript array methods for fast lookups
+
+### Chart.js Integration
+
+**Default Charting Library**: Chart.js is pre-loaded globally for creating interactive charts and data visualizations across the application.
+
+#### Available Chart Types
+
+- **Line Charts**: Time series data, trends, performance metrics
+- **Bar Charts**: Comparative data, statistics, categorical analysis
+- **Pie/Doughnut Charts**: Proportional data, percentages, distributions
+- **Area Charts**: Cumulative data, filled line charts
+- **Scatter Plots**: Correlation analysis, data point relationships
+- **Mixed Charts**: Combination of multiple chart types
+
+#### Usage Examples
+
+**Basic Chart Implementation**:
+```html
+<div class="card">
+  <div class="card-header">
+    <h5>User Statistics</h5>
+  </div>
+  <div class="card-body">
+    <canvas id="userChart" width="400" height="200"></canvas>
+  </div>
+</div>
+
+<script>
+const ctx = document.getElementById('userChart').getContext('2d');
+const userChart = new Chart(ctx, {
+  type: 'line',
+  data: {
+    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    datasets: [{
+      label: 'Active Users',
+      data: [12, 19, 3, 5, 2, 3],
+      borderColor: 'rgb(75, 192, 192)',
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      tension: 0.1
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      title: {
+        display: true,
+        text: 'Monthly Active Users'
+      }
+    }
+  }
+});
+</script>
+```
+
+**Dashboard Integration**:
+```javascript
+// Queue statistics chart
+const queueChart = new Chart(document.getElementById('queueChart'), {
+  type: 'doughnut',
+  data: {
+    labels: ['Completed', 'Pending', 'Processing', 'Failed'],
+    datasets: [{
+      data: [120, 45, 8, 12],
+      backgroundColor: [
+        '#28a745', // success
+        '#ffc107', // warning  
+        '#17a2b8', // info
+        '#dc3545'  // danger
+      ]
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: {
+        position: 'bottom'
+      }
+    }
+  }
+});
+```
+
+#### Advanced Features
+
+- **Real-time Updates**: Use Chart.js update methods for live data
+- **Responsive Design**: Automatic resizing for mobile devices
+- **Interactive Tooltips**: Hover effects and custom tooltip formatting
+- **Animation**: Smooth transitions and custom animation configs
+- **Plugin Ecosystem**: Extensible with Chart.js plugins
+
+#### Alternative Libraries
+
+For complex visualizations requiring advanced features:
+- **D3.js**: Custom visualizations, complex interactions, geographic maps
+- **Additional libraries**: Can be added to `public/js/` and included in `script.njk` as needed
+
+#### Integration with Backend Data
+
+```javascript
+// Fetch data from API endpoint
+async function updateChart() {
+  try {
+    const response = await fetch('/api/dashboard/stats');
+    const data = await response.json();
+    
+    userChart.data.datasets[0].data = data.userStats;
+    userChart.update();
+  } catch (error) {
+    console.error('Failed to update chart:', error);
+  }
+}
+
+// Update every 30 seconds
+setInterval(updateChart, 30000);
+```
 
 ## Configuration System
 
