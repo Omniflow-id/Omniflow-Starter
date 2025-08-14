@@ -368,7 +368,7 @@ app.use("/admin", async (req, res, next) => {
 - **Roles Management**: `/admin/roles/*` (role management, permission assignment)
 - **Activity Logs**: `/admin/log/*` (view logs, export)
 - **Cache Management**: `/admin/cache/*` (cache statistics, operations)
-- **Queue Management**: `/admin/queue/*` (job monitoring, failed jobs)
+- **Queue Management**: `/admin/queue/*` (statistics, all jobs, failed jobs)
 - **API Endpoints**: `/api/*` (JWT-based authentication, JSON responses)
 - **Session API**: `/api/session/*` (CSRF-protected session management)
 
@@ -1021,6 +1021,7 @@ res.render("pages/admin/users", {
 
 **Admin Management** (`/admin/queue/*`):
 - **Real-time Statistics**: Job counts by status with Redis-backed caching
+- **All Jobs Management**: Complete job listing with status filtering, pagination, and detailed view
 - **Failed Job Management**: View, retry, and monitor failed jobs with pagination
 - **Connection Monitoring**: RabbitMQ connection status and circuit breaker state
 - **Queue Operations**: Send test jobs, retry failed jobs, view recent activity
@@ -1110,10 +1111,22 @@ const retriedCount = await retryFailedJobs(10);
 
 **Admin Panel Features**:
 - **Queue Statistics**: Real-time job counts with cache optimization
+- **All Jobs Interface**: Complete job management with status filtering (all, pending, processing, completed, failed)
+- **Job Data Viewer**: Expandable JSON data view with proper formatting and error handling
 - **Connection Status**: RabbitMQ health with circuit breaker state monitoring
 - **Failed Job Management**: Detailed error viewing, retry functionality, bulk operations
 - **Test Job Creation**: Admin can send test jobs to verify worker functionality
 - **Cache Integration**: Queue stats cached for 2 minutes for performance
+
+**All Jobs Management Interface** (`/admin/queue/jobs`):
+- **Status Filtering**: Filter jobs by status with button-based navigation (All, Pending, Processing, Completed, Failed)
+- **Comprehensive Job Display**: Shows job ID, status, queue, data, attempts, timestamps, and errors
+- **JSON Data Viewer**: Click-to-expand JSON data with proper formatting and error handling for corrupted data
+- **Pagination Support**: Navigate through large job lists with standard pagination controls
+- **Status Badges**: Color-coded status indicators (warning for pending, info for processing, success for completed, danger for failed)
+- **Timestamp Tracking**: Display created, started, and completed timestamps for full job lifecycle visibility
+- **Error Context**: For failed jobs, expandable error messages with detailed failure information
+- **Retry Integration**: Direct access to retry failed jobs from the interface
 
 **Circuit Breaker States**:
 - **CLOSED**: Normal operation, all jobs processed

@@ -130,11 +130,42 @@
       {% if hasPermission(permissions, 'manage_queue') %}
       <!-- Queue Management - Based on permissions -->
       <a
-        class="nav-link {% if url.includes('/admin/queue') %}active{% endif %}"
-        href="/admin/queue"
+        class="nav-link {% if url.includes('/admin/queue') %}{% else %}collapsed{% endif %}"
+        href="#"
+        data-bs-toggle="collapse"
+        data-bs-target="#collapseLayoutsQueue"
+        aria-expanded="{% if url.includes('/admin/queue') %}true{% else %}false{% endif %}"
+        aria-controls="collapseLayoutsQueue"
       >
         Queue
+        <div class="sb-sidenav-collapse-arrow">
+          <i class="fas fa-angle-down"></i>
+        </div>
       </a>
+      <div
+        class="collapse {% if url.includes('/admin/queue') %}show{% endif %}"
+        id="collapseLayoutsQueue"
+        aria-labelledby="headingOne"
+        data-bs-parent="#sidenavAccordion"
+      >
+        <nav class="sb-sidenav-menu-nested nav">
+          <a
+            class="nav-link {% if url == '/admin/queue' %}active{% endif %}"
+            href="/admin/queue"
+            >Statistics</a
+          >
+          <a
+            class="nav-link {% if url.includes('/admin/queue/jobs') %}active{% endif %}"
+            href="/admin/queue/jobs"
+            >All Jobs</a
+          >
+          <a
+            class="nav-link {% if url.includes('/admin/queue/failed') %}active{% endif %}"
+            href="/admin/queue/failed"
+            >Failed Jobs</a
+          >
+        </nav>
+      </div>
       {% endif %}
 
       {% if hasPermission(permissions, 'view_logs') %}

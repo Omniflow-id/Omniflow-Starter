@@ -1,0 +1,238 @@
+{% extends "layout/masterLayout.njk" %}
+
+{% block title %}All Jobs{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+  <h1 class="mt-4">All Jobs</h1>
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <!-- Status Filter -->
+      <div class="btn-group" role="group">
+        <a href="?status=all" class="btn {% if currentStatus == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm">
+          All
+        </a>
+        <a href="?status=pending" class="btn {% if currentStatus == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %} btn-sm">
+          Pending
+        </a>
+        <a href="?status=processing" class="btn {% if currentStatus == 'processing' %}btn-info{% else %}btn-outline-info{% endif %} btn-sm">
+          Processing
+        </a>
+        <a href="?status=completed" class="btn {% if currentStatus == 'completed' %}btn-success{% else %}btn-outline-success{% endif %} btn-sm">
+          Completed
+        </a>
+        <a href="?status=failed" class="btn {% if currentStatus == 'failed' %}btn-danger{% else %}btn-outline-danger{% endif %} btn-sm">
+          Failed
+        </a>
+      </div>
+    </div>
+    <div>
+      <a href="/admin/queue" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i>Back to Queue Stats
+      </a>
+    </div>
+  </div>
+
+  {% if error %}
+  <div class="alert alert-danger">
+    <i class="fas fa-exclamation-triangle me-2"></i>{{ error }}
+  </div>
+  {% endif %}
+
+  {% if jobs.length > 0 %}
+  <div class="card">
+    <div class="card-header">
+      <div class="d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">
+          {% if currentStatus == 'all' %}
+            All Jobs ({{ pagination.total }} total)
+          {% else %}
+            {{ currentStatus | title }} Jobs ({{ pagination.total }} total)
+          {% endif %}
+        </h5>
+        {% if currentStatus == 'failed' %}
+        <form action="/admin/queue/retry" method="POST" class="d-inline">
+          {{ csrfField() | safe }}
+          <button type="submit" class="btn btn-warning btn-sm">
+            <i class="fas fa-redo"></i> Retry Failed
+          </button>
+        </form>
+        {% endif %}
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Status</th>
+              <th>Queue</th>
+              <th>Data</th>
+              <th>Attempts</th>
+              <th>Created</th>
+              <th>Started</th>
+              <th>Completed</th>
+              {% if currentStatus == 'failed' or currentStatus == 'all' %}
+              <th>Error</th>
+              {% endif %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for job in jobs %}
+            <tr>
+              <td>
+                <code>#{{ job.id }}</code>
+              </td>
+              <td>
+                {% if job.status == 'pending' %}
+                  <span class="badge bg-warning">{{ job.status | title }}</span>
+                {% elif job.status == 'processing' %}
+                  <span class="badge bg-info">{{ job.status | title }}</span>
+                {% elif job.status == 'completed' %}
+                  <span class="badge bg-success">{{ job.status | title }}</span>
+                {% elif job.status == 'failed' %}
+                  <span class="badge bg-danger">{{ job.status | title }}</span>
+                {% else %}
+                  <span class="badge bg-secondary">{{ job.status | title }}</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge bg-secondary">{{ job.queue }}</span>
+              </td>
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-info"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#job-data-{{ job.id }}"
+                >
+                  <i class="fas fa-eye"></i> View
+                </button>
+                <div class="collapse mt-2" id="job-data-{{ job.id }}">
+                  <pre
+                    class="small bg-light p-2 rounded"
+                  ><code>{{ job.data | safe }}</code></pre>
+                </div>
+              </td>
+              <td>
+                <span
+                  class="badge {% if job.attempts >= job.max_attempts %}bg-danger{% else %}bg-warning{% endif %}"
+                >
+                  {{ job.attempts }}/{{ job.max_attempts }}
+                </span>
+              </td>
+              <td>
+                <small>{{ job.created_at | formatDateTime }}</small>
+              </td>
+              <td>
+                {% if job.started_at %}
+                <small>{{ job.started_at | formatDateTime }}</small>
+                {% else %}
+                <small class="text-muted">-</small>
+                {% endif %}
+              </td>
+              <td>
+                {% if job.completed_at %}
+                <small>{{ job.completed_at | formatDateTime }}</small>
+                {% else %}
+                <small class="text-muted">-</small>
+                {% endif %}
+              </td>
+              {% if currentStatus == 'failed' or currentStatus == 'all' %}
+              <td>
+                {% if job.error %}
+                <button
+                  class="btn btn-sm btn-outline-danger"
+                  data-bs-toggle="collapse"
+                  data-bs-target="#job-error-{{ job.id }}"
+                >
+                  <i class="fas fa-exclamation-triangle"></i> Error
+                </button>
+                <div class="collapse mt-2" id="job-error-{{ job.id }}">
+                  <div class="alert alert-danger small mb-0">
+                    {{ job.error }}
+                  </div>
+                </div>
+                {% else %}
+                <small class="text-muted">-</small>
+                {% endif %}
+              </td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      {% if pagination.totalPages > 1 %}
+      <nav aria-label="Jobs pagination">
+        <ul class="pagination justify-content-center">
+          {% if pagination.currentPage > 1 %}
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="?page={{ pagination.currentPage - 1 }}&limit={{
+                pagination.limit
+              }}&status={{ currentStatus }}"
+            >
+              Previous
+            </a>
+          </li>
+          {% endif %} 
+          {% for page in range(1, pagination.totalPages + 1) %}
+          {% if page == pagination.currentPage %}
+          <li class="page-item active">
+            <span class="page-link">{{ page }}</span>
+          </li>
+          {% elif page <= 3 or page > pagination.totalPages - 3 or (page >=
+          pagination.currentPage - 1 and page <= pagination.currentPage + 1)
+          %}
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="?page={{ page }}&limit={{ pagination.limit }}&status={{ currentStatus }}"
+              >{{ page }}</a
+            >
+          </li>
+          {% elif page == 4 or page == pagination.totalPages - 3 %}
+          <li class="page-item disabled">
+            <span class="page-link">...</span>
+          </li>
+          {% endif %} 
+          {% endfor %} 
+          {% if pagination.currentPage < pagination.totalPages %}
+          <li class="page-item">
+            <a
+              class="page-link"
+              href="?page={{ pagination.currentPage + 1 }}&limit={{
+                pagination.limit
+              }}&status={{ currentStatus }}"
+            >
+              Next
+            </a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+  </div>
+  {% else %}
+  <div class="card">
+    <div class="card-body text-center py-5">
+      <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+      <h4>No Jobs Found</h4>
+      {% if currentStatus == 'all' %}
+      <p class="text-muted">No jobs have been created yet.</p>
+      {% else %}
+      <p class="text-muted">No {{ currentStatus }} jobs found.</p>
+      {% endif %}
+      <a href="/admin/queue" class="btn btn-primary">
+        <i class="fas fa-arrow-left"></i> Back to Queue Stats
+      </a>
+    </div>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}
