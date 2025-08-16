@@ -9,9 +9,21 @@ const router = express.Router();
 router.use(isLoggedIn);
 
 // DataTable endpoints with permission checks
-router.get("/users", checkPermission("view_users"), controller.getUsersDataTable);
+router.get(
+  "/users",
+  checkPermission("view_users"),
+  controller.getUsersDataTable
+);
 router.get("/logs", checkPermission("view_logs"), controller.getLogsDataTable);
-router.get("/jobs", checkPermission("manage_queue"), controller.getJobsDataTable);
-router.get("/failed-jobs", checkPermission("manage_queue"), controller.getFailedJobsDataTable);
+router.get(
+  "/jobs",
+  checkPermission("manage_queue"),
+  controller.getJobsDataTable
+);
+router.get(
+  "/failed-jobs",
+  checkPermission("manage_queue"),
+  controller.getFailedJobsDataTable
+);
 
 module.exports = router;

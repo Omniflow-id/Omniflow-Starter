@@ -8,13 +8,13 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
     length = 10,
     search = {},
     order = [],
-    columns = []
+    columns = [],
   } = req.query;
 
   // Parse DataTables parameters
   const offset = parseInt(start);
   const limit = parseInt(length);
-  const searchValue = search.value || '';
+  const searchValue = search.value || "";
 
   // Base query
   let query = `
@@ -53,7 +53,7 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
     `;
     query += searchCondition;
     countQuery += searchCondition;
-    
+
     const searchParam = `%${searchValue}%`;
     queryParams.push(searchParam, searchParam, searchParam, searchParam);
     countParams.push(searchParam, searchParam, searchParam, searchParam);
@@ -61,20 +61,20 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
 
   // Add column-specific search
   columns.forEach((column, index) => {
-    if (column.search && column.search.value) {
+    if (column.search?.value) {
       const columnMap = {
-        0: 'u.id',
-        1: 'u.username', 
-        2: 'u.email',
-        3: 'r.role_name',
-        4: 'u.is_active'
+        0: "u.id",
+        1: "u.username",
+        2: "u.email",
+        3: "r.role_name",
+        4: "u.is_active",
       };
-      
+
       if (columnMap[index]) {
         const columnSearchCondition = ` AND ${columnMap[index]} LIKE ?`;
         query += columnSearchCondition;
         countQuery += columnSearchCondition;
-        
+
         const columnSearchParam = `%${column.search.value}%`;
         queryParams.push(columnSearchParam);
         countParams.push(columnSearchParam);
@@ -85,26 +85,26 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
   // Add ordering
   if (order && order.length > 0) {
     const orderColumn = order[0].column;
-    const orderDir = order[0].dir === 'desc' ? 'DESC' : 'ASC';
-    
+    const orderDir = order[0].dir === "desc" ? "DESC" : "ASC";
+
     const columnMap = {
-      0: 'u.id',
-      1: 'u.username',
-      2: 'u.email', 
-      3: 'r.role_name',
-      4: 'u.is_active',
-      5: 'u.created_at'
+      0: "u.id",
+      1: "u.username",
+      2: "u.email",
+      3: "r.role_name",
+      4: "u.is_active",
+      5: "u.created_at",
     };
 
     if (columnMap[orderColumn]) {
       query += ` ORDER BY ${columnMap[orderColumn]} ${orderDir}`;
     }
   } else {
-    query += ' ORDER BY u.created_at DESC';
+    query += " ORDER BY u.created_at DESC";
   }
 
   // Add pagination
-  query += ' LIMIT ? OFFSET ?';
+  query += " LIMIT ? OFFSET ?";
   queryParams.push(limit, offset);
 
   try {
@@ -124,14 +124,14 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
     const [users] = await db.query(query, queryParams);
 
     // Format data for DataTables
-    const data = users.map(user => [
+    const data = users.map((user) => [
       user.id,
       user.username,
       user.email,
-      user.role || 'No Role',
-      user.is_active ? 
-        '<span class="badge bg-success">Active</span>' : 
-        '<span class="badge bg-secondary">Inactive</span>',
+      user.role || "No Role",
+      user.is_active
+        ? '<span class="badge bg-success">Active</span>'
+        : '<span class="badge bg-secondary">Inactive</span>',
       `
         <div class="btn-group" role="group">
           <a href="/user/edit/${user.id}" class="btn btn-sm btn-primary">
@@ -140,16 +140,20 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
           <a href="/admin/user/${user.id}/permissions" class="btn btn-sm btn-info" title="Manage User Permissions">
             <i class="fas fa-key"></i>
           </a>
-          ${user.id !== req.session.user?.id ? `
+          ${
+            user.id !== req.session.user?.id
+              ? `
             <form method="POST" action="/admin/user/toggle-active/${user.id}" style="display: inline-block;">
-              <input type="hidden" name="_csrf" value="${req.csrfToken ? req.csrfToken() : ''}" />
-              <button type="submit" class="btn btn-sm ${user.is_active ? 'btn-warning' : 'btn-success'}">
+              <input type="hidden" name="_csrf" value="${req.csrfToken ? req.csrfToken() : ""}" />
+              <button type="submit" class="btn btn-sm ${user.is_active ? "btn-warning" : "btn-success"}">
                 ${user.is_active ? '<i class="fas fa-user-slash"></i>' : '<i class="fas fa-user-check"></i>'}
               </button>
             </form>
-          ` : ''}
+          `
+              : ""
+          }
         </div>
-      `
+      `,
     ]);
 
     // Return DataTables response
@@ -157,17 +161,16 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
       draw: parseInt(draw),
       recordsTotal: totalCount,
       recordsFiltered: filteredCount,
-      data: data
+      data: data,
     });
-
   } catch (error) {
-    console.error('❌ [DATATABLE] Error getting users data:', error.message);
+    console.error("❌ [DATATABLE] Error getting users data:", error.message);
     res.status(500).json({
       draw: parseInt(draw),
       recordsTotal: 0,
       recordsFiltered: 0,
       data: [],
-      error: 'Failed to load data'
+      error: "Failed to load data",
     });
   }
 });

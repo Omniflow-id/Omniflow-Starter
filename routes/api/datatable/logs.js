@@ -8,13 +8,13 @@ const getLogsDataTable = asyncHandler(async (req, res) => {
     length = 10,
     search = {},
     order = [],
-    columns = []
+    columns = [],
   } = req.query;
 
   // Parse DataTables parameters
   const offset = parseInt(start);
   const limit = parseInt(length);
-  const searchValue = search.value || '';
+  const searchValue = search.value || "";
 
   // Base query
   let query = `
@@ -58,30 +58,46 @@ const getLogsDataTable = asyncHandler(async (req, res) => {
     `;
     query += searchCondition;
     countQuery += searchCondition;
-    
+
     const searchParam = `%${searchValue}%`;
-    queryParams.push(searchParam, searchParam, searchParam, searchParam, searchParam, searchParam, searchParam);
-    countParams.push(searchParam, searchParam, searchParam, searchParam, searchParam, searchParam, searchParam);
+    queryParams.push(
+      searchParam,
+      searchParam,
+      searchParam,
+      searchParam,
+      searchParam,
+      searchParam,
+      searchParam
+    );
+    countParams.push(
+      searchParam,
+      searchParam,
+      searchParam,
+      searchParam,
+      searchParam,
+      searchParam,
+      searchParam
+    );
   }
 
   // Add column-specific search
   columns.forEach((column, index) => {
-    if (column.search && column.search.value) {
+    if (column.search?.value) {
       const columnMap = {
-        0: 'id',
-        1: 'activity_type',
-        2: 'action_type',
-        3: 'status',
-        4: 'username',
-        5: 'activity',
-        6: 'created_at'
+        0: "id",
+        1: "activity_type",
+        2: "action_type",
+        3: "status",
+        4: "username",
+        5: "activity",
+        6: "created_at",
       };
-      
+
       if (columnMap[index]) {
         const columnSearchCondition = ` AND ${columnMap[index]} LIKE ?`;
         query += columnSearchCondition;
         countQuery += columnSearchCondition;
-        
+
         const columnSearchParam = `%${column.search.value}%`;
         queryParams.push(columnSearchParam);
         countParams.push(columnSearchParam);
@@ -92,27 +108,27 @@ const getLogsDataTable = asyncHandler(async (req, res) => {
   // Add ordering
   if (order && order.length > 0) {
     const orderColumn = order[0].column;
-    const orderDir = order[0].dir === 'desc' ? 'DESC' : 'ASC';
-    
+    const orderDir = order[0].dir === "desc" ? "DESC" : "ASC";
+
     const columnMap = {
-      0: 'id',
-      1: 'activity_type',
-      2: 'action_type',
-      3: 'status',
-      4: 'username',
-      5: 'activity',
-      6: 'created_at'
+      0: "id",
+      1: "activity_type",
+      2: "action_type",
+      3: "status",
+      4: "username",
+      5: "activity",
+      6: "created_at",
     };
 
     if (columnMap[orderColumn]) {
       query += ` ORDER BY ${columnMap[orderColumn]} ${orderDir}`;
     }
   } else {
-    query += ' ORDER BY created_at DESC';
+    query += " ORDER BY created_at DESC";
   }
 
   // Add pagination
-  query += ' LIMIT ? OFFSET ?';
+  query += " LIMIT ? OFFSET ?";
   queryParams.push(limit, offset);
 
   try {
@@ -131,67 +147,73 @@ const getLogsDataTable = asyncHandler(async (req, res) => {
     const [logs] = await db.query(query, queryParams);
 
     // Format data for DataTables
-    const data = logs.map(log => {
+    const data = logs.map((log) => {
       // Parse metadata safely
       let parsedMetadata = null;
       if (log.metadata) {
         try {
-          parsedMetadata = typeof log.metadata === 'string' 
-            ? JSON.parse(log.metadata) 
-            : log.metadata;
-        } catch (e) {
+          parsedMetadata =
+            typeof log.metadata === "string"
+              ? JSON.parse(log.metadata)
+              : log.metadata;
+        } catch (_e) {
           parsedMetadata = null;
         }
       }
 
       return [
         log.id,
-        log.activity_type === 'user' 
-          ? '<span class="badge bg-primary">User</span>' 
+        log.activity_type === "user"
+          ? '<span class="badge bg-primary">User</span>'
           : '<span class="badge bg-secondary">System</span>',
-        log.action_type 
+        log.action_type
           ? `<span class="badge bg-info">${log.action_type.toUpperCase()}</span>`
-          : '-',
+          : "-",
         (() => {
-          switch(log.status) {
-            case 'success': return '<span class="badge bg-success">Success</span>';
-            case 'failure': return '<span class="badge bg-danger">Failure</span>';
-            case 'warning': return '<span class="badge bg-warning text-dark">Warning</span>';
-            case 'info': return '<span class="badge bg-info">Info</span>';
-            default: return `<span class="badge bg-light text-dark">${log.status || '-'}</span>`;
+          switch (log.status) {
+            case "success":
+              return '<span class="badge bg-success">Success</span>';
+            case "failure":
+              return '<span class="badge bg-danger">Failure</span>';
+            case "warning":
+              return '<span class="badge bg-warning text-dark">Warning</span>';
+            case "info":
+              return '<span class="badge bg-info">Info</span>';
+            default:
+              return `<span class="badge bg-light text-dark">${log.status || "-"}</span>`;
           }
         })(),
-        log.username 
+        log.username
           ? `<div class="user-info">
                <strong>${log.username}</strong>
-               ${log.user_role ? `<br><small class="text-muted">${log.user_role}</small>` : ''}
+               ${log.user_role ? `<br><small class="text-muted">${log.user_role}</small>` : ""}
              </div>`
           : '<span class="text-muted">-</span>',
         `<div class="activity-cell">
            ${log.activity}
-           ${log.error_message ? `<br><small class="text-danger"><i class="fas fa-exclamation-triangle"></i> ${log.error_message}</small>` : ''}
+           ${log.error_message ? `<br><small class="text-danger"><i class="fas fa-exclamation-triangle"></i> ${log.error_message}</small>` : ""}
          </div>`,
         `<div class="time-info">
-           ${new Date(log.created_at).toLocaleString('id-ID', {
-             timeZone: 'Asia/Jakarta',
-             year: 'numeric',
-             month: '2-digit',
-             day: '2-digit',
-             hour: '2-digit',
-             minute: '2-digit',
-             second: '2-digit'
+           ${new Date(log.created_at).toLocaleString("id-ID", {
+             timeZone: "Asia/Jakarta",
+             year: "numeric",
+             month: "2-digit",
+             day: "2-digit",
+             hour: "2-digit",
+             minute: "2-digit",
+             second: "2-digit",
            })}
-           ${log.duration_ms ? `<br><small class="text-muted">${log.duration_ms}ms</small>` : ''}
+           ${log.duration_ms ? `<br><small class="text-muted">${log.duration_ms}ms</small>` : ""}
          </div>`,
         `<button 
            class="btn btn-sm btn-outline-primary btn-details" 
            data-log-data='${JSON.stringify({
              ...log,
-             parsedMetadata
+             parsedMetadata,
            })}'
            title="View Details">
            <i class="fas fa-eye"></i>
-         </button>`
+         </button>`,
       ];
     });
 
@@ -200,17 +222,16 @@ const getLogsDataTable = asyncHandler(async (req, res) => {
       draw: parseInt(draw),
       recordsTotal: totalCount,
       recordsFiltered: filteredCount,
-      data: data
+      data: data,
     });
-
   } catch (error) {
-    console.error('❌ [DATATABLE] Error getting logs data:', error.message);
+    console.error("❌ [DATATABLE] Error getting logs data:", error.message);
     res.status(500).json({
       draw: parseInt(draw),
       recordsTotal: 0,
       recordsFiltered: 0,
       data: [],
-      error: 'Failed to load data'
+      error: "Failed to load data",
     });
   }
 });

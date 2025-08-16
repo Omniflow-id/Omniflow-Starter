@@ -9,13 +9,13 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
     search = {},
     order = [],
     columns = [],
-    status = 'all'
+    status = "all",
   } = req.query;
 
   // Parse DataTables parameters
   const offset = parseInt(start);
   const limit = parseInt(length);
-  const searchValue = search.value || '';
+  const searchValue = search.value || "";
 
   // Base query
   let query = `
@@ -45,7 +45,7 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
   const countParams = [];
 
   // Add status filter
-  if (status && status !== 'all') {
+  if (status && status !== "all") {
     const statusCondition = ` AND status = ?`;
     query += statusCondition;
     countQuery += statusCondition;
@@ -66,29 +66,41 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
     `;
     query += searchCondition;
     countQuery += searchCondition;
-    
+
     const searchParam = `%${searchValue}%`;
-    queryParams.push(searchParam, searchParam, searchParam, searchParam, searchParam);
-    countParams.push(searchParam, searchParam, searchParam, searchParam, searchParam);
+    queryParams.push(
+      searchParam,
+      searchParam,
+      searchParam,
+      searchParam,
+      searchParam
+    );
+    countParams.push(
+      searchParam,
+      searchParam,
+      searchParam,
+      searchParam,
+      searchParam
+    );
   }
 
   // Add column-specific search
   columns.forEach((column, index) => {
-    if (column.search && column.search.value) {
+    if (column.search?.value) {
       const columnMap = {
-        0: 'CAST(id AS CHAR)',
-        1: 'status',
-        2: 'queue',
-        3: 'data',
-        4: 'CAST(attempts AS CHAR)',
-        5: 'created_at'
+        0: "CAST(id AS CHAR)",
+        1: "status",
+        2: "queue",
+        3: "data",
+        4: "CAST(attempts AS CHAR)",
+        5: "created_at",
       };
-      
+
       if (columnMap[index]) {
         const columnSearchCondition = ` AND ${columnMap[index]} LIKE ?`;
         query += columnSearchCondition;
         countQuery += columnSearchCondition;
-        
+
         const columnSearchParam = `%${column.search.value}%`;
         queryParams.push(columnSearchParam);
         countParams.push(columnSearchParam);
@@ -99,28 +111,28 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
   // Add ordering
   if (order && order.length > 0) {
     const orderColumn = order[0].column;
-    const orderDir = order[0].dir === 'desc' ? 'DESC' : 'ASC';
-    
+    const orderDir = order[0].dir === "desc" ? "DESC" : "ASC";
+
     const columnMap = {
-      0: 'id',
-      1: 'status',
-      2: 'queue',
-      3: 'data',
-      4: 'attempts',
-      5: 'created_at',
-      6: 'started_at',
-      7: 'completed_at'
+      0: "id",
+      1: "status",
+      2: "queue",
+      3: "data",
+      4: "attempts",
+      5: "created_at",
+      6: "started_at",
+      7: "completed_at",
     };
 
     if (columnMap[orderColumn]) {
       query += ` ORDER BY ${columnMap[orderColumn]} ${orderDir}`;
     }
   } else {
-    query += ' ORDER BY created_at DESC';
+    query += " ORDER BY created_at DESC";
   }
 
   // Add pagination
-  query += ' LIMIT ? OFFSET ?';
+  query += " LIMIT ? OFFSET ?";
   queryParams.push(limit, offset);
 
   try {
@@ -129,14 +141,14 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
     const filteredCount = countResult[0].total;
 
     // Get total count (without filters)
-    let totalCountQuery = 'SELECT COUNT(*) as total FROM jobs';
+    let totalCountQuery = "SELECT COUNT(*) as total FROM jobs";
     const totalCountParams = [];
-    
-    if (status && status !== 'all') {
-      totalCountQuery += ' WHERE status = ?';
+
+    if (status && status !== "all") {
+      totalCountQuery += " WHERE status = ?";
       totalCountParams.push(status);
     }
-    
+
     const [totalResult] = await db.query(totalCountQuery, totalCountParams);
     const totalCount = totalResult[0].total;
 
@@ -144,29 +156,34 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
     const [jobs] = await db.query(query, queryParams);
 
     // Format data for DataTables
-    const data = jobs.map(job => {
+    const data = jobs.map((job) => {
       // Parse JSON data safely
       let formattedData;
       try {
-        if (typeof job.data === 'string') {
+        if (typeof job.data === "string") {
           const parsed = JSON.parse(job.data);
           formattedData = JSON.stringify(parsed, null, 2);
-        } else if (typeof job.data === 'object') {
+        } else if (typeof job.data === "object") {
           formattedData = JSON.stringify(job.data, null, 2);
         } else {
           formattedData = String(job.data);
         }
-      } catch (parseError) {
+      } catch (_parseError) {
         formattedData = String(job.data);
       }
 
       const statusBadge = (() => {
-        switch(job.status) {
-          case 'pending': return '<span class="badge bg-warning">Pending</span>';
-          case 'processing': return '<span class="badge bg-info">Processing</span>';
-          case 'completed': return '<span class="badge bg-success">Completed</span>';
-          case 'failed': return '<span class="badge bg-danger">Failed</span>';
-          default: return `<span class="badge bg-secondary">${job.status}</span>`;
+        switch (job.status) {
+          case "pending":
+            return '<span class="badge bg-warning">Pending</span>';
+          case "processing":
+            return '<span class="badge bg-info">Processing</span>';
+          case "completed":
+            return '<span class="badge bg-success">Completed</span>';
+          case "failed":
+            return '<span class="badge bg-danger">Failed</span>';
+          default:
+            return `<span class="badge bg-secondary">${job.status}</span>`;
         }
       })();
 
@@ -184,11 +201,13 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
       `;
 
       const attemptsColumn = (() => {
-        const badgeClass = job.attempts >= job.max_attempts ? 'bg-danger' : 'bg-warning';
+        const badgeClass =
+          job.attempts >= job.max_attempts ? "bg-danger" : "bg-warning";
         return `<span class="badge ${badgeClass}">${job.attempts}/${job.max_attempts}</span>`;
       })();
 
-      const errorColumn = job.error ? `
+      const errorColumn = job.error
+        ? `
         <button
           class="btn btn-sm btn-outline-danger"
           data-bs-toggle="collapse"
@@ -201,18 +220,19 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
             ${job.error}
           </div>
         </div>
-      ` : '<small class="text-muted">-</small>';
+      `
+        : '<small class="text-muted">-</small>';
 
       const formatDateTime = (dateTime) => {
         if (!dateTime) return '<small class="text-muted">-</small>';
-        return `<small>${new Date(dateTime).toLocaleString('id-ID', {
-          timeZone: 'Asia/Jakarta',
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          second: '2-digit'
+        return `<small>${new Date(dateTime).toLocaleString("id-ID", {
+          timeZone: "Asia/Jakarta",
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
         })}</small>`;
       };
 
@@ -225,7 +245,7 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
         formatDateTime(job.created_at),
         formatDateTime(job.started_at),
         formatDateTime(job.completed_at),
-        errorColumn
+        errorColumn,
       ];
     });
 
@@ -234,17 +254,16 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
       draw: parseInt(draw),
       recordsTotal: totalCount,
       recordsFiltered: filteredCount,
-      data: data
+      data: data,
     });
-
   } catch (error) {
-    console.error('❌ [DATATABLE] Error getting jobs data:', error.message);
+    console.error("❌ [DATATABLE] Error getting jobs data:", error.message);
     res.status(500).json({
       draw: parseInt(draw),
       recordsTotal: 0,
       recordsFiltered: 0,
       data: [],
-      error: 'Failed to load data'
+      error: "Failed to load data",
     });
   }
 });
