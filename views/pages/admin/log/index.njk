@@ -120,79 +120,6 @@
                   <th width="50">Details</th>
                 </tr>
               </thead>
-              <tbody>
-                {% for log in logs %}
-                <tr data-log-id="{{ log.id }}">
-                  <td>{{ log.id }}</td>
-                  <td>
-                    {% if log.activity_type == 'user' %}
-                      <span class="badge bg-primary">User</span>
-                    {% else %}
-                      <span class="badge bg-secondary">System</span>
-                    {% endif %}
-                  </td>
-                  <td>
-                    {% if log.action_type %}
-                      <span class="badge bg-info">{{ log.action_type | upper }}</span>
-                    {% else %}
-                      -
-                    {% endif %}
-                  </td>
-                  <td>
-                    {% if log.status == 'success' %}
-                      <span class="badge bg-success">Success</span>
-                    {% elif log.status == 'failure' %}
-                      <span class="badge bg-danger">Failure</span>
-                    {% elif log.status == 'warning' %}
-                      <span class="badge bg-warning text-dark">Warning</span>
-                    {% elif log.status == 'info' %}
-                      <span class="badge bg-info">Info</span>
-                    {% else %}
-                      <span class="badge bg-light text-dark">{{ log.status or '-' }}</span>
-                    {% endif %}
-                  </td>
-                  <td>
-                    {% if log.username %}
-                      <div class="user-info">
-                        <strong>{{ log.username }}</strong>
-                        {% if log.user_role %}
-                          <br><small class="text-muted">{{ log.user_role }}</small>
-                        {% endif %}
-                      </div>
-                    {% else %}
-                      <span class="text-muted">-</span>
-                    {% endif %}
-                  </td>
-                  <td>
-                    <div class="activity-cell">
-                      {{ log.activity }}
-                      {% if log.error_message %}
-                        <br><small class="text-danger"><i class="fas fa-exclamation-triangle"></i> {{ log.error_message }}</small>
-                      {% endif %}
-                    </div>
-                  </td>
-                  <td>
-                    <div class="time-info">
-                      {{ log.created_at | formatDateTime }}
-                      {% if log.duration_ms %}
-                        <br><small class="text-muted">{{ log.duration_ms }}ms</small>
-                      {% endif %}
-                    </div>
-                  </td>
-                  <td>
-                    <button 
-                      class="btn btn-sm btn-outline-primary btn-details" 
-                      data-bs-toggle="modal" 
-                      data-bs-target="#logDetailModal"
-                      data-log-id="{{ log.id }}"
-                      title="View Details"
-                    >
-                      <i class="fas fa-eye"></i>
-                    </button>
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
             </table>
           </div>
         </div>
@@ -226,14 +153,34 @@
 {% endblock %} {% block scripts %}
 <script>
   $(document).ready(function () {
-    // Initialize DataTable with custom configuration
+    // Initialize DataTable with server-side processing
     $("#datatablesSimple").DataTable({
+      processing: true,
+      serverSide: true,
+      ajax: {
+        url: '/api/datatable/logs',
+        type: 'GET'
+      },
+      columns: [
+        { data: 0, name: 'id' },
+        { data: 1, name: 'activity_type' },
+        { data: 2, name: 'action_type' },
+        { data: 3, name: 'status' },
+        { data: 4, name: 'username' },
+        { data: 5, name: 'activity' },
+        { data: 6, name: 'created_at' },
+        { 
+          data: 7, 
+          name: 'details',
+          orderable: false,
+          searchable: false
+        }
+      ],
       responsive: true,
       scrollX: true,
       order: [[0, "desc"]],
       pageLength: 25,
       columnDefs: [
-        { targets: [7], orderable: false }, // Details column not sortable
         { className: "text-center", targets: [0, 1, 2, 3, 7] }
       ],
       language: {
@@ -241,22 +188,16 @@
         lengthMenu: "Show _MENU_ logs per page", 
         info: "Showing _START_ to _END_ of _TOTAL_ logs",
         infoEmpty: "No logs found",
-        infoFiltered: "(filtered from _MAX_ total logs)"
+        infoFiltered: "(filtered from _MAX_ total logs)",
+        processing: "Processing...",
+        loadingRecords: "Loading...",
+        zeroRecords: "No matching logs found"
       }
     });
 
-    // Handle detail modal
-    $('.btn-details').on('click', function() {
-      const logId = $(this).data('log-id');
-      const logRow = $(`tr[data-log-id="${logId}"]`);
-      
-      // Find log data from the current page
-      let logData = null;
-      {% for log in logs %}
-      if ({{ log.id }} == logId) {
-        logData = {{ log | dump | safe }};
-      }
-      {% endfor %}
+    // Handle detail modal with server-side data
+    $(document).on('click', '.btn-details', function() {
+      const logData = $(this).data('log-data');
       
       if (logData) {
         displayLogDetails(logData);
