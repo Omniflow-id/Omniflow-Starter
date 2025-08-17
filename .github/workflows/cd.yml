@@ -56,8 +56,8 @@ jobs:
             # Install dependencies
             npm install
             
-            # Start/Restart application using ecosystem config
-            pm2 restart ecosystem.config.js || pm2 start ecosystem.config.js
+            # Start/Restart application using ecosystem config in production mode
+            pm2 restart ecosystem.config.js --env production || pm2 start ecosystem.config.js --env production
             
             # Save PM2 process list and setup startup script
             pm2 save
