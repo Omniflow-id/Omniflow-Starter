@@ -12,6 +12,8 @@ const retryFailedJobsAction = asyncHandler(async (req, res) => {
     );
     // Invalidate queue cache since stats will change
     await invalidateCache("admin:queue:*", true);
+    await invalidateCache("datatable:jobs:*", true); // DataTable cache
+    await invalidateCache("datatable:failed-jobs:*", true); // Failed jobs DataTable cache
   } else {
     req.flash(
       "error_msg",

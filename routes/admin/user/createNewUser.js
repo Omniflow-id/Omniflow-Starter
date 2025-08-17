@@ -179,6 +179,7 @@ const createNewUser = async (req, res) => {
 
     // Invalidate user-related caches
     await invalidateCache("admin:users:*", true);
+    await invalidateCache("datatable:users:*", true); // DataTable cache
     await invalidateCache("user:*", true);
 
     // Store generated password for display

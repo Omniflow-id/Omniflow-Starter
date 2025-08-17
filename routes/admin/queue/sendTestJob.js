@@ -63,6 +63,8 @@ const sendTestJob = asyncHandler(async (req, res) => {
     req.flash("success_msg", "Test job sent successfully!");
     // Invalidate queue cache since stats might change
     await invalidateCache("admin:queue:*", true);
+    await invalidateCache("datatable:jobs:*", true); // DataTable cache
+    await invalidateCache("datatable:failed-jobs:*", true); // Failed jobs DataTable cache
   } else {
     req.flash(
       "error_msg",

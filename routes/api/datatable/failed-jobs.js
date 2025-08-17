@@ -1,4 +1,5 @@
 const { db } = require("@db/db");
+const { handleCache } = require("@helpers/cache");
 const { asyncHandler } = require("@middlewares/errorHandler");
 
 const getFailedJobsDataTable = asyncHandler(async (req, res) => {
@@ -112,20 +113,42 @@ const getFailedJobsDataTable = asyncHandler(async (req, res) => {
   queryParams.push(limit, offset);
 
   try {
-    // Get filtered count
-    const [countResult] = await db.query(countQuery, countParams);
-    const filteredCount = countResult[0].total;
+    // Create cache key based on query parameters for pagination
+    const cacheKey = `datatable:failed-jobs:${Buffer.from(
+      JSON.stringify({
+        search: searchValue,
+        offset,
+        limit,
+        order: order?.[0] || {},
+        columns: columns.filter((col) => col.search?.value),
+      })
+    ).toString("base64")}`;
 
-    // Get total count of failed jobs
-    const [totalResult] = await db.query(`
-      SELECT COUNT(*) as total 
-      FROM jobs 
-      WHERE status = 'failed'
-    `);
-    const totalCount = totalResult[0].total;
+    // Use cache with 2-minute TTL for DataTable data
+    const result = await handleCache({
+      key: cacheKey,
+      ttl: 120, // 2 minutes (shorter TTL for real-time data)
+      dbQueryFn: async () => {
+        // Get filtered count
+        const [countResult] = await db.query(countQuery, countParams);
+        const filteredCount = countResult[0].total;
 
-    // Get data
-    const [jobs] = await db.query(query, queryParams);
+        // Get total count of failed jobs
+        const [totalResult] = await db.query(`
+          SELECT COUNT(*) as total 
+          FROM jobs 
+          WHERE status = 'failed'
+        `);
+        const totalCount = totalResult[0].total;
+
+        // Get data
+        const [jobs] = await db.query(query, queryParams);
+
+        return { jobs, filteredCount, totalCount };
+      },
+    });
+
+    const { jobs, filteredCount, totalCount } = result.data;
 
     // Format data for DataTables
     const data = jobs.map((job) => {
@@ -204,12 +227,16 @@ const getFailedJobsDataTable = asyncHandler(async (req, res) => {
       ];
     });
 
-    // Return DataTables response
+    // Return DataTables response with cache info
     res.json({
       draw: parseInt(draw),
       recordsTotal: totalCount,
       recordsFiltered: filteredCount,
       data: data,
+      cache: {
+        source: result.source,
+        duration_ms: result.duration_ms,
+      },
     });
   } catch (error) {
     console.error(

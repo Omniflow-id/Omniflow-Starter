@@ -116,6 +116,7 @@ const updateUserPermissions = asyncHandler(async (req, res) => {
   // Invalidate cache
   await invalidateCache("admin:permissions:*", true);
   await invalidateCache("admin:users:*", true);
+  await invalidateCache("datatable:users:*", true); // DataTable cache
   await invalidateCache(`admin:user:${userId}:*`, true);
 
   res.json({

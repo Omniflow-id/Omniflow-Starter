@@ -419,6 +419,7 @@ async function logActivity(options = {}) {
     setImmediate(async () => {
       try {
         await invalidateCache("admin:logs:*", true);
+        await invalidateCache("datatable:logs:*", true); // DataTable cache
       } catch (cacheErr) {
         console.warn(
           "Warning: Failed to invalidate logs cache:",

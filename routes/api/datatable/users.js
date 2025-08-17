@@ -1,5 +1,7 @@
 const { db } = require("@db/db");
+const { handleCache } = require("@helpers/cache");
 const { asyncHandler } = require("@middlewares/errorHandler");
+const { generateCsrfToken } = require("@middlewares/csrfProtection");
 
 const getUsersDataTable = asyncHandler(async (req, res) => {
   const {
@@ -108,20 +110,45 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
   queryParams.push(limit, offset);
 
   try {
-    // Get filtered count
-    const [countResult] = await db.query(countQuery, countParams);
-    const filteredCount = countResult[0].total;
+    // Create cache key based on query parameters for pagination
+    const cacheKey = `datatable:users:${Buffer.from(
+      JSON.stringify({
+        search: searchValue,
+        offset,
+        limit,
+        order: order?.[0] || {},
+        columns: columns.filter((col) => col.search?.value),
+      })
+    ).toString("base64")}`;
 
-    // Get total count (without filters)
-    const [totalResult] = await db.query(`
-      SELECT COUNT(*) as total 
-      FROM users 
-      WHERE deleted_at IS NULL
-    `);
-    const totalCount = totalResult[0].total;
+    // Use cache with 2-minute TTL for DataTable data
+    const result = await handleCache({
+      key: cacheKey,
+      ttl: 120, // 2 minutes (shorter TTL for real-time data)
+      dbQueryFn: async () => {
+        // Get filtered count
+        const [countResult] = await db.query(countQuery, countParams);
+        const filteredCount = countResult[0].total;
 
-    // Get data
-    const [users] = await db.query(query, queryParams);
+        // Get total count (without filters)
+        const [totalResult] = await db.query(`
+          SELECT COUNT(*) as total 
+          FROM users 
+          WHERE deleted_at IS NULL
+        `);
+        const totalCount = totalResult[0].total;
+
+        // Get data
+        const [users] = await db.query(query, queryParams);
+
+        return { users, filteredCount, totalCount };
+      },
+    });
+
+    const { users, filteredCount, totalCount } = result.data;
+
+    // Generate CSRF token for forms in DataTable
+    const csrfToken = generateCsrfToken(req, res);
 
     // Format data for DataTables
     const data = users.map((user) => [
@@ -144,7 +171,7 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
             user.id !== req.session.user?.id
               ? `
             <form method="POST" action="/admin/user/toggle-active/${user.id}" style="display: inline-block;">
-              <input type="hidden" name="_csrf" value="${req.csrfToken ? req.csrfToken() : ""}" />
+              <input type="hidden" name="_csrf" value="${csrfToken}" />
               <button type="submit" class="btn btn-sm ${user.is_active ? "btn-warning" : "btn-success"}">
                 ${user.is_active ? '<i class="fas fa-user-slash"></i>' : '<i class="fas fa-user-check"></i>'}
               </button>
@@ -156,12 +183,16 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
       `,
     ]);
 
-    // Return DataTables response
+    // Return DataTables response with cache info
     res.json({
       draw: parseInt(draw),
       recordsTotal: totalCount,
       recordsFiltered: filteredCount,
       data: data,
+      cache: {
+        source: result.source,
+        duration_ms: result.duration_ms,
+      },
     });
   } catch (error) {
     console.error("❌ [DATATABLE] Error getting users data:", error.message);

@@ -1,91 +1,54 @@
 const { db } = require("@db/db");
+const { handleCache } = require("@helpers/cache");
 const { asyncHandler } = require("@middlewares/errorHandler");
 
 const getAllJobsPage = asyncHandler(async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 20;
   const status = req.query.status || "all";
 
-  const offset = (page - 1) * limit;
-
-  let whereClause = "";
-  const params = [];
-
-  if (status && status !== "all") {
-    whereClause = "WHERE status = ?";
-    params.push(status);
-  }
-
   try {
-    const [jobs] = await db.query(
-      `SELECT * FROM jobs 
-       ${whereClause}
-       ORDER BY created_at DESC 
-       LIMIT ? OFFSET ?`,
-      [...params, limit, offset]
-    );
+    // Just get basic stats for page metadata - DataTable loads data via AJAX
+    const result = await handleCache({
+      key: `admin:queue:jobs-metadata:${status}`,
+      ttl: 120, // 2 minutes cache
+      dbQueryFn: async () => {
+        let whereClause = "";
+        const params = [];
 
-    // Parse JSON data for each job with error handling
-    const parsedJobs = jobs.map((job) => {
-      let formattedData;
-      try {
-        // Check if data is already an object or string
-        if (typeof job.data === "string") {
-          const parsed = JSON.parse(job.data);
-          formattedData = JSON.stringify(parsed, null, 2);
-        } else if (typeof job.data === "object") {
-          formattedData = JSON.stringify(job.data, null, 2);
-        } else {
-          formattedData = String(job.data);
+        if (status && status !== "all") {
+          whereClause = "WHERE status = ?";
+          params.push(status);
         }
-      } catch (parseError) {
-        console.error(
-          "❌ [QUEUE] Error parsing job data for job ID",
-          job.id,
-          ":",
-          parseError.message
-        );
-        formattedData = String(job.data); // Fallback to string representation
-      }
 
-      return {
-        ...job,
-        data: formattedData,
-      };
+        const [countResult] = await db.query(
+          `SELECT COUNT(*) as total FROM jobs ${whereClause}`,
+          params
+        );
+
+        const total = countResult[0].total;
+        return { total };
+      },
     });
 
-    const [countResult] = await db.query(
-      `SELECT COUNT(*) as total FROM jobs ${whereClause}`,
-      params
-    );
-
-    const total = countResult[0].total;
-    const totalPages = Math.ceil(total / limit);
-
     res.render("pages/admin/queue/all-jobs", {
-      jobs: parsedJobs,
-      pagination: {
-        currentPage: page,
-        limit,
-        total,
-        totalPages,
-      },
       currentStatus: status,
+      totalJobs: result.data.total,
       user: req.session.user,
+      cacheInfo: {
+        source: result.source,
+        duration_ms: result.duration_ms,
+      },
     });
   } catch (error) {
-    console.error("❌ [QUEUE] Error getting all jobs:", error.message);
+    console.error("❌ [QUEUE] Error getting jobs page:", error.message);
     res.render("pages/admin/queue/all-jobs", {
-      jobs: [],
-      pagination: {
-        currentPage: 1,
-        limit,
-        total: 0,
-        totalPages: 0,
-      },
       currentStatus: status,
+      totalJobs: 0,
       user: req.session.user,
-      error: "Failed to load jobs data",
+      error: "Failed to load jobs page",
+      cacheInfo: {
+        source: "error",
+        duration_ms: 0,
+      },
     });
   }
 });

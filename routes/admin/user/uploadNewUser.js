@@ -161,6 +161,7 @@ const uploadNewUser = async (req, res) => {
     if (successfulUsers.length > 0) {
       // Invalidate user-related caches after bulk creation
       await invalidateCache("admin:users:*", true);
+      await invalidateCache("datatable:users:*", true); // DataTable cache
       await invalidateCache("user:*", true);
 
       // Log bulk upload summary

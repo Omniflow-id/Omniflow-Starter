@@ -92,6 +92,7 @@ const toggleUserActive = async (req, res) => {
 
     // Invalidate user-related caches after status change
     await invalidateCache("admin:users:*", true);
+    await invalidateCache("datatable:users:*", true); // DataTable cache
     await invalidateCache(`user:${userId}:*`, true);
 
     req.flash(

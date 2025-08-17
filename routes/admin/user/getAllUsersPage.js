@@ -13,31 +13,22 @@ const {
 
 const getAllUsersPage = async (req, res) => {
   try {
-    // Use cache with 5-minute TTL for user list
+    // Only load roles for modal - users data loaded via server-side DataTable
     const result = await handleCache({
-      key: "admin:users:list",
+      key: "admin:users:roles",
       ttl: 300, // 5 minutes
       dbQueryFn: async () => {
-        const [users] = await db.query(
-          "SELECT u.id, u.username, u.email, u.full_name, r.role_name as role, u.is_active FROM users u LEFT JOIN roles r ON u.role_id = r.role_id WHERE u.deleted_at IS NULL ORDER BY u.id"
-        );
         const [roles] = await db.query(
           "SELECT role_id, role_name FROM roles WHERE deleted_at IS NULL ORDER BY role_name"
         );
-        return { users, roles };
+        return { roles };
       },
     });
 
-    // Add session user ID to prevent self-deactivation
-    const usersWithSessionInfo = result.data.users.map((user) => ({
-      ...user,
-      session_user_id: req.session.user.id,
-    }));
-
-    // Add cache info to template data for debugging
+    // Render page with roles only - DataTable will load users via AJAX
     res.render("pages/admin/user/index", {
-      users: usersWithSessionInfo,
       roles: result.data.roles,
+      session_user_id: req.session.user.id, // For preventing self-deactivation
       cacheInfo: {
         source: result.source,
         duration_ms: result.duration_ms,
@@ -48,10 +39,10 @@ const getAllUsersPage = async (req, res) => {
     const userAgent = getUserAgent(req);
 
     await logUserActivity({
-      activity: "Failed to load users list page",
+      activity: "Failed to load users page",
       actionType: ACTION_TYPES.READ,
       resourceType: RESOURCE_TYPES.USER,
-      resourceId: "users_list",
+      resourceId: "users_page",
       status: ACTIVITY_STATUS.FAILURE,
       userId: req.session?.user?.id,
       requestInfo: {
@@ -64,9 +55,9 @@ const getAllUsersPage = async (req, res) => {
         url: req.originalUrl,
       },
       errorMessage: error.message,
-      errorCode: error.code || "USER_LIST_LOAD_FAILED",
+      errorCode: error.code || "USER_PAGE_LOAD_FAILED",
       metadata: {
-        pageType: "users_list",
+        pageType: "users_page",
         cacheEnabled: true,
         cacheTTL: 300,
         errorDetails: error.name,
