@@ -1,0 +1,96 @@
+@startuml Omniflow-Enterprise-Architecture
+
+skinparam componentStyle uml2
+skinparam monochrome false
+skinparam defaultFontName Helvetica
+skinparam defaultFontSize 11
+
+title Omniflow-Starter Enterprise Architecture
+
+package "Client Layer" {
+  [Web Browser] as Browser
+  [Mobile App] as Mobile
+  [API Client] as APIClient
+}
+
+package "Application Layer" #LightBlue {
+  [Express.js Server] as Server
+  [Worker System] as Workers
+}
+
+package "Business Layer" #LightGreen {
+  [User Management] as UserMgmt
+  [RBAC & Permissions] as RBAC
+  [Activity Logging] as ActivityLog
+  [File Processing] as FileProcessing
+}
+
+package "Data Layer" #LightYellow {
+  database "MySQL" as MySQL
+  [Redis Cache] as Redis
+  [RabbitMQ] as RabbitMQ
+}
+
+package "Security Layer" #LightPink {
+  [Authentication] as Auth
+  [Authorization] as Authorization
+  [Security Middleware] as Security
+}
+
+package "Infrastructure" #LightGrey {
+  cloud "Cloud Services" as Cloud {
+    [S3 Storage] as S3
+    [Managed DB] as RDS
+    [Cache Service] as ElastiCache
+  }
+}
+
+' Main flow connections
+Browser --> Server : HTTPS
+Mobile --> Server : REST API
+APIClient --> Server : JSON API
+
+Server --> UserMgmt
+Server --> RBAC
+Server --> ActivityLog
+Server --> FileProcessing
+
+UserMgmt --> MySQL
+RBAC --> MySQL
+ActivityLog --> MySQL
+FileProcessing --> S3
+
+Server --> Redis : Cache
+Server --> RabbitMQ : Jobs
+Workers --> RabbitMQ : Processing
+
+Auth --> Server
+Authorization --> Server
+Security --> Server
+
+MySQL --> RDS : Production
+Redis --> ElastiCache : Production
+
+note right of Server
+  Express.js + Nunjucks
+  Module aliases
+  Error handling
+  Rate limiting & CSRF
+end note
+
+note right of MySQL
+  Schema: users, roles,
+  permissions, activity_logs, jobs
+end note
+
+note right of Redis
+  Sessions, permissions,
+  DataTable cache (2-5min TTL)
+end note
+
+note right of Auth
+  Session + JWT + 2FA OTP
+  24h timeout
+end note
+
+@enduml
