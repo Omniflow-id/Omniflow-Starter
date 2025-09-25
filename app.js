@@ -76,6 +76,7 @@ nunjucksDate.setDefaultFormat("YYYY"); // Change default format to YYYY
 env.addFilter("date", nunjucksDate);
 env.addGlobal("currentYear", new Date().getFullYear()); // Add current year as global
 env.addGlobal("marked", marked);
+env.addGlobal("appName", process.env.APP_NAME || "Omniflow Starter");
 
 // Add template helper functions
 const {

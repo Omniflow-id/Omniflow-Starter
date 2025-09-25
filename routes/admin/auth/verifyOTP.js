@@ -193,7 +193,7 @@ const postVerifyOTP = asyncHandler(async (req, res) => {
 
     req.flash(
       "success",
-      "OTP verified successfully! Welcome to Omniflow Admin."
+      `OTP verified successfully! Welcome to ${process.env.APP_NAME || "Omniflow"} Admin.`
     );
     res.redirect("/admin");
   } catch (error) {

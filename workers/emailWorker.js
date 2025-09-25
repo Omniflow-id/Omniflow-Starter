@@ -45,9 +45,9 @@ class EmailWorker {
       }
 
       const mailOptions = {
-        from: `"${config.email.fromName || "Omniflow Starter"}" <${config.email.fromEmail || config.email.user}>`,
+        from: `"${config.email.fromName || process.env.APP_NAME || "Omniflow Starter"}" <${config.email.fromEmail || config.email.user}>`,
         to: email,
-        subject: "Your OTP Code - Omniflow Admin Login",
+        subject: `Your OTP Code - ${process.env.APP_NAME || "Omniflow"} Admin Login`,
         html: `
           <!DOCTYPE html>
           <html>
@@ -72,11 +72,11 @@ class EmailWorker {
             <div class="container">
               <div class="header">
                 <h1>🔐 Admin Login Verification</h1>
-                <p>Secure access to your Omniflow admin panel</p>
+                <p>Secure access to your ${process.env.APP_NAME || "Omniflow"} admin panel</p>
               </div>
               <div class="content">
                 <p>Hello <strong>${userFullName}</strong>,</p>
-                <p>You have requested to login to the Omniflow admin panel. Please use the following One-Time Password (OTP) to complete your login:</p>
+                <p>You have requested to login to the ${process.env.APP_NAME || "Omniflow"} admin panel. Please use the following One-Time Password (OTP) to complete your login:</p>
                 
                 <div class="otp-box">
                   <p style="margin: 0; font-size: 18px; color: #666;">Your OTP Code:</p>
@@ -92,11 +92,11 @@ class EmailWorker {
                   <strong>🛡️ Security Tip:</strong> If you didn't request this login, please ignore this email and ensure your account credentials are secure.
                 </div>
 
-                <p>Thank you for using Omniflow Starter!</p>
+                <p>Thank you for using ${process.env.APP_NAME || "Omniflow Starter"}!</p>
               </div>
               <div class="footer">
-                <p>This is an automated message from Omniflow Starter Admin System</p>
-                <p>© ${new Date().getFullYear()} Omniflow. All rights reserved.</p>
+                <p>This is an automated message from ${process.env.APP_NAME || "Omniflow Starter"} Admin System</p>
+                <p>© ${new Date().getFullYear()} ${process.env.APP_NAME || "Omniflow"}. All rights reserved.</p>
               </div>
             </div>
           </body>
@@ -105,7 +105,7 @@ class EmailWorker {
         text: `
 Hello ${userFullName},
 
-You have requested to login to the Omniflow admin panel.
+You have requested to login to the ${process.env.APP_NAME || "Omniflow"} admin panel.
 
 Your OTP Code: ${otp}
 
@@ -113,7 +113,7 @@ This code will expire in 5 minutes and can only be used once.
 
 If you didn't request this login, please ignore this email.
 
-Thank you for using Omniflow Starter!
+Thank you for using ${process.env.APP_NAME || "Omniflow Starter"}!
         `,
       };
 
@@ -139,16 +139,16 @@ Thank you for using Omniflow Starter!
       }
 
       const mailOptions = {
-        from: `"${config.email.fromName || "Omniflow Starter"}" <${config.email.fromEmail || config.email.user}>`,
+        from: `"${config.email.fromName || process.env.APP_NAME || "Omniflow Starter"}" <${config.email.fromEmail || config.email.user}>`,
         to: email,
-        subject: "Welcome to Omniflow - Your Account is Ready!",
+        subject: `Welcome to ${process.env.APP_NAME || "Omniflow"} - Your Account is Ready!`,
         html: `
           <!DOCTYPE html>
           <html>
           <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Welcome to Omniflow</title>
+            <title>Welcome to ${process.env.APP_NAME || "Omniflow"}</title>
             <style>
               body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; background-color: #f4f4f4; margin: 0; padding: 20px; }
               .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); overflow: hidden; }
@@ -167,12 +167,12 @@ Thank you for using Omniflow Starter!
           <body>
             <div class="container">
               <div class="header">
-                <h1>🎉 Welcome to Omniflow!</h1>
+                <h1>🎉 Welcome to ${process.env.APP_NAME || "Omniflow"}!</h1>
                 <p>Your admin account has been created successfully</p>
               </div>
               <div class="content">
                 <p>Hello <strong>${userFullName}</strong>,</p>
-                <p>Your Omniflow admin account has been created. Here are your login credentials:</p>
+                <p>Your ${process.env.APP_NAME || "Omniflow"} admin account has been created. Here are your login credentials:</p>
                 
                 <div class="credentials-box">
                   <div class="credential-item">
@@ -190,25 +190,25 @@ Thank you for using Omniflow Starter!
                 </div>
 
                 <p style="text-align: center;">
-                  <a href="${config.app.getFullUrl()}/admin/login" class="btn">Login to Omniflow Admin</a>
+                  <a href="${config.app.getFullUrl()}/admin/login" class="btn">Login to ${process.env.APP_NAME || "Omniflow"} Admin</a>
                 </p>
 
                 <p>If you have any questions, please contact your system administrator.</p>
               </div>
               <div class="footer">
-                <p>This is an automated message from Omniflow Starter Admin System</p>
-                <p>© ${new Date().getFullYear()} Omniflow. All rights reserved.</p>
+                <p>This is an automated message from ${process.env.APP_NAME || "Omniflow Starter"} Admin System</p>
+                <p>© ${new Date().getFullYear()} ${process.env.APP_NAME || "Omniflow"}. All rights reserved.</p>
               </div>
             </div>
           </body>
           </html>
         `,
         text: `
-Welcome to Omniflow!
+Welcome to ${process.env.APP_NAME || "Omniflow"}!
 
 Hello ${userFullName},
 
-Your Omniflow admin account has been created successfully.
+Your ${process.env.APP_NAME || "Omniflow"} admin account has been created successfully.
 
 Login Credentials:
 Email: ${email}
@@ -218,7 +218,7 @@ Please change your password after your first login for security reasons.
 
 Login URL: ${config.app.getFullUrl()}/admin/login
 
-Thank you for using Omniflow Starter!
+Thank you for using ${process.env.APP_NAME || "Omniflow Starter"}!
         `,
       };
 
