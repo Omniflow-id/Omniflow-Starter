@@ -1,5 +1,12 @@
 <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
-  <a class="navbar-brand ps-3" href="/">{{ appName }}</a>
+  <a class="navbar-brand ps-3 d-flex align-items-center" href="/">
+    {{ appName.replace(' (Dev)', '') }}
+    {% if isDevelopment %}
+      <span class="badge bg-warning text-dark ms-2 small">DEV</span>
+    {% elif isProduction %}
+      <span class="badge bg-success text-white ms-2 small">PRODUCTION</span>
+    {% endif %}
+  </a>
   <button
     class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0"
     id="sidebarToggle"

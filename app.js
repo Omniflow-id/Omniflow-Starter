@@ -76,7 +76,16 @@ nunjucksDate.setDefaultFormat("YYYY"); // Change default format to YYYY
 env.addFilter("date", nunjucksDate);
 env.addGlobal("currentYear", new Date().getFullYear()); // Add current year as global
 env.addGlobal("marked", marked);
-env.addGlobal("appName", process.env.APP_NAME || "Omniflow Starter");
+
+// Add app name with environment mode indicator
+const baseAppName = process.env.APP_NAME || "Omniflow Starter";
+const isDevelopment = process.env.NODE_ENV === "development";
+const isProduction = process.env.NODE_ENV === "production";
+const appNameWithMode = isDevelopment ? `${baseAppName} (Dev)` : baseAppName;
+
+env.addGlobal("appName", appNameWithMode); // Add app name as global
+env.addGlobal("isDevelopment", isDevelopment); // Add development mode flag
+env.addGlobal("isProduction", isProduction); // Add production mode flag
 
 // Add template helper functions
 const {
