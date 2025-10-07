@@ -154,11 +154,15 @@ app.use((req, res, next) => {
   res.locals.url = req.originalUrl;
   res.locals.success_msg = req.flash("success");
   res.locals.error_msg = req.flash("error");
+  res.locals.warning_msg = req.flash("warning");
+  res.locals.info_msg = req.flash("info");
 
   // Debugging
   console.log("Flash Messages:", {
     success: res.locals.success_msg,
     error: res.locals.error_msg,
+    warning: res.locals.warning_msg,
+    info: res.locals.info_msg,
   });
 
   next();
