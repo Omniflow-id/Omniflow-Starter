@@ -1,0 +1,29 @@
+@startuml
+!include https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+title Container Diagram for Omniflow Starter
+
+Person(user, "User", "A user of the Omniflow system (Admin or Client)")
+
+System_Boundary(c1, "Omniflow Starter System") {
+    Container(web_app, "Web Application", "Node.js, Express", "Delivers the static content, Nunjucks templates, and the JSON API.")
+    Container(socket_io, "Socket.IO", "Node.js", "Handles real-time bi-directional communication.")
+    Container(worker, "Worker Service", "Node.js", "Background workers for processing async tasks like emails.")
+    
+    ContainerDb(database, "Database", "MySQL", "Stores user data, permissions, logs, etc.")
+    ContainerDb(redis, "Cache", "Redis", "Stores sessions and caches frequently accessed data.")
+    ContainerQueue(rabbitmq, "Message Queue", "RabbitMQ", "Queues background jobs for workers.")
+}
+
+Rel(user, web_app, "Uses", "HTTPS")
+Rel(user, socket_io, "Uses", "WebSocket")
+
+Rel(web_app, database, "Reads/Writes", "SQL/Knex")
+Rel(web_app, redis, "Reads/Writes Cache & Session", "Redis Protocol")
+Rel(web_app, rabbitmq, "Publishes messages", "AMQP")
+Rel(web_app, socket_io, "Integrates with", "Internal")
+
+Rel(worker, rabbitmq, "Consumes messages", "AMQP")
+Rel(worker, database, "Reads/Writes status", "SQL/Knex")
+
+@enduml
