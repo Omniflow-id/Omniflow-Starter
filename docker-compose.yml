@@ -62,7 +62,7 @@ services:
   # Node.js Application
   app:
     build: .
-    container_name: omniflow_app
+    container_name: omniflow-express-starter
     environment:
       NODE_ENV: production
       PORT: 1234
@@ -113,6 +113,7 @@ services:
       
     ports:
       - "1234:1234"
+      - "9096:9096"
     depends_on:
       mysql:
         condition: service_healthy

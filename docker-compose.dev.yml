@@ -65,7 +65,7 @@ services:
       context: .
       dockerfile: Dockerfile
       target: development  # Use development stage
-    container_name: omniflow_app_dev
+    container_name: omniflow-express-starter-dev
     environment:
       NODE_ENV: development
       PORT: 1234
@@ -117,6 +117,7 @@ services:
       
     ports:
       - "1234:1234"
+      - "9096:9096"
     depends_on:
       mysql:
         condition: service_healthy

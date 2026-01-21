@@ -4,8 +4,8 @@
   "description": "Production-ready Node.js ERP starter with comprehensive user management, flexible permission system, enterprise-grade activity logging, Redis caching, RabbitMQ job queue, and S3 file storage",
   "main": "server.js",
   "scripts": {
-    "start": "node --no-deprecation server.js",
-    "dev": "nodemon --exec \"node --no-deprecation\" server.js",
+    "start": "node --require ./instrument.js --no-deprecation server.js",
+    "dev": "nodemon --exec \"node --require ./instrument.js --no-deprecation\" server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "biome check --write .",
     "lint": "biome lint .",
