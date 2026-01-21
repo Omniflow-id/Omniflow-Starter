@@ -71,11 +71,12 @@ function createRedisConnection() {
     };
 
     const newRedis = new Redis(redisConfig);
+    redis = newRedis; // Assign immediately so getRedis() works
 
     // Connection success handler
     newRedis.on("connect", () => {
       console.log("✅ [REDIS] Connected successfully");
-      redis = newRedis;
+      // redis = newRedis; // Already assigned
       isRedisConnected = true;
       isReconnecting = false;
 
@@ -180,6 +181,9 @@ function createRedisConnection() {
  * @returns {Redis|null} Current Redis connection or null
  */
 function getRedis() {
+  if (!redis && config.redis.enabled && !isReconnecting) {
+    return createRedisConnection();
+  }
   return redis;
 }
 

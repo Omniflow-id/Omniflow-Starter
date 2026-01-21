@@ -9,7 +9,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "biome check --write .",
     "lint": "biome lint .",
-
     "pm2:dev": "pm2 start ecosystem.config.js --env development",
     "pm2:prod": "pm2 start ecosystem.config.js --env production",
     "pm2:stop": "pm2 stop ecosystem.config.js",
@@ -17,21 +16,17 @@
     "pm2:logs": "pm2 logs omniflow-starter",
     "pm2:monitor": "pm2 monit",
     "pm2:status": "pm2 status",
-
     "docker:dev": "docker-compose -f docker-compose.dev.yml up -d",
     "docker:dev:build": "docker-compose -f docker-compose.dev.yml up -d --build",
     "docker:dev:down": "docker-compose -f docker-compose.dev.yml down",
     "docker:dev:logs": "docker-compose -f docker-compose.dev.yml logs -f app",
-
     "docker:prod": "docker-compose up -d",
     "docker:prod:build": "docker-compose up -d --build",
     "docker:prod:down": "docker-compose down",
     "docker:prod:logs": "docker-compose logs -f app",
-
     "docker:clean": "docker system prune -af && docker volume prune -f",
     "setup:dev": "npm install && npm run docker:dev",
     "setup:prod": "npm ci --only=production && npm run docker:prod",
-
     "db:migrate": "knex migrate:latest",
     "db:seed": "knex seed:run",
     "db:reset": "knex migrate:rollback --all && knex migrate:latest && knex seed:run",
@@ -74,7 +69,7 @@
     "@opentelemetry/exporter-trace-otlp-http": "^0.202.0",
     "@opentelemetry/sdk-node": "^0.202.0",
     "amqplib": "^0.10.8",
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^6.0.0",
     "body-parser": "^1.20.3",
     "chokidar": "^3.6.0",
     "compression": "^1.8.1",
@@ -86,6 +81,7 @@
     "dotenv": "^16.4.7",
     "exceljs": "^4.4.0",
     "express": "^4.21.2",
+    "express-mysql-session": "^3.0.3",
     "express-rate-limit": "^8.0.1",
     "express-session": "^1.18.1",
     "helmet": "^8.0.0",
@@ -102,6 +98,7 @@
     "nodemailer": "^7.0.5",
     "nunjucks": "^3.2.4",
     "nunjucks-date-filter": "^0.1.1",
+    "rate-limit-redis": "^4.3.1",
     "redis": "^5.7.0",
     "ua-parser-js": "^2.0.0",
     "uuid": "^11.1.0"

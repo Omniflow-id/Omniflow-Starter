@@ -16,6 +16,7 @@ const morgan = require("morgan");
 const nunjucks = require("nunjucks");
 const nunjucksDate = require("nunjucks-date-filter");
 const session = require("express-session");
+const MySQLStore = require("express-mysql-session")(session);
 const { v4: uuidv4 } = require("uuid");
 
 // === Absolute / alias imports ===
@@ -31,8 +32,8 @@ const {
 const { createCorsMiddleware } = require("@middlewares/corsMiddleware");
 const { csrfGlobalMiddleware } = require("@middlewares/csrfProtection");
 const { generalLimiter } = require("@middlewares/rateLimiter");
-
 // === Relative imports ===
+const { db } = require("@db/db");
 const config = require("./config");
 
 const app = express();
@@ -135,7 +136,16 @@ env.addFilter("formatTime", (date, format) => {
 
 app.set("view engine", "njk");
 app.use(morgan("combined"));
-app.use(session(config.session));
+
+// Session handling with MySQL Store
+const sessionStore = new MySQLStore(config.session.storeOptions, db);
+
+app.use(
+  session({
+    ...config.session,
+    store: sessionStore,
+  })
+);
 
 // Request ID middleware - Generate unique request ID for tracking
 app.use((req, _res, next) => {

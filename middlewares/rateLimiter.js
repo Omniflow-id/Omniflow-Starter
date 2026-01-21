@@ -5,12 +5,40 @@ const rateLimit = require("express-rate-limit");
 const { getClientIP } = require("@helpers/getClientIP");
 const { getUserAgent } = require("@helpers/getUserAgent");
 const { log, LOG_LEVELS } = require("@helpers/log");
+const config = require("@config");
+const { RedisStore } = require("rate-limit-redis");
+const { getRedis } = require("@db/redis");
+
+// Factory function to create unique Redis stores for each limiter
+const createStore = (prefix) => {
+  if (!config.redis?.enabled) return undefined;
+
+  return new RedisStore({
+    sendCommand: async (...args) => {
+      const client = getRedis();
+      if (!client) {
+        console.error("❌ [RATE-LIMIT] Redis client is null but redis is enabled!");
+        return null; // This causes the TypeError
+      }
+      try {
+        const result = await client.call(...args);
+        return result;
+      } catch (err) {
+        console.error("❌ [RATE-LIMIT] Redis call error:", err);
+        throw err;
+      }
+    },
+    // Ensure prefix ends with a colon if not provided
+    prefix: prefix ? `${prefix}:` : "rl:",
+  });
+};
 
 // Use express-rate-limit's built-in IP key generator for proper IPv6 handling
 // const keyGenerator = rateLimit.default?.keyGenerator || ((req) => req.ip);
 
 // Basic rate limiter - general requests
 const generalLimiter = rateLimit({
+  store: createStore("rl:general"),
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // limit each IP to 100 requests per windowMs
   message: {
@@ -89,6 +117,7 @@ const generalLimiter = rateLimit({
 
 // Strict rate limiter - authentication endpoints
 const authLimiter = rateLimit({
+  store: createStore("rl:auth"),
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // limit each IP to 5 login attempts per windowMs
   message: {
@@ -151,6 +180,7 @@ const authLimiter = rateLimit({
 
 // Admin operation limiter - admin-only operations
 const adminLimiter = rateLimit({
+  store: createStore("rl:admin"),
   windowMs: 15 * 60 * 1000, // 5 minutes
   max: 100, // limit each IP to 50 admin requests per windowMs
   message: {
@@ -164,8 +194,7 @@ const adminLimiter = rateLimit({
       const clientIP = getClientIP(req);
       const userAgent = getUserAgent(req);
       log(
-        `Admin rate limit exceeded for IP: ${req.ip}, User: ${
-          req.session.user?.email || "Unknown"
+        `Admin rate limit exceeded for IP: ${req.ip}, User: ${req.session.user?.email || "Unknown"
         }`,
         LOG_LEVELS.WARN,
         req.session?.user?.id || null,
@@ -211,6 +240,7 @@ const adminLimiter = rateLimit({
 
 // File upload limiter - file operations
 const uploadLimiter = rateLimit({
+  store: createStore("rl:upload"),
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10, // limit each IP to 10 file uploads per windowMs
   message: {
@@ -224,8 +254,7 @@ const uploadLimiter = rateLimit({
       const clientIP = getClientIP(req);
       const userAgent = getUserAgent(req);
       log(
-        `Upload rate limit exceeded for IP: ${req.ip}, User: ${
-          req.session.user?.email || "Unknown"
+        `Upload rate limit exceeded for IP: ${req.ip}, User: ${req.session.user?.email || "Unknown"
         }`,
         LOG_LEVELS.WARN,
         req.session?.user?.id || null,
@@ -264,6 +293,7 @@ const uploadLimiter = rateLimit({
 
 // Export limiter - data export operations
 const exportLimiter = rateLimit({
+  store: createStore("rl:export"),
   windowMs: 5 * 60 * 1000, // 5 minutes
   max: 20, // limit each IP to 20 exports per windowMs
   message: {
@@ -277,8 +307,7 @@ const exportLimiter = rateLimit({
       const clientIP = getClientIP(req);
       const userAgent = getUserAgent(req);
       log(
-        `Export rate limit exceeded for IP: ${req.ip}, User: ${
-          req.session.user?.email || "Unknown"
+        `Export rate limit exceeded for IP: ${req.ip}, User: ${req.session.user?.email || "Unknown"
         }`,
         LOG_LEVELS.WARN,
         req.session?.user?.id || null,

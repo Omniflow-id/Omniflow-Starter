@@ -39,7 +39,26 @@ const config = {
     rolling: true, // Reset session timeout on each request to implement sliding sessions
     cookie: {
       maxAge: (process.env.SESSION_TIMEOUT_HOURS || 24) * 60 * 60 * 1000, // Default 24 hours
-      secure: process.env.NODE_ENV === "production" && process.env.USE_HTTPS === "true",
+      secure:
+        process.env.NODE_ENV === "production" &&
+        process.env.USE_HTTPS === "true",
+      httpOnly: true, // Prevent client-side JS from accessing the cookie
+      sameSite: "lax", // CSRF protection
+    },
+    // MySQL Session Store Options
+    storeOptions: {
+      clearExpired: true,
+      checkExpirationInterval: 900000, // 15 minutes
+      expiration: (process.env.SESSION_TIMEOUT_HOURS || 24) * 60 * 60 * 1000, // Sync with cookie maxAge
+      createDatabaseTable: true,
+      schema: {
+        tableName: "sessions",
+        columnNames: {
+          session_id: "session_id",
+          expires: "expires",
+          data: "data",
+        },
+      },
     },
   },
 
