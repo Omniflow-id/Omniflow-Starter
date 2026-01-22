@@ -28,9 +28,6 @@ FROM base AS development
 # Install all dependencies (including devDependencies)
 RUN npm ci && npm cache clean --force
 
-# Install nodemon globally for development
-RUN npm install -g nodemon
-
 # Copy application code
 COPY . .
 
@@ -57,8 +54,8 @@ HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=2 \
 # Set entrypoint for database initialization
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-# Development command - use nodemon
-CMD ["nodemon", "--no-deprecation", "server.js"]
+# Development command - use nodedirectly
+CMD ["node", "--no-deprecation", "server.js"]
 
 # ================================== 
 # Production dependencies stage
@@ -84,19 +81,12 @@ RUN apk add --no-cache \
     dumb-init \
     netcat-openbsd
 
-# Copy PM2 from prod-deps stage
-COPY --from=prod-deps /usr/local/lib/node_modules/pm2 /usr/local/lib/node_modules/pm2
-COPY --from=prod-deps /usr/local/bin/pm2 /usr/local/bin/pm2
-
 # Copy production dependencies
 COPY --from=prod-deps /app/node_modules ./node_modules
 COPY --from=prod-deps /app/package*.json ./
 
 # Copy application code
 COPY . .
-
-# Copy PM2 ecosystem file
-COPY ecosystem.config.js ./
 
 # Copy and set permissions for entrypoint script
 COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
@@ -121,5 +111,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 # Set entrypoint for database initialization
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-# Production command - use PM2
-CMD ["dumb-init", "pm2-runtime", "start", "ecosystem.config.js"]
+# Production command - use node directly
+CMD ["dumb-init", "node", "server.js"]

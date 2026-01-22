@@ -14,9 +14,9 @@ const server = http.createServer(app);
 
 const start = () => {
   try {
-    server.listen(PORT, async () => {
+    server.listen(PORT, "0.0.0.0", async () => {
       console.log(
-        `🚀 [SERVER] Application running on http://localhost:${PORT}`
+        `🚀 [SERVER] Application running on http://0.0.0.0:${PORT}`
       );
 
       // Start workers after server is ready
