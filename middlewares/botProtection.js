@@ -107,9 +107,8 @@ const botProtectionLimiter = rateLimit({
       const userAgent = getUserAgent(req);
 
       // Log as security warning
-      log(
-        `🚨 SECURITY: Aggressive bot activity detected - IP: ${req.ip}, Path: ${
-          req.path
+      await log(
+        `🚨 SECURITY: Aggressive bot activity detected - IP: ${req.ip}, Path: ${req.path
         }, UA: ${req.get("User-Agent") || "Unknown"}`,
         LOG_LEVELS.WARN,
         null,
@@ -169,7 +168,7 @@ const bannedIPLimiter = rateLimit({
       const clientIP = getClientIP(req);
       const userAgent = getUserAgent(req);
 
-      log(
+      await log(
         `🔒 SECURITY: IP banned for malicious activity - IP: ${req.ip}, Path: ${req.path}`,
         LOG_LEVELS.WARN,
         null,
@@ -195,13 +194,13 @@ const bannedIPLimiter = rateLimit({
 });
 
 // Middleware to log suspicious activity even if not rate limited
-const suspiciousActivityLogger = (req, _res, next) => {
+const suspiciousActivityLogger = async (req, _res, next) => {
   if (isSuspiciousPath(req.path)) {
     try {
       const clientIP = getClientIP(req);
       const userAgent = getUserAgent(req);
 
-      log(
+      await log(
         `⚠️ Suspicious path accessed: ${req.path} from IP: ${req.ip}`,
         LOG_LEVELS.WARN,
         null,

@@ -366,11 +366,15 @@ async function logActivity(options = {}) {
   console.log(detailedLogMessage);
 
   // File logging
-  const logFilePath = path.resolve(config.logging.file);
-  if (!fs.existsSync(path.dirname(logFilePath))) {
-    fs.mkdirSync(path.dirname(logFilePath), { recursive: true });
+  try {
+    const logFilePath = path.resolve(config.logging.file);
+    if (!fs.existsSync(path.dirname(logFilePath))) {
+      fs.mkdirSync(path.dirname(logFilePath), { recursive: true });
+    }
+    fs.appendFileSync(logFilePath, `${detailedLogMessage}\n`, "utf8");
+  } catch (fileError) {
+    console.error(`❌ [LOG] Failed to write to log file: ${fileError.message}`);
   }
-  fs.appendFileSync(logFilePath, `${detailedLogMessage}\n`, "utf8");
 
   // Database logging
   try {

@@ -67,7 +67,7 @@ const generalLimiter = rateLimit({
     try {
       const clientIP = getClientIP(req);
       const userAgent = getUserAgent(req);
-      log(
+      await log(
         `Rate limit exceeded for IP: ${req.ip}`,
         LOG_LEVELS.WARN,
         req.session?.user?.id || null,
@@ -130,7 +130,7 @@ const authLimiter = rateLimit({
     try {
       const clientIP = getClientIP(req);
       const userAgent = getUserAgent(req);
-      log(
+      await log(
         `Login rate limit exceeded for IP: ${req.ip}`,
         LOG_LEVELS.WARN,
         req.session?.user?.id || null,
@@ -193,7 +193,7 @@ const adminLimiter = rateLimit({
     try {
       const clientIP = getClientIP(req);
       const userAgent = getUserAgent(req);
-      log(
+      await log(
         `Admin rate limit exceeded for IP: ${req.ip}, User: ${req.session.user?.email || "Unknown"
         }`,
         LOG_LEVELS.WARN,
@@ -253,7 +253,7 @@ const uploadLimiter = rateLimit({
     try {
       const clientIP = getClientIP(req);
       const userAgent = getUserAgent(req);
-      log(
+      await log(
         `Upload rate limit exceeded for IP: ${req.ip}, User: ${req.session.user?.email || "Unknown"
         }`,
         LOG_LEVELS.WARN,
@@ -306,7 +306,7 @@ const exportLimiter = rateLimit({
     try {
       const clientIP = getClientIP(req);
       const userAgent = getUserAgent(req);
-      log(
+      await log(
         `Export rate limit exceeded for IP: ${req.ip}, User: ${req.session.user?.email || "Unknown"
         }`,
         LOG_LEVELS.WARN,

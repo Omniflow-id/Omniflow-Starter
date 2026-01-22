@@ -35,11 +35,10 @@ COPY . .
 COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Create necessary directories
-RUN mkdir -p logs uploads
-
-# Set proper permissions
-RUN chown -R node:node /app
+# Create necessary directories and set permissions before switching user
+RUN mkdir -p logs uploads && \
+    chown -R node:node /app && \
+    chmod -R 755 /app/logs /app/uploads
 
 # Switch to non-root user
 USER node
@@ -92,11 +91,10 @@ COPY . .
 COPY scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
-# Create necessary directories
-RUN mkdir -p logs uploads
-
-# Set proper permissions
-RUN chown -R node:node /app
+# Create necessary directories and set permissions before switching user
+RUN mkdir -p logs uploads && \
+    chown -R node:node /app && \
+    chmod -R 755 /app/logs /app/uploads
 
 # Switch to non-root user
 USER node
