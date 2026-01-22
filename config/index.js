@@ -106,9 +106,9 @@ const config = {
   },
 
   otel: {
-    serviceName: process.env.OTEL_SERVICE_NAME || "omniflow-starter",
+    serviceName: process.env.OTEL_SERVICE_NAME || "omniflow-express-starter",
     serviceVersion: process.env.OTEL_SERVICE_VERSION || "1.0.0",
-    metricsPort: process.env.OTEL_METRICS_PORT || 9091,
+    metricsPort: parseInt(process.env.OTEL_METRICS_PORT) || 9096,
     metricsEndpoint: process.env.OTEL_METRICS_ENDPOINT || "/metrics",
     tracesEndpoint:
       process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT ||
