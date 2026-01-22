@@ -83,9 +83,9 @@ const config = {
     ssl:
       process.env.DB_SSL_ENABLED === "true"
         ? {
-            rejectUnauthorized:
-              process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
-          }
+          rejectUnauthorized:
+            process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
+        }
         : false,
   },
 
@@ -152,21 +152,25 @@ const config = {
             "use.fontawesome.com",
           ],
           objectSrc: ["'none'"],
-          upgradeInsecureRequests: [],
+          upgradeInsecureRequests:
+            process.env.NODE_ENV === "production" ? [] : null,
         },
       },
-      crossOriginEmbedderPolicy: true,
+      crossOriginEmbedderPolicy: process.env.NODE_ENV === "production",
       crossOriginOpenerPolicy: { policy: "same-origin" },
       crossOriginResourcePolicy: { policy: "same-origin" },
       dnsPrefetchControl: { allow: false },
       expectCt: { maxAge: 86400, enforce: true },
       frameguard: { action: "deny" },
       hidePoweredBy: true,
-      hsts: {
-        maxAge: 63072000,
-        includeSubDomains: true,
-        preload: true,
-      },
+      hsts:
+        process.env.NODE_ENV === "production"
+          ? {
+            maxAge: 63072000,
+            includeSubDomains: true,
+            preload: true,
+          }
+          : false,
       ieNoOpen: true,
       noSniff: true,
       permittedCrossDomainPolicies: { policy: "none" },
