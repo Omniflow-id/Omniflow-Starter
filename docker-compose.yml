@@ -81,9 +81,6 @@ services:
       options:
         loki-url: "${LOKI_URL:-http://100.127.148.109:3100/loki/api/v1/push}"
         loki-retention: "${LOKI_RETENTION:-168h}"
-        loki-batch-size: "${LOKI_BATCH_SIZE:-40000}"
-        loki-pipeline-stage-count: "${LOKI_PIPELINE_STAGE_COUNT:-10}"
-        mode: non-blocking
         max-buffer-size: "${LOKI_MAX_BUFFER_SIZE:-10m}"
 
 networks:
