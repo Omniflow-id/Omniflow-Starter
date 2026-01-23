@@ -56,13 +56,13 @@ ENTRYPOINT ["docker-entrypoint.sh"]
 # Development command - use nodedirectly
 CMD ["node", "--no-deprecation", "server.js"]
 
-# ================================== 
+# ==================================
 # Production dependencies stage
 # ==================================
 FROM base AS prod-deps
 
-# Install only production dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install production dependencies (using install instead of ci for better reliability)
+RUN npm install --production && npm cache clean --force
 
 # Install PM2 globally for production
 RUN npm install -g pm2
