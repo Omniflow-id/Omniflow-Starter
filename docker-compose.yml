@@ -80,7 +80,6 @@ services:
       driver: loki
       options:
         loki-url: "${LOKI_URL:-http://100.127.148.109:3100/loki/api/v1/push}"
-        loki-retention: "${LOKI_RETENTION:-168h}"
         mode: non-blocking
         max-buffer-size: "${LOKI_MAX_BUFFER_SIZE:-10m}"
 
