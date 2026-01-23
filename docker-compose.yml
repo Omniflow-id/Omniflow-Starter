@@ -7,7 +7,7 @@ services:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: ${PORT:-1234}
       DOCKER_ENV: "true"
-      
+
       # Database Configuration
       DB_HOST: ${DB_HOST}
       DB_PORT: ${DB_PORT:-3306}
@@ -15,30 +15,30 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
       DB_CONNECTION_LIMIT: ${DB_CONNECTION_LIMIT:-50}
-      
+
       # Redis Configuration
       REDIS_ENABLED: ${REDIS_ENABLED:-true}
       REDIS_HOST: ${REDIS_HOST}
       REDIS_PORT: ${REDIS_PORT:-6379}
       REDIS_USERNAME: ${REDIS_USERNAME}
       REDIS_PASSWORD: ${REDIS_PASSWORD}
-      
+
       # RabbitMQ Configuration
       RABBITMQ_ENABLED: ${RABBITMQ_ENABLED:-true}
       RABBITMQ_HOST: ${RABBITMQ_HOST}
       RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
       RABBITMQ_USER: ${RABBITMQ_USER}
       RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
-      
+
       # Session & Security
       SESSION_KEY: ${SESSION_KEY}
       CSRF_SECRET: ${CSRF_SECRET}
-      
+
       # Application Settings
       APP_URL: ${APP_URL}
       SESSION_TIMEOUT_HOURS: ${SESSION_TIMEOUT_HOURS:-24}
       TIMEZONE: ${TIMEZONE:-Asia/Jakarta}
-      
+
       # Optional Features
       EMAIL_ENABLED: ${EMAIL_ENABLED:-false}
       S3_ENABLED: ${S3_ENABLED:-false}
@@ -52,15 +52,15 @@ services:
       OTEL_METRICS_PORT: ${OTEL_METRICS_PORT}
       OTEL_METRICS_ENDPOINT: ${OTEL_METRICS_ENDPOINT}
       OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: ${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}
-      
+
       # CORS Configuration
       CORS_ENABLED: ${CORS_ENABLED:-true}
       CORS_ORIGIN: ${CORS_ORIGIN:-*}
       CORS_CREDENTIALS: ${CORS_CREDENTIALS:-true}
-      
+
       # Development Settings
       DEV_2FA_BYPASS: ${DEV_2FA_BYPASS:-false}
-      
+
     ports:
       - "${PORT:-1234}:${PORT:-1234}"
       - "9096:9096"
@@ -76,6 +76,15 @@ services:
       retries: 3
       interval: 30s
       start_period: 60s
+    logging:
+      driver: loki
+      options:
+        loki-url: "${LOKI_URL:-http://100.127.148.109:3100/loki/api/v1/push}"
+        loki-retention: "${LOKI_RETENTION:-168h}"
+        loki-batch-size: "${LOKI_BATCH_SIZE:-40000}"
+        loki-pipeline-stage-count: "${LOKI_PIPELINE_STAGE_COUNT:-10}"
+        mode: non-blocking
+        max-buffer-size: "${LOKI_MAX_BUFFER_SIZE:-10m}"
 
 networks:
   omniflow_network:
