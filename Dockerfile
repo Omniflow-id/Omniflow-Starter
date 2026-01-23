@@ -61,11 +61,8 @@ CMD ["node", "--no-deprecation", "server.js"]
 # ==================================
 FROM base AS prod-deps
 
-# Install production dependencies (using install instead of ci for better reliability)
-RUN npm install --production && npm cache clean --force
-
-# Install PM2 globally for production
-RUN npm install -g pm2
+# Install production dependencies (omit dev dependencies)
+RUN npm install --omit=dev && npm cache clean --force
 
 # ==================================
 # Production stage  
