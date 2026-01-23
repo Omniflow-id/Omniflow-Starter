@@ -3,64 +3,10 @@ services:
   app:
     build: .
     container_name: omniflow-express-starter
+    env_file:
+      - .env
     environment:
-      NODE_ENV: ${NODE_ENV:-production}
-      PORT: ${PORT:-1234}
       DOCKER_ENV: "true"
-
-      # Database Configuration
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT:-3306}
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
-      DB_CONNECTION_LIMIT: ${DB_CONNECTION_LIMIT:-50}
-
-      # Redis Configuration
-      REDIS_ENABLED: ${REDIS_ENABLED:-true}
-      REDIS_HOST: ${REDIS_HOST}
-      REDIS_PORT: ${REDIS_PORT:-6379}
-      REDIS_USERNAME: ${REDIS_USERNAME}
-      REDIS_PASSWORD: ${REDIS_PASSWORD}
-
-      # RabbitMQ Configuration
-      RABBITMQ_ENABLED: ${RABBITMQ_ENABLED:-true}
-      RABBITMQ_HOST: ${RABBITMQ_HOST}
-      RABBITMQ_PORT: ${RABBITMQ_PORT:-5672}
-      RABBITMQ_USER: ${RABBITMQ_USER}
-      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD}
-
-      # Session & Security
-      SESSION_KEY: ${SESSION_KEY}
-      CSRF_SECRET: ${CSRF_SECRET}
-
-      # Application Settings
-      APP_URL: ${APP_URL}
-      SESSION_TIMEOUT_HOURS: ${SESSION_TIMEOUT_HOURS:-24}
-      TIMEZONE: ${TIMEZONE:-Asia/Jakarta}
-
-      # Optional Features
-      EMAIL_ENABLED: ${EMAIL_ENABLED:-false}
-      S3_ENABLED: ${S3_ENABLED:-false}
-      JWT_ENABLED: ${JWT_ENABLED:-false}
-      MONITORING_ENABLED: ${MONITORING_ENABLED}
-      BEEPBOT_ENABLED: ${BEEPBOT_ENABLED:-false}
-
-      # OpenTelemetry Monitoring
-      OTEL_SERVICE_NAME: ${OTEL_SERVICE_NAME}
-      OTEL_SERVICE_VERSION: ${OTEL_SERVICE_VERSION}
-      OTEL_METRICS_PORT: ${OTEL_METRICS_PORT}
-      OTEL_METRICS_ENDPOINT: ${OTEL_METRICS_ENDPOINT}
-      OTEL_EXPORTER_OTLP_TRACES_ENDPOINT: ${OTEL_EXPORTER_OTLP_TRACES_ENDPOINT}
-
-      # CORS Configuration
-      CORS_ENABLED: ${CORS_ENABLED:-true}
-      CORS_ORIGIN: ${CORS_ORIGIN:-*}
-      CORS_CREDENTIALS: ${CORS_CREDENTIALS:-true}
-
-      # Development Settings
-      DEV_2FA_BYPASS: ${DEV_2FA_BYPASS:-false}
-
     ports:
       - "${PORT:-1234}:${PORT:-1234}"
       - "9096:9096"
