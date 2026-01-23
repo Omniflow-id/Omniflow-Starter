@@ -42,25 +42,27 @@ const DEFAULT_POLICY = {
 function getPasswordPolicy() {
   return {
     minLength:
-      parseInt(process.env.PASSWORD_MIN_LENGTH) || DEFAULT_POLICY.minLength,
+      parseInt(process.env.PASSWORD_MIN_LENGTH, 10) || DEFAULT_POLICY.minLength,
     maxLength:
-      parseInt(process.env.PASSWORD_MAX_LENGTH) || DEFAULT_POLICY.maxLength,
+      parseInt(process.env.PASSWORD_MAX_LENGTH, 10) || DEFAULT_POLICY.maxLength,
     requireUppercase: process.env.PASSWORD_REQUIRE_UPPERCASE !== "false",
     requireLowercase: process.env.PASSWORD_REQUIRE_LOWERCASE !== "false",
     requireNumbers: process.env.PASSWORD_REQUIRE_NUMBERS !== "false",
     requireSymbols: process.env.PASSWORD_REQUIRE_SYMBOLS !== "false",
     minSymbols:
-      parseInt(process.env.PASSWORD_MIN_SYMBOLS) || DEFAULT_POLICY.minSymbols,
+      parseInt(process.env.PASSWORD_MIN_SYMBOLS, 10) ||
+      DEFAULT_POLICY.minSymbols,
     minNumbers:
-      parseInt(process.env.PASSWORD_MIN_NUMBERS) || DEFAULT_POLICY.minNumbers,
+      parseInt(process.env.PASSWORD_MIN_NUMBERS, 10) ||
+      DEFAULT_POLICY.minNumbers,
     minUppercase:
-      parseInt(process.env.PASSWORD_MIN_UPPERCASE) ||
+      parseInt(process.env.PASSWORD_MIN_UPPERCASE, 10) ||
       DEFAULT_POLICY.minUppercase,
     minLowercase:
-      parseInt(process.env.PASSWORD_MIN_LOWERCASE) ||
+      parseInt(process.env.PASSWORD_MIN_LOWERCASE, 10) ||
       DEFAULT_POLICY.minLowercase,
     maxRepeatingChars:
-      parseInt(process.env.PASSWORD_MAX_REPEATING) ||
+      parseInt(process.env.PASSWORD_MAX_REPEATING, 10) ||
       DEFAULT_POLICY.maxRepeatingChars,
     forbiddenPatterns:
       process.env.PASSWORD_FORBIDDEN_PATTERNS?.split(",") ||

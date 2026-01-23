@@ -394,7 +394,7 @@ class QueueService {
       };
 
       results.forEach((row) => {
-        stats[row.status] = parseInt(row.count);
+        stats[row.status] = parseInt(row.count, 10);
       });
 
       return stats;

@@ -120,11 +120,12 @@ env.addFilter("formatDateTime", (date, format) => {
   return moment(date).tz(config.timezone).format(defaultFormat);
 });
 
-// Add moment timezone filter for date only
+// Add moment timezone filter for date only (consistent with local time to avoid shifts)
 env.addFilter("formatDate", (date, format) => {
   if (!date) return "";
   const defaultFormat = format || "DD MMMM YYYY";
-  return moment(date).tz(config.timezone).format(defaultFormat);
+  // We use moment(date) which treats the Date object as local time (same as DB's 00:00:00 local)
+  return moment(date).format(defaultFormat);
 });
 
 // Add moment timezone filter for time only

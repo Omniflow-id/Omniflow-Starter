@@ -67,15 +67,15 @@ const config = {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    port: parseInt(process.env.DB_PORT) || 3306,
+    port: parseInt(process.env.DB_PORT, 10) || 3306,
     // Connection Pool Configuration (MySQL2 compatible)
     connectionLimit:
-      parseInt(process.env.DB_CONNECTION_LIMIT) ||
+      parseInt(process.env.DB_CONNECTION_LIMIT, 10) ||
       (process.env.NODE_ENV === "production" ? 50 : 10),
-    queueLimit: parseInt(process.env.DB_QUEUE_LIMIT) || 0,
+    queueLimit: parseInt(process.env.DB_QUEUE_LIMIT, 10) || 0,
     waitForConnections: true,
-    maxIdle: parseInt(process.env.DB_MAX_IDLE) || 10,
-    idleTimeout: parseInt(process.env.DB_IDLE_TIMEOUT) || 60000,
+    maxIdle: parseInt(process.env.DB_MAX_IDLE, 10) || 10,
+    idleTimeout: parseInt(process.env.DB_IDLE_TIMEOUT, 10) || 60000,
     // Advanced Settings
     multipleStatements: process.env.DB_MULTIPLE_STATEMENTS === "true", // Default: false for security
     timezone: "+07:00", // MySQL2 compatible timezone format
@@ -97,7 +97,7 @@ const config = {
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      port: parseInt(process.env.DB_PORT) || 3306,
+      port: parseInt(process.env.DB_PORT, 10) || 3306,
     },
     migrations: {
       directory: "./db/migrations",
@@ -110,7 +110,7 @@ const config = {
   otel: {
     serviceName: process.env.OTEL_SERVICE_NAME || "omniflow-express-starter",
     serviceVersion: process.env.OTEL_SERVICE_VERSION || "1.0.0",
-    metricsPort: parseInt(process.env.OTEL_METRICS_PORT) || 9096,
+    metricsPort: parseInt(process.env.OTEL_METRICS_PORT, 10) || 9096,
     metricsEndpoint: process.env.OTEL_METRICS_ENDPOINT || "/metrics",
     tracesEndpoint:
       process.env.OTEL_EXPORTER_OTLP_TRACES_ENDPOINT ||
@@ -120,7 +120,7 @@ const config = {
   email: {
     enabled: process.env.EMAIL_ENABLED === "true",
     host: process.env.SMTP_HOST,
-    port: parseInt(process.env.SMTP_PORT) || 587,
+    port: parseInt(process.env.SMTP_PORT, 10) || 587,
     user: process.env.SMTP_USER,
     password: process.env.SMTP_PASSWORD,
     fromName: process.env.SMTP_FROM_NAME || "Omniflow Starter",
@@ -157,13 +157,17 @@ const config = {
             "cdn.jsdelivr.net",
             "use.fontawesome.com",
           ],
+          scriptSrcAttr: ["'unsafe-inline'"],
           objectSrc: ["'none'"],
           upgradeInsecureRequests:
             process.env.NODE_ENV === "production" ? [] : null,
         },
       },
       crossOriginEmbedderPolicy: process.env.NODE_ENV === "production",
-      crossOriginOpenerPolicy: { policy: "same-origin" },
+      crossOriginOpenerPolicy: {
+        policy:
+          process.env.NODE_ENV === "production" ? "same-origin" : "unsafe-none",
+      },
       crossOriginResourcePolicy: { policy: "same-origin" },
       dnsPrefetchControl: { allow: false },
       expectCt: { maxAge: 86400, enforce: true },
@@ -197,14 +201,14 @@ const config = {
   },
 
   compression: {
-    threshold: parseInt(process.env.COMPRESSION_THRESHOLD) || 1024, // Only compress if >= 1KB
-    level: parseInt(process.env.COMPRESSION_LEVEL) || 6, // Balance between compression ratio and speed (1-9)
-    chunkSize: parseInt(process.env.COMPRESSION_CHUNK_SIZE) || 16 * 1024, // 16KB chunks
+    threshold: parseInt(process.env.COMPRESSION_THRESHOLD, 10) || 1024, // Only compress if >= 1KB
+    level: parseInt(process.env.COMPRESSION_LEVEL, 10) || 6, // Balance between compression ratio and speed (1-9)
+    chunkSize: parseInt(process.env.COMPRESSION_CHUNK_SIZE, 10) || 16 * 1024, // 16KB chunks
     enabled: process.env.COMPRESSION_ENABLED !== "false", // Default: enabled
     brotli: {
       enabled: process.env.BROTLI_ENABLED !== "false", // Default: enabled
-      quality: parseInt(process.env.BROTLI_QUALITY) || 4, // Brotli quality 0-11 (4 = balanced)
-      chunkSize: parseInt(process.env.BROTLI_CHUNK_SIZE) || 16 * 1024, // 16KB chunks
+      quality: parseInt(process.env.BROTLI_QUALITY, 10) || 4, // Brotli quality 0-11 (4 = balanced)
+      chunkSize: parseInt(process.env.BROTLI_CHUNK_SIZE, 10) || 16 * 1024, // 16KB chunks
     },
   },
 
@@ -224,42 +228,42 @@ const config = {
       process.env.CORS_ALLOWED_HEADERS ||
       "Content-Type,Authorization,X-Requested-With",
     exposedHeaders: process.env.CORS_EXPOSED_HEADERS || "",
-    maxAge: parseInt(process.env.CORS_MAX_AGE) || 86400, // 24 hours
+    maxAge: parseInt(process.env.CORS_MAX_AGE, 10) || 86400, // 24 hours
     preflightContinue: process.env.CORS_PREFLIGHT_CONTINUE === "true",
     optionsSuccessStatus:
-      parseInt(process.env.CORS_OPTIONS_SUCCESS_STATUS) || 204,
+      parseInt(process.env.CORS_OPTIONS_SUCCESS_STATUS, 10) || 204,
   },
 
   redis: {
     enabled: process.env.REDIS_ENABLED === "true",
     host: process.env.REDIS_HOST || "127.0.0.1",
-    port: parseInt(process.env.REDIS_PORT) || 6379,
+    port: parseInt(process.env.REDIS_PORT, 10) || 6379,
     password: process.env.REDIS_PASSWORD || undefined,
-    db: parseInt(process.env.REDIS_DB) || 0,
+    db: parseInt(process.env.REDIS_DB, 10) || 0,
     username: process.env.REDIS_USERNAME || undefined,
     // Connection configuration
-    maxRetries: parseInt(process.env.REDIS_MAX_RETRIES) || 5,
-    retryDelayOnFailover: parseInt(process.env.REDIS_RETRY_DELAY) || 100,
+    maxRetries: parseInt(process.env.REDIS_MAX_RETRIES, 10) || 5,
+    retryDelayOnFailover: parseInt(process.env.REDIS_RETRY_DELAY, 10) || 100,
     enableReadyCheck: process.env.REDIS_READY_CHECK !== "false", // Default: true
     maxRetriesPerRequest:
-      parseInt(process.env.REDIS_MAX_RETRIES_PER_REQUEST) || 3,
+      parseInt(process.env.REDIS_MAX_RETRIES_PER_REQUEST, 10) || 3,
     lazyConnect: process.env.REDIS_LAZY_CONNECT !== "false", // Default: true
-    keepAlive: parseInt(process.env.REDIS_KEEP_ALIVE) || 30000, // 30 seconds
+    keepAlive: parseInt(process.env.REDIS_KEEP_ALIVE, 10) || 30000, // 30 seconds
     // Cache configuration
-    defaultTTL: parseInt(process.env.REDIS_DEFAULT_TTL) || 3600, // 1 hour default
+    defaultTTL: parseInt(process.env.REDIS_DEFAULT_TTL, 10) || 3600, // 1 hour default
     keyPrefix: process.env.REDIS_KEY_PREFIX || "omniflow:",
   },
 
   rabbitmq: {
     enabled: process.env.RABBITMQ_ENABLED === "true",
     host: process.env.RABBITMQ_HOST || "localhost",
-    port: parseInt(process.env.RABBITMQ_PORT) || 5672,
+    port: parseInt(process.env.RABBITMQ_PORT, 10) || 5672,
     username: process.env.RABBITMQ_USER || "guest",
     password: process.env.RABBITMQ_PASSWORD || "guest",
     // Connection configuration
     maxReconnectAttempts:
-      parseInt(process.env.RABBITMQ_MAX_RECONNECT_ATTEMPTS) || 10,
-    reconnectDelay: parseInt(process.env.RABBITMQ_RECONNECT_DELAY) || 1000,
+      parseInt(process.env.RABBITMQ_MAX_RECONNECT_ATTEMPTS, 10) || 10,
+    reconnectDelay: parseInt(process.env.RABBITMQ_RECONNECT_DELAY, 10) || 1000,
     // Queue configuration
     defaultQueueOptions: {
       durable: process.env.RABBITMQ_QUEUE_DURABLE !== "false", // Default: true

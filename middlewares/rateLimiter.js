@@ -17,7 +17,9 @@ const createStore = (prefix) => {
     sendCommand: async (...args) => {
       const client = getRedis();
       if (!client) {
-        console.error("❌ [RATE-LIMIT] Redis client is null but redis is enabled!");
+        console.error(
+          "❌ [RATE-LIMIT] Redis client is null but redis is enabled!"
+        );
         return null; // This causes the TypeError
       }
       try {
@@ -40,7 +42,7 @@ const createStore = (prefix) => {
 const generalLimiter = rateLimit({
   store: createStore("rl:general"),
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 1000, // limit each IP to 100 requests per windowMs
   message: {
     error: "Too many requests from this IP, please try again after 15 minutes.",
   },
@@ -194,7 +196,8 @@ const adminLimiter = rateLimit({
       const clientIP = getClientIP(req);
       const userAgent = getUserAgent(req);
       await log(
-        `Admin rate limit exceeded for IP: ${req.ip}, User: ${req.session.user?.email || "Unknown"
+        `Admin rate limit exceeded for IP: ${req.ip}, User: ${
+          req.session.user?.email || "Unknown"
         }`,
         LOG_LEVELS.WARN,
         req.session?.user?.id || null,
@@ -254,7 +257,8 @@ const uploadLimiter = rateLimit({
       const clientIP = getClientIP(req);
       const userAgent = getUserAgent(req);
       await log(
-        `Upload rate limit exceeded for IP: ${req.ip}, User: ${req.session.user?.email || "Unknown"
+        `Upload rate limit exceeded for IP: ${req.ip}, User: ${
+          req.session.user?.email || "Unknown"
         }`,
         LOG_LEVELS.WARN,
         req.session?.user?.id || null,
@@ -307,7 +311,8 @@ const exportLimiter = rateLimit({
       const clientIP = getClientIP(req);
       const userAgent = getUserAgent(req);
       await log(
-        `Export rate limit exceeded for IP: ${req.ip}, User: ${req.session.user?.email || "Unknown"
+        `Export rate limit exceeded for IP: ${req.ip}, User: ${
+          req.session.user?.email || "Unknown"
         }`,
         LOG_LEVELS.WARN,
         req.session?.user?.id || null,

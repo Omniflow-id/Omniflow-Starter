@@ -184,13 +184,17 @@ const validateEnvVariables = () => {
   // Display enabled features
   if (enabledFeatures.length > 0) {
     console.log("\n🔧 [CONFIG] Enabled optional features:");
-    enabledFeatures.forEach((feature) => console.log(`   • ${feature}`));
+    enabledFeatures.forEach((feature) => {
+      console.log(`   • ${feature}`);
+    });
   }
 
   // Display warnings for empty variables
   if (warnings.length > 0) {
     console.log("\n⚠️  [CONFIG] Warnings:");
-    warnings.forEach((warning) => console.log(`   ${warning}`));
+    warnings.forEach((warning) => {
+      console.log(`   ${warning}`);
+    });
   }
 
   // If any required variables are missing, exit the application

@@ -152,7 +152,7 @@ const sendEmailSmart = async (emailType, ...args) => {
   if (config.rabbitmq.enabled && queueService.isConnected) {
     // Use queue-based approach with timeout
     try {
-      const queueTimeout = parseInt(process.env.EMAIL_QUEUE_TIMEOUT) || 150;
+      const queueTimeout = parseInt(process.env.EMAIL_QUEUE_TIMEOUT, 10) || 150;
       const timeoutPromise = new Promise((_, reject) =>
         setTimeout(() => reject(new Error("Queue timeout")), queueTimeout)
       );

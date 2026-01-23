@@ -374,7 +374,9 @@ async function logActivity(options = {}) {
       }
       fs.appendFileSync(logFilePath, `${detailedLogMessage}\n`, "utf8");
     } catch (fileError) {
-      console.error(`❌ [LOG] Failed to write to log file: ${fileError.message}`);
+      console.error(
+        `❌ [LOG] Failed to write to log file: ${fileError.message}`
+      );
     }
   }
 

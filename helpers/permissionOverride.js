@@ -51,9 +51,9 @@ async function getUserEffectivePermissions(userId, roleId) {
     ]);
 
     // Remove revoked permissions
-    userRevokeNames.forEach((permission) =>
-      effectivePermissions.delete(permission)
-    );
+    userRevokeNames.forEach((permission) => {
+      effectivePermissions.delete(permission);
+    });
 
     return {
       effectivePermissions: Array.from(effectivePermissions),

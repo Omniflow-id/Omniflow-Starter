@@ -15,9 +15,7 @@ const server = http.createServer(app);
 const start = () => {
   try {
     server.listen(PORT, "0.0.0.0", async () => {
-      console.log(
-        `🚀 [SERVER] Application running on http://0.0.0.0:${PORT}`
-      );
+      console.log(`🚀 [SERVER] Application running on http://0.0.0.0:${PORT}`);
 
       // Start workers after server is ready
       if (config.rabbitmq.enabled) {

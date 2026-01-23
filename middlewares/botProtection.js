@@ -108,7 +108,8 @@ const botProtectionLimiter = rateLimit({
 
       // Log as security warning
       await log(
-        `🚨 SECURITY: Aggressive bot activity detected - IP: ${req.ip}, Path: ${req.path
+        `🚨 SECURITY: Aggressive bot activity detected - IP: ${req.ip}, Path: ${
+          req.path
         }, UA: ${req.get("User-Agent") || "Unknown"}`,
         LOG_LEVELS.WARN,
         null,
