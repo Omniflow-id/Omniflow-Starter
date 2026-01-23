@@ -6,6 +6,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       PORT: ${PORT:-1234}
+      DOCKER_ENV: "true"
       
       # Database Configuration
       DB_HOST: ${DB_HOST}

@@ -135,7 +135,11 @@ const config = {
 
   logging: {
     level: process.env.LOG_LEVEL || "info",
-    file: process.env.LOG_FILE || "./logs/app.log",
+    // Disable file logging in production/Docker - use Docker logs instead
+    file:
+      process.env.DOCKER_ENV === "true"
+        ? false
+        : process.env.LOG_FILE || "./logs/app.log",
   },
 
   timezone: process.env.TIMEZONE || "Asia/Jakarta",
