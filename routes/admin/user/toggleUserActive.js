@@ -19,7 +19,7 @@ const toggleUserActive = async (req, res) => {
 
   try {
     // Check if trying to deactivate own account
-    if (parseInt(userId) === req.session.user.id) {
+    if (parseInt(userId, 10) === req.session.user.id) {
       req.flash("error", "Cannot deactivate your own account");
       return res.redirect("/admin/user/index");
     }
@@ -91,9 +91,9 @@ const toggleUserActive = async (req, res) => {
     });
 
     // Invalidate user-related caches after status change
-    await invalidateCache("admin:users:*", true);
+    await invalidateCache("users:*", true);
     await invalidateCache("datatable:users:*", true); // DataTable cache
-    await invalidateCache(`user:${userId}:*`, true);
+    await invalidateCache(`users:${userId}:*`, true);
 
     req.flash(
       "success",

@@ -160,9 +160,9 @@ const uploadNewUser = async (req, res) => {
     // Handle results and show password list
     if (successfulUsers.length > 0) {
       // Invalidate user-related caches after bulk creation
-      await invalidateCache("admin:users:*", true);
+      await invalidateCache("users:*", true);
       await invalidateCache("datatable:users:*", true); // DataTable cache
-      await invalidateCache("user:*", true);
+      await invalidateCache("users:*", true);
 
       // Log bulk upload summary
       await logUserActivity({

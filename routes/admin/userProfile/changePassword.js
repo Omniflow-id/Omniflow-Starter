@@ -175,8 +175,8 @@ const changePassword = asyncHandler(async (req, res) => {
   });
 
   // Invalidate user-related caches
-  await invalidateCache(`user:${userId}:*`, true);
-  await invalidateCache("admin:users:*", true);
+  await invalidateCache(`users:${userId}:*`, true);
+  await invalidateCache("users:*", true);
 
   req.flash("success", "Password changed successfully!");
   res.redirect("/admin/profile");

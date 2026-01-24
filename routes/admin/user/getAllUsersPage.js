@@ -15,7 +15,7 @@ const getAllUsersPage = async (req, res) => {
   try {
     // Only load roles for modal - users data loaded via server-side DataTable
     const result = await handleCache({
-      key: "admin:users:roles",
+      key: "users:roles:list",
       ttl: 300, // 5 minutes
       dbQueryFn: async () => {
         const [roles] = await db.query(

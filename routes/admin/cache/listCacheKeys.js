@@ -9,7 +9,7 @@ const listCacheKeys = asyncHandler(async (req, res) => {
   const { pattern = "*", limit = 50 } = req.query;
 
   // Validate limit (max 100 for performance)
-  const parsedLimit = Math.min(parseInt(limit) || 50, 100);
+  const parsedLimit = Math.min(parseInt(limit, 10) || 50, 100);
 
   const result = await listKeys(pattern, parsedLimit);
 

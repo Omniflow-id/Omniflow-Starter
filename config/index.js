@@ -84,9 +84,9 @@ const config = {
     ssl:
       process.env.DB_SSL_ENABLED === "true"
         ? {
-          rejectUnauthorized:
-            process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
-        }
+            rejectUnauthorized:
+              process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
+          }
         : false,
   },
 
@@ -176,10 +176,10 @@ const config = {
       hsts:
         process.env.NODE_ENV === "production"
           ? {
-            maxAge: 63072000,
-            includeSubDomains: true,
-            preload: true,
-          }
+              maxAge: 63072000,
+              includeSubDomains: true,
+              preload: true,
+            }
           : false,
       ieNoOpen: true,
       noSniff: true,
@@ -251,7 +251,7 @@ const config = {
     keepAlive: parseInt(process.env.REDIS_KEEP_ALIVE, 10) || 30000, // 30 seconds
     // Cache configuration
     defaultTTL: parseInt(process.env.REDIS_DEFAULT_TTL, 10) || 3600, // 1 hour default
-    keyPrefix: process.env.REDIS_KEY_PREFIX || "omniflow:",
+    keyPrefix: process.env.REDIS_KEY_PREFIX || "starter:",
   },
 
   rabbitmq: {

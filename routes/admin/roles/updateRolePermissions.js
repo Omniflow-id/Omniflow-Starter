@@ -113,8 +113,8 @@ const updateRolePermissions = asyncHandler(async (req, res) => {
     );
 
     // Invalidate cache
-    await invalidateCache("admin:permissions:*", true);
-    await invalidateCache("admin:users:*", true); // User cache may show roles
+    await invalidateCache("permissions:*", true);
+    await invalidateCache("users:*", true); // User cache may show roles
 
     res.json({
       success: true,

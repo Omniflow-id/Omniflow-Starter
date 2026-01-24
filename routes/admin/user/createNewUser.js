@@ -165,6 +165,7 @@ const createNewUser = async (req, res) => {
         url: req.originalUrl,
       },
       dataChanges: {
+        oldData: null,
         newData: createdUserData,
         maskSensitive: true, // Will mask password_hash
       },
@@ -178,7 +179,7 @@ const createNewUser = async (req, res) => {
     });
 
     // Invalidate user-related caches
-    await invalidateCache("admin:users:*", true);
+    await invalidateCache("users:*", true);
     await invalidateCache("datatable:users:*", true); // DataTable cache
     await invalidateCache("user:*", true);
 

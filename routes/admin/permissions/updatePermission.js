@@ -45,7 +45,7 @@ const updatePermission = asyncHandler(async (req, res) => {
     req
   );
 
-  await invalidateCache("admin:permissions:*", true);
+  await invalidateCache("permissions:*", true);
 
   req.flash("success", `Permission '${permission_name}' updated successfully.`);
   res.redirect("/admin/permissions");

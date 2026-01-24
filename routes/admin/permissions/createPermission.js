@@ -42,7 +42,7 @@ const createPermission = asyncHandler(async (req, res) => {
     req
   );
 
-  await invalidateCache("admin:permissions:*", true);
+  await invalidateCache("permissions:*", true);
 
   req.flash("success", `Permission '${permission_name}' created successfully.`);
   res.redirect("/admin/permissions");

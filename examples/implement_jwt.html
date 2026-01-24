@@ -655,7 +655,7 @@
         try {
           const payload = JSON.parse(atob(token.split(".")[1]));
           return payload.exp * 1000; // Convert to milliseconds
-        } catch (e) {
+        } catch (_e) {
           return null;
         }
       }
@@ -671,7 +671,7 @@
         if (accessToken) {
           const truncated =
             accessToken.length > 50
-              ? accessToken.substring(0, 50) + "..."
+              ? `${accessToken.substring(0, 50)}...`
               : accessToken;
           accessDisplay.innerHTML = `<span class="text-green-400">${truncated}</span>`;
           accessDisplay.title = accessToken;
@@ -686,7 +686,7 @@
         if (refreshToken) {
           const truncated =
             refreshToken.length > 50
-              ? refreshToken.substring(0, 50) + "..."
+              ? `${refreshToken.substring(0, 50)}...`
               : refreshToken;
           refreshDisplay.innerHTML = `<span class="text-blue-400">${truncated}</span>`;
           refreshDisplay.title = refreshToken;
@@ -810,7 +810,7 @@
         }, 300);
       }
 
-      function clearResponse() {
+      function _clearResponse() {
         const display = document.getElementById("responseDisplay");
         display.innerHTML = `
                 <div class="flex items-center mb-2">
@@ -892,7 +892,7 @@
       }
 
       // API test functions with enhanced UX
-      async function testIndexAPI() {
+      async function _testIndexAPI() {
         try {
           await makeRequest(`${API_BASE}/`, {}, "indexBtn");
           showToast(
@@ -900,7 +900,7 @@
             "API server is responding correctly",
             "success"
           );
-        } catch (error) {
+        } catch (_error) {
           showToast(
             "Connection Failed",
             "Could not reach the API server",
@@ -909,7 +909,7 @@
         }
       }
 
-      async function testHealthAPI() {
+      async function _testHealthAPI() {
         try {
           const { response, data } = await makeRequest(
             `${API_BASE}/health`,
@@ -930,7 +930,7 @@
               "warning"
             );
           }
-        } catch (error) {
+        } catch (_error) {
           showToast(
             "Health Check Failed",
             "Could not reach the health endpoint",
@@ -939,7 +939,7 @@
         }
       }
 
-      async function testLoginAPI() {
+      async function _testLoginAPI() {
         const email = document.getElementById("loginEmail").value;
         const password = document.getElementById("loginPassword").value;
 
@@ -984,12 +984,12 @@
               "error"
             );
           }
-        } catch (error) {
+        } catch (_error) {
           showToast("Login Error", "Network error during login", "error");
         }
       }
 
-      async function testRefreshTokenAPI() {
+      async function _testRefreshTokenAPI() {
         if (!refreshToken) {
           updateResponse(
             {
@@ -1031,12 +1031,12 @@
               "error"
             );
           }
-        } catch (error) {
+        } catch (_error) {
           showToast("Refresh Error", "Network error during refresh", "error");
         }
       }
 
-      async function testProtectedAPI() {
+      async function _testProtectedAPI() {
         if (!accessToken) {
           updateResponse(
             {
@@ -1054,7 +1054,7 @@
         }
 
         try {
-          const { response, data } = await makeRequest(
+          const { response } = await makeRequest(
             `${API_BASE}/protected`,
             {
               headers: {
@@ -1077,7 +1077,7 @@
               "error"
             );
           }
-        } catch (error) {
+        } catch (_error) {
           showToast(
             "Protected Route Error",
             "Network error accessing protected route",
@@ -1087,7 +1087,7 @@
       }
 
       // Cache API Functions
-      async function testCacheStatsAPI() {
+      async function _testCacheStatsAPI() {
         if (!accessToken) {
           updateResponse(
             {
@@ -1105,7 +1105,7 @@
         }
 
         try {
-          const { response, data } = await makeRequest(
+          const { response } = await makeRequest(
             `${API_BASE}/cache/stats`,
             {
               headers: {
@@ -1128,7 +1128,7 @@
               "error"
             );
           }
-        } catch (error) {
+        } catch (_error) {
           showToast(
             "Cache Stats Error",
             "Network error accessing cache stats",
@@ -1137,7 +1137,7 @@
         }
       }
 
-      async function testCacheTestAPI() {
+      async function _testCacheTestAPI() {
         if (!accessToken) {
           updateResponse(
             {
@@ -1155,7 +1155,7 @@
         }
 
         try {
-          const { response, data } = await makeRequest(
+          const { response } = await makeRequest(
             `${API_BASE}/cache/test`,
             {
               headers: {
@@ -1178,7 +1178,7 @@
               "error"
             );
           }
-        } catch (error) {
+        } catch (_error) {
           showToast(
             "Cache Test Error",
             "Network error during cache test",
@@ -1187,7 +1187,7 @@
         }
       }
 
-      async function testCacheFlushAPI() {
+      async function _testCacheFlushAPI() {
         if (!accessToken) {
           updateResponse(
             {
@@ -1219,7 +1219,7 @@
         }
 
         try {
-          const { response, data } = await makeRequest(
+          const { response } = await makeRequest(
             `${API_BASE}/cache/flush`,
             {
               method: "POST",
@@ -1243,7 +1243,7 @@
               "error"
             );
           }
-        } catch (error) {
+        } catch (_error) {
           showToast(
             "Cache Flush Error",
             "Network error during cache flush",
@@ -1258,7 +1258,7 @@
         .addEventListener("click", clearTokens);
 
       // Initialize app with loading animation
-      document.addEventListener("DOMContentLoaded", function () {
+      document.addEventListener("DOMContentLoaded", () => {
         loadTokens();
         updateTokenDisplays();
 

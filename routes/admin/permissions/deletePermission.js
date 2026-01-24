@@ -37,7 +37,7 @@ const deletePermission = asyncHandler(async (req, res) => {
     req
   );
 
-  await invalidateCache("admin:permissions:*", true);
+  await invalidateCache("permissions:*", true);
 
   req.flash(
     "success",

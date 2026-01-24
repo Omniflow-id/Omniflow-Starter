@@ -9,7 +9,7 @@ const listCacheKeysAPI = asyncHandler(async (req, res) => {
   const { pattern = "*", limit = 50 } = req.query;
 
   // Validate limit (max 500 for API, higher than admin interface)
-  const parsedLimit = Math.min(parseInt(limit) || 50, 500);
+  const parsedLimit = Math.min(parseInt(limit, 10) || 50, 500);
 
   const result = await listKeys(pattern, parsedLimit);
 

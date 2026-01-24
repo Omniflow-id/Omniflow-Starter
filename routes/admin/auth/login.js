@@ -367,12 +367,14 @@ const loadUserPermissions = async (user) => {
       .map((p) => p.permission_name);
 
     // Add grants to base permissions
-    grantedPermissions.forEach((permission) => basePermissions.add(permission));
+    grantedPermissions.forEach((permission) => {
+      basePermissions.add(permission);
+    });
 
     // Remove revokes from base permissions
-    revokedPermissions.forEach((permission) =>
-      basePermissions.delete(permission)
-    );
+    revokedPermissions.forEach((permission) => {
+      basePermissions.delete(permission);
+    });
 
     userPermissions = Array.from(basePermissions);
   } catch (permissionError) {

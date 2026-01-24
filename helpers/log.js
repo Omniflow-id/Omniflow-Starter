@@ -388,9 +388,9 @@ async function logActivity(options = {}) {
         user_id, username, user_email, user_role,
         ip_address, user_agent, device_type, browser, platform, request_method, request_url, request_id,
         application, environment, server_instance, process_id,
-        metadata, status, error_message, error_code, duration_ms, memory_usage_mb,
+        metadata, data_changes, status, error_message, error_code, duration_ms, memory_usage_mb,
         created_at
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         activityType,
         activity,
@@ -414,6 +414,7 @@ async function logActivity(options = {}) {
         systemInfo.serverInstance,
         systemInfo.processId,
         finalMetadata ? JSON.stringify(finalMetadata) : null,
+        changeLog ? JSON.stringify(changeLog) : null,
         status,
         errorMessage,
         errorCode,
@@ -426,7 +427,7 @@ async function logActivity(options = {}) {
     // Invalidate logs cache after new log entry
     setImmediate(async () => {
       try {
-        await invalidateCache("admin:logs:*", true);
+        await invalidateCache("logs:*", true);
         await invalidateCache("datatable:logs:*", true); // DataTable cache
       } catch (cacheErr) {
         console.warn(

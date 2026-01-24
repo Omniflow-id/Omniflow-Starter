@@ -44,6 +44,7 @@ exports.up = (knex) =>
 
       // Additional metadata (flexible JSON field)
       table.json("metadata").nullable();
+      table.json("data_changes").nullable(); // For tracking before/after values
 
       // Status and result
       table

@@ -14,8 +14,8 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
   } = req.query;
 
   // Parse DataTables parameters
-  const offset = parseInt(start);
-  const limit = parseInt(length);
+  const offset = parseInt(start, 10);
+  const limit = parseInt(length, 10);
   const searchValue = search.value || "";
 
   // Base query
@@ -167,8 +167,9 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
           <a href="/admin/user/${user.id}/permissions" class="btn btn-sm btn-info" title="Manage User Permissions">
             <i class="fas fa-key"></i>
           </a>
-          ${user.id !== req.session.user?.id
-        ? `
+          ${
+            user.id !== req.session.user?.id
+              ? `
             <form method="POST" action="/admin/user/toggle-active/${user.id}" style="display: inline-block;">
               <input type="hidden" name="_csrf" value="${csrfToken}" />
               <button type="submit" class="btn btn-sm ${user.is_active ? "btn-warning" : "btn-success"}">
@@ -179,15 +180,15 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
               <i class="fas fa-trash"></i>
             </button>
           `
-        : ""
-      }
+              : ""
+          }
         </div>
       `,
     ]);
 
     // Return DataTables response with cache info
     res.json({
-      draw: parseInt(draw),
+      draw: parseInt(draw, 10),
       recordsTotal: totalCount,
       recordsFiltered: filteredCount,
       data: data,
@@ -199,7 +200,7 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
   } catch (error) {
     console.error("❌ [DATATABLE] Error getting users data:", error.message);
     res.status(500).json({
-      draw: parseInt(draw),
+      draw: parseInt(draw, 10),
       recordsTotal: 0,
       recordsFiltered: 0,
       data: [],

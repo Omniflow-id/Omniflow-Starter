@@ -92,10 +92,10 @@ const updateUserPermissions = asyncHandler(async (req, res) => {
       resourceType: RESOURCE_TYPES.USER,
       resourceId: userId,
       dataChanges: {
-        before: {
+        oldData: {
           permissions: currentPermissions.map((p) => p.permission_name),
         },
-        after: {
+        newData: {
           grantedPermissions,
           revokedPermissions,
         },
@@ -114,10 +114,11 @@ const updateUserPermissions = asyncHandler(async (req, res) => {
   );
 
   // Invalidate cache
-  await invalidateCache("admin:permissions:*", true);
-  await invalidateCache("admin:users:*", true);
+  // Invalidate cache
+  await invalidateCache("permissions:*", true);
+  await invalidateCache("users:*", true);
   await invalidateCache("datatable:users:*", true); // DataTable cache
-  await invalidateCache(`admin:user:${userId}:*`, true);
+  await invalidateCache(`users:${userId}:*`, true);
 
   res.json({
     success: true,

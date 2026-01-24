@@ -47,7 +47,7 @@ const getLogPage = async (req, res) => {
     }
 
     query += " ORDER BY created_at DESC LIMIT ?";
-    params.push(parseInt(limit));
+    params.push(parseInt(limit, 10));
 
     // Create cache key that includes filters
     const filterKey = JSON.stringify({
@@ -174,7 +174,7 @@ const downloadLogData = async (req, res) => {
     }
 
     query += " ORDER BY created_at DESC LIMIT ?";
-    params.push(parseInt(limit));
+    params.push(parseInt(limit, 10));
 
     const [logs] = await db.query(query, params);
 

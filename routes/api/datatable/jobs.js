@@ -14,8 +14,8 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
   } = req.query;
 
   // Parse DataTables parameters
-  const offset = parseInt(start);
-  const limit = parseInt(length);
+  const offset = parseInt(start, 10);
+  const limit = parseInt(length, 10);
   const searchValue = search.value || "";
 
   // Base query
@@ -275,7 +275,7 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
 
     // Return DataTables response with cache info
     res.json({
-      draw: parseInt(draw),
+      draw: parseInt(draw, 10),
       recordsTotal: totalCount,
       recordsFiltered: filteredCount,
       data: data,
@@ -287,7 +287,7 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
   } catch (error) {
     console.error("❌ [DATATABLE] Error getting jobs data:", error.message);
     res.status(500).json({
-      draw: parseInt(draw),
+      draw: parseInt(draw, 10),
       recordsTotal: 0,
       recordsFiltered: 0,
       data: [],
