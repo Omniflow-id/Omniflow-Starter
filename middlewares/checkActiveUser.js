@@ -18,9 +18,10 @@ const checkActiveUser = async (req, res, next) => {
     }
 
     // Check user's active status from database
-    const [users] = await db.query("SELECT is_active FROM users WHERE id = ?", [
-      req.session.user.id,
-    ]);
+    const [users] = await db.query(
+      "SELECT is_active FROM users WHERE id = ? AND deleted_at IS NULL",
+      [req.session.user.id]
+    );
 
     if (users.length === 0) {
       // User not found in database - clear session

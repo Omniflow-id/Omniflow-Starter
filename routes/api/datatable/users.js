@@ -167,18 +167,20 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
           <a href="/admin/user/${user.id}/permissions" class="btn btn-sm btn-info" title="Manage User Permissions">
             <i class="fas fa-key"></i>
           </a>
-          ${
-            user.id !== req.session.user?.id
-              ? `
+          ${user.id !== req.session.user?.id
+        ? `
             <form method="POST" action="/admin/user/toggle-active/${user.id}" style="display: inline-block;">
               <input type="hidden" name="_csrf" value="${csrfToken}" />
               <button type="submit" class="btn btn-sm ${user.is_active ? "btn-warning" : "btn-success"}">
                 ${user.is_active ? '<i class="fas fa-user-slash"></i>' : '<i class="fas fa-user-check"></i>'}
               </button>
             </form>
+            <button class="btn btn-sm btn-danger btn-delete-user" data-id="${user.id}" data-username="${user.username}" title="Delete User">
+              <i class="fas fa-trash"></i>
+            </button>
           `
-              : ""
-          }
+        : ""
+      }
         </div>
       `,
     ]);

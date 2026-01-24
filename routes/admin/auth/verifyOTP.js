@@ -62,7 +62,7 @@ const postVerifyOTP = asyncHandler(async (req, res) => {
 
     // Load user permissions and complete login
     const { db } = require("@db/db");
-    const [userRows] = await db.query("SELECT * FROM users WHERE id = ?", [
+    const [userRows] = await db.query("SELECT * FROM users WHERE id = ? AND deleted_at IS NULL", [
       pending2FA.userId,
     ]);
 

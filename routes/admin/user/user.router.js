@@ -45,6 +45,11 @@ router.post(
   doubleCsrfProtection,
   user.toggleUserActive
 );
+router.post(
+  "/user/delete/:id",
+  doubleCsrfProtection,
+  user.deleteUser
+);
 
 // User permissions management routes
 router.get(

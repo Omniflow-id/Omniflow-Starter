@@ -22,9 +22,10 @@ const deleteRole = asyncHandler(async (req, res) => {
   }
 
   // Soft delete the role
-  await db.query("UPDATE roles SET deleted_at = NOW() WHERE role_id = ?", [
-    roleId,
-  ]);
+  await db.query(
+    "UPDATE roles SET deleted_at = NOW(), updated_at = NOW() WHERE role_id = ?",
+    [roleId]
+  );
 
   await logUserActivity(
     {

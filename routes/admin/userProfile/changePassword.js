@@ -47,7 +47,7 @@ const changePassword = asyncHandler(async (req, res) => {
 
   // Get current user data
   const [users] = await db.query(
-    "SELECT id, username, email, password_hash FROM users WHERE id = ?",
+    "SELECT id, username, email, password_hash FROM users WHERE id = ? AND deleted_at IS NULL",
     [userId]
   );
 

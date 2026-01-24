@@ -290,5 +290,40 @@
       onClick: function () {}, // Callback after click
     }).showToast();
   });
+
+  // Handle Delete User
+  $(document).on('click', '.btn-delete-user', function() {
+    const userId = $(this).data('id');
+    const username = $(this).data('username');
+    
+    if (confirm(`Apakah Anda yakin ingin menghapus user "${username}"?\nTindakan ini tidak dapat dibatalkan (Soft Delete).`)) {
+      $.ajax({
+        url: `/admin/user/delete/${userId}`,
+        type: 'POST',
+        headers: {
+          'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content') || ""
+        },
+        success: function(response) {
+          if (response.success) {
+            Toastify({
+              text: response.message,
+              duration: 3000,
+              style: {
+                background: "linear-gradient(to right, #00b09b, #96c93d)",
+                marginTop: "50px",
+              },
+            }).showToast();
+            $('#datatablesSimple').DataTable().ajax.reload();
+          } else {
+            alert(response.message);
+          }
+        },
+        error: function(xhr) {
+          const response = xhr.responseJSON;
+          alert(response ? response.message : "Terjadi kesalahan saat menghapus user");
+        }
+      });
+    }
+  });
 </script>
 {% endblock %}

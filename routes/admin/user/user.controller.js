@@ -10,6 +10,8 @@ const { showGeneratedPasswordsPage } = require("./showGeneratedPasswordsPage");
 const { getUserPermissionsPage } = require("./getUserPermissionsPage");
 const { updateUserPermissions } = require("./updateUserPermissions");
 
+const { deleteUser } = require("./deleteUser");
+
 module.exports = {
   getUserOverviewPage,
   getAllUsersPage,
@@ -21,4 +23,5 @@ module.exports = {
   showGeneratedPasswordsPage,
   getUserPermissionsPage,
   updateUserPermissions,
+  deleteUser,
 };
