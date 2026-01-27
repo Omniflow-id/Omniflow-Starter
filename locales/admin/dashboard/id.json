@@ -1,0 +1,82 @@
+{
+  "pageTitle": "Dashboard Admin",
+  "brand": {
+    "name": "Omniflow"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "profile": "Profil",
+    "module": "Modul",
+    "overview": "Gambaran Umum",
+    "submodule": "Sub Modul",
+    "users": "Manajemen User",
+    "permissions": "Permissions",
+    "allPermissions": "All Permissions",
+    "roles": "Roles & Permissions",
+    "logs": "Log",
+    "cache": "Cache",
+    "queue": "Queue",
+    "statistics": "Statistik",
+    "allJobs": "Semua Jobs",
+    "failedJobs": "Failed Jobs",
+    "loggedInAs": "Masuk sebagai"
+  },
+  "greeting": "Selamat datang",
+  "welcome": "di panel administrasi Omniflow",
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Ringkasan aktivitas sistem",
+    "overview": "Gambaran Umum",
+    "quickStats": "Statistik Cepat",
+    "recentActivity": "Aktivitas Terbaru",
+    "systemStatus": "Status Sistem"
+  },
+  "stats": {
+    "totalUsers": "Total User",
+    "activeUsers": "User Aktif",
+    "totalLogs": "Total Log",
+    "todayLogs": "Log Hari Ini",
+    "cacheHitRate": "Cache Hit Rate",
+    "queueJobs": "Queue Jobs"
+  },
+  "table": {
+    "id": "ID",
+    "actions": "Aksi",
+    "status": "Status",
+    "createdAt": "Dibuat",
+    "updatedAt": "Diperbarui"
+  },
+  "buttons": {
+    "viewAll": "Lihat Semua",
+    "refresh": "Refresh",
+    "export": "Export",
+    "save": "Simpan",
+    "cancel": "Batal",
+    "delete": "Hapus",
+    "edit": "Edit",
+    "create": "Buat Baru",
+    "search": "Cari",
+    "filter": "Filter"
+  },
+  "messages": {
+    "loading": "Memuat...",
+    "noData": "Tidak ada data",
+    "success": "Berhasil",
+    "error": "Terjadi kesalahan",
+    "confirmDelete": "Apakah Anda yakin ingin menghapus?",
+    "saved": "Data berhasil disimpan",
+    "deleted": "Data berhasil dihapus",
+    "updated": "Data berhasil diperbarui"
+  },
+  "overview": {
+    "pageTitle": "Halaman Overview",
+    "welcome": "Selamat datang di Overview"
+  },
+  "submodule": {
+    "pageTitle": "Halaman Sub Modul",
+    "welcome": "Selamat datang di Sub Modul"
+  },
+  "footer": {
+    "copyright": "© 2025 Omniflow Starter. All rights reserved."
+  }
+}

@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ currentLang or 'en' }}">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rate Limit Exceeded</title>
+    <title>{{ t('429.pageTitle') }}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 
 <body class="d-flex flex-column min-vh-100">
     <div class="container text-center my-auto">
         <h1 class="display-1 text-danger">429</h1>
-        <h2 class="mb-4">Terlalu Banyak Permintaan</h2>
-        <p class="lead">{{ errorDescription if errorDescription else "Anda telah mencapai batas permintaan. Silakan tunggu sebentar sebelum mencoba lagi." }}</p>
+        <h2 class="mb-4">{{ t('429.title') }}</h2>
+        <p class="lead">{{ errorDescription if errorDescription else t('429.message') }}</p>
         
         {% if error_msg and error_msg.length > 0 %}
         <div class="alert alert-warning mt-3">
@@ -21,12 +21,12 @@
         {% endif %}
 
         <div class="mt-4">
-            <a href="javascript:history.back()" class="btn btn-secondary me-2">Kembali</a>
-            <a href="/admin" class="btn btn-primary">Dashboard</a>
+            <a href="javascript:history.back()" class="btn btn-secondary me-2">{{ t('common.back') }}</a>
+            <a href="/admin" class="btn btn-primary">{{ t('common.dashboard') }}</a>
         </div>
     </div>
     <footer class="mt-auto text-center py-3">
-        <p class="text-muted">&copy; {{ currentYear }} {{ appName }}. All rights reserved.</p>
+        <p class="text-muted">&copy; {{ currentYear }} {{ appName }}. {{ t('common.rightsReserved') }}</p>
     </footer>
 </body>
 

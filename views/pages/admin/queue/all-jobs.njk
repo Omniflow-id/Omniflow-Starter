@@ -1,34 +1,38 @@
 {% extends "layout/masterLayout.njk" %}
 
-{% block title %}All Jobs{% endblock %}
+{% block title %}{{ t('pageTitle') }}{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-4">
-  <h1 class="mt-4">All Jobs</h1>
+  <h1 class="mt-4">{{ t('pageTitle') }}</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/admin">{{ t('sidebar.dashboard') }}</a></li>
+    <li class="breadcrumb-item active">{{ t('pageTitle') }}</li>
+  </ol>
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
       <!-- Status Filter -->
       <div class="btn-group" role="group">
         <a href="?status=all" class="btn {% if currentStatus == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %} btn-sm">
-          All
+          {{ t('filters.all') }}
         </a>
         <a href="?status=pending" class="btn {% if currentStatus == 'pending' %}btn-warning{% else %}btn-outline-warning{% endif %} btn-sm">
-          Pending
+          {{ t('filters.pending') }}
         </a>
         <a href="?status=processing" class="btn {% if currentStatus == 'processing' %}btn-info{% else %}btn-outline-info{% endif %} btn-sm">
-          Processing
+          {{ t('filters.processing') }}
         </a>
         <a href="?status=completed" class="btn {% if currentStatus == 'completed' %}btn-success{% else %}btn-outline-success{% endif %} btn-sm">
-          Completed
+          {{ t('filters.completed') }}
         </a>
         <a href="?status=failed" class="btn {% if currentStatus == 'failed' %}btn-danger{% else %}btn-outline-danger{% endif %} btn-sm">
-          Failed
+          {{ t('filters.failed') }}
         </a>
       </div>
     </div>
     <div>
       <a href="/admin/queue" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left me-1"></i>Back to Queue Stats
+        <i class="fas fa-arrow-left me-1"></i>{{ t('buttons.back') }}
       </a>
     </div>
   </div>
@@ -45,16 +49,16 @@
       <div class="d-flex justify-content-between align-items-center">
         <h5 class="card-title mb-0">
           {% if currentStatus == 'all' %}
-            All Jobs ({{ pagination.total }} total)
+            {{ t('labels.allJobs') }} ({{ pagination.total }} {{ t('labels.total') }})
           {% else %}
-            {{ currentStatus | title }} Jobs ({{ pagination.total }} total)
+            {{ t('status.' + currentStatus) }} {{ t('labels.jobs') }} ({{ pagination.total }} {{ t('labels.total') }})
           {% endif %}
         </h5>
         {% if currentStatus == 'failed' %}
         <form action="/admin/queue/retry" method="POST" class="d-inline">
           {{ csrfField() | safe }}
           <button type="submit" class="btn btn-warning btn-sm">
-            <i class="fas fa-redo"></i> Retry Failed
+            <i class="fas fa-redo"></i> {{ t('buttons.retryFailed') }}
           </button>
         </form>
         {% endif %}
@@ -65,15 +69,15 @@
         <table id="datatablesSimple" class="table table-striped" style="width: 100%">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Status</th>
-              <th>Queue</th>
-              <th>Data</th>
-              <th>Attempts</th>
-              <th>Created</th>
-              <th>Started</th>
-              <th>Completed</th>
-              <th>Error</th>
+              <th>{{ t('table.id') }}</th>
+              <th>{{ t('table.status') }}</th>
+              <th>{{ t('table.queue') }}</th>
+              <th>{{ t('table.data') }}</th>
+              <th>{{ t('table.attempts') }}</th>
+              <th>{{ t('table.createdAt') }}</th>
+              <th>{{ t('table.startedAt') }}</th>
+              <th>{{ t('table.completedAt') }}</th>
+              <th>{{ t('table.error') }}</th>
             </tr>
           </thead>
         </table>
@@ -84,14 +88,14 @@
   <div class="card">
     <div class="card-body text-center py-5">
       <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-      <h4>No Jobs Found</h4>
+      <h4>{{ t('labels.noJobs') }}</h4>
       {% if currentStatus == 'all' %}
-      <p class="text-muted">No jobs have been created yet.</p>
+      <p class="text-muted">{{ t('messages.noJobsCreated') }}</p>
       {% else %}
-      <p class="text-muted">No {{ currentStatus }} jobs found.</p>
+      <p class="text-muted">{{ t('messages.noStatusJobs') | replace('{status}', currentStatus) }}</p>
       {% endif %}
       <a href="/admin/queue" class="btn btn-primary">
-        <i class="fas fa-arrow-left"></i> Back to Queue Stats
+        <i class="fas fa-arrow-left"></i> {{ t('buttons.back') }}
       </a>
     </div>
   </div>
@@ -103,7 +107,17 @@
 <script>
   $(document).ready(function () {
     const currentStatus = '{{ currentStatus }}';
-    
+    const datatableLang = {
+      search: '{{ t('datatable.search') }}',
+      lengthMenu: '{{ t('datatable.lengthMenu') }}',
+      info: '{{ t('datatable.info') }}',
+      infoEmpty: '{{ t('datatable.infoEmpty') }}',
+      infoFiltered: '{{ t('datatable.infoFiltered') }}',
+      processing: '{{ t('datatable.processing') }}',
+      loadingRecords: '{{ t('datatable.loadingRecords') }}',
+      zeroRecords: '{{ t('datatable.zeroRecords') }}'
+    };
+
     $("#datatablesSimple").DataTable({
       processing: true,
       serverSide: true,
@@ -118,8 +132,8 @@
         { data: 0, name: 'id' },
         { data: 1, name: 'status' },
         { data: 2, name: 'queue' },
-        { 
-          data: 3, 
+        {
+          data: 3,
           name: 'data',
           orderable: false,
           searchable: false
@@ -128,8 +142,8 @@
         { data: 5, name: 'created_at' },
         { data: 6, name: 'started_at' },
         { data: 7, name: 'completed_at' },
-        { 
-          data: 8, 
+        {
+          data: 8,
           name: 'error',
           orderable: false,
           searchable: false
@@ -142,16 +156,7 @@
       columnDefs: [
         { className: "text-center", targets: [0, 1, 2, 4] }
       ],
-      language: {
-        search: "Search jobs:",
-        lengthMenu: "Show _MENU_ jobs per page",
-        info: "Showing _START_ to _END_ of _TOTAL_ jobs",
-        infoEmpty: "No jobs found",
-        infoFiltered: "(filtered from _MAX_ total jobs)",
-        processing: "Processing...",
-        loadingRecords: "Loading...",
-        zeroRecords: "No matching jobs found"
-      }
+      language: datatableLang
     });
   });
 </script>

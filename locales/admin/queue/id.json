@@ -1,0 +1,113 @@
+{
+  "pageTitle": "Queue Management",
+  "title": "Queue Management",
+  "subtitle": "Kelola job queue sistem",
+  "nav": {
+    "dashboard": "Dashboard",
+    "queue": "Queue Management"
+  },
+  "labels": {
+    "status": "Status",
+    "testJobDescription": "Mengirim test job ke worker",
+    "retryDescription": "Retry hingga 10 failed jobs",
+    "recentFailed": "Recent Failed Jobs",
+    "noError": "Tidak ada pesan error",
+    "viewAllFailed": "Lihat Semua Failed Jobs",
+    "noFailedJobs": "Tidak Ada Failed Jobs",
+    "allJobs": "Semua Jobs",
+    "jobs": "Jobs",
+    "total": "total",
+    "failedJobs": "Failed Jobs",
+    "noJobs": "Tidak Ada Jobs"
+  },
+  "filters": {
+    "all": "Semua",
+    "pending": "Pending",
+    "processing": "Processing",
+    "completed": "Selesai",
+    "failed": "Gagal"
+  },
+  "stats": {
+    "title": "Statistik Queue",
+    "pending": "Pending",
+    "processing": "Processing",
+    "completed": "Selesai",
+    "failed": "Gagal",
+    "retrying": "Mencoba Lagi",
+    "total": "Total Jobs",
+    "connectionStatus": "Status Koneksi",
+    "connected": "Terhubung",
+    "disconnected": "Terputus"
+  },
+  "tabs": {
+    "allJobs": "Semua Jobs",
+    "failedJobs": "Failed Jobs"
+  },
+  "table": {
+    "id": "ID",
+    "queue": "Queue",
+    "status": "Status",
+    "attempts": "Attempts",
+    "data": "Data",
+    "createdAt": "Dibuat",
+    "startedAt": "Started",
+    "completedAt": "Selesai",
+    "error": "Error",
+    "nextRetry": "Retry Berikutnya"
+  },
+  "status": {
+    "pending": "Pending",
+    "processing": "Processing",
+    "completed": "Selesai",
+    "failed": "Gagal",
+    "retrying": "Mencoba Lagi"
+  },
+  "actions": {
+    "retry": "Retry Job",
+    "retryAll": "Retry All Failed",
+    "sendTest": "Send Test Job",
+    "confirmRetry": "Apakah Anda yakin ingin retry job ini?",
+    "confirmRetryAll": "Apakah Anda yakin ingin retry semua failed jobs?"
+  },
+  "buttons": {
+    "refresh": "Refresh",
+    "view": "Lihat",
+    "retry": "Retry All",
+    "retryFailed": "Retry Failed",
+    "retrySelected": "Retry Selected",
+    "sendTest": "Send Test",
+    "back": "Kembali ke Queue Stats"
+  },
+  "messages": {
+    "retrySuccess": "Job berhasil di-retry",
+    "retryAllSuccess": "Semua failed jobs berhasil di-retry",
+    "testSuccess": "Test job berhasil dikirim",
+    "noJobs": "Tidak ada jobs",
+    "rabbitmqReady": "RabbitMQ siap memproses jobs",
+    "reconnecting": "Mencoba menghubungkan kembali",
+    "rabbitmqFailed": "Koneksi RabbitMQ gagal",
+    "allSuccess": "Semua job berhasil diproses!",
+    "noJobsCreated": "Belum ada job yang dibuat.",
+    "noStatusJobs": "Tidak ada job {{status}} yang ditemukan."
+  },
+  "datatable": {
+    "search": "Cari job:",
+    "lengthMenu": "Tampilkan _MENU_ job per halaman",
+    "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ job",
+    "infoEmpty": "Tidak ada job",
+    "infoFiltered": "(difilter dari _MAX_ total job)",
+    "processing": "Memproses...",
+    "loadingRecords": "Memuat...",
+    "zeroRecords": "Tidak ada job yang cocok",
+    "searchFailed": "Cari failed job:",
+    "lengthMenuFailed": "Tampilkan _MENU_ failed job per halaman",
+    "infoFailed": "Menampilkan _START_ sampai _END_ dari _TOTAL_ failed job",
+    "infoEmptyFailed": "Tidak ada failed job",
+    "infoFilteredFailed": "(difilter dari _MAX_ total failed job)"
+  },
+  "modals": {
+    "jobDetails": "Detail Job",
+    "jobData": "Data Job",
+    "errorDetails": "Error Details"
+  }
+}

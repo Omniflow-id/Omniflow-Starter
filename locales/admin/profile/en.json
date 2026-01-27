@@ -1,0 +1,63 @@
+{
+  "pageTitle": "My Profile",
+  "title": "My Profile",
+  "subtitle": "Manage your account information",
+  "breadcrumb": {
+    "dashboard": "Dashboard",
+    "profile": "User Profile"
+  },
+  "sections": {
+    "profile": {
+      "title": "Profile",
+      "activeAccount": "Active Account",
+      "inactiveAccount": "Inactive Account",
+      "memberSince": "Member since"
+    },
+    "info": {
+      "title": "Account Information",
+      "personalInfo": "Personal Information",
+      "fullName": "Full Name",
+      "username": "Username",
+      "email": "Email Address",
+      "notProvided": "Not provided",
+      "copyEmail": "Copy email",
+      "accountStatus": "Account Status",
+      "accountId": "Account ID",
+      "role": "Role",
+      "status": "Status",
+      "memberSince": "Member Since"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "changePassword": "Change Password",
+      "editProfile": "Edit Profile",
+      "logout": "Logout",
+      "updateComingSoon": "Update profile feature coming soon!",
+      "securityNote": "Your account is protected by session-based authentication. Sessions expire after 24 hours of inactivity."
+    }
+  },
+  "changePassword": {
+    "pageTitle": "Change Password",
+    "cardTitle": "Change Your Password",
+    "backToProfile": "Back to Profile",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "passwordHelp": "Password must be at least 8 characters with uppercase, lowercase, numbers, and symbols.",
+    "submit": "Change Password",
+    "cancel": "Cancel",
+    "securityTips": {
+      "title": "Password Security Tips",
+      "length": "Use at least 8 characters",
+      "case": "Include uppercase and lowercase letters",
+      "special": "Add numbers and special characters",
+      "common": "Avoid common words or personal info",
+      "reuse": "Don't reuse old passwords"
+    }
+  },
+  "toast": {
+    "title": "Copied!",
+    "message": "Email address copied to clipboard",
+    "fail": "Failed to copy email address"
+  }
+}

@@ -1,7 +1,7 @@
 {% extends "layout/masterLayout.njk" %} {% block content %}
 <div class="container-fluid px-4">
-  <h1 class="mt-4">Halaman User</h1>
-  
+  <h1 class="mt-4">{{ pageTitle or 'User Management' }}</h1>
+
 
   <div class="row">
     <div class="col-12">
@@ -10,14 +10,14 @@
           <div
             class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2"
           >
-            <span class="mb-2 mb-sm-0">Daftar User</span>
+            <span class="mb-2 mb-sm-0">{{ userList or 'User List' }}</span>
             <div class="d-flex flex-wrap gap-2">
               <button
                 class="btn btn-info btn-sm text-white"
                 id="btnDownloadData"
               >
                 <i class="fas fa-file-excel me-1"></i>
-                <span class="d-none d-sm-inline">Download Data</span>
+                <span class="d-none d-sm-inline">{{ downloadData or 'Download Data' }}</span>
                 <span class="d-inline d-sm-none">Data</span>
               </button>
               <button
@@ -27,12 +27,12 @@
                 data-bs-target="#uploadModal"
               >
                 <i class="fas fa-upload me-1"></i>
-                <span class="d-none d-sm-inline">Upload Data User</span>
+                <span class="d-none d-sm-inline">{{ uploadDataUser or 'Upload Data User' }}</span>
                 <span class="d-inline d-sm-none">Upload</span>
               </button>
               <button class="btn btn-success btn-sm" id="btnDownloadTemplate">
                 <i class="fas fa-download me-1"></i>
-                <span class="d-none d-sm-inline">Download Template</span>
+                <span class="d-none d-sm-inline">{{ downloadTemplate or 'Download Template' }}</span>
                 <span class="d-inline d-sm-none">Template</span>
               </button>
               <button
@@ -42,8 +42,8 @@
                 data-bs-target="#tambahModal"
               >
                 <i class="fas fa-plus me-1"></i>
-                <span class="d-none d-sm-inline">Tambah User</span>
-                <span class="d-inline d-sm-none">Tambah</span>
+                <span class="d-none d-sm-inline">{{ tambahUser or 'Add User' }}</span>
+                <span class="d-inline d-sm-none">{{ tambah or 'Add' }}</span>
               </button>
             </div>
           </div>
@@ -56,12 +56,12 @@
           >
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Nama</th>
-                <th>Email</th>
-                <th>Role</th>
-                <th>Status</th>
-                <th>Aksi</th>
+                <th>{{ table.id or 'ID' }}</th>
+                <th>{{ table.name or 'Name' }}</th>
+                <th>{{ table.email or 'Email' }}</th>
+                <th>{{ table.role or 'Role' }}</th>
+                <th>{{ table.status or 'Status' }}</th>
+                <th>{{ table.actions or 'Actions' }}</th>
               </tr>
             </thead>
           </table>
@@ -82,7 +82,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="uploadModalLabel">Upload Data User</h5>
+        <h5 class="modal-title" id="uploadModalLabel">{{ modals.importUsers or 'Import Users' }}</h5>
         <button
           type="button"
           class="btn-close"
@@ -100,7 +100,7 @@
           {{ csrfField() | safe }}
           <div class="mb-3">
             <label for="fileUpload" class="form-label"
-              >Pilih file untuk diupload:</label
+              >{{ form.chooseFile or 'Choose file to upload:' }}</label
             >
             <input
               type="file"
@@ -118,7 +118,7 @@
             class="btn btn-secondary"
             data-bs-dismiss="modal"
           >
-            Close
+            {{ buttons.cancel or 'Cancel' }}
           </button>
           <button type="submit" class="btn btn-primary" form="uploadForm">
             Upload
@@ -140,7 +140,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="tambahModalLabel">Tambah User</h5>
+        <h5 class="modal-title" id="tambahModalLabel">{{ modals.createUser or 'Create User' }}</h5>
         <button
           type="button"
           class="btn-close"
@@ -152,7 +152,7 @@
         <div class="modal-body">
           {{ csrfField() | safe }}
           <div class="mb-3">
-            <label for="username" class="form-label">Username:</label>
+            <label for="username" class="form-label">{{ form.username or 'Username' }}:</label>
             <input
               type="text"
               class="form-control"
@@ -162,7 +162,7 @@
             />
           </div>
           <div class="mb-3">
-            <label for="email" class="form-label">Email:</label>
+            <label for="email" class="form-label">{{ form.email or 'Email' }}:</label>
             <input
               type="email"
               class="form-control"
@@ -172,7 +172,7 @@
             />
           </div>
           <div class="mb-3">
-            <label for="full_name" class="form-label">Nama Lengkap:</label>
+            <label for="full_name" class="form-label">{{ form.name or 'Full Name' }}:</label>
             <input
               type="text"
               class="form-control"
@@ -182,13 +182,13 @@
               required
             />
             <div class="form-text">
-              Password akan dibuat otomatis: NamaLengkap@12345?.
+              {{ messages.passwordGenerated or 'Password will be auto-generated' }}: FullName@12345?.
             </div>
           </div>
           <div class="mb-3">
-            <label for="role" class="form-label">Role:</label>
+            <label for="role" class="form-label">{{ form.role or 'Role' }}:</label>
             <select class="form-control" id="role" name="role_id" required>
-              <option value="">Pilih Role</option>
+              <option value="">{{ form.selectRole or 'Select Role' }}</option>
               {% for role in roles %}
               <option value="{{ role.role_id }}">{{ role.role_name }}</option>
               {% endfor %}
@@ -201,10 +201,10 @@
             class="btn btn-secondary"
             data-bs-dismiss="modal"
           >
-            Close
+            {{ buttons.cancel or 'Cancel' }}
           </button>
           <button type="submit" class="btn btn-primary" form="tambahForm">
-            Simpan
+            {{ buttons.save or 'Save' }}
           </button>
         </div>
       </form>
@@ -216,17 +216,17 @@
   document.getElementById("btnDownloadData").addEventListener("click", () => {
     window.location.href = "/admin/user/download";
     Toastify({
-      text: "Download berhasil! Silakan cek folder download Anda.",
+      text: "{{ messages.downloadSuccess or 'Download successful!' }}",
       duration: 5000,
       close: true,
-      gravity: "top", // `top` or `bottom`
-      position: "right", // `left`, `center` or `right`
-      stopOnFocus: true, // Prevents dismissing of toast on hover
+      gravity: "top",
+      position: "right",
+      stopOnFocus: true,
       style: {
         background: "linear-gradient(to right, #00b09b, #96c93d)",
         marginTop: "50px",
       },
-      onClick: function () {}, // Callback after click
+      onClick: function () {},
     }).showToast();
   });
 </script>
@@ -246,13 +246,13 @@
         { data: 1, name: 'username' },
         { data: 2, name: 'email' },
         { data: 3, name: 'role' },
-        { 
-          data: 4, 
+        {
+          data: 4,
           name: 'is_active',
           orderable: false
         },
-        { 
-          data: 5, 
+        {
+          data: 5,
           name: 'actions',
           orderable: false,
           searchable: false
@@ -262,14 +262,14 @@
       pageLength: 25,
       responsive: true,
       language: {
-        search: "Cari users:",
-        lengthMenu: "Tampilkan _MENU_ users per halaman",
-        info: "Menampilkan _START_ hingga _END_ dari _TOTAL_ users",
-        infoEmpty: "Tidak ada users",
-        infoFiltered: "(difilter dari _MAX_ total users)",
-        processing: "Memproses...",
-        loadingRecords: "Memuat...",
-        zeroRecords: "Tidak ada data yang cocok"
+        search: "{{ datatable.search or 'Search users:' }}",
+        lengthMenu: "{{ datatable.lengthMenu or 'Show _MENU_ users per page' }}",
+        info: "{{ datatable.info or 'Showing _START_ to _END_ of _TOTAL_ users' }}",
+        infoEmpty: "{{ datatable.infoEmpty or 'No users found' }}",
+        infoFiltered: "{{ datatable.infoFiltered or '(filtered from _MAX_ total users)' }}",
+        processing: "{{ datatable.processing or 'Processing...' }}",
+        loadingRecords: "{{ datatable.loadingRecords or 'Loading...' }}",
+        zeroRecords: "{{ datatable.zeroRecords or 'No matching records found' }}"
       }
     });
   });
@@ -277,7 +277,7 @@
   $("#btnDownloadTemplate").on("click", function () {
     window.location.href = "/admin/user/download-template";
     Toastify({
-      text: "Download berhasil! Silakan cek folder download Anda.",
+      text: "{{ messages.downloadSuccess or 'Download successful!' }}",
       duration: 5000,
       close: true,
       gravity: "top",
@@ -287,7 +287,7 @@
         background: "linear-gradient(to right, #00b09b, #96c93d)",
         marginTop: "50px",
       },
-      onClick: function () {}, // Callback after click
+      onClick: function () {},
     }).showToast();
   });
 
@@ -295,8 +295,8 @@
   $(document).on('click', '.btn-delete-user', function() {
     const userId = $(this).data('id');
     const username = $(this).data('username');
-    
-    if (confirm(`Apakah Anda yakin ingin menghapus user "${username}"?\nTindakan ini tidak dapat dibatalkan (Soft Delete).`)) {
+
+    if (confirm("{{ messages.confirmDelete or 'Are you sure you want to delete this user?' }}")) {
       $.ajax({
         url: `/admin/user/delete/${userId}`,
         type: 'POST',
@@ -320,7 +320,7 @@
         },
         error: function(xhr) {
           const response = xhr.responseJSON;
-          alert(response ? response.message : "Terjadi kesalahan saat menghapus user");
+          alert(response ? response.message : "{{ messages.error or 'An error occurred' }}");
         }
       });
     }

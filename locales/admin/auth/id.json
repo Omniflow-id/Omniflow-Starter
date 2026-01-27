@@ -1,0 +1,42 @@
+{
+  "pageTitle": "Login Admin",
+  "title": "Login Admin",
+  "subtitle": "Masuk ke panel administrasi",
+  "email": "Email",
+  "password": "Password",
+  "rememberMe": "Ingat saya",
+  "forgotPassword": "Lupa password?",
+  "loginButton": "Masuk",
+  "login": "Login",
+  "logout": "Logout",
+  "registerLabel": "Register",
+  "labels": {
+    "emailAddress": "Alamat Email",
+    "emailPlaceholder": "nama@contoh.com",
+    "loading": "Memuat...",
+    "loggingIn": "Sedang masuk..."
+  },
+  "footer": {
+    "backToHome": "Kembali ke beranda",
+    "needAccount": "Butuh akun? Silakan hubungi administrator"
+  },
+  "messages": {
+    "loginSuccess": "Login berhasil",
+    "loginSuccessDev": "Login berhasil! (Development mode)",
+    "loginSuccessOtpBypass": "Login berhasil! (Development mode - OTP bypassed)",
+    "loginError": "Email atau password salah",
+    "logoutSuccess": "Logout berhasil",
+    "sessionExpired": "Sesi Anda telah berakhir, silakan login ulang",
+    "accountInactive": "Akun Anda tidak aktif, silakan hubungi administrator",
+    "2faRequired": "Verifikasi 2FA diperlukan",
+    "2faInvalid": "Kode OTP tidak valid",
+    "otpSent": "OTP telah dibuat. Email sedang dikirim - silakan cek inbox Anda dan masukkan kode OTP di bawah."
+  },
+  "register": {
+    "title": "Daftar Admin Baru",
+    "subtitle": "Buat akun administrator baru",
+    "confirmPassword": "Konfirmasi Password",
+    "registerButton": "Daftar",
+    "alreadyHaveAccount": "Sudah punya akun?"
+  }
+}

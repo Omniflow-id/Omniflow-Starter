@@ -89,7 +89,7 @@ const postVerifyOTP = asyncHandler(async (req, res) => {
 
     await logSuccessfulLogin(user, req, "2fa_dev_bypass");
 
-    req.flash("success", "Berhasil login! (Development mode - OTP bypassed)");
+    req.flash("success", "loginSuccessOtpBypass");
     return res.redirect("/admin");
   }
 

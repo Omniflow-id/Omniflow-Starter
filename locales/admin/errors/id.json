@@ -1,0 +1,39 @@
+{
+  "400": {
+    "title": "Permintaan Tidak Valid",
+    "message": "Data yang Anda kirim tidak sesuai format yang diharapkan",
+    "pageTitle": "Bad Request"
+  },
+  "401": {
+    "title": "Akses Tidak Diizinkan",
+    "message": "Anda perlu login untuk mengakses halaman ini",
+    "pageTitle": "Akses Tidak Diizinkan",
+    "login": "Masuk",
+    "home": "Beranda"
+  },
+  "403": {
+    "title": "Akses Dilarang",
+    "message": "Anda tidak memiliki hak akses untuk halaman ini",
+    "pageTitle": "Forbidden"
+  },
+  "404": {
+    "title": "Oops! Halaman yang Anda cari tidak ditemukan",
+    "message": "Halaman yang Anda cari tidak ada atau telah dipindahkan",
+    "pageTitle": "Halaman Tidak Ditemukan"
+  },
+  "429": {
+    "title": "Terlalu Banyak Permintaan",
+    "message": "Anda telah mencapai batas permintaan. Silakan tunggu sebentar sebelum mencoba lagi.",
+    "pageTitle": "Terlalu Banyak Permintaan"
+  },
+  "500": {
+    "title": "Terjadi Kesalahan Server",
+    "message": "Mohon maaf, terjadi kesalahan pada server. Silahkan coba lagi nanti.",
+    "pageTitle": "Kesalahan Server Internal"
+  },
+  "common": {
+    "back": "Kembali",
+    "dashboard": "Dashboard",
+    "rightsReserved": "Hak cipta dilindungi."
+  }
+}

@@ -1,0 +1,144 @@
+{
+  "pageTitle": "User Management",
+  "title": "User Management",
+  "subtitle": "Manage system user accounts",
+  "createUser": "Create New User",
+  "importUsers": "Import Users",
+  "exportUsers": "Export Users",
+  "downloadTemplate": "Download Template",
+  "downloadData": "Download Data",
+  "uploadDataUser": "Upload Data User",
+  "tambahUser": "Add User",
+  "tambah": "Add",
+  "userList": "User List",
+  "table": {
+    "name": "Name",
+    "email": "Email",
+    "role": "Role",
+    "status": "Status",
+    "lastLogin": "Last Login",
+    "createdAt": "Created",
+    "actions": "Actions"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive"
+  },
+  "form": {
+    "name": "Full Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "role": "Role",
+    "status": "Status",
+    "selectRole": "Select Role",
+    "selectStatus": "Select Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "username": "Username",
+    "chooseFile": "Choose file to upload:"
+  },
+  "messages": {
+    "createSuccess": "User created successfully",
+    "updateSuccess": "User updated successfully",
+    "deleteSuccess": "User deleted successfully",
+    "toggleSuccess": "User status changed successfully",
+    "importSuccess": "Users imported successfully",
+    "importError": "Error occurred during import",
+    "emailExists": "Email already registered",
+    "passwordGenerated": "Generated password",
+    "passwordNote": "Save this password! It will not be shown again.",
+    "confirmDelete": "Are you sure you want to delete this user?",
+    "confirmToggle": "Are you sure you want to change this user's status?",
+    "downloadSuccess": "Download successful! Please check your download folder."
+  },
+  "modals": {
+    "createUser": "Create New User",
+    "editUser": "Edit User",
+    "viewUser": "User Details",
+    "deleteUser": "Delete User",
+    "importUsers": "Import Users from Excel",
+    "generatedPasswords": "Generated Passwords",
+    "permissions": "Permissions"
+  },
+  "tabs": {
+    "info": "Information",
+    "permissions": "Permissions",
+    "activity": "Activity"
+  },
+  "search": {
+    "placeholder": "Search user..."
+  },
+  "import": {
+    "title": "Import Users",
+    "description": "Upload Excel file (.xlsx) with correct format",
+    "dropzone": "Drag & drop file here or click to upload",
+    "note": "Note: Passwords will be auto-generated for each user",
+    "columns": "Required columns: name, email, full_name, role",
+    "uploaded": " users uploaded successfully",
+    "errors": " errors encountered"
+  },
+  "overview": {
+    "pageTitle": "User Overview",
+    "totalUsers": "Total Users"
+  },
+  "datatable": {
+    "search": "Search users:",
+    "lengthMenu": "Show _MENU_ users per page",
+    "info": "Showing _START_ to _END_ of _TOTAL_ users",
+    "infoEmpty": "No users found",
+    "infoFiltered": "(filtered from _MAX_ total users)",
+    "processing": "Processing...",
+    "loadingRecords": "Loading...",
+    "zeroRecords": "No matching records found"
+  },
+  "permissions": {
+    "pageTitle": "User Permissions Management",
+    "breadcrumb": {
+      "dashboard": "Dashboard",
+      "users": "Users",
+      "permissions": "User Permissions"
+    },
+    "userInfo": "User Information",
+    "fullName": "Full Name",
+    "username": "Username",
+    "email": "Email",
+    "role": "Role",
+    "permissionOverride": "Permission Override System",
+    "howItWorks": "How it works:",
+    "rolePermissions": "Role Permissions",
+    "userOverrides": "User Overrides",
+    "finalResult": "Final Result",
+    "formula": "(Role Permissions + User Grants) - User Revokes = Effective Permissions",
+    "permissionManagement": "Permission Management",
+    "manageFor": "Manage all permissions for",
+    "userGrant": "User Grant",
+    "revoked": "Revoked",
+    "notAssigned": "Not Assigned",
+    "action": {
+      "inheritedFromRole": "Inherited from role",
+      "rolePermissionRevoked": "Role permission (revoked by user)",
+      "additionalUserPermission": "Additional user permission",
+      "notGranted": "Not granted"
+    },
+    "buttons": {
+      "updatePermissions": "Update User Permissions",
+      "grantAll": "Grant All",
+      "revokeAll": "Revoke All",
+      "resetToRole": "Reset to Role Defaults"
+    },
+    "summary": {
+      "title": "Permission Summary",
+      "effectivePermissions": "Effective Permissions",
+      "fromRole": "From Role",
+      "userGrants": "User Grants",
+      "userRevokes": "User Revokes"
+    },
+    "alerts": {
+      "success": "Successfully updated permissions for",
+      "successDetails": "Successfully updated permissions: {grants} granted, {revokes} revoked",
+      "failed": "Failed to update permissions",
+      "networkError": "Network error occurred while updating permissions"
+    }
+  }
+}

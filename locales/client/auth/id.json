@@ -1,0 +1,49 @@
+{
+  "pageTitle": "Authentication",
+  "login": {
+    "title": "Login",
+    "subtitle": "Masuk ke akun Anda",
+    "email": "Email",
+    "password": "Password",
+    "rememberMe": "Ingat saya",
+    "forgotPassword": "Lupa password?",
+    "button": "Masuk",
+    "noAccount": "Belum punya akun?",
+    "registerLink": "Daftar sekarang"
+  },
+  "register": {
+    "title": "Daftar",
+    "subtitle": "Buat akun baru",
+    "name": "Nama Lengkap",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Konfirmasi Password",
+    "button": "Daftar",
+    "hasAccount": "Sudah punya akun?",
+    "loginLink": "Masuk"
+  },
+  "forgotPassword": {
+    "title": "Lupa Password",
+    "subtitle": "Kami akan mengirim link reset password ke email Anda",
+    "email": "Email",
+    "button": "Kirim Link Reset",
+    "backToLogin": "Kembali ke login",
+    "success": "Link reset password telah dikirim ke email Anda"
+  },
+  "resetPassword": {
+    "title": "Reset Password",
+    "subtitle": "Masukkan password baru Anda",
+    "password": "Password Baru",
+    "confirmPassword": "Konfirmasi Password",
+    "button": "Reset Password",
+    "success": "Password berhasil direset"
+  },
+  "messages": {
+    "loginSuccess": "Login berhasil",
+    "loginError": "Email atau password salah",
+    "registerSuccess": "Registrasi berhasil",
+    "registerError": "Registrasi gagal",
+    "logoutSuccess": "Logout berhasil",
+    "sessionExpired": "Sesi Anda telah berakhir"
+  }
+}

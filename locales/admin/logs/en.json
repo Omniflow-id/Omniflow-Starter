@@ -1,0 +1,91 @@
+{
+  "pageTitle": "Activity Logs",
+  "title": "Enterprise Activity Logs",
+  "subtitle": "System and user activity logs",
+  "breadcrumb": {
+    "dashboard": "Dashboard",
+    "logs": "Activity Logs"
+  },
+  "filters": {
+    "title": "Filters",
+    "activityType": "Activity Type",
+    "allTypes": "All Types",
+    "actionType": "Action Type",
+    "allActions": "All Actions",
+    "status": "Status",
+    "allStatus": "All Status",
+    "user": "User",
+    "allUsers": "All Users",
+    "limit": "Limit"
+  },
+  "table": {
+    "id": "ID",
+    "type": "Type",
+    "action": "Action",
+    "status": "Status",
+    "user": "User",
+    "activity": "Activity",
+    "time": "Time",
+    "details": "Details",
+    "records": "records"
+  },
+  "status": {
+    "success": "Success",
+    "failure": "Failure",
+    "warning": "Warning",
+    "info": "Info"
+  },
+  "messages": {
+    "noLogs": "No activity logs found",
+    "exportSuccess": "Logs exported successfully",
+    "filterReset": "Filter reset",
+    "noLogsFound": "No logs found",
+    "logDetailsNotFound": "Log details not found"
+  },
+  "modals": {
+    "viewDetails": "Log Details",
+    "close": "Close",
+    "basicInfo": "Basic Information",
+    "requestInfo": "Request Information",
+    "activity": "Activity",
+    "userAgent": "User Agent",
+    "metadata": "Metadata",
+    "systemInfo": "System Information"
+  },
+  "buttons": {
+    "export": "Export CSV",
+    "resetFilters": "Reset Filters",
+    "applyFilters": "Apply Filters",
+    "downloadData": "Download Data",
+    "close": "Close"
+  },
+  "search": {
+    "placeholder": "Search logs...",
+    "searchLogs": "Search logs:"
+  },
+  "datatable": {
+    "search": "Search logs:",
+    "lengthMenu": "Show _MENU_ logs per page",
+    "info": "Showing _START_ to _END_ of _TOTAL_ logs",
+    "infoEmpty": "No logs found",
+    "infoFiltered": "(filtered from _MAX_ total logs)",
+    "processing": "Processing...",
+    "loadingRecords": "Loading...",
+    "zeroRecords": "No matching logs found"
+  },
+  "labels": {
+    "activityType": "Activity Type",
+    "actionType": "Action Type",
+    "resourceType": "Resource Type",
+    "resourceId": "Resource ID",
+    "requestId": "Request ID",
+    "errorCode": "Error Code",
+    "ipAddress": "IP Address",
+    "method": "Method",
+    "url": "URL",
+    "device": "Device",
+    "email": "Email",
+    "loading": "Loading...",
+    "downloadStarted": "Download started! Check your downloads folder."
+  }
+}

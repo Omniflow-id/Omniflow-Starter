@@ -1,0 +1,73 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "module": "Module",
+    "overview": "Overview",
+    "submodule": "Sub Module",
+    "users": "Users",
+    "allUsers": "All Users",
+    "permissions": "Permissions",
+    "allPermissions": "All Permissions",
+    "roles": "Roles & Permissions",
+    "cache": "Cache",
+    "queue": "Queue",
+    "statistics": "Statistics",
+    "allJobs": "All Jobs",
+    "failedJobs": "Failed Jobs",
+    "logs": "Logs",
+    "loggedInAs": "Logged in as"
+  },
+  "common": {
+    "actions": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete",
+      "edit": "Edit",
+      "view": "View",
+      "create": "Create",
+      "update": "Update",
+      "search": "Search",
+      "filter": "Filter",
+      "reset": "Reset",
+      "export": "Export",
+      "import": "Import",
+      "download": "Download",
+      "upload": "Upload",
+      "refresh": "Refresh",
+      "submit": "Submit",
+      "close": "Close",
+      "confirm": "Confirm",
+      "back": "Back",
+      "next": "Next",
+      "previous": "Previous",
+      "login": "Login",
+      "logout": "Logout",
+      "register": "Register"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending",
+      "success": "Success",
+      "failed": "Failed",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "loading": "Loading...",
+      "noData": "No data available",
+      "showing": "Showing",
+      "of": "of",
+      "entries": "entries"
+    },
+    "messages": {
+      "confirmDelete": "Are you sure you want to delete this item?",
+      "confirmAction": "Are you sure you want to proceed?",
+      "operationSuccess": "Operation completed successfully",
+      "operationFailed": "Operation failed",
+      "errorOccurred": "An error occurred",
+      "pleaseWait": "Please wait...",
+      "required": "This field is required",
+      "invalidInput": "Invalid input"
+    }
+  }
+}

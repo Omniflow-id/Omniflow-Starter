@@ -1,0 +1,149 @@
+{
+  "pageTitle": "Beranda",
+  "brand": {
+    "name": "Omniflow Starter",
+    "tagline": "Enterprise ERP Module Starter"
+  },
+  "nav": {
+    "home": "Beranda",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "dashboard": "Dashboard",
+    "profile": "Profil"
+  },
+  "hero": {
+    "heading": "Selamat Datang di Omniflow",
+    "subheading": "Solusi Digital Terdepan untuk Transformasi Bisnis Anda",
+    "description": "Kami menghadirkan inovasi teknologi yang mengoptimalkan alur kerja, meningkatkan efisiensi, dan mendorong pertumbuhan bisnis di era digital.",
+    "primaryCta": "Layanan Kami",
+    "secondaryCta": "Hubungi Kami"
+  },
+  "about": {
+    "title": "Tentang Omniflow",
+    "subtitle": "Membangun masa depan digital yang lebih baik",
+    "innovation": {
+      "title": "Inovasi",
+      "description": "Menghadirkan solusi teknologi terdepan yang mengikuti perkembangan zaman dan kebutuhan industri modern."
+    },
+    "collaboration": {
+      "title": "Kolaborasi",
+      "description": "Membangun kemitraan strategis dengan klien untuk mencapai tujuan bisnis bersama melalui pendekatan yang personal."
+    },
+    "growth": {
+      "title": "Pertumbuhan",
+      "description": "Fokus pada hasil yang terukur dan berkelanjutan untuk mendorong pertumbuhan bisnis jangka panjang."
+    }
+  },
+  "services": {
+    "title": "Layanan Kami",
+    "subtitle": "Solusi komprehensif untuk kebutuhan digital Anda",
+    "appDevelopment": {
+      "title": "Pengembangan Aplikasi",
+      "description": "Membangun aplikasi web dan mobile yang responsif, scalable, dan user-friendly sesuai kebutuhan bisnis Anda.",
+      "items": {
+        "web": "Web Application Development",
+        "mobile": "Mobile App Development",
+        "api": "API Integration",
+        "database": "Database Design"
+      }
+    },
+    "automation": {
+      "title": "Otomasi Proses Bisnis",
+      "description": "Mengoptimalkan alur kerja dengan sistem otomasi yang mengurangi manual work dan meningkatkan efisiensi.",
+      "items": {
+        "workflow": "Workflow Automation",
+        "document": "Document Management",
+        "reporting": "Reporting System",
+        "integration": "Integration Solutions"
+      }
+    },
+    "bi": {
+      "title": "Business Intelligence",
+      "description": "Mengubah data menjadi insight yang actionable untuk pengambilan keputusan bisnis yang lebih baik.",
+      "items": {
+        "analytics": "Data Analytics",
+        "dashboard": "Dashboard Development",
+        "monitoring": "Performance Monitoring",
+        "predictive": "Predictive Analytics"
+      }
+    },
+    "consulting": {
+      "title": "Konsultasi IT",
+      "description": "Memberikan panduan strategis untuk transformasi digital dan optimasi infrastruktur teknologi.",
+      "items": {
+        "digital": "Digital Transformation",
+        "architecture": "System Architecture",
+        "security": "Security Assessment",
+        "roadmap": "Technology Roadmap"
+      }
+    }
+  },
+  "whyChooseUs": {
+    "title": "Mengapa Memilih Omniflow?",
+    "subtitle": "Keunggulan yang membedakan kami dari yang lain",
+    "timing": {
+      "title": "Delivery Tepat Waktu",
+      "description": "Komitmen untuk menyelesaikan proyek sesuai timeline yang disepakati"
+    },
+    "quality": {
+      "title": "Kualitas Terjamin",
+      "description": "Standar kualitas tinggi dengan testing dan quality assurance yang ketat"
+    },
+    "support": {
+      "title": "Support 24/7",
+      "description": "Tim support yang siap membantu kapan saja Anda membutuhkan"
+    },
+    "pricing": {
+      "title": "Harga Kompetitif",
+      "description": "Solusi berkualitas dengan harga yang sesuai dengan budget Anda"
+    }
+  },
+  "contact": {
+    "title": "Hubungi Kami",
+    "subtitle": "Mari diskusikan kebutuhan digital bisnis Anda",
+    "email": "Email",
+    "phone": "Telepon",
+    "address": "Alamat",
+    "website": "Website",
+    "cta": "Hubungi Kami"
+  },
+  "cta": {
+    "title": "Siap Memulai Transformasi Digital?",
+    "subtitle": "Bergabunglah dengan ratusan perusahaan yang telah mempercayai Omniflow untuk mengoptimalkan bisnis mereka.",
+    "button": "Mulai Konsultasi Gratis"
+  },
+  "features": {
+    "heading": "Fitur Utama",
+    "description": "Fitur enterprise-grade yang siap digunakan",
+    "items": [
+      {
+        "title": "User Management",
+        "description": "Sistem manajemen user dengan role-based access control"
+      },
+      {
+        "title": "Activity Logging",
+        "description": "Logging aktivitas komprehensif untuk audit trail"
+      },
+      {
+        "title": "Caching System",
+        "description": "Redis caching untuk performa optimal"
+      },
+      {
+        "title": "Job Queue",
+        "description": "RabbitMQ untuk background job processing"
+      }
+    ]
+  },
+  "footer": {
+    "company": "Omniflow Starter",
+    "description": "Enterprise ERP Module Starter untuk pengembangan aplikasi bisnis modern",
+    "links": {
+      "about": "Tentang Kami",
+      "contact": "Kontak",
+      "privacy": "Kebijakan Privasi",
+      "terms": "Syarat & Ketentuan"
+    },
+    "copyright": "© 2025 Omniflow Starter. All rights reserved."
+  }
+}

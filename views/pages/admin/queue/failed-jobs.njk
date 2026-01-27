@@ -1,15 +1,20 @@
 {% extends "layout/masterLayout.njk" %}
 
-{% block title %}Failed Jobs{% endblock %}
+{% block title %}{{ t('tabs.failedJobs') }}{% endblock %}
 
 {% block content %}
 <div class="container-fluid px-4">
-  <h1 class="mt-4">Failed Jobs</h1>
+  <h1 class="mt-4">{{ t('tabs.failedJobs') }}</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/admin">{{ t('sidebar.dashboard') }}</a></li>
+    <li class="breadcrumb-item"><a href="/admin/queue">{{ t('pageTitle') }}</a></li>
+    <li class="breadcrumb-item active">{{ t('tabs.failedJobs') }}</li>
+  </ol>
   <div class="d-flex justify-content-between align-items-center mb-4">
     <div></div>
     <div>
       <a href="/admin/queue" class="btn btn-outline-secondary">
-        <i class="fas fa-arrow-left me-1"></i>Back to Queue Stats
+        <i class="fas fa-arrow-left me-1"></i>{{ t('buttons.back') }}
       </a>
     </div>
   </div>
@@ -19,12 +24,12 @@
         <div class="card-header">
           <div class="d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0">
-              Failed Jobs ({{ pagination.total }} total)
+              {{ t('labels.failedJobs') }} ({{ pagination.total }} {{ t('labels.total') }})
             </h5>
             <form action="/admin/queue/retry" method="POST" class="d-inline">
               {{ csrfField() | safe }}
               <button type="submit" class="btn btn-warning btn-sm">
-                <i class="fas fa-redo"></i> Retry Selected
+                <i class="fas fa-redo"></i> {{ t('buttons.retrySelected') }}
               </button>
             </form>
           </div>
@@ -34,13 +39,13 @@
             <table id="datatablesSimple" class="table table-striped" style="width: 100%">
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Queue</th>
-                  <th>Data</th>
-                  <th>Error</th>
-                  <th>Attempts</th>
-                  <th>Created</th>
-                  <th>Next Retry</th>
+                  <th>{{ t('table.id') }}</th>
+                  <th>{{ t('table.queue') }}</th>
+                  <th>{{ t('table.data') }}</th>
+                  <th>{{ t('table.error') }}</th>
+                  <th>{{ t('table.attempts') }}</th>
+                  <th>{{ t('table.createdAt') }}</th>
+                  <th>{{ t('table.nextRetry') }}</th>
                 </tr>
               </thead>
             </table>
@@ -51,10 +56,10 @@
       <div class="card">
         <div class="card-body text-center py-5">
           <i class="fas fa-check-circle fa-3x text-success mb-3"></i>
-          <h4>No Failed Jobs</h4>
-          <p class="text-muted">All jobs are processing successfully!</p>
+          <h4>{{ t('labels.noFailedJobs') }}</h4>
+          <p class="text-muted">{{ t('messages.allSuccess') }}</p>
           <a href="/admin/queue" class="btn btn-primary">
-            <i class="fas fa-arrow-left"></i> Back to Queue Stats
+            <i class="fas fa-arrow-left"></i> {{ t('buttons.back') }}
           </a>
         </div>
       </div>
@@ -67,6 +72,17 @@
 {% block scripts %}
 <script>
   $(document).ready(function () {
+    const datatableLang = {
+      search: '{{ t('datatable.searchFailed') }}',
+      lengthMenu: '{{ t('datatable.lengthMenuFailed') }}',
+      info: '{{ t('datatable.infoFailed') }}',
+      infoEmpty: '{{ t('datatable.infoEmptyFailed') }}',
+      infoFiltered: '{{ t('datatable.infoFilteredFailed') }}',
+      processing: '{{ t('datatable.processing') }}',
+      loadingRecords: '{{ t('datatable.loadingRecords') }}',
+      zeroRecords: '{{ t('datatable.zeroRecords') }}'
+    };
+
     $("#datatablesSimple").DataTable({
       processing: true,
       serverSide: true,
@@ -77,14 +93,14 @@
       columns: [
         { data: 0, name: 'id' },
         { data: 1, name: 'queue' },
-        { 
-          data: 2, 
+        {
+          data: 2,
           name: 'data',
           orderable: false,
           searchable: false
         },
-        { 
-          data: 3, 
+        {
+          data: 3,
           name: 'error',
           orderable: false,
           searchable: false
@@ -100,16 +116,7 @@
       columnDefs: [
         { className: "text-center", targets: [0, 1, 4] }
       ],
-      language: {
-        search: "Search failed jobs:",
-        lengthMenu: "Show _MENU_ failed jobs per page",
-        info: "Showing _START_ to _END_ of _TOTAL_ failed jobs",
-        infoEmpty: "No failed jobs found",
-        infoFiltered: "(filtered from _MAX_ total failed jobs)",
-        processing: "Processing...",
-        loadingRecords: "Loading...",
-        zeroRecords: "No matching failed jobs found"
-      }
+      language: datatableLang
     });
   });
 </script>

@@ -1,0 +1,44 @@
+{
+  "common": {
+    "appName": "Omniflow Starter",
+    "loading": "Memuat...",
+    "error": "Terjadi kesalahan",
+    "success": "Berhasil",
+    "save": "Simpan",
+    "cancel": "Batal",
+    "delete": "Hapus",
+    "edit": "Edit",
+    "create": "Buat",
+    "search": "Cari",
+    "filter": "Filter",
+    "reset": "Reset",
+    "confirm": "Konfirmasi",
+    "yes": "Ya",
+    "no": "Tidak",
+    "back": "Kembali",
+    "next": "Selanjutnya",
+    "previous": "Sebelumnya",
+    "submit": "Submit",
+    "close": "Tutup",
+    "viewMore": "Lihat Selengkapnya",
+    "viewLess": "Tutup"
+  },
+  "errors": {
+    "notFound": "Halaman tidak ditemukan",
+    "unauthorized": "Unauthorized - Silakan login",
+    "forbidden": "Akses ditolak",
+    "serverError": "Server error",
+    "validationError": "Validasi error",
+    "networkError": "Koneksi jaringan terputus"
+  },
+  "session": {
+    "title": "Sesi akan berakhir",
+    "message": "Sesi Anda akan berakhir dalam {seconds} detik.",
+    "extend": "Tetap Login",
+    "logout": "Logout Sekarang"
+  },
+  "language": {
+    "switch": "Ganti Bahasa",
+    "current": "Bahasa Saat Ini"
+  }
+}

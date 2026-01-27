@@ -1,12 +1,12 @@
-{% extends "layout/masterLayout.njk" %} 
-{% block title %}{{ title }}{% endblock %} 
+{% extends "layout/masterLayout.njk" %}
+{% block title %}{{ t('permissions.pageTitle') }}{% endblock %}
 {% block content %}
 <div class="container-fluid px-4">
-  <h1 class="mt-4">{{ title }}</h1>
+  <h1 class="mt-4">{{ t('permissions.pageTitle') }}</h1>
   <ol class="breadcrumb mb-4">
-    <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
-    <li class="breadcrumb-item"><a href="/admin/user/index">Users</a></li>
-    <li class="breadcrumb-item active">User Permissions</li>
+    <li class="breadcrumb-item"><a href="/admin">{{ t('permissions.breadcrumb.dashboard') }}</a></li>
+    <li class="breadcrumb-item"><a href="/admin/user/index">{{ t('permissions.breadcrumb.users') }}</a></li>
+    <li class="breadcrumb-item active">{{ t('permissions.breadcrumb.permissions') }}</li>
   </ol>
 
   <!-- Alert Messages -->
@@ -17,7 +17,7 @@
     <div class="card-header bg-primary text-white">
       <h5 class="mb-0">
         <i class="fas fa-user me-2"></i>
-        User Information
+        {{ t('permissions.userInfo') }}
       </h5>
     </div>
     <div class="card-body">
@@ -25,19 +25,19 @@
         <div class="col-md-6">
           <table class="table table-borderless">
             <tr>
-              <td><strong>Full Name:</strong></td>
+              <td><strong>{{ t('permissions.fullName') }}:</strong></td>
               <td>{{ user.full_name }}</td>
             </tr>
             <tr>
-              <td><strong>Username:</strong></td>
+              <td><strong>{{ t('permissions.username') }}:</strong></td>
               <td>{{ user.username }}</td>
             </tr>
             <tr>
-              <td><strong>Email:</strong></td>
+              <td><strong>{{ t('permissions.email') }}:</strong></td>
               <td>{{ user.email }}</td>
             </tr>
             <tr>
-              <td><strong>Role:</strong></td>
+              <td><strong>{{ t('permissions.role') }}:</strong></td>
               <td>
                 <span class="badge bg-info">{{ user.role_name }}</span>
               </td>
@@ -53,17 +53,17 @@
     <div class="card-header bg-warning text-dark">
       <h5 class="mb-0">
         <i class="fas fa-info-circle me-2"></i>
-        Permission Override System
+        {{ t('permissions.permissionOverride') }}
       </h5>
     </div>
     <div class="card-body">
       <div class="row">
         <div class="col-md-12">
-          <p class="mb-2"><strong>How it works:</strong></p>
+          <p class="mb-2"><strong>{{ t('permissions.howItWorks') }}</strong></p>
           <ul class="mb-0">
-            <li><strong>Role Permissions:</strong> Base permissions inherited from the <span class="badge bg-info">{{ user.role_name }}</span> role</li>
-            <li><strong>User Overrides:</strong> You can grant additional permissions or revoke role permissions for this specific user</li>
-            <li><strong>Final Result:</strong> (Role Permissions + User Grants) - User Revokes = Effective Permissions</li>
+            <li><strong>{{ t('permissions.rolePermissions') }}:</strong> {{ t('permissions.rolePermissions') }} dasar yang diwarisi dari role <span class="badge bg-info">{{ user.role_name }}</span></li>
+            <li><strong>{{ t('permissions.userOverrides') }}:</strong> Anda dapat memberikan permission tambahan atau mencabut permission role untuk user spesifik ini</li>
+            <li><strong>{{ t('permissions.finalResult') }}:</strong> ({{ t('permissions.rolePermissions') }} + {{ t('permissions.userGrants') }}) - {{ t('permissions.userRevokes') }} = {{ t('permissions.summary.effectivePermissions') }}</li>
           </ul>
         </div>
       </div>
@@ -76,10 +76,10 @@
       <div>
         <h5 class="mb-0">
           <i class="fas fa-shield-alt me-2"></i>
-          Permission Management
+          {{ t('permissions.permissionManagement') }}
           <span class="badge bg-light text-dark ms-2" id="effectivePermCount">{{ effectivePermissions.length }}</span>
         </h5>
-        <small>Manage all permissions for {{ user.full_name }}</small>
+        <small>{{ t('permissions.manageFor') }} {{ user.full_name }}</small>
       </div>
     </div>
     <div class="card-body">
@@ -91,13 +91,13 @@
                 {% set isRolePermission = false %}
                 {% set isUserPermission = false %}
                 {% set isEffective = false %}
-                
+
                 {% for rolePerm in rolePermissions %}
                   {% if rolePerm.permission_id == permission.permission_id %}
                     {% set isRolePermission = true %}
                   {% endif %}
                 {% endfor %}
-                
+
                 {% for userPerm in userPermissions %}
                   {% if userPerm.permission_id == permission.permission_id %}
                     {% set isUserPermission = true %}
@@ -114,11 +114,11 @@
                   <div class="row align-items-center">
                     <div class="col-md-6">
                       <div class="form-check">
-                        <input class="form-check-input permission-checkbox" 
-                               type="checkbox" 
+                        <input class="form-check-input permission-checkbox"
+                               type="checkbox"
                                value="{{ permission.permission_id }}"
-                               id="perm_{{ permission.permission_id }}" 
-                               name="permissions" 
+                               id="perm_{{ permission.permission_id }}"
+                               name="permissions"
                                {% if isEffective %}checked{% endif %}
                                data-is-role="{% if isRolePermission %}true{% else %}false{% endif %}"
                                data-is-user="{% if isUserPermission %}true{% else %}false{% endif %}">
@@ -132,35 +132,35 @@
                       <div class="permission-status">
                         {% if isRolePermission %}
                           <span class="badge bg-info me-1">
-                            <i class="fas fa-users me-1"></i>Role
+                            <i class="fas fa-users me-1"></i>{{ t('permissions.role') }}
                           </span>
                         {% endif %}
                         {% if isUserPermission %}
                           <span class="badge bg-success me-1">
-                            <i class="fas fa-user-plus me-1"></i>User Grant
+                            <i class="fas fa-user-plus me-1"></i>{{ t('permissions.userGrant') }}
                           </span>
                         {% endif %}
                         {% if not isEffective and (isRolePermission or isUserPermission) %}
                           <span class="badge bg-danger me-1">
-                            <i class="fas fa-user-minus me-1"></i>Revoked
+                            <i class="fas fa-user-minus me-1"></i>{{ t('permissions.revoked') }}
                           </span>
                         {% endif %}
                         {% if not isRolePermission and not isUserPermission %}
                           <span class="badge bg-secondary me-1">
-                            <i class="fas fa-minus me-1"></i>Not Assigned
+                            <i class="fas fa-minus me-1"></i>{{ t('permissions.notAssigned') }}
                           </span>
                         {% endif %}
                       </div>
                       <div class="permission-action mt-1">
                         <small class="text-muted" id="action_{{ permission.permission_id }}">
                           {% if isRolePermission and isEffective %}
-                            Inherited from role
+                            {{ t('permissions.action.inheritedFromRole') }}
                           {% elif isRolePermission and not isEffective %}
-                            Role permission (revoked by user)
+                            {{ t('permissions.action.rolePermissionRevoked') }}
                           {% elif not isRolePermission and isEffective %}
-                            Additional user permission
+                            {{ t('permissions.action.additionalUserPermission') }}
                           {% else %}
-                            Not granted
+                            {{ t('permissions.action.notGranted') }}
                           {% endif %}
                         </small>
                       </div>
@@ -173,29 +173,29 @@
         </div>
       </div>
       <div class="card-footer">
-        <button type="button" 
-                class="btn btn-success btn-sm" 
+        <button type="button"
+                class="btn btn-success btn-sm"
                 id="updatePermissionsBtn">
           <i class="fas fa-save me-1"></i>
-          Update User Permissions
+          {{ t('permissions.buttons.updatePermissions') }}
         </button>
-        <button type="button" 
-                class="btn btn-outline-secondary btn-sm ms-2" 
+        <button type="button"
+                class="btn btn-outline-secondary btn-sm ms-2"
                 id="selectAllBtn">
           <i class="fas fa-check-double me-1"></i>
-          Grant All
+          {{ t('permissions.buttons.grantAll') }}
         </button>
-        <button type="button" 
-                class="btn btn-outline-danger btn-sm ms-1" 
+        <button type="button"
+                class="btn btn-outline-danger btn-sm ms-1"
                 id="revokeAllBtn">
           <i class="fas fa-times me-1"></i>
-          Revoke All
+          {{ t('permissions.buttons.revokeAll') }}
         </button>
-        <button type="button" 
-                class="btn btn-outline-info btn-sm ms-1" 
+        <button type="button"
+                class="btn btn-outline-info btn-sm ms-1"
                 id="resetToRoleBtn">
           <i class="fas fa-undo me-1"></i>
-          Reset to Role Defaults
+          {{ t('permissions.buttons.resetToRole') }}
         </button>
       </div>
     </div>
@@ -205,31 +205,31 @@
   <div class="card mt-4">
     <div class="card-header">
       <i class="fas fa-chart-bar me-1"></i>
-      Permission Summary
+      {{ t('permissions.summary.title') }}
     </div>
     <div class="card-body">
       <div class="row">
         <div class="col-md-3">
-          <h6>Effective Permissions</h6>
+          <h6>{{ t('permissions.summary.effectivePermissions') }}</h6>
           <h3 class="text-primary" id="totalPerms">{{ effectivePermissions.length }}</h3>
         </div>
         <div class="col-md-3">
-          <h6>From Role</h6>
+          <h6>{{ t('permissions.summary.fromRole') }}</h6>
           <h3 class="text-info">{{ rolePermissions.length }}</h3>
         </div>
         <div class="col-md-3">
-          <h6>User Grants</h6>
+          <h6>{{ t('permissions.summary.userGrants') }}</h6>
           <h3 class="text-success" id="userGrants">{{ userGrants.length }}</h3>
         </div>
         <div class="col-md-3">
-          <h6>User Revokes</h6>
+          <h6>{{ t('permissions.summary.userRevokes') }}</h6>
           <h3 class="text-danger" id="userRevokes">{{ userRevokes.length }}</h3>
         </div>
       </div>
     </div>
   </div>
 </div>
-{% endblock %} 
+{% endblock %}
 
 {% block scripts %}
 <script>
@@ -244,6 +244,15 @@
     // Initial data for calculations
     const initialRolePermissions = {{ rolePermissions | dump | safe }};
     const initialUserPermissions = {{ userPermissions | dump | safe }};
+
+    // Translation strings
+    const i18n = {
+      inheritedFromRole: "{{ t('permissions.action.inheritedFromRole') }}",
+      rolePermissionRevoked: "{{ t('permissions.action.rolePermissionRevoked') }}",
+      additionalUserPermission: "{{ t('permissions.action.additionalUserPermission') }}",
+      notGranted: "{{ t('permissions.action.notGranted') }}",
+      updating: "{{ t('permissions.buttons.updatePermissions') }}..."
+    };
 
     // Show alert function
     function showAlert(message, type = "success") {
@@ -267,24 +276,24 @@
     function updatePermissionStatus(permissionId, isChecked, isRole, isUser) {
       const actionElement = document.getElementById(`action_${permissionId}`);
       const permissionItem = document.querySelector(`#perm_${permissionId}`).closest('.permission-item');
-      
+
       if (isChecked) {
         permissionItem.classList.add('bg-light');
         if (isRole && !isUser) {
-          actionElement.textContent = 'Inherited from role';
+          actionElement.textContent = i18n.inheritedFromRole;
         } else if (isRole && isUser) {
-          actionElement.textContent = 'Role permission (confirmed by user)';
+          actionElement.textContent = i18n.rolePermissionRevoked;
         } else if (!isRole && isUser) {
-          actionElement.textContent = 'Additional user permission';
+          actionElement.textContent = i18n.additionalUserPermission;
         } else {
-          actionElement.textContent = 'Granted by user';
+          actionElement.textContent = i18n.additionalUserPermission;
         }
       } else {
         permissionItem.classList.remove('bg-light');
         if (isRole) {
-          actionElement.textContent = 'Role permission (revoked by user)';
+          actionElement.textContent = i18n.rolePermissionRevoked;
         } else {
-          actionElement.textContent = 'Not granted';
+          actionElement.textContent = i18n.notGranted;
         }
       }
     }
@@ -293,21 +302,21 @@
     function updateCounts() {
       const checkedBoxes = form.querySelectorAll('.permission-checkbox:checked');
       const effectiveCount = checkedBoxes.length;
-      
+
       let userGrantCount = 0;
       let userRevokeCount = 0;
-      
+
       form.querySelectorAll('.permission-checkbox').forEach(cb => {
         const isRole = cb.dataset.isRole === 'true';
         const isChecked = cb.checked;
-        
+
         if (!isRole && isChecked) {
-          userGrantCount++; // User granted a non-role permission
+          userGrantCount++;
         } else if (isRole && !isChecked) {
-          userRevokeCount++; // User revoked a role permission
+          userRevokeCount++;
         }
       });
-      
+
       document.getElementById('totalPerms').textContent = effectiveCount;
       document.getElementById('userGrants').textContent = userGrantCount;
       document.getElementById('userRevokes').textContent = userRevokeCount;
@@ -321,7 +330,7 @@
         const isChecked = e.target.checked;
         const isRole = e.target.dataset.isRole === 'true';
         const isUser = e.target.dataset.isUser === 'true';
-        
+
         updatePermissionStatus(permissionId, isChecked, isRole, isUser);
         updateCounts();
       }
@@ -331,33 +340,31 @@
     updateBtn.addEventListener("click", async function () {
       const userId = form.dataset.userId;
       const userName = form.dataset.userName;
-      
+
       // Calculate grants and revokes
       const grants = [];
       const revokes = [];
-      
+
       form.querySelectorAll('.permission-checkbox').forEach(cb => {
         const permissionId = parseInt(cb.value);
         const isRole = cb.dataset.isRole === 'true';
         const isChecked = cb.checked;
-        
+
         if (!isRole && isChecked) {
-          grants.push(permissionId); // Grant non-role permission
+          grants.push(permissionId);
         } else if (isRole && !isChecked) {
-          revokes.push(permissionId); // Revoke role permission
+          revokes.push(permissionId);
         }
       });
 
-      // Send both grants and revokes
-
       // Show loading state
       const originalText = this.innerHTML;
-      this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
+      this.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i> ' + i18n.updating;
       this.disabled = true;
 
       try {
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute("content");
-        
+
         const response = await fetch(`/admin/user/${userId}/permissions`, {
           method: "POST",
           headers: {
@@ -371,22 +378,21 @@
 
         if (result.success) {
           showAlert(
-            `<i class="fas fa-check me-2"></i>Successfully updated permissions for <strong>${userName}</strong>`,
+            `<i class="fas fa-check me-2"></i>{{ t('permissions.alerts.success') }} <strong>${userName}</strong>`,
             "success"
           );
-          
-          // Show success with revoke/grant counts
+
           if (revokes.length > 0 || grants.length > 0) {
             showAlert(
-              `<i class="fas fa-check me-2"></i>Successfully updated permissions: ${grants.length} granted, ${revokes.length} revoked`,
+              `<i class="fas fa-check me-2"></i>{{ t('permissions.alerts.successDetails') }}`.replace('{grants}', grants.length).replace('{revokes}', revokes.length),
               "success"
             );
           }
-          
+
           updateCounts();
         } else {
           showAlert(
-            `<i class="fas fa-exclamation-triangle me-2"></i>Failed to update permissions: ${
+            `<i class="fas fa-exclamation-triangle me-2"></i>{{ t('permissions.alerts.failed') }}: ${
               result.error || "Unknown error"
             }`,
             "danger"
@@ -395,7 +401,7 @@
       } catch (error) {
         console.error("Error updating permissions:", error);
         showAlert(
-          `<i class="fas fa-exclamation-triangle me-2"></i>Network error occurred while updating permissions`,
+          `<i class="fas fa-exclamation-triangle me-2"></i>{{ t('permissions.alerts.networkError') }}`,
           "danger"
         );
       } finally {
@@ -436,7 +442,7 @@
       const checkboxes = form.querySelectorAll('.permission-checkbox');
       checkboxes.forEach((cb) => {
         const isRole = cb.dataset.isRole === 'true';
-        cb.checked = isRole; // Check only role permissions
+        cb.checked = isRole;
         const permissionId = cb.value;
         const isUser = cb.dataset.isUser === 'true';
         updatePermissionStatus(permissionId, isRole, isRole, isUser);

@@ -4,6 +4,7 @@ const multer = require("multer");
 const { uploadLimiter, exportLimiter } = require("@middlewares/rateLimiter");
 const { doubleCsrfProtection } = require("@middlewares/csrfProtection");
 const { checkPermission } = require("@middlewares/checkPermission");
+const { withLocale } = require("@helpers/i18n");
 
 const user = require("./user.controller");
 
@@ -27,9 +28,17 @@ const upload = multer({
   },
 });
 
-router.get("/user/index", user.getAllUsersPage);
-router.get("/user/overview", user.getUserOverviewPage);
-router.get("/user/passwords", user.showGeneratedPasswordsPage);
+router.get("/user/index", withLocale("admin/users"), user.getAllUsersPage);
+router.get(
+  "/user/overview",
+  withLocale("admin/users"),
+  user.getUserOverviewPage
+);
+router.get(
+  "/user/passwords",
+  withLocale("admin/users"),
+  user.showGeneratedPasswordsPage
+);
 router.get("/user/download", exportLimiter, user.downloadUserData);
 router.get("/user/download-template", exportLimiter, user.downloadUserTemplate);
 router.post(
@@ -50,11 +59,13 @@ router.post("/user/delete/:id", doubleCsrfProtection, user.deleteUser);
 // User permissions management routes
 router.get(
   "/user/:userId/permissions",
+  withLocale("admin/users"),
   checkPermission("manage_permissions"),
   user.getUserPermissionsPage
 );
 router.post(
   "/user/:userId/permissions",
+  withLocale("admin/users"),
   checkPermission("manage_permissions"),
   doubleCsrfProtection,
   user.updateUserPermissions

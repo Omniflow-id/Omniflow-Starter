@@ -5,6 +5,7 @@ const router = express.Router();
 const { isLoggedInAndActive } = require("@middlewares/isLoggedIn");
 const { checkPermission } = require("@middlewares/checkPermission");
 const { doubleCsrfProtection } = require("@middlewares/csrfProtection");
+const { withLocale } = require("@helpers/i18n");
 
 // === Route Handlers ===
 const permission = require("./permission.controller");
@@ -14,6 +15,7 @@ const permission = require("./permission.controller");
 // Permissions list page
 router.get(
   "/",
+  withLocale("admin/permissions"),
   isLoggedInAndActive,
   checkPermission("manage_permissions"),
   permission.getPermissionsPage
@@ -22,6 +24,7 @@ router.get(
 // CRUD for Permissions
 router.post(
   "/",
+  withLocale("admin/permissions"),
   isLoggedInAndActive,
   checkPermission("manage_permissions"),
   doubleCsrfProtection,
@@ -29,6 +32,7 @@ router.post(
 );
 router.post(
   "/:permissionId/update",
+  withLocale("admin/permissions"),
   isLoggedInAndActive,
   checkPermission("manage_permissions"),
   doubleCsrfProtection,
@@ -36,6 +40,7 @@ router.post(
 );
 router.post(
   "/:permissionId/delete",
+  withLocale("admin/permissions"),
   isLoggedInAndActive,
   checkPermission("manage_permissions"),
   doubleCsrfProtection,

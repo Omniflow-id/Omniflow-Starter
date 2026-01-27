@@ -1,13 +1,14 @@
-{% extends "layout/masterLayout.njk" %} {% block title %}{{ title }}{% endblock
-%} {% block content %}
+{% extends "layout/masterLayout.njk" %}
+{% block title %}{{ t('pageTitle') }}{% endblock %}
+{% block content %}
 <div class="container-fluid px-4">
-  <h1 class="mt-4">{{ title }}</h1>
+  <h1 class="mt-4">{{ t('pageTitle') }}</h1>
   <ol class="breadcrumb mb-4">
-    <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
+    <li class="breadcrumb-item"><a href="/admin">{{ t('sidebar.dashboard') }}</a></li>
     <li class="breadcrumb-item">
-      <a href="/admin/permissions">Permissions</a>
+      <a href="/admin/permissions">{{ t('pageTitle') }}</a>
     </li>
-    <li class="breadcrumb-item active">Roles & Permissions</li>
+    <li class="breadcrumb-item active">{{ t('rolesPermissions') }}</li>
   </ol>
 
   <!-- Alert Messages -->
@@ -20,7 +21,7 @@
       data-bs-toggle="modal"
       data-bs-target="#roleModal"
     >
-      <i class="fas fa-plus me-1"></i> Create New Role
+      <i class="fas fa-plus me-1"></i> {{ t('createNewRole') }}
     </button>
   </div>
 
@@ -51,7 +52,7 @@
               action="/admin/roles/{{ role.role_id }}/delete"
               method="POST"
               class="d-inline"
-              onsubmit="return confirm('Are you sure you want to delete this role?');"
+              onsubmit="return confirm('{{ t('messages.confirmDelete') }}');"
             >
               {{ csrfField() | safe }}
               <button type="submit" class="btn btn-sm btn-danger">
@@ -63,7 +64,7 @@
         <div class="card-body">
           <p class="card-text">{{ role.description }}</p>
           <h6 class="card-title mb-3">
-            Assigned Permissions
+            {{ t('assignedPermissions') }}
             <span class="badge bg-secondary">{{
               role.permissions.length
             }}</span>
@@ -120,7 +121,7 @@
             data-role-name="{{ role.role_name }}"
           >
             <i class="fas fa-save me-1"></i>
-            Update Permissions
+            {{ t('updatePermissions') }}
           </button>
           <button
             type="button"
@@ -128,7 +129,7 @@
             data-role-id="{{ role.role_id }}"
           >
             <i class="fas fa-check-double me-1"></i>
-            Select All
+            {{ t('selectAll') }}
           </button>
           <button
             type="button"
@@ -136,7 +137,7 @@
             data-role-id="{{ role.role_id }}"
           >
             <i class="fas fa-times me-1"></i>
-            Clear All
+            {{ t('clearAll') }}
           </button>
         </div>
       </div>
@@ -147,9 +148,9 @@
   {% if roles.length == 0 %}
   <div class="text-center py-5">
     <i class="fas fa-users fa-3x text-gray-300 mb-3"></i>
-    <h5 class="text-gray-500">No roles found</h5>
+    <h5 class="text-gray-500">{{ t('noRolesFound') }}</h5>
     <p class="text-gray-400">
-      Please contact system administrator to set up user roles.
+      {{ t('contactAdmin') }}
     </p>
   </div>
   {% endif %}
@@ -165,7 +166,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="roleModalLabel">Create Role</h5>
+          <h5 class="modal-title" id="roleModalLabel">{{ t('createNewRole') }}</h5>
           <button
             type="button"
             class="btn-close"
@@ -177,7 +178,7 @@
           {{ csrfField() | safe }}
           <div class="modal-body">
             <div class="mb-3">
-              <label for="role_name" class="form-label">Role Name</label>
+              <label for="role_name" class="form-label">{{ t('form.name') }}</label>
               <input
                 type="text"
                 class="form-control"
@@ -187,7 +188,7 @@
               />
             </div>
             <div class="mb-3">
-              <label for="description" class="form-label">Description</label>
+              <label for="description" class="form-label">{{ t('form.description') }}</label>
               <textarea
                 class="form-control"
                 id="description"
@@ -202,9 +203,9 @@
               class="btn btn-secondary"
               data-bs-dismiss="modal"
             >
-              Close
+              {{ t('buttons.close') }}
             </button>
-            <button type="submit" class="btn btn-primary">Save Role</button>
+            <button type="submit" class="btn btn-primary">{{ t('saveRole') }}</button>
           </div>
         </form>
       </div>
@@ -215,33 +216,34 @@
   <div class="card mt-4 mb-3">
     <div class="card-header">
       <i class="fas fa-chart-bar me-1"></i>
-      Permission Distribution Summary
+      {{ t('permissionDistribution') }}
     </div>
     <div class="card-body">
       <div class="row">
         <div class="col-md-4">
-          <h6>Total Roles</h6>
+          <h6>{{ t('totalRoles') }}</h6>
           <h3 class="text-primary">{{ roles.length }}</h3>
         </div>
         <div class="col-md-4">
-          <h6>Total Permissions</h6>
+          <h6>{{ t('totalPermissions') }}</h6>
           <h3 class="text-success">{{ allPermissions.length }}</h3>
         </div>
         <div class="col-md-4">
-          <h6>Most Privileged Role</h6>
+          <h6>{{ t('mostPrivilegedRole') }}</h6>
           {% set maxRole = roles | sort(attribute="permissions.length",
           reverse=true) | first %}
           <h3 class="text-warning">
             {% if maxRole %}
             {{ maxRole.role_name }} ({{ maxRole.permissions.length }}) {% else
-            %} None {% endif %}
+            %} {{ t('none') }} {% endif %}
           </h3>
         </div>
       </div>
     </div>
   </div>
 </div>
-{% endblock %} {% block scripts %}
+{% endblock %}
+{% block scripts %}
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     const alertContainer = document.getElementById("alertContainer");
@@ -273,7 +275,7 @@
       const modalTitle = roleModal.querySelector(".modal-title");
 
       if (roleId) {
-        modalTitle.textContent = "Edit Role";
+        modalTitle.textContent = '{{ t('editRole') }}';
         form.action = `/admin/roles/${roleId}/update`;
         document.getElementById("role_name").value =
           button.getAttribute("data-role-name");
@@ -281,7 +283,7 @@
           "data-role-description"
         );
       } else {
-        modalTitle.textContent = "Create New Role";
+        modalTitle.textContent = '{{ t('createNewRole') }}';
         form.action = "/admin/roles";
         form.reset();
       }
@@ -303,7 +305,7 @@
         // Show loading state
         const originalText = this.innerHTML;
         this.innerHTML =
-          '<i class="fas fa-spinner fa-spin me-1"></i> Updating...';
+          '<i class="fas fa-spinner fa-spin me-1"></i> {{ t("buttons.updating") }}...';
         this.disabled = true;
 
         try {
@@ -325,12 +327,12 @@
 
           if (result.success) {
             showAlert(
-              `<i class="fas fa-check me-2"></i>Successfully updated permissions for <strong>${roleName}</strong>`,
+              `<i class="fas fa-check me-2"></i>{{ t('messages.updateSuccessTitle') }} - {{ t('messages.assignSuccess') }} <strong>${roleName}</strong>`,
               "success"
             );
           } else {
             showAlert(
-              `<i class="fas fa-exclamation-triangle me-2"></i>Failed to update permissions: ${
+              `<i class="fas fa-exclamation-triangle me-2"></i>{{ t('messages.error') }} ${
                 result.error || "Unknown error"
               }`,
               "danger"
@@ -339,7 +341,7 @@
         } catch (error) {
           console.error("Error updating permissions:", error);
           showAlert(
-            `<i class="fas fa-exclamation-triangle me-2"></i>Network error occurred while updating permissions`,
+            `<i class="fas fa-exclamation-triangle me-2"></i>{{ t('messages.networkError') }}`,
             "danger"
           );
         } finally {

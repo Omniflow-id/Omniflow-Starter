@@ -5,13 +5,13 @@
         class="nav-link {% if url == '/admin' or url == '/admin/' %}active{% endif %}"
         href="/admin"
       >
-        Beranda
+        {{ t('sidebar.dashboard') }}
       </a>
       <a
         class="nav-link {% if url.includes('/admin/profile') %}active{% endif %}"
         href="/admin/profile"
       >
-        Profile
+        {{ t('sidebar.profile') }}
       </a>
       <a
         class="nav-link {% if url.includes('/admin/overview') or url.includes('/admin/submodule') %}{% else %}collapsed{% endif %}"
@@ -21,7 +21,7 @@
         aria-expanded="{% if url.includes('/admin/overview') or url.includes('/admin/submodule') %}true{% else %}false{% endif %}"
         aria-controls="collapseLayouts"
       >
-        Modul
+        {{ t('sidebar.module') }}
         <div class="sb-sidenav-collapse-arrow">
           <i class="fas fa-angle-down"></i>
         </div>
@@ -36,12 +36,12 @@
           <a
             class="nav-link {% if url.includes('/admin/overview') %}active{% endif %}"
             href="/admin/overview"
-            >Gambaran Umum</a
+            >{{ t('sidebar.overview') }}</a
           >
           <a
             class="nav-link {% if url.includes('/admin/submodule') %}active{% endif %}"
             href="/admin/submodule"
-            >Sub Modul</a
+            >{{ t('sidebar.submodule') }}</a
           >
         </nav>
       </div>
@@ -55,7 +55,7 @@
         aria-expanded="{% if url.includes('/admin/user') %}true{% else %}false{% endif %}"
         aria-controls="collapseLayoutsUser"
       >
-        User
+        {{ t('sidebar.users') }}
         <div class="sb-sidenav-collapse-arrow">
           <i class="fas fa-angle-down"></i>
         </div>
@@ -70,12 +70,12 @@
           <a
             class="nav-link {% if url.includes('/admin/user/overview') %}active{% endif %}"
             href="/admin/user/overview"
-            >Gambaran Umum</a
+            >{{ t('sidebar.overview') }}</a
           >
           <a
             class="nav-link {% if url.includes('/admin/user/index') %}active{% endif %}"
             href="/admin/user/index"
-            >User</a
+            >{{ t('sidebar.users') }}</a
           >
         </nav>
       </div>
@@ -91,7 +91,7 @@
         aria-expanded="{% if url.includes('/admin/permissions') or url.includes('/admin/roles') %}true{% else %}false{% endif %}"
         aria-controls="collapseLayoutsPermissions"
       >
-        Permissions
+        {{ t('sidebar.permissions') }}
         <div class="sb-sidenav-collapse-arrow">
           <i class="fas fa-angle-down"></i>
         </div>
@@ -106,12 +106,12 @@
           <a
             class="nav-link {% if url.includes('/admin/permissions') and not url.includes('/admin/roles') %}active{% endif %}"
             href="/admin/permissions"
-            >All Permissions</a
+            >{{ t('sidebar.allPermissions') }}</a
           >
           <a
             class="nav-link {% if url.includes('/admin/roles') %}active{% endif %}"
             href="/admin/roles"
-            >Roles & Permissions</a
+            >{{ t('sidebar.roles') }}</a
           >
         </nav>
       </div>
@@ -123,7 +123,7 @@
         class="nav-link {% if url.includes('/admin/cache') %}active{% endif %}"
         href="/admin/cache/stats"
       >
-        Cache
+        {{ t('sidebar.cache') }}
       </a>
       {% endif %}
 
@@ -137,7 +137,7 @@
         aria-expanded="{% if url.includes('/admin/queue') %}true{% else %}false{% endif %}"
         aria-controls="collapseLayoutsQueue"
       >
-        Queue
+        {{ t('sidebar.queue') }}
         <div class="sb-sidenav-collapse-arrow">
           <i class="fas fa-angle-down"></i>
         </div>
@@ -152,17 +152,17 @@
           <a
             class="nav-link {% if url == '/admin/queue' %}active{% endif %}"
             href="/admin/queue"
-            >Statistics</a
+            >{{ t('sidebar.statistics') }}</a
           >
           <a
             class="nav-link {% if url.includes('/admin/queue/jobs') %}active{% endif %}"
             href="/admin/queue/jobs"
-            >All Jobs</a
+            >{{ t('sidebar.allJobs') }}</a
           >
           <a
             class="nav-link {% if url.includes('/admin/queue/failed') %}active{% endif %}"
             href="/admin/queue/failed"
-            >Failed Jobs</a
+            >{{ t('sidebar.failedJobs') }}</a
           >
         </nav>
       </div>
@@ -174,13 +174,13 @@
         class="nav-link {% if url.includes('/admin/log') %}active{% endif %}"
         href="/admin/log/index"
       >
-        Log
+        {{ t('sidebar.logs') }}
       </a>
       {% endif %}
     </div>
   </div>
   <div class="sb-sidenav-footer">
-    <div class="small">Masuk sebagai:</div>
+    <div class="small">{{ t('sidebar.loggedInAs') }}:</div>
     <span class="fw-bold">{{ user.username }}</span>
   </div>
 </nav>

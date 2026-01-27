@@ -2,159 +2,206 @@
 
 {% block content %}
 <div class="container-fluid px-4">
-  <h1 class="mt-4">
-    <i class="fas fa-user-circle me-2 text-primary"></i>User Profile
-  </h1>
+  <h1 class="mt-4">{{ t('pageTitle') }}</h1>
   <ol class="breadcrumb mb-4">
-    <li class="breadcrumb-item"><a href="/admin">Dashboard</a></li>
-    <li class="breadcrumb-item active">User Profile</li>
+    <li class="breadcrumb-item"><a href="/admin">{{ t('breadcrumb.dashboard') }}</a></li>
+    <li class="breadcrumb-item active">{{ t('breadcrumb.profile') }}</li>
   </ol>
 
   <div class="row">
-    <!-- Profile Card -->
-    <div class="col-lg-4 col-md-6 mb-4">
-      <div class="card shadow-sm border-0 h-100">
-        <div class="card-header bg-primary text-white text-center py-4">
-          <div class="profile-avatar mb-3">
-            <div class="avatar-circle bg-white text-primary fs-1 fw-bold mx-auto d-flex align-items-center justify-content-center" 
-                 style="width: 100px; height: 100px; border-radius: 50%;">
-              {{ (userProfile.full_name[0] if userProfile.full_name else userProfile.username[0]) | upper }}
-            </div>
-          </div>
-          <h4 class="mb-1">{{ userProfile.full_name or userProfile.username }}</h4>
-          <p class="mb-0 opacity-75">@{{ userProfile.username }}</p>
+    <!-- Left Column: Profile Card -->
+    <div class="col-lg-4">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-user me-1"></i>
+          {{ t('sections.profile.title') }}
         </div>
         <div class="card-body text-center">
           <div class="mb-3">
-            {% if userProfile.is_active %}
-              <span class="badge bg-success fs-6 px-3 py-2">
-                <i class="fas fa-check-circle me-1"></i>Active Account
-              </span>
-            {% else %}
-              <span class="badge bg-danger fs-6 px-3 py-2">
-                <i class="fas fa-times-circle me-1"></i>Inactive Account
-              </span>
-            {% endif %}
+            <div class="d-inline-flex align-items-center justify-content-center bg-primary text-white rounded-circle" 
+                 style="width: 100px; height: 100px; font-size: 2.5rem;">
+              {{ (userProfile.full_name[0] if userProfile.full_name else userProfile.username[0]) | upper }}
+            </div>
           </div>
+          <h5 class="fw-bold mb-1">{{ userProfile.full_name or userProfile.username }}</h5>
+          <p class="text-muted mb-3">@{{ userProfile.username }}</p>
+
           <div class="mb-3">
-            {% set roleClass = {
+             {% set roleClass = {
               'Admin': 'bg-danger',
               'Manager': 'bg-warning text-dark',
               'User': 'bg-info'
             } %}
-            <span class="badge {{ roleClass[userProfile.role] or 'bg-secondary' }} fs-6 px-3 py-2">
-              <i class="fas fa-shield-alt me-1"></i>{{ userProfile.role }}
+            <span class="badge {{ roleClass[userProfile.role] or 'bg-secondary' }}">
+              {{ userProfile.role }}
             </span>
           </div>
-          <small class="text-muted">
-            <i class="fas fa-calendar-alt me-1"></i>
-            Member since {{ userProfile.created_at | date("DD MMMM YYYY") }}
-          </small>
+
+          <div class="small text-muted">
+            {{ t('sections.profile.memberSince') }} {{ userProfile.created_at | date("DD MMMM YYYY") }}
+          </div>
+        </div>
+      </div>
+
+       <!-- Quick Actions -->
+       <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-bolt me-1"></i>
+          {{ t('sections.quickActions.title') }}
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-2">
+            <a href="/admin/change-password" class="btn btn-primary">
+               <i class="fas fa-key me-2"></i>{{ t('sections.quickActions.changePassword') }}
+            </a>
+            <button class="btn btn-outline-secondary" onclick="alert('{{ t(\'sections.quickActions.updateComingSoon\') }}')">
+               <i class="fas fa-user-edit me-2"></i>{{ t('sections.quickActions.editProfile') }}
+            </button>
+             <a href="/admin/logout" class="btn btn-danger">
+               <i class="fas fa-sign-out-alt me-2"></i>{{ t('sections.quickActions.logout') }}
+            </a>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Account Details -->
-    <div class="col-lg-8 col-md-6 mb-4">
-      <div class="card shadow-sm border-0 h-100">
-        <div class="card-header bg-light">
-          <h5 class="card-title mb-0">
-            <i class="fas fa-info-circle me-2 text-info"></i>Account Information
-          </h5>
+    <!-- Right Column: Detailed Info -->
+    <div class="col-lg-8">
+      <div class="card mb-4">
+        <div class="card-header">
+          <i class="fas fa-info-circle me-1"></i>
+          {{ t('sections.info.title') }}
         </div>
         <div class="card-body">
-          <div class="row g-4">
-            <!-- Personal Information -->
+          <div class="row g-3">
+            <!-- Full Name -->
             <div class="col-md-6">
-              <h6 class="text-primary border-bottom pb-2 mb-3">
-                <i class="fas fa-user me-2"></i>Personal Information
-              </h6>
-              <div class="info-item mb-3">
-                <label class="form-label text-muted small">Full Name</label>
-                <div class="fw-semibold">{{ userProfile.full_name or 'Not provided' }}</div>
-              </div>
-              <div class="info-item mb-3">
-                <label class="form-label text-muted small">Username</label>
-                <div class="fw-semibold">{{ userProfile.username }}</div>
-              </div>
-              <div class="info-item mb-3">
-                <label class="form-label text-muted small">Email Address</label>
-                <div class="d-flex align-items-center">
-                  <span class="fw-semibold me-2">{{ userProfile.email }}</span>
-                  <button class="btn btn-sm btn-outline-secondary" 
-                          onclick="copyToClipboard('{{ userProfile.email }}')"
-                          title="Copy email">
-                    <i class="fas fa-copy"></i>
-                  </button>
+              <div class="info-item p-3 rounded bg-light h-100">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="info-icon bg-primary bg-opacity-10 rounded p-2 me-3">
+                    <i class="fas fa-user text-primary"></i>
+                  </div>
+                  <div>
+                    <small class="text-muted text-uppercase small fw-bold">{{ t('sections.info.fullName') }}</small>
+                  </div>
+                </div>
+                <div class="ps-5">
+                  <span class="fw-semibold">{{ userProfile.full_name or t('sections.info.notProvided') }}</span>
                 </div>
               </div>
             </div>
 
-            <!-- Account Status -->
+            <!-- Username -->
             <div class="col-md-6">
-              <h6 class="text-primary border-bottom pb-2 mb-3">
-                <i class="fas fa-cog me-2"></i>Account Status
-              </h6>
-              <div class="info-item mb-3">
-                <label class="form-label text-muted small">Account ID</label>
-                <div class="fw-semibold">#{{ userProfile.id }}</div>
-              </div>
-              <div class="info-item mb-3">
-                <label class="form-label text-muted small">Role</label>
-                <div>
-                  <span class="badge {{ roleClass[userProfile.role] or 'bg-secondary' }}">
-                    {{ userProfile.role }}
-                  </span>
+              <div class="info-item p-3 rounded bg-light h-100">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="info-icon bg-info bg-opacity-10 rounded p-2 me-3">
+                    <i class="fas fa-at text-info"></i>
+                  </div>
+                  <div>
+                    <small class="text-muted text-uppercase small fw-bold">{{ t('sections.info.username') }}</small>
+                  </div>
+                </div>
+                <div class="ps-5">
+                  <span class="fw-semibold">@{{ userProfile.username }}</span>
                 </div>
               </div>
-              <div class="info-item mb-3">
-                <label class="form-label text-muted small">Status</label>
-                <div>
+            </div>
+
+            <!-- Email -->
+            <div class="col-md-6">
+              <div class="info-item p-3 rounded bg-light h-100">
+                <div class="d-flex align-items-start mb-2">
+                  <div class="info-icon bg-success bg-opacity-10 rounded p-2 me-3">
+                    <i class="fas fa-envelope text-success"></i>
+                  </div>
+                  <div>
+                    <small class="text-muted text-uppercase small fw-bold">{{ t('sections.info.email') }}</small>
+                  </div>
+                </div>
+                <div class="ps-5">
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="fw-semibold">{{ userProfile.email }}</span>
+                    <button class="btn btn-sm btn-outline-secondary py-0" type="button" onclick="copyToClipboard('{{ userProfile.email }}')" title="{{ t('sections.info.copyEmail') }}">
+                      <i class="fas fa-copy small"></i>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Account ID -->
+            <div class="col-md-6">
+              <div class="info-item p-3 rounded bg-light h-100">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="info-icon bg-secondary bg-opacity-10 rounded p-2 me-3">
+                    <i class="fas fa-hashtag text-secondary"></i>
+                  </div>
+                  <div>
+                    <small class="text-muted text-uppercase small fw-bold">{{ t('sections.info.accountId') }}</small>
+                  </div>
+                </div>
+                <div class="ps-5">
+                  <span class="fw-semibold">#{{ userProfile.id }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Role -->
+            <div class="col-md-6">
+              <div class="info-item p-3 rounded bg-light h-100">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="info-icon bg-warning bg-opacity-10 rounded p-2 me-3">
+                    <i class="fas fa-user-tag text-warning"></i>
+                  </div>
+                  <div>
+                    <small class="text-muted text-uppercase small fw-bold">{{ t('sections.info.role') }}</small>
+                  </div>
+                </div>
+                <div class="ps-5">
+                  <span class="badge {{ roleClass[userProfile.role] or 'bg-secondary' }}">{{ userProfile.role }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Status -->
+            <div class="col-md-6">
+              <div class="info-item p-3 rounded bg-light h-100">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="info-icon {{ 'bg-success bg-opacity-10' if userProfile.is_active else 'bg-danger bg-opacity-10' }} rounded p-2 me-3">
+                    <i class="fas fa-circle {{ 'text-success' if userProfile.is_active else 'text-danger' }}"></i>
+                  </div>
+                  <div>
+                    <small class="text-muted text-uppercase small fw-bold">{{ t('sections.info.status') }}</small>
+                  </div>
+                </div>
+                <div class="ps-5">
                   {% if userProfile.is_active %}
-                    <span class="badge bg-success">Active</span>
+                    <span class="badge bg-success">{{ t('sections.profile.activeAccount') }}</span>
                   {% else %}
-                    <span class="badge bg-danger">Inactive</span>
+                    <span class="badge bg-danger">{{ t('sections.profile.inactiveAccount') }}</span>
                   {% endif %}
                 </div>
               </div>
-              <div class="info-item mb-3">
-                <label class="form-label text-muted small">Member Since</label>
-                <div class="fw-semibold">{{ userProfile.created_at | date("DD MMMM YYYY, HH:mm:ss") }}</div>
+            </div>
+
+            <!-- Member Since -->
+            <div class="col-12">
+              <div class="info-item p-3 rounded bg-light">
+                <div class="d-flex align-items-center mb-2">
+                  <div class="info-icon bg-dark bg-opacity-10 rounded p-2 me-3">
+                    <i class="fas fa-calendar-alt text-dark"></i>
+                  </div>
+                  <div>
+                    <small class="text-muted text-uppercase small fw-bold">{{ t('sections.info.memberSince') }}</small>
+                  </div>
+                </div>
+                <div class="ps-5">
+                  <span class="fw-semibold">{{ userProfile.created_at | date("DD MMMM YYYY, HH:mm:ss") }}</span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Quick Actions -->
-  <div class="row">
-    <div class="col-12">
-      <div class="card shadow-sm border-0">
-        <div class="card-header bg-light">
-          <h5 class="card-title mb-0">
-            <i class="fas fa-bolt me-2 text-warning"></i>Quick Actions
-          </h5>
-        </div>
-        <div class="card-body">
-          <div class="d-flex flex-wrap gap-2">
-            <a href="/admin/change-password" class="btn btn-primary">
-              <i class="fas fa-key me-2"></i>Change Password
-            </a>
-            <button class="btn btn-outline-info" onclick="alert('Update profile feature coming soon!')">
-              <i class="fas fa-edit me-2"></i>Edit Profile
-            </button>
-            <a href="/admin/logout" class="btn btn-outline-danger">
-              <i class="fas fa-sign-out-alt me-2"></i>Logout
-            </a>
-          </div>
-          <hr class="my-3">
-          <small class="text-muted">
-            <i class="fas fa-shield-alt me-1"></i>
-            Your account is protected by session-based authentication. 
-            Sessions expire after 24 hours of inactivity.
-          </small>
         </div>
       </div>
     </div>
@@ -163,14 +210,12 @@
 
 <!-- Toast for copy functionality -->
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
-  <div id="copyToast" class="toast" role="alert">
-    <div class="toast-header">
-      <i class="fas fa-check-circle text-success me-2"></i>
-      <strong class="me-auto">Copied!</strong>
-      <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
-    </div>
-    <div class="toast-body">
-      Email address copied to clipboard
+  <div id="copyToast" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+         <i class="fas fa-check-circle me-2"></i>{{ t('toast.message') }}
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
   </div>
 </div>
@@ -178,12 +223,11 @@
 <script>
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text).then(function() {
-    // Show toast notification
     const toast = new bootstrap.Toast(document.getElementById('copyToast'));
     toast.show();
   }).catch(function(err) {
     console.error('Failed to copy: ', err);
-    alert('Failed to copy email address');
+    alert('{{ t(\'toast.fail\') }}');
   });
 }
 </script>

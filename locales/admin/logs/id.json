@@ -1,0 +1,91 @@
+{
+  "pageTitle": "Log Aktivitas",
+  "title": "Log Aktivitas Enterprise",
+  "subtitle": "Log aktivitas sistem dan pengguna",
+  "breadcrumb": {
+    "dashboard": "Dashboard",
+    "logs": "Log Aktivitas"
+  },
+  "filters": {
+    "title": "Filter",
+    "activityType": "Tipe Aktivitas",
+    "allTypes": "Semua Tipe",
+    "actionType": "Tipe Aksi",
+    "allActions": "Semua Aksi",
+    "status": "Status",
+    "allStatus": "Semua Status",
+    "user": "User",
+    "allUsers": "Semua User",
+    "limit": "Batas"
+  },
+  "table": {
+    "id": "ID",
+    "type": "Tipe",
+    "action": "Aksi",
+    "status": "Status",
+    "user": "User",
+    "activity": "Aktivitas",
+    "time": "Waktu",
+    "details": "Detail",
+    "records": "data"
+  },
+  "status": {
+    "success": "Berhasil",
+    "failure": "Gagal",
+    "warning": "Peringatan",
+    "info": "Info"
+  },
+  "messages": {
+    "noLogs": "Tidak ada log aktivitas",
+    "exportSuccess": "Logs berhasil diexport",
+    "filterReset": "Filter direset",
+    "noLogsFound": "Log tidak ditemukan",
+    "logDetailsNotFound": "Detail log tidak ditemukan"
+  },
+  "modals": {
+    "viewDetails": "Detail Log",
+    "close": "Tutup",
+    "basicInfo": "Informasi Dasar",
+    "requestInfo": "Informasi Request",
+    "activity": "Aktivitas",
+    "userAgent": "User Agent",
+    "metadata": "Metadata",
+    "systemInfo": "Informasi Sistem"
+  },
+  "buttons": {
+    "export": "Export CSV",
+    "resetFilters": "Reset Filter",
+    "applyFilters": "Terapkan Filter",
+    "downloadData": "Download Data",
+    "close": "Tutup"
+  },
+  "search": {
+    "placeholder": "Cari logs...",
+    "searchLogs": "Cari log:"
+  },
+  "datatable": {
+    "search": "Cari log:",
+    "lengthMenu": "Tampilkan _MENU_ log per halaman",
+    "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ log",
+    "infoEmpty": "Tidak ada log",
+    "infoFiltered": "(difilter dari _MAX_ total log)",
+    "processing": "Memproses...",
+    "loadingRecords": "Memuat...",
+    "zeroRecords": "Tidak ada log yang cocok"
+  },
+  "labels": {
+    "activityType": "Tipe Aktivitas",
+    "actionType": "Tipe Aksi",
+    "resourceType": "Tipe Resource",
+    "resourceId": "ID Resource",
+    "requestId": "ID Request",
+    "errorCode": "Kode Error",
+    "ipAddress": "IP Address",
+    "method": "Metode",
+    "url": "URL",
+    "device": "Device",
+    "email": "Email",
+    "loading": "Memuat...",
+    "downloadStarted": "Download dimulai! Cek folder downloads Anda."
+  }
+}

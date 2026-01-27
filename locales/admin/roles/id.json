@@ -1,0 +1,73 @@
+{
+  "pageTitle": "Roles & Permissions",
+  "title": "Roles & Permissions",
+  "subtitle": "Kelola role dan assign permissions",
+  "createRole": "Buat Role",
+  "createNewRole": "Create New Role",
+  "rolesPermissions": "Roles & Permissions",
+  "noRolesFound": "Tidak ada role ditemukan",
+  "assignedPermissions": "Assigned Permissions",
+  "editRole": "Edit Role",
+  "saveRole": "Save Role",
+  "updatePermissions": "Update Permissions",
+  "selectAll": "Select All",
+  "clearAll": "Clear All",
+  "permissionDistribution": "Permission Distribution Summary",
+  "totalRoles": "Total Roles",
+  "totalPermissions": "Total Permissions",
+  "mostPrivilegedRole": "Most Privileged Role",
+  "none": "None",
+  "contactAdmin": "Silakan hubungi administrator sistem untuk mengatur role user.",
+  "table": {
+    "name": "Nama Role",
+    "description": "Deskripsi",
+    "users": "Jumlah User",
+    "permissions": "Permissions",
+    "createdAt": "Dibuat"
+  },
+  "form": {
+    "name": "Nama Role",
+    "description": "Deskripsi",
+    "selectRole": "Pilih Role"
+  },
+  "messages": {
+    "createSuccess": "Role berhasil dibuat",
+    "updateSuccess": "Role berhasil diperbarui",
+    "deleteSuccess": "Role berhasil dihapus",
+    "assignSuccess": "Permissions berhasil di-assign",
+    "confirmDelete": "Apakah Anda yakin ingin menghapus role ini?",
+    "updateSuccessTitle": "Berhasil!",
+    "error": "Gagal update permissions:",
+    "networkError": "Terjadi kesalahan jaringan saat update permissions"
+  },
+  "modals": {
+    "createRole": "Buat Role Baru",
+    "editRole": "Edit Role",
+    "deleteRole": "Hapus Role",
+    "managePermissions": "Manage Permissions"
+  },
+  "search": {
+    "placeholder": "Cari role..."
+  },
+  "permissions": {
+    "title": "Permissions",
+    "selectAll": "Select All",
+    "clearAll": "Clear All",
+    "noPermissions": "Tidak ada permissions tersedia"
+  },
+  "stats": {
+    "totalRoles": "Total Roles",
+    "adminRoles": "Admin Roles",
+    "managerRoles": "Manager Roles",
+    "userRoles": "User Roles"
+  },
+  "buttons": {
+    "create": "Create",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "updating": "Updating"
+  }
+}

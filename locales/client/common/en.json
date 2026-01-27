@@ -1,0 +1,44 @@
+{
+  "common": {
+    "appName": "Omniflow Starter",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "close": "Close",
+    "viewMore": "View More",
+    "viewLess": "Close"
+  },
+  "errors": {
+    "notFound": "Page not found",
+    "unauthorized": "Unauthorized - Please login",
+    "forbidden": "Access denied",
+    "serverError": "Server error",
+    "validationError": "Validation error",
+    "networkError": "Network connection lost"
+  },
+  "session": {
+    "title": "Session Expiring",
+    "message": "Your session will expire in {seconds} seconds.",
+    "extend": "Stay Logged In",
+    "logout": "Logout Now"
+  },
+  "language": {
+    "switch": "Switch Language",
+    "current": "Current Language"
+  }
+}

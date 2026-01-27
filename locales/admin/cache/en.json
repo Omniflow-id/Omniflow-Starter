@@ -1,0 +1,84 @@
+{
+  "pageTitle": "Cache Management",
+  "title": "Cache Management",
+  "subtitle": "Manage system cache",
+  "breadcrumb": {
+    "dashboard": "Dashboard",
+    "cache": "Cache Management"
+  },
+  "labels": {
+    "host": "Host",
+    "database": "Database",
+    "status": "Status",
+    "defaultTTL": "Default TTL",
+    "keyPrefix": "Key Prefix",
+    "patternPlaceholder": "admin:users:*, user:*, logs:*",
+    "patternExample": "Pattern (e.g., user:*)",
+    "wildcardInfo": "Use * for wildcard matching (e.g., admin:* matches all admin keys)",
+    "cacheKeys": "Cache Keys",
+    "performanceTesting": "Performance Testing",
+    "testDescription": "Tests cache read/write performance",
+    "realtimeStats": "Real-time Statistics",
+    "flushDescription": "Removes all cached data"
+  },
+  "stats": {
+    "title": "Cache Statistics",
+    "totalKeys": "Total Keys",
+    "memoryUsage": "Memory Usage",
+    "connected": "Connected",
+    "disconnected": "Disconnected",
+    "enabled": "Enabled & Running"
+  },
+  "test": {
+    "title": "Test Cache",
+    "description": "Test cache performance with read/write operations",
+    "setValue": "Set Value",
+    "getValue": "Get Value",
+    "deleteValue": "Delete Value",
+    "result": "Result",
+    "duration": "Duration",
+    "source": "Source",
+    "cacheHit": "Cache Hit",
+    "cacheMiss": "Cache Miss",
+    "benchmark": "Run Benchmark"
+  },
+  "health": {
+    "title": "Health Check",
+    "status": "Status",
+    "latency": "Latency",
+    "healthy": "Healthy",
+    "unhealthy": "Unhealthy"
+  },
+  "actions": {
+    "flush": "Flush All Cache",
+    "invalidate": "Invalidate Pattern",
+    "confirmFlush": "Are you sure you want to clear all cache?",
+    "confirmInvalidate": "Are you sure you want to invalidate this pattern?"
+  },
+  "buttons": {
+    "refresh": "Refresh",
+    "flush": "Flush",
+    "test": "Test",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "invalidate": "Invalidate"
+  },
+  "modals": {
+    "confirmAction": "Confirm Action",
+    "confirmMessage": "Are you sure you want to proceed?"
+  },
+  "messages": {
+    "flushSuccess": "Cache cleared successfully",
+    "flushError": "Failed to clear cache",
+    "invalidateSuccess": "Pattern invalidated successfully",
+    "invalidateError": "Failed to invalidate pattern",
+    "testSuccess": "Test successful",
+    "benchmarkSuccess": "Benchmark completed",
+    "redisUnavailable": "Redis is not available. Using database fallback.",
+    "cacheStatsUnavailable": "Cache statistics unavailable",
+    "keysWillAppear": "Cache keys will appear here",
+    "clickRefresh": "Click refresh to load existing cache keys",
+    "realtimeReady": "Real-time statistics ready",
+    "clickRefreshStats": "Click refresh button to load current cache statistics"
+  }
+}

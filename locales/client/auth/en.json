@@ -1,0 +1,49 @@
+{
+  "pageTitle": "Authentication",
+  "login": {
+    "title": "Login",
+    "subtitle": "Sign in to your account",
+    "email": "Email",
+    "password": "Password",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot password?",
+    "button": "Sign In",
+    "noAccount": "Don't have an account?",
+    "registerLink": "Register now"
+  },
+  "register": {
+    "title": "Register",
+    "subtitle": "Create a new account",
+    "name": "Full Name",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "button": "Register",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Sign In"
+  },
+  "forgotPassword": {
+    "title": "Forgot Password",
+    "subtitle": "We will send a password reset link to your email",
+    "email": "Email",
+    "button": "Send Reset Link",
+    "backToLogin": "Back to login",
+    "success": "Password reset link has been sent to your email"
+  },
+  "resetPassword": {
+    "title": "Reset Password",
+    "subtitle": "Enter your new password",
+    "password": "New Password",
+    "confirmPassword": "Confirm Password",
+    "button": "Reset Password",
+    "success": "Password has been reset successfully"
+  },
+  "messages": {
+    "loginSuccess": "Login successful",
+    "loginError": "Invalid email or password",
+    "registerSuccess": "Registration successful",
+    "registerError": "Registration failed",
+    "logoutSuccess": "Logout successful",
+    "sessionExpired": "Your session has expired"
+  }
+}

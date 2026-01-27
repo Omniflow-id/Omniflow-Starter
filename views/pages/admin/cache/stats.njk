@@ -1,6 +1,10 @@
-{% extends "layout/masterLayout.njk" %} {% block content %}
+{% extends "layout/masterLayout.njk" %} {% block title %}{{ title }}{% endblock %} {% block content %}
 <div class="container-fluid px-4">
-  <h1 class="mt-4">Cache Statistics</h1>
+  <h1 class="mt-4">{{ title }}</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/admin">{{ nav.dashboard or 'Dashboard' }}</a></li>
+    <li class="breadcrumb-item active">{{ pageTitle or 'Cache Management' }}</li>
+  </ol>
 
   <!-- Redis Connection Status -->
   <div class="row mb-4">
@@ -8,19 +12,19 @@
       <div class="card mb-4">
         <div class="card-header">
           <i class="fas fa-server me-1"></i>
-          Redis Connection Status
+          {{ stats.connected or 'Redis Connection Status' }}
         </div>
         <div class="card-body">
           {% if redisStats.connected %}
           <div class="d-flex align-items-center mb-3">
             <span class="badge bg-success me-2">
-              <i class="fas fa-check-circle me-1"></i>Connected
+              <i class="fas fa-check-circle me-1"></i>{{ stats.connected or 'Connected' }}
             </span>
           </div>
           <div class="row">
             <div class="col-sm-6">
               <p class="mb-2">
-                <strong><i class="fas fa-network-wired me-1"></i>Host:</strong
+                <strong><i class="fas fa-network-wired me-1"></i>{{ labels.host or 'Host' }}:</strong
                 ><br />
                 <span class="text-muted"
                   >{{ redisStats.host }}:{{ redisStats.port }}</span
@@ -29,25 +33,25 @@
             </div>
             <div class="col-sm-6">
               <p class="mb-2">
-                <strong><i class="fas fa-database me-1"></i>Database:</strong
+                <strong><i class="fas fa-database me-1"></i>{{ labels.database or 'Database' }}:</strong
                 ><br />
                 <span class="text-muted">{{ redisStats.db }}</span>
               </p>
             </div>
           </div>
           <p class="mb-0">
-            <strong><i class="fas fa-toggle-on me-1"></i>Status:</strong><br />
-            <span class="text-success">Enabled & Running</span>
+            <strong><i class="fas fa-toggle-on me-1"></i>{{ labels.status or 'Status' }}:</strong><br />
+            <span class="text-success">{{ stats.enabled or 'Enabled & Running' }}</span>
           </p>
           {% else %}
           <div class="d-flex align-items-center mb-3">
             <span class="badge bg-danger me-2">
-              <i class="fas fa-times-circle me-1"></i>Disconnected
+              <i class="fas fa-times-circle me-1"></i>{{ stats.disconnected or 'Disconnected' }}
             </span>
           </div>
           <div class="alert alert-warning mb-0">
             <i class="fas fa-exclamation-triangle me-1"></i>
-            Redis is not available. Using database fallback.
+            {{ messages.redisUnavailable or 'Redis is not available. Using database fallback.' }}
           </div>
           {% endif %}
         </div>
@@ -58,7 +62,7 @@
       <div class="card mb-4">
         <div class="card-header">
           <i class="fas fa-chart-bar me-1"></i>
-          Cache Statistics
+          {{ stats.title or 'Cache Statistics' }}
         </div>
         <div class="card-body">
           {% if cacheStats.connected %}
@@ -68,25 +72,25 @@
                 <h3 class="text-primary mb-1">
                   {{ cacheStats.database_keys }}
                 </h3>
-                <p class="text-muted small mb-0">Total Keys</p>
+                <p class="text-muted small mb-0">{{ stats.totalKeys or 'Total Keys' }}</p>
               </div>
             </div>
             <div class="col-6">
               <div class="text-center">
                 <h3 class="text-info mb-1">{{ cacheStats.default_ttl }}s</h3>
-                <p class="text-muted small mb-0">Default TTL</p>
+                <p class="text-muted small mb-0">{{ labels.defaultTTL or 'Default TTL' }}</p>
               </div>
             </div>
           </div>
           <hr />
           <p class="mb-0">
-            <strong><i class="fas fa-key me-1"></i>Key Prefix:</strong><br />
+            <strong><i class="fas fa-key me-1"></i>{{ labels.keyPrefix or 'Key Prefix' }}:</strong><br />
             <code class="bg-light p-1 rounded">{{ cacheStats.prefix }}</code>
           </p>
           {% else %}
           <div class="text-center">
             <i class="fas fa-exclamation-circle text-warning fa-3x mb-3"></i>
-            <p class="text-muted mb-2">Cache statistics unavailable</p>
+            <p class="text-muted mb-2">{{ messages.cacheStatsUnavailable or 'Cache statistics unavailable' }}</p>
             {% if cacheStats.error %}
             <small class="text-danger">
               <i class="fas fa-bug me-1"></i>{{ cacheStats.error }}
@@ -105,7 +109,7 @@
       <div class="card">
         <div class="card-header">
           <i class="fas fa-cogs me-1"></i>
-          Cache Management
+          {{ title or 'Cache Management' }}
         </div>
         <div class="card-body">
           <div class="row">
@@ -113,7 +117,7 @@
               <div class="card bg-light">
                 <div class="card-body text-center p-3">
                   <h6 class="card-title text-danger mb-3">
-                    <i class="fas fa-trash-alt me-1"></i>Flush All Cache
+                    <i class="fas fa-trash-alt me-1"></i>{{ actions.flush or 'Flush All Cache' }}
                   </h6>
                   <form method="post" action="/admin/cache/flush" class="mb-0">
                     {{ csrfField() | safe }}
@@ -122,11 +126,11 @@
                       class="btn btn-danger btn-sm w-100"
                       id="flushCacheBtn"
                     >
-                      <i class="fas fa-trash me-1"></i>Flush All
+                      <i class="fas fa-trash me-1"></i>{{ buttons.flush or 'Flush' }}
                     </button>
                   </form>
                   <small class="text-muted mt-2 d-block"
-                    >Removes all cached data</small
+                    >{{ labels.flushDescription or 'Removes all cached data' }}</small
                   >
                 </div>
               </div>
@@ -136,7 +140,7 @@
               <div class="card bg-light">
                 <div class="card-body p-3">
                   <h6 class="card-title text-warning mb-3">
-                    <i class="fas fa-search me-1"></i>Pattern Invalidation
+                    <i class="fas fa-search me-1"></i>{{ actions.invalidate or 'Pattern Invalidation' }}
                   </h6>
                   <form
                     method="post"
@@ -152,7 +156,7 @@
                         type="text"
                         name="pattern"
                         class="form-control"
-                        placeholder="admin:users:*, user:*, logs:*"
+                        placeholder="{{ labels.patternPlaceholder or 'admin:users:*, user:*, logs:*' }}"
                         required
                         id="invalidatePattern"
                       />
@@ -161,13 +165,12 @@
                         class="btn btn-warning"
                         id="invalidateBtn"
                       >
-                        <i class="fas fa-times-circle me-1"></i>Invalidate
+                        <i class="fas fa-times-circle me-1"></i>{{ buttons.invalidate or 'Invalidate' }}
                       </button>
                     </div>
                     <small class="text-muted">
                       <i class="fas fa-info-circle me-1"></i>
-                      Use * for wildcard matching (e.g., admin:* matches all
-                      admin keys)
+                      {{ labels.wildcardInfo or 'Use * for wildcard matching (e.g., admin:* matches all admin keys)' }}
                     </small>
                   </form>
                 </div>
@@ -185,7 +188,7 @@
       <div class="card">
         <div class="card-header">
           <i class="fas fa-flask me-1"></i>
-          Cache Performance Test
+          {{ test.title or 'Cache Performance Test' }}
         </div>
         <div class="card-body">
           <div class="row">
@@ -193,13 +196,13 @@
               <div class="text-center mb-3 mb-md-0">
                 <div class="mb-3">
                   <i class="fas fa-stopwatch text-primary fa-2x mb-2"></i>
-                  <h6 class="text-muted">Performance Testing</h6>
+                  <h6 class="text-muted">{{ labels.performanceTesting or 'Performance Testing' }}</h6>
                 </div>
                 <button id="testCacheBtn" class="btn btn-primary">
-                  <i class="fas fa-play me-1"></i>Run Performance Test
+                  <i class="fas fa-play me-1"></i>{{ test.benchmark or 'Run Benchmark' }}
                 </button>
                 <p class="text-muted small mt-2 mb-0">
-                  Tests cache read/write performance
+                  {{ labels.testDescription or 'Tests cache read/write performance' }}
                 </p>
               </div>
             </div>
@@ -207,7 +210,7 @@
               <div id="testResults" class="card bg-light" style="display: none">
                 <div class="card-header py-2">
                   <h6 class="mb-0">
-                    <i class="fas fa-chart-line me-1"></i>Test Results
+                    <i class="fas fa-chart-line me-1"></i>{{ test.result or 'Test Results' }}
                   </h6>
                 </div>
                 <div class="card-body p-3">
@@ -234,7 +237,7 @@
         >
           <div>
             <i class="fas fa-key me-1"></i>
-            Cache Keys
+            {{ labels.cacheKeys or 'Cache Keys' }}
           </div>
           <div class="d-flex gap-2">
             <div class="input-group" style="width: 200px">
@@ -242,7 +245,7 @@
                 type="text"
                 id="keyPattern"
                 class="form-control form-control-sm"
-                placeholder="Pattern (e.g., user:*)"
+                placeholder="{{ labels.patternExample or 'Pattern (e.g., user:*)' }}"
                 value="*"
               />
               <button id="searchKeys" class="btn btn-sm btn-outline-secondary">
@@ -250,7 +253,7 @@
               </button>
             </div>
             <button id="refreshKeys" class="btn btn-sm btn-outline-primary">
-              <i class="fas fa-sync-alt me-1"></i>Refresh
+              <i class="fas fa-sync-alt me-1"></i>{{ buttons.refresh or 'Refresh' }}
             </button>
           </div>
         </div>
@@ -258,10 +261,10 @@
           <div id="keysContainer">
             <div class="text-center py-4">
               <i class="fas fa-key text-muted fa-3x mb-3"></i>
-              <p class="text-muted mb-2">Cache keys will appear here</p>
+              <p class="text-muted mb-2">{{ messages.keysWillAppear or 'Cache keys will appear here' }}</p>
               <small class="text-muted">
                 <i class="fas fa-info-circle me-1"></i>
-                Click refresh to load existing cache keys
+                {{ messages.clickRefresh or 'Click refresh to load existing cache keys' }}
               </small>
             </div>
           </div>
@@ -283,7 +286,7 @@
         <div class="modal-header">
           <h5 class="modal-title" id="confirmModalLabel">
             <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-            Confirm Action
+            {{ modals.confirmAction or 'Confirm Action' }}
           </h5>
           <button
             type="button"
@@ -293,7 +296,7 @@
           ></button>
         </div>
         <div class="modal-body">
-          <p id="confirmMessage">Are you sure you want to proceed?</p>
+          <p id="confirmMessage">{{ modals.confirmMessage or 'Are you sure you want to proceed?' }}</p>
         </div>
         <div class="modal-footer">
           <button
@@ -301,10 +304,10 @@
             class="btn btn-secondary"
             data-bs-dismiss="modal"
           >
-            <i class="fas fa-times me-1"></i>Cancel
+            <i class="fas fa-times me-1"></i>{{ buttons.cancel or 'Cancel' }}
           </button>
           <button type="button" class="btn btn-danger" id="confirmActionBtn">
-            <i class="fas fa-check me-1"></i>Confirm
+            <i class="fas fa-check me-1"></i>{{ buttons.confirm or 'Confirm' }}
           </button>
         </div>
       </div>
@@ -320,20 +323,20 @@
         >
           <div>
             <i class="fas fa-chart-bar me-1"></i>
-            Real-time Statistics
+            {{ labels.realtimeStats or 'Real-time Statistics' }}
           </div>
           <button id="refreshStats" class="btn btn-sm btn-outline-primary">
-            <i class="fas fa-sync-alt me-1"></i>Refresh
+            <i class="fas fa-sync-alt me-1"></i>{{ buttons.refresh or 'Refresh' }}
           </button>
         </div>
         <div class="card-body">
           <div id="realTimeStats">
             <div class="text-center py-4">
               <i class="fas fa-clock text-muted fa-3x mb-3"></i>
-              <p class="text-muted mb-2">Real-time statistics ready</p>
+              <p class="text-muted mb-2">{{ messages.realtimeReady or 'Real-time statistics ready' }}</p>
               <small class="text-muted">
                 <i class="fas fa-info-circle me-1"></i>
-                Click refresh button to load current cache statistics
+                {{ messages.clickRefreshStats or 'Click refresh button to load current cache statistics' }}
               </small>
             </div>
           </div>

@@ -1,20 +1,26 @@
-{% extends "layout/masterLayout.njk" %} {% block content %}
+{% extends "layout/masterLayout.njk" %}
+{% block title %}{{ t('pageTitle') }}{% endblock %}
+{% block content %}
 <div class="container-fluid px-4">
-  <h1 class="mt-4">Enterprise Activity Logs</h1>
-  
+  <h1 class="mt-4">{{ t('title') }}</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item"><a href="/admin">{{ t('sidebar.dashboard') }}</a></li>
+    <li class="breadcrumb-item active">{{ t('pageTitle') }}</li>
+  </ol>
+
   <!-- Filters Section -->
   <div class="row mb-3">
     <div class="col-12">
       <div class="card">
         <div class="card-header">
-          <h6 class="mb-0"><i class="fas fa-filter me-2"></i>Filters</h6>
+          <h6 class="mb-0"><i class="fas fa-filter me-2"></i>{{ t('filters.title') }}</h6>
         </div>
         <div class="card-body">
           <form method="GET" class="row g-3">
             <div class="col-md-3">
-              <label for="activity_type" class="form-label">Activity Type</label>
+              <label for="activity_type" class="form-label">{{ t('filters.activityType') }}</label>
               <select class="form-select" id="activity_type" name="activity_type">
-                <option value="">All Types</option>
+                <option value="">{{ t('filters.allTypes') }}</option>
                 {% for type in filterOptions.activityTypes %}
                 <option value="{{ type }}" {% if filters.activity_type == type %}selected{% endif %}>
                   {{ type | capitalize }}
@@ -23,9 +29,9 @@
               </select>
             </div>
             <div class="col-md-3">
-              <label for="action_type" class="form-label">Action Type</label>
+              <label for="action_type" class="form-label">{{ t('filters.actionType') }}</label>
               <select class="form-select" id="action_type" name="action_type">
-                <option value="">All Actions</option>
+                <option value="">{{ t('filters.allActions') }}</option>
                 {% for action in filterOptions.actionTypes %}
                 <option value="{{ action }}" {% if filters.action_type == action %}selected{% endif %}>
                   {{ action | capitalize }}
@@ -34,9 +40,9 @@
               </select>
             </div>
             <div class="col-md-2">
-              <label for="status" class="form-label">Status</label>
+              <label for="status" class="form-label">{{ t('filters.status') }}</label>
               <select class="form-select" id="status" name="status">
-                <option value="">All Status</option>
+                <option value="">{{ t('filters.allStatus') }}</option>
                 {% for stat in filterOptions.statuses %}
                 <option value="{{ stat }}" {% if filters.status == stat %}selected{% endif %}>
                   {{ stat | capitalize }}
@@ -45,9 +51,9 @@
               </select>
             </div>
             <div class="col-md-2">
-              <label for="user_id" class="form-label">User</label>
+              <label for="user_id" class="form-label">{{ t('filters.user') }}</label>
               <select class="form-select" id="user_id" name="user_id">
-                <option value="">All Users</option>
+                <option value="">{{ t('filters.allUsers') }}</option>
                 {% for user in filterOptions.users %}
                 <option value="{{ user.id }}" {% if filters.user_id == user.id|string %}selected{% endif %}>
                   {{ user.username }}
@@ -56,7 +62,7 @@
               </select>
             </div>
             <div class="col-md-2">
-              <label for="limit" class="form-label">Limit</label>
+              <label for="limit" class="form-label">{{ t('filters.limit') }}</label>
               <select class="form-select" id="limit" name="limit">
                 <option value="100" {% if filters.limit == "100" %}selected{% endif %}>100</option>
                 <option value="500" {% if filters.limit == "500" %}selected{% endif %}>500</option>
@@ -66,10 +72,10 @@
             </div>
             <div class="col-12">
               <button type="submit" class="btn btn-primary">
-                <i class="fas fa-search me-1"></i>Apply Filters
+                <i class="fas fa-search me-1"></i>{{ t('buttons.applyFilters') }}
               </button>
               <a href="/admin/log/index" class="btn btn-secondary ms-2">
-                <i class="fas fa-undo me-1"></i>Reset
+                <i class="fas fa-undo me-1"></i>{{ t('buttons.resetFilters') }}
               </a>
             </div>
           </form>
@@ -86,8 +92,8 @@
             class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2"
           >
             <span class="mb-2 mb-sm-0">
-              Activity Logs 
-              <span class="badge bg-info">{{ logs.length }} records</span>
+              {{ t('pageTitle') }}
+              <span class="badge bg-info">{{ logs.length }} {{ t('table.records') }}</span>
             </span>
             <div class="d-flex flex-wrap gap-2">
               <button
@@ -95,7 +101,7 @@
                 id="btnDownloadData"
               >
                 <i class="fas fa-file-excel me-1"></i>
-                <span class="d-none d-sm-inline">Download Data</span>
+                <span class="d-none d-sm-inline">{{ t('buttons.downloadData') }}</span>
                 <span class="d-inline d-sm-none">Data</span>
               </button>
             </div>
@@ -110,14 +116,14 @@
             >
               <thead>
                 <tr>
-                  <th width="50">ID</th>
-                  <th width="60">Type</th>
-                  <th width="80">Action</th>
-                  <th width="80">Status</th>
-                  <th width="100">User</th>
-                  <th width="300">Activity</th>
-                  <th width="120">Time</th>
-                  <th width="50">Details</th>
+                  <th width="50">{{ t('table.id') }}</th>
+                  <th width="60">{{ t('table.type') }}</th>
+                  <th width="80">{{ t('table.action') }}</th>
+                  <th width="80">{{ t('table.status') }}</th>
+                  <th width="100">{{ t('table.user') }}</th>
+                  <th width="300">{{ t('table.activity') }}</th>
+                  <th width="120">{{ t('table.time') }}</th>
+                  <th width="50">{{ t('table.details') }}</th>
                 </tr>
               </thead>
             </table>
@@ -133,24 +139,25 @@
   <div class="modal-dialog modal-xl">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="logDetailModalLabel">Log Details</h5>
+        <h5 class="modal-title" id="logDetailModalLabel">{{ t('modals.viewDetails') }}</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body" id="logDetailContent">
         <div class="text-center">
           <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading...</span>
+            <span class="visually-hidden">{{ t('labels.loading') }}</span>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('buttons.close') }}</button>
       </div>
     </div>
   </div>
 </div>
 
-{% endblock %} {% block scripts %}
+{% endblock %}
+{% block scripts %}
 <script>
   $(document).ready(function () {
     // Initialize DataTable with server-side processing
@@ -169,8 +176,8 @@
         { data: 4, name: 'username' },
         { data: 5, name: 'activity' },
         { data: 6, name: 'created_at' },
-        { 
-          data: 7, 
+        {
+          data: 7,
           name: 'details',
           orderable: false,
           searchable: false
@@ -184,25 +191,25 @@
         { className: "text-center", targets: [0, 1, 2, 3, 7] }
       ],
       language: {
-        search: "Search logs:",
-        lengthMenu: "Show _MENU_ logs per page", 
-        info: "Showing _START_ to _END_ of _TOTAL_ logs",
-        infoEmpty: "No logs found",
-        infoFiltered: "(filtered from _MAX_ total logs)",
-        processing: "Processing...",
-        loadingRecords: "Loading...",
-        zeroRecords: "No matching logs found"
+        search: '{{ t("datatable.search") }}',
+        lengthMenu: '{{ t("datatable.lengthMenu") }}',
+        info: '{{ t("datatable.info") }}',
+        infoEmpty: '{{ t("datatable.infoEmpty") }}',
+        infoFiltered: '{{ t("datatable.infoFiltered") }}',
+        processing: '{{ t("datatable.processing") }}',
+        loadingRecords: '{{ t("datatable.loadingRecords") }}',
+        zeroRecords: '{{ t("datatable.zeroRecords") }}'
       }
     });
 
     // Handle detail modal with server-side data
     $(document).on('click', '.btn-details', function() {
       const logData = $(this).data('log-data');
-      
+
       if (logData) {
         displayLogDetails(logData);
       } else {
-        $('#logDetailContent').html('<div class="alert alert-warning">Log details not found.</div>');
+        $('#logDetailContent').html('<div class="alert alert-warning">{{ t("messages.logDetailsNotFound") }}</div>');
       }
     });
 
@@ -210,34 +217,34 @@
       let detailsHtml = `
         <div class="row">
           <div class="col-md-6">
-            <h6><i class="fas fa-info-circle me-2"></i>Basic Information</h6>
+            <h6><i class="fas fa-info-circle me-2"></i>{{ t("modals.basicInfo") }}</h6>
             <table class="table table-sm">
-              <tr><td><strong>ID:</strong></td><td>${log.id}</td></tr>
-              <tr><td><strong>Activity Type:</strong></td><td>${log.activity_type}</td></tr>
-              <tr><td><strong>Action Type:</strong></td><td>${log.action_type || '-'}</td></tr>
-              <tr><td><strong>Status:</strong></td><td>${log.status}</td></tr>
-              <tr><td><strong>Resource Type:</strong></td><td>${log.resource_type || '-'}</td></tr>
-              <tr><td><strong>Resource ID:</strong></td><td>${log.resource_id || '-'}</td></tr>
-              <tr><td><strong>Request ID:</strong></td><td><small>${log.request_id || '-'}</small></td></tr>
-              <tr><td><strong>Error Code:</strong></td><td>${log.error_code || '-'}</td></tr>
+              <tr><td><strong>{{ t("table.id") }}:</strong></td><td>${log.id}</td></tr>
+              <tr><td><strong>{{ t("labels.activityType") }}:</strong></td><td>${log.activity_type}</td></tr>
+              <tr><td><strong>{{ t("labels.actionType") }}:</strong></td><td>${log.action_type || '-'}</td></tr>
+              <tr><td><strong>{{ t("table.status") }}:</strong></td><td>${log.status}</td></tr>
+              <tr><td><strong>{{ t("labels.resourceType") }}:</strong></td><td>${log.resource_type || '-'}</td></tr>
+              <tr><td><strong>{{ t("labels.resourceId") }}:</strong></td><td>${log.resource_id || '-'}</td></tr>
+              <tr><td><strong>{{ t("labels.requestId") }}:</strong></td><td><small>${log.request_id || '-'}</small></td></tr>
+              <tr><td><strong>{{ t("labels.errorCode") }}:</strong></td><td>${log.error_code || '-'}</td></tr>
             </table>
           </div>
           <div class="col-md-6">
-            <h6><i class="fas fa-globe me-2"></i>Request Information</h6>
+            <h6><i class="fas fa-globe me-2"></i>{{ t("modals.requestInfo") }}</h6>
             <table class="table table-sm">
-              <tr><td><strong>IP Address:</strong></td><td>${log.ip_address || '-'}</td></tr>
-              <tr><td><strong>Method:</strong></td><td>${log.request_method || '-'}</td></tr>
-              <tr><td><strong>URL:</strong></td><td><small>${log.request_url || '-'}</small></td></tr>
-              <tr><td><strong>Device:</strong></td><td>${log.device_type || '-'} / ${log.browser || '-'} / ${log.platform || '-'}</td></tr>
-              <tr><td><strong>User:</strong></td><td>${log.username || '-'} (${log.user_role || '-'})</td></tr>
-              <tr><td><strong>Email:</strong></td><td>${log.user_email || '-'}</td></tr>
+              <tr><td><strong>{{ t("labels.ipAddress") }}:</strong></td><td>${log.ip_address || '-'}</td></tr>
+              <tr><td><strong>{{ t("labels.method") }}:</strong></td><td>${log.request_method || '-'}</td></tr>
+              <tr><td><strong>{{ t("labels.url") }}:</strong></td><td><small>${log.request_url || '-'}</small></td></tr>
+              <tr><td><strong>{{ t("labels.device") }}:</strong></td><td>${log.device_type || '-'} / ${log.browser || '-'} / ${log.platform || '-'}</td></tr>
+              <tr><td><strong>{{ t("table.user") }}:</strong></td><td>${log.username || '-'} (${log.user_role || '-'})</td></tr>
+              <tr><td><strong>{{ t("labels.email") }}:</strong></td><td>${log.user_email || '-'}</td></tr>
             </table>
           </div>
         </div>
-        
+
         <div class="row mt-3">
           <div class="col-12">
-            <h6><i class="fas fa-comment me-2"></i>Activity</h6>
+            <h6><i class="fas fa-comment me-2"></i>{{ t("modals.activity") }}</h6>
             <div class="alert alert-info">${log.activity}</div>
             ${log.error_message ? `<div class="alert alert-danger"><i class="fas fa-exclamation-triangle me-2"></i>${log.error_message}</div>` : ''}
           </div>
@@ -247,7 +254,7 @@
         detailsHtml += `
         <div class="row mt-3">
           <div class="col-12">
-            <h6><i class="fas fa-desktop me-2"></i>User Agent</h6>
+            <h6><i class="fas fa-desktop me-2"></i>{{ t("modals.userAgent") }}</h6>
             <small class="text-muted">${log.user_agent}</small>
           </div>
         </div>`;
@@ -257,7 +264,7 @@
         detailsHtml += `
         <div class="row mt-3">
           <div class="col-12">
-            <h6><i class="fas fa-database me-2"></i>Metadata</h6>
+            <h6><i class="fas fa-database me-2"></i>{{ t("modals.metadata") }}</h6>
             <pre class="bg-dark text-light p-3 rounded">${JSON.stringify(log.parsedMetadata, null, 2)}</pre>
           </div>
         </div>`;
@@ -266,7 +273,7 @@
       detailsHtml += `
         <div class="row mt-3">
           <div class="col-12">
-            <h6><i class="fas fa-server me-2"></i>System Information</h6>
+            <h6><i class="fas fa-server me-2"></i>{{ t("modals.systemInfo") }}</h6>
             <div class="row">
               <div class="col-md-3"><strong>Application:</strong> ${log.application || '-'}</div>
               <div class="col-md-3"><strong>Environment:</strong> ${log.environment || '-'}</div>
@@ -300,9 +307,9 @@
 
     const downloadUrl = `/admin/log/download${params.toString() ? '?' + params.toString() : ''}`;
     window.location.href = downloadUrl;
-    
+
     Toastify({
-      text: "Download started! Check your downloads folder.",
+      text: '{{ t("labels.downloadStarted") }}',
       duration: 5000,
       close: true,
       gravity: "top",
@@ -367,7 +374,7 @@
   .activity-cell {
     max-width: 200px;
   }
-  
+
   .user-info strong {
     font-size: 0.9rem;
   }

@@ -1,0 +1,73 @@
+{
+  "sidebar": {
+    "dashboard": "Dashboard",
+    "profile": "Profil",
+    "module": "Modul",
+    "overview": "Ringkasan",
+    "submodule": "Sub Modul",
+    "users": "Users",
+    "allUsers": "Semua User",
+    "permissions": "Permissions",
+    "allPermissions": "Semua Permissions",
+    "roles": "Roles & Permissions",
+    "cache": "Cache",
+    "queue": "Queue",
+    "statistics": "Statistik",
+    "allJobs": "Semua Jobs",
+    "failedJobs": "Failed Jobs",
+    "logs": "Log Aktivitas",
+    "loggedInAs": "Masuk sebagai"
+  },
+  "common": {
+    "actions": {
+      "save": "Simpan",
+      "cancel": "Batal",
+      "delete": "Hapus",
+      "edit": "Edit",
+      "view": "Lihat",
+      "create": "Buat",
+      "update": "Update",
+      "search": "Cari",
+      "filter": "Filter",
+      "reset": "Reset",
+      "export": "Export",
+      "import": "Import",
+      "download": "Download",
+      "upload": "Upload",
+      "refresh": "Refresh",
+      "submit": "Submit",
+      "close": "Tutup",
+      "confirm": "Konfirmasi",
+      "back": "Kembali",
+      "next": "Selanjutnya",
+      "previous": "Sebelumnya",
+      "login": "Login",
+      "logout": "Logout",
+      "register": "Register"
+    },
+    "status": {
+      "active": "Aktif",
+      "inactive": "Tidak Aktif",
+      "pending": "Tertunda",
+      "success": "Berhasil",
+      "failed": "Gagal",
+      "enabled": "Aktif",
+      "disabled": "Nonaktif",
+      "loading": "Memuat...",
+      "noData": "Tidak ada data",
+      "showing": "Menampilkan",
+      "of": "dari",
+      "entries": "data"
+    },
+    "messages": {
+      "confirmDelete": "Apakah Anda yakin ingin menghapus item ini?",
+      "confirmAction": "Apakah Anda yakin ingin melanjutkan?",
+      "operationSuccess": "Operasi berhasil",
+      "operationFailed": "Operasi gagal",
+      "errorOccurred": "Terjadi kesalahan",
+      "pleaseWait": "Mohon tunggu...",
+      "required": "Field ini wajib diisi",
+      "invalidInput": "Input tidak valid"
+    }
+  }
+}

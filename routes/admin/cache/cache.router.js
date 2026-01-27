@@ -9,6 +9,7 @@ const express = require("express");
 // === Absolute / alias imports ===
 const { checkPermission } = require("@middlewares/checkPermission");
 const { doubleCsrfProtection } = require("@middlewares/csrfProtection");
+const { withLocale } = require("@helpers/i18n");
 
 // === Relative imports ===
 const cache = require("./cache.controller");
@@ -19,7 +20,12 @@ const router = express.Router();
  * Cache statistics page
  * GET /admin/cache/stats
  */
-router.get("/stats", checkPermission("manage_cache"), cache.getCacheStatsPage);
+router.get(
+  "/stats",
+  checkPermission("manage_cache"),
+  withLocale("admin/cache"),
+  cache.getCacheStatsPage
+);
 
 /**
  * Test cache endpoint - demonstrates cache usage

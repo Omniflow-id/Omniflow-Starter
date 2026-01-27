@@ -32,6 +32,14 @@ const {
 const { createCorsMiddleware } = require("@middlewares/corsMiddleware");
 const { csrfGlobalMiddleware } = require("@middlewares/csrfProtection");
 const { generalLimiter } = require("@middlewares/rateLimiter");
+// === i18n imports ===
+const {
+  resolveRequestLanguage,
+  setLanguageCookie,
+  buildLanguageOptions,
+  getLanguageDefinition,
+  getPageLocale,
+} = require("./helpers/i18n");
 // === Relative imports ===
 const { db } = require("@db/db");
 const config = require("./config");
@@ -159,6 +167,87 @@ app.use(flash());
 
 // Global CSRF middleware - Laravel-style implementation
 app.use(csrfGlobalMiddleware);
+
+// i18n middleware - Inject language data into res.locals
+app.use(async (req, res, next) => {
+  try {
+    // Resolve language from query, cookie, or default
+    const { lang } = resolveRequestLanguage(req);
+    setLanguageCookie(res, lang);
+
+    // Build language options for language switcher
+    const languageOptions = buildLanguageOptions({ lang, req });
+    const currentLanguage =
+      languageOptions.find((option) => option.isActive) ||
+      getLanguageDefinition(lang);
+
+    // Load global locale data (common for all pages)
+    // Use admin/common for admin routes, client/common for client routes
+    let commonLocale = {};
+    try {
+      const isAdminRoute = req.path.startsWith("/admin");
+      const commonPage = isAdminRoute ? "admin/common" : "client/common";
+      const { data } = getPageLocale(commonPage, lang);
+      commonLocale = data || {};
+    } catch (err) {
+      console.warn("[i18n] Failed to load common locale:", err.message);
+    }
+
+    // Create translate function
+    const t = (key) => {
+      if (!key) return "";
+      const result = key
+        .split(".")
+        .reduce((o, i) => (o ? o[i] : undefined), commonLocale);
+      return result !== undefined ? result : key;
+    };
+
+    // Inject i18n data into res.locals (available to all templates)
+    res.locals.currentLang = lang;
+    res.locals.languages = languageOptions;
+    res.locals.currentLanguage = currentLanguage;
+    res.locals.t = t;
+    res.locals.locale = commonLocale;
+
+    // Wrap res.render to automatically merge i18n data
+    // Store original render function for other wrappers to use
+    if (!res.render.__original) {
+      res.render.__original = res.render;
+    }
+    const originalRender = res.render.__original;
+    res.render = function (view, context = {}) {
+      // Priority for t function and locale:
+      // 1. context.t from withLocale (page-specific) - set in withLocale's wrapped render
+      // 2. res.locals.t (set by withLocale middleware)
+      // 3. global t (fallback)
+      const currentT = res.locals.t;
+      const currentLocale = res.locals.locale;
+
+      // Check if context already has t from a page-specific wrapper (withLocale)
+      // If withLocale runs before us, context.t would be set
+      // If we run before withLocale, context.t would be undefined and we use global t
+      const tFunction = (currentT && currentT !== t) ? currentT : (context.t || t);
+      const pageLocale = (currentLocale && currentLocale !== commonLocale) ? currentLocale : (context.locale || commonLocale);
+
+      const mergedContext = {
+        ...res.locals,
+        ...context,
+        currentLang: lang,
+        languages: languageOptions,
+        currentLanguage,
+        t: tFunction,
+        locale: pageLocale,
+      };
+      return originalRender.call(this, view, mergedContext);
+    };
+
+    next();
+  } catch (error) {
+    console.error("[i18n] Middleware error:", error);
+    next();
+  }
+});
+
 app.use((req, res, next) => {
   res.locals.user = req.session.user;
   res.locals.permissions = req.session.permissions || [];

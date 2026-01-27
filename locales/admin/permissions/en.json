@@ -1,0 +1,52 @@
+{
+  "pageTitle": "Permissions",
+  "title": "Permissions Management",
+  "subtitle": "Manage system permissions",
+  "createPermission": "Create Permission",
+  "createNewPermission": "Create New Permission",
+  "allSystemPermissions": "All System Permissions",
+  "permission": "Permission",
+  "noPermissionsFound": "No permissions found",
+  "editPermission": "Edit Permission",
+  "savePermission": "Save Permission",
+  "table": {
+    "name": "Permission Name",
+    "description": "Description",
+    "createdAt": "Created"
+  },
+  "form": {
+    "name": "Permission Name",
+    "description": "Description",
+    "placeholderName": "e.g., view_users",
+    "placeholderDescription": "Description of this permission"
+  },
+  "messages": {
+    "createSuccess": "Permission created successfully",
+    "updateSuccess": "Permission updated successfully",
+    "deleteSuccess": "Permission deleted successfully",
+    "confirmDelete": "Are you sure you want to delete this permission?"
+  },
+  "modals": {
+    "createPermission": "Create New Permission",
+    "editPermission": "Edit Permission",
+    "deletePermission": "Delete Permission"
+  },
+  "search": {
+    "placeholder": "Search permission..."
+  },
+  "stats": {
+    "total": "Total Permissions",
+    "systemPermissions": "System Permissions",
+    "viewPermissions": "View Permissions",
+    "actionPermissions": "Action Permissions",
+    "manageRolePermissions": "Manage Role Permissions"
+  },
+  "buttons": {
+    "create": "Create",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close"
+  }
+}

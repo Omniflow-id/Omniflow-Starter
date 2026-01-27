@@ -1,0 +1,63 @@
+{
+  "pageTitle": "Profil Saya",
+  "title": "Profil Saya",
+  "subtitle": "Kelola informasi akun Anda",
+  "breadcrumb": {
+    "dashboard": "Dashboard",
+    "profile": "Profil Pengguna"
+  },
+  "sections": {
+    "profile": {
+      "title": "Profil",
+      "activeAccount": "Akun Aktif",
+      "inactiveAccount": "Akun Tidak Aktif",
+      "memberSince": "Anggota sejak"
+    },
+    "info": {
+      "title": "Informasi Akun",
+      "personalInfo": "Informasi Pribadi",
+      "fullName": "Nama Lengkap",
+      "username": "Username",
+      "email": "Alamat Email",
+      "notProvided": "Tidak tersedia",
+      "copyEmail": "Salin email",
+      "accountStatus": "Status Akun",
+      "accountId": "ID Akun",
+      "role": "Peran",
+      "status": "Status",
+      "memberSince": "Anggota Sejak"
+    },
+    "quickActions": {
+      "title": "Aksi Cepat",
+      "changePassword": "Ubah Password",
+      "editProfile": "Edit Profil",
+      "logout": "Keluar",
+      "updateComingSoon": "Fitur update profil akan segera hadir!",
+      "securityNote": "Akun Anda dilindungi oleh autentikasi berbasis sesi. Sesi akan berakhir setelah 24 jam tidak ada aktivitas."
+    }
+  },
+  "changePassword": {
+    "pageTitle": "Ubah Password",
+    "cardTitle": "Ubah Password Anda",
+    "backToProfile": "Kembali ke Profil",
+    "currentPassword": "Password Saat Ini",
+    "newPassword": "Password Baru",
+    "confirmPassword": "Konfirmasi Password",
+    "passwordHelp": "Password harus minimal 8 karakter dengan huruf besar, kecil, angka, dan simbol.",
+    "submit": "Ubah Password",
+    "cancel": "Batal",
+    "securityTips": {
+      "title": "Tips Keamanan Password",
+      "length": "Gunakan minimal 8 karakter",
+      "case": "Gunakan huruf besar dan kecil",
+      "special": "Tambahkan angka dan karakter spesial",
+      "common": "Hindari kata umum atau info pribadi",
+      "reuse": "Jangan gunakan password lama"
+    }
+  },
+  "toast": {
+    "title": "Tersalin!",
+    "message": "Alamat email disalin ke clipboard",
+    "fail": "Gagal menyalin alamat email"
+  }
+}

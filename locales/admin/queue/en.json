@@ -1,0 +1,113 @@
+{
+  "pageTitle": "Queue Management",
+  "title": "Queue Management",
+  "subtitle": "Manage system job queue",
+  "nav": {
+    "dashboard": "Dashboard",
+    "queue": "Queue Management"
+  },
+  "labels": {
+    "status": "Status",
+    "testJobDescription": "Send test job to worker",
+    "retryDescription": "Retry up to 10 failed jobs",
+    "recentFailed": "Recent Failed Jobs",
+    "noError": "No error message",
+    "viewAllFailed": "View All Failed Jobs",
+    "noFailedJobs": "No Failed Jobs",
+    "allJobs": "All Jobs",
+    "jobs": "Jobs",
+    "total": "total",
+    "failedJobs": "Failed Jobs",
+    "noJobs": "No Jobs"
+  },
+  "filters": {
+    "all": "All",
+    "pending": "Pending",
+    "processing": "Processing",
+    "completed": "Completed",
+    "failed": "Failed"
+  },
+  "stats": {
+    "title": "Queue Statistics",
+    "pending": "Pending",
+    "processing": "Processing",
+    "completed": "Completed",
+    "failed": "Failed",
+    "retrying": "Retrying",
+    "total": "Total Jobs",
+    "connectionStatus": "Connection Status",
+    "connected": "Connected",
+    "disconnected": "Disconnected"
+  },
+  "tabs": {
+    "allJobs": "All Jobs",
+    "failedJobs": "Failed Jobs"
+  },
+  "table": {
+    "id": "ID",
+    "queue": "Queue",
+    "status": "Status",
+    "attempts": "Attempts",
+    "data": "Data",
+    "createdAt": "Created",
+    "startedAt": "Started",
+    "completedAt": "Completed",
+    "error": "Error",
+    "nextRetry": "Next Retry"
+  },
+  "status": {
+    "pending": "Pending",
+    "processing": "Processing",
+    "completed": "Completed",
+    "failed": "Failed",
+    "retrying": "Retrying"
+  },
+  "actions": {
+    "retry": "Retry Job",
+    "retryAll": "Retry All Failed",
+    "sendTest": "Send Test Job",
+    "confirmRetry": "Are you sure you want to retry this job?",
+    "confirmRetryAll": "Are you sure you want to retry all failed jobs?"
+  },
+  "buttons": {
+    "refresh": "Refresh",
+    "view": "View",
+    "retry": "Retry All",
+    "retryFailed": "Retry Failed",
+    "retrySelected": "Retry Selected",
+    "sendTest": "Send Test",
+    "back": "Back to Queue Stats"
+  },
+  "messages": {
+    "retrySuccess": "Job retried successfully",
+    "retryAllSuccess": "All failed jobs retried successfully",
+    "testSuccess": "Test job sent successfully",
+    "noJobs": "No jobs",
+    "rabbitmqReady": "RabbitMQ ready to process jobs",
+    "reconnecting": "Attempting to reconnect",
+    "rabbitmqFailed": "RabbitMQ connection failed",
+    "allSuccess": "All jobs processed successfully!",
+    "noJobsCreated": "No jobs have been created yet.",
+    "noStatusJobs": "No {{status}} jobs found."
+  },
+  "datatable": {
+    "search": "Search job:",
+    "lengthMenu": "Show _MENU_ jobs per page",
+    "info": "Showing _START_ to _END_ of _TOTAL_ jobs",
+    "infoEmpty": "No jobs",
+    "infoFiltered": "(filtered from _MAX_ total jobs)",
+    "processing": "Processing...",
+    "loadingRecords": "Loading...",
+    "zeroRecords": "No matching jobs found",
+    "searchFailed": "Search failed job:",
+    "lengthMenuFailed": "Show _MENU_ failed jobs per page",
+    "infoFailed": "Showing _START_ to _END_ of _TOTAL_ failed jobs",
+    "infoEmptyFailed": "No failed jobs",
+    "infoFilteredFailed": "(filtered from _MAX_ total failed jobs)"
+  },
+  "modals": {
+    "jobDetails": "Job Details",
+    "jobData": "Job Data",
+    "errorDetails": "Error Details"
+  }
+}

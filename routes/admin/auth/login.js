@@ -22,8 +22,21 @@ const {
   DatabaseError,
 } = require("@middlewares/errorHandler");
 
+// Helper to get translation
+const { resolveRequestLanguage, getPageLocale } = require("@helpers/i18n");
+
 const login = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
+  const { lang } = resolveRequestLanguage(req);
+  const { data: locale } = getPageLocale("admin/auth", lang);
+
+  const t = (key) => {
+    if (!key) return "";
+    const result = key
+      .split(".")
+      .reduce((o, i) => (o ? o[i] : undefined), locale);
+    return result !== undefined ? result : key;
+  };
 
   // Input validation with custom errors
   if (!email || !password) {
@@ -190,7 +203,7 @@ const login = asyncHandler(async (req, res) => {
     // Log successful login
     await logSuccessfulLogin(user, req);
 
-    req.flash("success", "Berhasil login! (Development mode)");
+    req.flash("success", t("messages.loginSuccessDev"));
     return res.redirect("/admin");
   }
 
@@ -235,10 +248,7 @@ const login = asyncHandler(async (req, res) => {
     });
 
     // Flash message for immediate response
-    req.flash(
-      "info",
-      "OTP telah dibuat. Email sedang dikirim - silakan cek inbox Anda dan masukkan kode OTP di bawah."
-    );
+    req.flash("info", t("messages.otpSent"));
 
     // IMMEDIATE REDIRECT - User gets OTP page instantly (<50ms)
     res.redirect("/admin/verify-otp");

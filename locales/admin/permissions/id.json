@@ -1,0 +1,52 @@
+{
+  "pageTitle": "Permissions",
+  "title": "Permissions Management",
+  "subtitle": "Kelola permission sistem",
+  "createPermission": "Buat Permission",
+  "createNewPermission": "Create New Permission",
+  "allSystemPermissions": "All System Permissions",
+  "permission": "Permission",
+  "noPermissionsFound": "Tidak ada permission ditemukan",
+  "editPermission": "Edit Permission",
+  "savePermission": "Save Permission",
+  "table": {
+    "name": "Nama Permission",
+    "description": "Deskripsi",
+    "createdAt": "Dibuat"
+  },
+  "form": {
+    "name": "Nama Permission",
+    "description": "Deskripsi",
+    "placeholderName": "例如: view_users",
+    "placeholderDescription": "Deskripsi permission ini"
+  },
+  "messages": {
+    "createSuccess": "Permission berhasil dibuat",
+    "updateSuccess": "Permission berhasil diperbarui",
+    "deleteSuccess": "Permission berhasil dihapus",
+    "confirmDelete": "Apakah Anda yakin ingin menghapus permission ini?"
+  },
+  "modals": {
+    "createPermission": "Buat Permission Baru",
+    "editPermission": "Edit Permission",
+    "deletePermission": "Hapus Permission"
+  },
+  "search": {
+    "placeholder": "Cari permission..."
+  },
+  "stats": {
+    "total": "Total Permissions",
+    "systemPermissions": "System Permissions",
+    "viewPermissions": "View Permissions",
+    "actionPermissions": "Action Permissions",
+    "manageRolePermissions": "Manage Role Permissions"
+  },
+  "buttons": {
+    "create": "Create",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close"
+  }
+}

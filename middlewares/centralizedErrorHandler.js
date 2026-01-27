@@ -8,6 +8,7 @@ const {
 const { getClientIP } = require("../helpers/getClientIP");
 const { getUserAgent } = require("../helpers/getUserAgent");
 const { notifyDatabaseError, notifyError } = require("@helpers/beepbot");
+const { getPageLocale, resolveRequestLanguage } = require("../helpers/i18n");
 
 // Custom error classes
 class AppError extends Error {
@@ -205,13 +206,35 @@ const centralizedErrorHandler = async (err, req, res, _next) => {
   }
 
   // Web request - render error page or redirect
+
+  // Resolve language and load error locale
+  const { lang } = resolveRequestLanguage(req);
+  const { data: locale } = getPageLocale("admin/errors", lang);
+
+  // Helper translate function for error pages
+  const t = (key) => {
+    if (!key) return "";
+    const result = key
+      .split(".")
+      .reduce((o, i) => (o ? o[i] : undefined), locale);
+    return result !== undefined ? result : key;
+  };
+
+  const renderError = (view, context) => {
+    res.status(statusCode).render(view, {
+      ...context,
+      ...locale,
+      t,
+    });
+  };
+
   if (statusCode === 401) {
     req.flash("error", message);
     return res.redirect("/admin/login");
   }
 
   if (statusCode === 403) {
-    return res.status(403).render("pages/admin/errors/403", {
+    return renderError("pages/admin/errors/403", {
       error: { message, statusCode },
     });
   }
@@ -222,15 +245,15 @@ const centralizedErrorHandler = async (err, req, res, _next) => {
   }
 
   if (statusCode === 404) {
-    return res.status(404).render("pages/admin/errors/404", {
+    return renderError("pages/admin/errors/404", {
       error: { message, statusCode },
     });
   }
 
   // Default 500 error
-  return res.status(500).render("pages/admin/errors/500", {
+  return renderError("pages/admin/errors/500", {
     error: {
-      message: isOperational ? message : "Internal Server Error",
+      message: isOperational ? message : t("500.message"),
       statusCode: 500,
     },
   });
@@ -244,12 +267,25 @@ const asyncHandler = (fn) => {
 };
 
 // 404 handler (keep existing functionality)
-const notFoundHandler = (_req, res, _next) => {
+const notFoundHandler = (req, res, _next) => {
+  const { lang } = resolveRequestLanguage(req);
+  const { data: locale } = getPageLocale("admin/errors", lang);
+
+  const t = (key) => {
+    if (!key) return "";
+    const result = key
+      .split(".")
+      .reduce((o, i) => (o ? o[i] : undefined), locale);
+    return result !== undefined ? result : key;
+  };
+
   res.status(404).render("pages/admin/errors/404", {
     error: {
-      message: "Page not found",
+      message: t("404.message"),
       statusCode: 404,
     },
+    ...locale,
+    t,
   });
 };
 

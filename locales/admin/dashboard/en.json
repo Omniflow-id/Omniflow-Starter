@@ -1,0 +1,82 @@
+{
+  "pageTitle": "Admin Dashboard",
+  "brand": {
+    "name": "Omniflow"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "module": "Module",
+    "overview": "Overview",
+    "submodule": "Sub Module",
+    "users": "User Management",
+    "permissions": "Permissions",
+    "allPermissions": "All Permissions",
+    "roles": "Roles & Permissions",
+    "logs": "Logs",
+    "cache": "Cache",
+    "queue": "Queue",
+    "statistics": "Statistics",
+    "allJobs": "All Jobs",
+    "failedJobs": "Failed Jobs",
+    "loggedInAs": "Logged in as"
+  },
+  "greeting": "Welcome",
+  "welcome": "to Omniflow admin panel",
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "System activity overview",
+    "overview": "Overview",
+    "quickStats": "Quick Stats",
+    "recentActivity": "Recent Activity",
+    "systemStatus": "System Status"
+  },
+  "stats": {
+    "totalUsers": "Total Users",
+    "activeUsers": "Active Users",
+    "totalLogs": "Total Logs",
+    "todayLogs": "Today's Logs",
+    "cacheHitRate": "Cache Hit Rate",
+    "queueJobs": "Queue Jobs"
+  },
+  "table": {
+    "id": "ID",
+    "actions": "Actions",
+    "status": "Status",
+    "createdAt": "Created",
+    "updatedAt": "Updated"
+  },
+  "buttons": {
+    "viewAll": "View All",
+    "refresh": "Refresh",
+    "export": "Export",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create New",
+    "search": "Search",
+    "filter": "Filter"
+  },
+  "messages": {
+    "loading": "Loading...",
+    "noData": "No data available",
+    "success": "Success",
+    "error": "An error occurred",
+    "confirmDelete": "Are you sure you want to delete?",
+    "saved": "Data saved successfully",
+    "deleted": "Data deleted successfully",
+    "updated": "Data updated successfully"
+  },
+  "overview": {
+    "pageTitle": "Overview Page",
+    "welcome": "Welcome to Overview"
+  },
+  "submodule": {
+    "pageTitle": "Sub Module Page",
+    "welcome": "Welcome to Sub Module"
+  },
+  "footer": {
+    "copyright": "© 2025 Omniflow Starter. All rights reserved."
+  }
+}

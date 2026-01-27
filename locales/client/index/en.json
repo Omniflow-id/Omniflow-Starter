@@ -1,0 +1,102 @@
+{
+  "hero": {
+    "subheading": "Leading Digital Solution for Your Business Transformation",
+    "description": "We deliver technological innovations that optimize workflows, increase efficiency, and drive business growth in the digital era.",
+    "primaryCta": "Our Services",
+    "secondaryCta": "Contact Us"
+  },
+  "about": {
+    "title": "About ",
+    "subtitle": "Building a better digital future",
+    "innovation": {
+      "title": "Innovation",
+      "description": "Delivering cutting-edge technology solutions that follow modern trends and industry needs."
+    },
+    "collaboration": {
+      "title": "Collaboration",
+      "description": "Building strategic partnerships with clients to achieve shared business goals through a personal approach."
+    },
+    "growth": {
+      "title": "Growth",
+      "description": "Focusing on measurable and sustainable results to drive long-term business growth."
+    }
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Comprehensive solutions for your digital needs",
+    "appDevelopment": {
+      "title": "Application Development",
+      "description": "Building responsive, scalable, and user-friendly web and mobile applications tailored to your business needs.",
+      "items": {
+        "web": "Web Application Development",
+        "mobile": "Mobile App Development",
+        "api": "API Integration",
+        "database": "Database Design"
+      }
+    },
+    "automation": {
+      "title": "Business Process Automation",
+      "description": "Optimizing workflows with automation systems that reduce manual work and increase efficiency.",
+      "items": {
+        "workflow": "Workflow Automation",
+        "document": "Document Management",
+        "reporting": "Reporting System",
+        "integration": "Integration Solutions"
+      }
+    },
+    "bi": {
+      "title": "Business Intelligence",
+      "description": "Turning data into actionable insights for better business decision-making.",
+      "items": {
+        "analytics": "Data Analytics",
+        "dashboard": "Dashboard Development",
+        "monitoring": "Performance Monitoring",
+        "predictive": "Predictive Analytics"
+      }
+    },
+    "consulting": {
+      "title": "IT Consulting",
+      "description": "Providing strategic guidance for digital transformation and technology infrastructure optimization.",
+      "items": {
+        "digital": "Digital Transformation",
+        "architecture": "System Architecture",
+        "security": "Security Assessment",
+        "roadmap": "Technology Roadmap"
+      }
+    }
+  },
+  "whyChooseUs": {
+    "title": "Why Choose ",
+    "subtitle": "Distinguishing advantages that set us apart",
+    "timing": {
+      "title": "On-Time Delivery",
+      "description": "Commitment to completing projects within agreed timelines"
+    },
+    "quality": {
+      "title": "Guaranteed Quality",
+      "description": "High quality standards with rigorous testing and quality assurance"
+    },
+    "support": {
+      "title": "24/7 Support",
+      "description": "Support team ready to help whenever you need"
+    },
+    "pricing": {
+      "title": "Competitive Pricing",
+      "description": "Quality solutions at prices that fit your budget"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Let's discuss your business digital needs",
+    "email": "Email",
+    "phone": "Phone",
+    "address": "Address",
+    "website": "Website",
+    "cta": "Contact Us"
+  },
+  "cta": {
+    "title": "Ready to Start Digital Transformation?",
+    "subtitle": "Join hundreds of companies that trust ",
+    "button": "Start Free Consultation"
+  }
+}

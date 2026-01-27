@@ -55,7 +55,6 @@ const getRolesPage = asyncHandler(async (req, res) => {
   });
 
   res.render("pages/admin/permissions/roles", {
-    title: "Roles & Permissions Management",
     roles: result.data.roles,
     allPermissions: result.data.allPermissions,
     user: req.session.user,

@@ -23,7 +23,6 @@ const getPermissionsPage = asyncHandler(async (req, res) => {
   });
 
   res.render("pages/admin/permissions/index", {
-    title: "Permissions Management",
     allPermissions: result.data,
     user: req.session.user,
     cacheInfo: {

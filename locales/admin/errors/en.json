@@ -1,0 +1,41 @@
+{
+  "400": {
+    "title": "Bad Request",
+    "message": "The data you sent does not match the expected format",
+    "pageTitle": "Bad Request"
+  },
+  "401": {
+    "title": "Unauthorized",
+    "message": "You need to log in to access this page",
+    "pageTitle": "Unauthorized",
+    "login": "Login",
+    "home": "Home"
+  },
+  "403": {
+    "title": "Forbidden",
+    "message": "You do not have permission to access this page",
+    "pageTitle": "Forbidden"
+  },
+  "404": {
+    "title": "Oops! Page not found",
+    "message": "The page you are looking for does not exist or has been moved",
+    "pageTitle": "Page Not Found"
+  },
+  "429": {
+    "title": "Too Many Requests",
+    "message": "You have reached the request limit. Please wait a moment before trying again.",
+    "pageTitle": "Rate Limit Exceeded"
+  },
+  "500": {
+    "title": "Internal Server Error",
+    "message": "Sorry, a server error occurred. Please try again later.",
+    "pageTitle": "Internal Server Error",
+    "adminInfo": "Admin Info",
+    "errorLogged": "Error logged with timestamp"
+  },
+  "common": {
+    "back": "Back",
+    "dashboard": "Dashboard",
+    "rightsReserved": "All rights reserved."
+  }
+}

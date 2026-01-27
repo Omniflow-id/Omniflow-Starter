@@ -1,0 +1,84 @@
+{
+  "pageTitle": "Manajemen Cache",
+  "title": "Manajemen Cache",
+  "subtitle": "Kelola cache sistem",
+  "breadcrumb": {
+    "dashboard": "Dashboard",
+    "cache": "Manajemen Cache"
+  },
+  "labels": {
+    "host": "Host",
+    "database": "Database",
+    "status": "Status",
+    "defaultTTL": "Default TTL",
+    "keyPrefix": "Key Prefix",
+    "patternPlaceholder": "admin:users:*, user:*, logs:*",
+    "patternExample": "Pattern (contoh: user:*)",
+    "wildcardInfo": "Gunakan * untuk wildcard (contoh: admin:* cocok dengan semua kunci admin)",
+    "cacheKeys": "Cache Keys",
+    "performanceTesting": "Pengujian Performa",
+    "testDescription": "Menguji performa read/write cache",
+    "realtimeStats": "Statistik Real-time",
+    "flushDescription": "Menghapus semua data cache"
+  },
+  "stats": {
+    "title": "Statistik Cache",
+    "totalKeys": "Total Keys",
+    "memoryUsage": "Penggunaan Memori",
+    "connected": "Terhubung",
+    "disconnected": "Terputus",
+    "enabled": "Aktif & Berjalan"
+  },
+  "test": {
+    "title": "Test Cache",
+    "description": "Test performa cache dengan operasi read/write",
+    "setValue": "Set Value",
+    "getValue": "Get Value",
+    "deleteValue": "Delete Value",
+    "result": "Hasil",
+    "duration": "Durasi",
+    "source": "Sumber",
+    "cacheHit": "Cache Hit",
+    "cacheMiss": "Cache Miss",
+    "benchmark": "Jalankan Benchmark"
+  },
+  "health": {
+    "title": "Health Check",
+    "status": "Status",
+    "latency": "Latency",
+    "healthy": "Sehat",
+    "unhealthy": "Tidak Sehat"
+  },
+  "actions": {
+    "flush": "Flush All Cache",
+    "invalidate": "Invalidate Pattern",
+    "confirmFlush": "Apakah Anda yakin ingin menghapus semua cache?",
+    "confirmInvalidate": "Apakah Anda yakin ingin invalidate pattern ini?"
+  },
+  "buttons": {
+    "refresh": "Refresh",
+    "flush": "Flush",
+    "test": "Test",
+    "cancel": "Batal",
+    "confirm": "Konfirmasi",
+    "invalidate": "Invalidate"
+  },
+  "modals": {
+    "confirmAction": "Konfirmasi Aksi",
+    "confirmMessage": "Apakah Anda yakin ingin melanjutkan?"
+  },
+  "messages": {
+    "flushSuccess": "Cache berhasil dihapus",
+    "flushError": "Gagal menghapus cache",
+    "invalidateSuccess": "Pattern berhasil di-invalidate",
+    "invalidateError": "Gagal invalidate pattern",
+    "testSuccess": "Test berhasil",
+    "benchmarkSuccess": "Benchmark selesai",
+    "redisUnavailable": "Redis tidak tersedia. Menggunakan fallback database.",
+    "cacheStatsUnavailable": "Statistik cache tidak tersedia",
+    "keysWillAppear": "Cache keys akan muncul di sini",
+    "clickRefresh": "Klik refresh untuk memuat cache keys yang ada",
+    "realtimeReady": "Statistik real-time siap",
+    "clickRefreshStats": "Klik tombol refresh untuk memuat statistik cache saat ini"
+  }
+}

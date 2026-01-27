@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ currentLang or 'en' }}">
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -9,7 +9,7 @@
     />
     <meta name="description" content="" />
     <meta name="author" content="" />
-    <title>Login - {{ appName }}</title>
+    <title>{{ pageTitle }} - {{ appName }}</title>
     <link rel="icon" href="/img/logo.png" />
     <link href="/css/styles.css" rel="stylesheet" />
     <script
@@ -25,6 +25,7 @@
       }
       #togglePassword:hover {
         background-color: #0b5ed7;
+        width: 100%;
       }
       #togglePassword:active {
         background-color: #0a58ca;
@@ -45,9 +46,31 @@
         border-top-right-radius: 0;
         border-bottom-right-radius: 0;
       }
+      .lang-switcher {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 1000;
+      }
     </style>
   </head>
   <body>
+    <!-- Language Switcher -->
+    <div class="lang-switcher">
+      <div class="btn-group shadow-sm" role="group" aria-label="Language switcher">
+        {% for lang in languages %}
+        <a
+          href="{{ lang.href if lang.href else '#' }}"
+          class="btn btn-sm btn-light {{ 'active fw-bold text-primary' if lang.isActive else 'text-muted' }}"
+          {{ 'aria-current="page"' if lang.isActive else '' }}
+          title="{{ lang.name }}"
+        >
+          <span class="me-1">{{ lang.flag }}</span> {{ lang.shortLabel }}
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+
     <div id="layoutAuthentication">
       <div id="layoutAuthentication_content">
         <main>
@@ -62,11 +85,11 @@
                       class="img-fluid mx-auto d-block"
                       style="width: 100px; height: 100px"
                     />
-                    <h3 class="text-center font-weight-light my-4">Login</h3>
+                    <h3 class="text-center font-weight-light my-4">{{ title }}</h3>
                   </div>
                   <div class="card-body">
                     {% include "components/alert_flash_message.njk" %}
-                    <form id="login-form" action="/admin/login" method="post">
+                    <form id="login-form" action="/admin/login{% if currentLang %}?lang={{ currentLang }}{% endif %}" method="post">
                       {{ csrfField() | safe }}
                       <div class="form-floating mb-3">
                         <input
@@ -74,9 +97,9 @@
                           id="inputEmail"
                           type="email"
                           name="email"
-                          placeholder="name@example.com"
+                          placeholder="{{ labels.emailPlaceholder or 'name@example.com' }}"
                         />
-                        <label for="inputEmail">Email address</label>
+                        <label for="inputEmail">{{ labels.emailAddress or 'Email address' }}</label>
                       </div>
                       <div class="form-floating mb-3">
                         <div class="input-group">
@@ -86,10 +109,10 @@
                               class="form-control"
                               id="inputPassword"
                               name="password"
-                              placeholder="Password"
+                              placeholder="{{ password or 'Password' }}"
                               required
                             />
-                            <label for="inputPassword">Password</label>
+                            <label for="inputPassword">{{ password or 'Password' }}</label>
                           </div>
                           <div class="input-group-append">
                             <button
@@ -109,14 +132,14 @@
                           class="btn btn-primary w-100"
                           type="submit"
                         >
-                          Login
+                          {{ loginButton or 'Login' }}
                         </button>
                       </div>
                     </form>
                   </div>
                   <div class="card-footer text-center py-3">
                     <div class="small">
-                      Need an account? Please contact your administrator
+                      {{ footer.needAccount or 'Need an account? Please contact your administrator' }}
                     </div>
                   </div>
                 </div>
@@ -138,7 +161,7 @@
           role="status"
           style="width: 3rem; height: 3rem"
         >
-          <span class="visually-hidden">Loading...</span>
+          <span class="visually-hidden">{{ labels.loading or 'Loading...' }}</span>
         </div>
       </div>
     </div>
@@ -153,7 +176,7 @@
         // Show loading state
         document.getElementById("login-loading").classList.remove("d-none");
         loginButton.disabled = true;
-        loginButton.innerHTML = "Logging in...";
+        loginButton.innerHTML = '{{ labels.loggingIn or "Logging in..." }}';
       });
 
       // Toggle password visibility

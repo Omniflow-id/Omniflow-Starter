@@ -1,4 +1,19 @@
 {% extends "layout/clientMasterLayout.njk" %} {% block content %}
+<div class="lang-switcher" style="position: absolute; top: 20px; right: 20px; z-index: 1000;">
+  <div class="btn-group shadow-sm" role="group" aria-label="Language switcher">
+    {% for lang in languages %}
+    <a
+      href="{{ lang.href if lang.href else '#' }}"
+      class="btn btn-sm btn-light {{ 'active fw-bold text-primary' if lang.isActive else 'text-muted' }}"
+      {{ 'aria-current="page"' if lang.isActive else '' }}
+      title="{{ lang.name }}"
+    >
+      <span class="me-1">{{ lang.flag }}</span> {{ lang.shortLabel }}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+
 <div class="container-fluid px-4">
   <!-- Hero Section -->
   <div class="row mb-5">
@@ -9,21 +24,19 @@
             <div class="col-lg-6 text-center text-lg-start">
               <h1 class="display-4 fw-bold mb-3">{{ appName }}.id</h1>
               <p class="lead mb-4">
-                Solusi Digital Terdepan untuk Transformasi Bisnis Anda
+                {{ hero.subheading or 'Solusi Digital Terdepan untuk Transformasi Bisnis Anda' }}
               </p>
               <p class="mb-4">
-                Kami menghadirkan inovasi teknologi yang mengoptimalkan alur
-                kerja, meningkatkan efisiensi, dan mendorong pertumbuhan bisnis
-                di era digital.
+                {{ hero.description or 'Kami menghadirkan inovasi teknologi yang mengoptimalkan alur kerja, meningkatkan efisiensi, dan mendorong pertumbuhan bisnis di era digital.' }}
               </p>
               <div
                 class="d-flex flex-column flex-sm-row gap-3 justify-content-center justify-content-lg-start"
               >
                 <a href="#services" class="btn btn-light btn-lg px-4"
-                  >Layanan Kami</a
+                  >{{ hero.primaryCta or 'Layanan Kami' }}</a
                 >
                 <a href="#contact" class="btn btn-outline-light btn-lg px-4"
-                  >Hubungi Kami</a
+                  >{{ hero.secondaryCta or 'Hubungi Kami' }}</a
                 >
               </div>
             </div>
@@ -45,9 +58,9 @@
   <div class="row mb-5" id="about">
     <div class="col-12">
       <div class="text-center mb-5">
-        <h2 class="display-5 fw-bold text-primary">Tentang {{ appName }}</h2>
+        <h2 class="display-5 fw-bold text-primary">{{ about.title or 'Tentang ' }} {{ appName }}</h2>
         <p class="lead text-muted">
-          Membangun masa depan digital yang lebih baik
+          {{ about.subtitle or 'Membangun masa depan digital yang lebih baik' }}
         </p>
       </div>
     </div>
@@ -60,10 +73,9 @@
           >
             <i class="fas fa-lightbulb text-white"></i>
           </div>
-          <h4 class="fw-bold">Inovasi</h4>
+          <h4 class="fw-bold">{{ about.innovation.title or 'Inovasi' }}</h4>
           <p class="text-muted">
-            Menghadirkan solusi teknologi terdepan yang mengikuti perkembangan
-            zaman dan kebutuhan industri modern.
+            {{ about.innovation.description or 'Menghadirkan solusi teknologi terdepan yang mengikuti perkembangan zaman dan kebutuhan industri modern.' }}
           </p>
         </div>
       </div>
@@ -77,10 +89,9 @@
           >
             <i class="fas fa-users text-white"></i>
           </div>
-          <h4 class="fw-bold">Kolaborasi</h4>
+          <h4 class="fw-bold">{{ about.collaboration.title or 'Kolaborasi' }}</h4>
           <p class="text-muted">
-            Membangun kemitraan strategis dengan klien untuk mencapai tujuan
-            bisnis bersama melalui pendekatan yang personal.
+            {{ about.collaboration.description or 'Membangun kemitraan strategis dengan klien untuk mencapai tujuan bisnis bersama melalui pendekatan yang personal.' }}
           </p>
         </div>
       </div>
@@ -94,10 +105,9 @@
           >
             <i class="fas fa-chart-line text-white"></i>
           </div>
-          <h4 class="fw-bold">Pertumbuhan</h4>
+          <h4 class="fw-bold">{{ about.growth.title or 'Pertumbuhan' }}</h4>
           <p class="text-muted">
-            Fokus pada hasil yang terukur dan berkelanjutan untuk mendorong
-            pertumbuhan bisnis jangka panjang.
+            {{ about.growth.description or 'Fokus pada hasil yang terukur dan berkelanjutan untuk mendorong pertumbuhan bisnis jangka panjang.' }}
           </p>
         </div>
       </div>
@@ -108,9 +118,9 @@
   <div class="row mb-5" id="services">
     <div class="col-12">
       <div class="text-center mb-5">
-        <h2 class="display-5 fw-bold text-primary">Layanan Kami</h2>
+        <h2 class="display-5 fw-bold text-primary">{{ services.title or 'Layanan Kami' }}</h2>
         <p class="lead text-muted">
-          Solusi komprehensif untuk kebutuhan digital Anda
+          {{ services.subtitle or 'Solusi komprehensif untuk kebutuhan digital Anda' }}
         </p>
       </div>
     </div>
@@ -124,26 +134,23 @@
             >
               <i class="fas fa-code text-white"></i>
             </div>
-            <h4 class="fw-bold mb-0">Pengembangan Aplikasi</h4>
+            <h4 class="fw-bold mb-0">{{ services.appDevelopment.title or 'Pengembangan Aplikasi' }}</h4>
           </div>
           <p class="text-muted mb-3">
-            Membangun aplikasi web dan mobile yang responsif, scalable, dan
-            user-friendly sesuai kebutuhan bisnis Anda.
+            {{ services.appDevelopment.description or 'Membangun aplikasi web dan mobile yang responsif, scalable, dan user-friendly sesuai kebutuhan bisnis Anda.' }}
           </p>
           <ul class="list-unstyled">
             <li>
-              <i class="fas fa-check text-success me-2"></i>Web Application
-              Development
+              <i class="fas fa-check text-success me-2"></i>{{ services.appDevelopment.items.web or 'Web Application Development' }}
             </li>
             <li>
-              <i class="fas fa-check text-success me-2"></i>Mobile App
-              Development
+              <i class="fas fa-check text-success me-2"></i>{{ services.appDevelopment.items.mobile or 'Mobile App Development' }}
             </li>
             <li>
-              <i class="fas fa-check text-success me-2"></i>API Integration
+              <i class="fas fa-check text-success me-2"></i>{{ services.appDevelopment.items.api or 'API Integration' }}
             </li>
             <li>
-              <i class="fas fa-check text-success me-2"></i>Database Design
+              <i class="fas fa-check text-success me-2"></i>{{ services.appDevelopment.items.database or 'Database Design' }}
             </li>
           </ul>
         </div>
@@ -159,25 +166,23 @@
             >
               <i class="fas fa-cogs text-white"></i>
             </div>
-            <h4 class="fw-bold mb-0">Otomasi Proses Bisnis</h4>
+            <h4 class="fw-bold mb-0">{{ services.automation.title or 'Otomasi Proses Bisnis' }}</h4>
           </div>
           <p class="text-muted mb-3">
-            Mengoptimalkan alur kerja dengan sistem otomasi yang mengurangi
-            manual work dan meningkatkan efisiensi.
+            {{ services.automation.description or 'Mengoptimalkan alur kerja dengan sistem otomasi yang mengurangi manual work dan meningkatkan efisiensi.' }}
           </p>
           <ul class="list-unstyled">
             <li>
-              <i class="fas fa-check text-success me-2"></i>Workflow Automation
+              <i class="fas fa-check text-success me-2"></i>{{ services.automation.items.workflow or 'Workflow Automation' }}
             </li>
             <li>
-              <i class="fas fa-check text-success me-2"></i>Document Management
+              <i class="fas fa-check text-success me-2"></i>{{ services.automation.items.document or 'Document Management' }}
             </li>
             <li>
-              <i class="fas fa-check text-success me-2"></i>Reporting System
+              <i class="fas fa-check text-success me-2"></i>{{ services.automation.items.reporting or 'Reporting System' }}
             </li>
             <li>
-              <i class="fas fa-check text-success me-2"></i>Integration
-              Solutions
+              <i class="fas fa-check text-success me-2"></i>{{ services.automation.items.integration or 'Integration Solutions' }}
             </li>
           </ul>
         </div>
@@ -193,26 +198,23 @@
             >
               <i class="fas fa-chart-bar text-white"></i>
             </div>
-            <h4 class="fw-bold mb-0">Business Intelligence</h4>
+            <h4 class="fw-bold mb-0">{{ services.bi.title or 'Business Intelligence' }}</h4>
           </div>
           <p class="text-muted mb-3">
-            Mengubah data menjadi insight yang actionable untuk pengambilan
-            keputusan bisnis yang lebih baik.
+            {{ services.bi.description or 'Mengubah data menjadi insight yang actionable untuk pengambilan keputusan bisnis yang lebih baik.' }}
           </p>
           <ul class="list-unstyled">
             <li>
-              <i class="fas fa-check text-success me-2"></i>Data Analytics
+              <i class="fas fa-check text-success me-2"></i>{{ services.bi.items.analytics or 'Data Analytics' }}
             </li>
             <li>
-              <i class="fas fa-check text-success me-2"></i>Dashboard
-              Development
+              <i class="fas fa-check text-success me-2"></i>{{ services.bi.items.dashboard or 'Dashboard Development' }}
             </li>
             <li>
-              <i class="fas fa-check text-success me-2"></i>Performance
-              Monitoring
+              <i class="fas fa-check text-success me-2"></i>{{ services.bi.items.monitoring or 'Performance Monitoring' }}
             </li>
             <li>
-              <i class="fas fa-check text-success me-2"></i>Predictive Analytics
+              <i class="fas fa-check text-success me-2"></i>{{ services.bi.items.predictive or 'Predictive Analytics' }}
             </li>
           </ul>
         </div>
@@ -228,25 +230,23 @@
             >
               <i class="fas fa-shield-alt text-white"></i>
             </div>
-            <h4 class="fw-bold mb-0">Konsultasi IT</h4>
+            <h4 class="fw-bold mb-0">{{ services.consulting.title or 'Konsultasi IT' }}</h4>
           </div>
           <p class="text-muted mb-3">
-            Memberikan panduan strategis untuk transformasi digital dan optimasi
-            infrastruktur teknologi.
+            {{ services.consulting.description or 'Memberikan panduan strategis untuk transformasi digital dan optimasi infrastruktur teknologi.' }}
           </p>
           <ul class="list-unstyled">
             <li>
-              <i class="fas fa-check text-success me-2"></i>Digital
-              Transformation
+              <i class="fas fa-check text-success me-2"></i>{{ services.consulting.items.digital or 'Digital Transformation' }}
             </li>
             <li>
-              <i class="fas fa-check text-success me-2"></i>System Architecture
+              <i class="fas fa-check text-success me-2"></i>{{ services.consulting.items.architecture or 'System Architecture' }}
             </li>
             <li>
-              <i class="fas fa-check text-success me-2"></i>Security Assessment
+              <i class="fas fa-check text-success me-2"></i>{{ services.consulting.items.security or 'Security Assessment' }}
             </li>
             <li>
-              <i class="fas fa-check text-success me-2"></i>Technology Roadmap
+              <i class="fas fa-check text-success me-2"></i>{{ services.consulting.items.roadmap or 'Technology Roadmap' }}
             </li>
           </ul>
         </div>
@@ -261,10 +261,10 @@
         <div class="card-body p-5">
           <div class="text-center mb-5">
             <h2 class="display-5 fw-bold text-primary">
-              Mengapa Memilih {{ appName }}?
+              {{ whyChooseUs.title or 'Mengapa Memilih ' }} {{ appName }} ?
             </h2>
             <p class="lead text-muted">
-              Keunggulan yang membedakan kami dari yang lain
+              {{ whyChooseUs.subtitle or 'Keunggulan yang membedakan kami dari yang lain' }}
             </p>
           </div>
           <div class="row">
@@ -276,10 +276,9 @@
                 >
                   <i class="fas fa-clock text-white"></i>
                 </div>
-                <h5 class="fw-bold">Delivery Tepat Waktu</h5>
+                <h5 class="fw-bold">{{ whyChooseUs.timing.title or 'Delivery Tepat Waktu' }}</h5>
                 <p class="text-muted">
-                  Komitmen untuk menyelesaikan proyek sesuai timeline yang
-                  disepakati
+                  {{ whyChooseUs.timing.description or 'Komitmen untuk menyelesaikan proyek sesuai timeline yang disepakati' }}
                 </p>
               </div>
             </div>
@@ -291,10 +290,9 @@
                 >
                   <i class="fas fa-medal text-white"></i>
                 </div>
-                <h5 class="fw-bold">Kualitas Terjamin</h5>
+                <h5 class="fw-bold">{{ whyChooseUs.quality.title or 'Kualitas Terjamin' }}</h5>
                 <p class="text-muted">
-                  Standar kualitas tinggi dengan testing dan quality assurance
-                  yang ketat
+                  {{ whyChooseUs.quality.description or 'Standar kualitas tinggi dengan testing dan quality assurance yang ketat' }}
                 </p>
               </div>
             </div>
@@ -306,9 +304,9 @@
                 >
                   <i class="fas fa-headset text-white"></i>
                 </div>
-                <h5 class="fw-bold">Support 24/7</h5>
+                <h5 class="fw-bold">{{ whyChooseUs.support.title or 'Support 24/7' }}</h5>
                 <p class="text-muted">
-                  Tim support yang siap membantu kapan saja Anda membutuhkan
+                  {{ whyChooseUs.support.description or 'Tim support yang siap membantu kapan saja Anda membutuhkan' }}
                 </p>
               </div>
             </div>
@@ -320,9 +318,9 @@
                 >
                   <i class="fas fa-dollar-sign text-white"></i>
                 </div>
-                <h5 class="fw-bold">Harga Kompetitif</h5>
+                <h5 class="fw-bold">{{ whyChooseUs.pricing.title or 'Harga Kompetitif' }}</h5>
                 <p class="text-muted">
-                  Solusi berkualitas dengan harga yang sesuai dengan budget Anda
+                  {{ whyChooseUs.pricing.description or 'Solusi berkualitas dengan harga yang sesuai dengan budget Anda' }}
                 </p>
               </div>
             </div>
@@ -336,9 +334,9 @@
   <div class="row mb-5" id="contact">
     <div class="col-12">
       <div class="text-center mb-5">
-        <h2 class="display-5 fw-bold text-primary">Hubungi Kami</h2>
+        <h2 class="display-5 fw-bold text-primary">{{ contact.title or 'Hubungi Kami' }}</h2>
         <p class="lead text-muted">
-          Mari diskusikan kebutuhan digital bisnis Anda
+          {{ contact.subtitle or 'Mari diskusikan kebutuhan digital bisnis Anda' }}
         </p>
       </div>
     </div>
@@ -355,7 +353,7 @@
                   <i class="fas fa-envelope text-white"></i>
                 </div>
                 <div>
-                  <h5 class="fw-bold mb-1">Email</h5>
+                  <h5 class="fw-bold mb-1">{{ contact.email or 'Email' }}</h5>
                   <p class="text-muted mb-0">info@omniflow.id</p>
                 </div>
               </div>
@@ -369,7 +367,7 @@
                   <i class="fas fa-phone text-white"></i>
                 </div>
                 <div>
-                  <h5 class="fw-bold mb-1">Telepon</h5>
+                  <h5 class="fw-bold mb-1">{{ contact.phone or 'Telepon' }}</h5>
                   <p class="text-muted mb-0">+62 821 2560 9413</p>
                 </div>
               </div>
@@ -383,7 +381,7 @@
                   <i class="fas fa-map-marker-alt text-white"></i>
                 </div>
                 <div>
-                  <h5 class="fw-bold mb-1">Alamat</h5>
+                  <h5 class="fw-bold mb-1">{{ contact.address or 'Alamat' }}</h5>
                   <p class="text-muted mb-0">Jakarta, Indonesia</p>
                 </div>
               </div>
@@ -397,7 +395,7 @@
                   <i class="fas fa-globe text-white"></i>
                 </div>
                 <div>
-                  <h5 class="fw-bold mb-1">Website</h5>
+                  <h5 class="fw-bold mb-1">{{ contact.website or 'Website' }}</h5>
                   <p class="text-muted mb-0">omniflow.id</p>
                 </div>
               </div>
@@ -409,7 +407,7 @@
               target="_blank"
               class="btn btn-primary btn-lg px-5"
             >
-              Hubungi Kami
+              {{ contact.cta or 'Hubungi Kami' }}
             </a>
           </div>
         </div>
@@ -426,14 +424,13 @@
       >
         <div class="card-body p-5 text-center">
           <h2 class="display-6 fw-bold mb-3">
-            Siap Memulai Transformasi Digital?
+            {{ cta.title or 'Siap Memulai Transformasi Digital?' }}
           </h2>
           <p class="lead mb-4">
-            Bergabunglah dengan ratusan perusahaan yang telah mempercayai
-            {{ appName }} untuk mengoptimalkan bisnis mereka.
+            {{ cta.subtitle or ('Bergabunglah dengan ratusan perusahaan yang telah mempercayai ' + appName + ' untuk mengoptimalkan bisnis mereka.') }}
           </p>
           <a href="#contact" class="btn btn-primary btn-lg px-5"
-            >Mulai Konsultasi Gratis</a
+            >{{ cta.button or 'Mulai Konsultasi Gratis' }}</a
           >
         </div>
       </div>

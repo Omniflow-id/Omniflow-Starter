@@ -22,6 +22,37 @@
     </div>
   </form>
   <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+    <!-- Language Switcher -->
+    <li class="nav-item dropdown">
+      <a
+        class="nav-link dropdown-toggle d-flex align-items-center"
+        id="languageDropdown"
+        href="#"
+        role="button"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+        title="{{ t('language.switch') }}"
+      >
+        <span class="me-1">{{ currentLanguage.flag }}</span>
+        <span class="d-none d-lg-inline">{{ currentLanguage.shortLabel }}</span>
+      </a>
+      <ul
+        class="dropdown-menu dropdown-menu-end"
+        aria-labelledby="languageDropdown"
+      >
+        {% for lang in languages %}
+          {% if not lang.isActive %}
+            <li>
+              <a class="dropdown-item d-flex align-items-center" href="{{ lang.href }}">
+                <span class="me-2">{{ lang.flag }}</span>
+                {{ lang.name }}
+              </a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    </li>
+    <!-- User Dropdown -->
     <li class="nav-item dropdown">
       <a
         class="nav-link dropdown-toggle"

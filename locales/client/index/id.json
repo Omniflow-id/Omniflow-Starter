@@ -1,0 +1,102 @@
+{
+  "hero": {
+    "subheading": "Solusi Digital Terdepan untuk Transformasi Bisnis Anda",
+    "description": "Kami menghadirkan inovasi teknologi yang mengoptimalkan alur kerja, meningkatkan efisiensi, dan mendorong pertumbuhan bisnis di era digital.",
+    "primaryCta": "Layanan Kami",
+    "secondaryCta": "Hubungi Kami"
+  },
+  "about": {
+    "title": "Tentang ",
+    "subtitle": "Membangun masa depan digital yang lebih baik",
+    "innovation": {
+      "title": "Inovasi",
+      "description": "Menghadirkan solusi teknologi terdepan yang mengikuti perkembangan zaman dan kebutuhan industri modern."
+    },
+    "collaboration": {
+      "title": "Kolaborasi",
+      "description": "Membangun kemitraan strategis dengan klien untuk mencapai tujuan bisnis bersama melalui pendekatan yang personal."
+    },
+    "growth": {
+      "title": "Pertumbuhan",
+      "description": "Fokus pada hasil yang terukur dan berkelanjutan untuk mendorong pertumbuhan bisnis jangka panjang."
+    }
+  },
+  "services": {
+    "title": "Layanan Kami",
+    "subtitle": "Solusi komprehensif untuk kebutuhan digital Anda",
+    "appDevelopment": {
+      "title": "Pengembangan Aplikasi",
+      "description": "Membangun aplikasi web dan mobile yang responsif, scalable, dan user-friendly sesuai kebutuhan bisnis Anda.",
+      "items": {
+        "web": "Pengembangan Aplikasi Web",
+        "mobile": "Pengembangan Aplikasi Mobile",
+        "api": "Integrasi API",
+        "database": "Desain Database"
+      }
+    },
+    "automation": {
+      "title": "Otomasi Proses Bisnis",
+      "description": "Mengoptimalkan alur kerja dengan sistem otomasi yang mengurangi manual work dan meningkatkan efisiensi.",
+      "items": {
+        "workflow": "Otomasi Alur Kerja",
+        "document": "Manajemen Dokumen",
+        "reporting": "Sistem Pelaporan",
+        "integration": "Solusi Integrasi"
+      }
+    },
+    "bi": {
+      "title": "Business Intelligence",
+      "description": "Mengubah data menjadi insight yang actionable untuk pengambilan keputusan bisnis yang lebih baik.",
+      "items": {
+        "analytics": "Analisis Data",
+        "dashboard": "Pengembangan Dashboard",
+        "monitoring": "Pemantauan Performa",
+        "predictive": "Analisis Prediktif"
+      }
+    },
+    "consulting": {
+      "title": "Konsultasi IT",
+      "description": "Memberikan panduan strategis untuk transformasi digital dan optimasi infrastruktur teknologi.",
+      "items": {
+        "digital": "Transformasi Digital",
+        "architecture": "Arsitektur Sistem",
+        "security": "Penilaian Keamanan",
+        "roadmap": "Peta Jalan Teknologi"
+      }
+    }
+  },
+  "whyChooseUs": {
+    "title": "Mengapa Memilih ",
+    "subtitle": "Keunggulan yang membedakan kami dari yang lain",
+    "timing": {
+      "title": "Delivery Tepat Waktu",
+      "description": "Komitmen untuk menyelesaikan proyek sesuai timeline yang disepakati"
+    },
+    "quality": {
+      "title": "Kualitas Terjamin",
+      "description": "Standar kualitas tinggi dengan testing dan quality assurance yang ketat"
+    },
+    "support": {
+      "title": "Support 24/7",
+      "description": "Tim support yang siap membantu kapan saja Anda membutuhkan"
+    },
+    "pricing": {
+      "title": "Harga Kompetitif",
+      "description": "Solusi berkualitas dengan harga yang sesuai dengan budget Anda"
+    }
+  },
+  "contact": {
+    "title": "Hubungi Kami",
+    "subtitle": "Mari diskusikan kebutuhan digital bisnis Anda",
+    "email": "Email",
+    "phone": "Telepon",
+    "address": "Alamat",
+    "website": "Website",
+    "cta": "Hubungi Kami"
+  },
+  "cta": {
+    "title": "Siap Memulai Transformasi Digital?",
+    "subtitle": "Bergabunglah dengan ratusan perusahaan yang telah mempercayai ",
+    "button": "Mulai Konsultasi Gratis"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "pageTitle": "Admin Login",
+  "title": "Admin Login",
+  "subtitle": "Sign in to admin panel",
+  "email": "Email",
+  "password": "Password",
+  "rememberMe": "Remember me",
+  "forgotPassword": "Forgot password?",
+  "loginButton": "Sign In",
+  "login": "Login",
+  "logout": "Logout",
+  "registerLabel": "Register",
+  "labels": {
+    "emailAddress": "Email address",
+    "emailPlaceholder": "name@example.com",
+    "loading": "Loading...",
+    "loggingIn": "Logging in..."
+  },
+  "footer": {
+    "backToHome": "Back to home",
+    "needAccount": "Need an account? Please contact your administrator"
+  },
+  "messages": {
+    "loginSuccess": "Login successful",
+    "loginSuccessDev": "Login successful! (Development mode)",
+    "loginSuccessOtpBypass": "Login successful! (Development mode - OTP bypassed)",
+    "loginError": "Invalid email or password",
+    "logoutSuccess": "Logout successful",
+    "sessionExpired": "Your session has expired, please login again",
+    "accountInactive": "Your account is inactive, please contact administrator",
+    "2faRequired": "2FA verification required",
+    "2faInvalid": "Invalid OTP code",
+    "otpSent": "OTP generated. Email is being sent - please check your inbox and enter the OTP code below."
+  },
+  "register": {
+    "title": "Register New Admin",
+    "subtitle": "Create new administrator account",
+    "confirmPassword": "Confirm Password",
+    "registerButton": "Register",
+    "alreadyHaveAccount": "Already have an account?"
+  }
+}

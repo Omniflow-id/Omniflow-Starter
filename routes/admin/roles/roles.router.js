@@ -5,6 +5,7 @@ const router = express.Router();
 const { isLoggedInAndActive } = require("@middlewares/isLoggedIn");
 const { checkPermission } = require("@middlewares/checkPermission");
 const { doubleCsrfProtection } = require("@middlewares/csrfProtection");
+const { withLocale } = require("@helpers/i18n");
 
 // === Route Handlers ===
 const role = require("./role.controller");
@@ -12,6 +13,7 @@ const role = require("./role.controller");
 // Roles and permissions management page
 router.get(
   "/",
+  withLocale("admin/roles"),
   isLoggedInAndActive,
   checkPermission("manage_permissions"),
   role.getRolesPage
@@ -20,6 +22,7 @@ router.get(
 // Update role permissions (AJAX)
 router.post(
   "/:roleId/permissions",
+  withLocale("admin/roles"),
   isLoggedInAndActive,
   checkPermission("manage_permissions"),
   doubleCsrfProtection,
@@ -29,6 +32,7 @@ router.post(
 // CRUD for Roles
 router.post(
   "/",
+  withLocale("admin/roles"),
   isLoggedInAndActive,
   checkPermission("manage_permissions"),
   doubleCsrfProtection,
@@ -36,6 +40,7 @@ router.post(
 );
 router.post(
   "/:roleId/update",
+  withLocale("admin/roles"),
   isLoggedInAndActive,
   checkPermission("manage_permissions"),
   doubleCsrfProtection,
@@ -43,6 +48,7 @@ router.post(
 );
 router.post(
   "/:roleId/delete",
+  withLocale("admin/roles"),
   isLoggedInAndActive,
   checkPermission("manage_permissions"),
   doubleCsrfProtection,

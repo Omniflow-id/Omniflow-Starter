@@ -1,0 +1,73 @@
+{
+  "pageTitle": "Roles & Permissions",
+  "title": "Roles & Permissions",
+  "subtitle": "Manage roles and assign permissions",
+  "createRole": "Create Role",
+  "createNewRole": "Create New Role",
+  "rolesPermissions": "Roles & Permissions",
+  "noRolesFound": "No roles found",
+  "assignedPermissions": "Assigned Permissions",
+  "editRole": "Edit Role",
+  "saveRole": "Save Role",
+  "updatePermissions": "Update Permissions",
+  "selectAll": "Select All",
+  "clearAll": "Clear All",
+  "permissionDistribution": "Permission Distribution Summary",
+  "totalRoles": "Total Roles",
+  "totalPermissions": "Total Permissions",
+  "mostPrivilegedRole": "Most Privileged Role",
+  "none": "None",
+  "contactAdmin": "Please contact system administrator to set up user roles.",
+  "table": {
+    "name": "Role Name",
+    "description": "Description",
+    "users": "User Count",
+    "permissions": "Permissions",
+    "createdAt": "Created"
+  },
+  "form": {
+    "name": "Role Name",
+    "description": "Description",
+    "selectRole": "Select Role"
+  },
+  "messages": {
+    "createSuccess": "Role created successfully",
+    "updateSuccess": "Role updated successfully",
+    "deleteSuccess": "Role deleted successfully",
+    "assignSuccess": "Permissions assigned successfully",
+    "confirmDelete": "Are you sure you want to delete this role?",
+    "updateSuccessTitle": "Success!",
+    "error": "Failed to update permissions:",
+    "networkError": "Network error occurred while updating permissions"
+  },
+  "modals": {
+    "createRole": "Create New Role",
+    "editRole": "Edit Role",
+    "deleteRole": "Delete Role",
+    "managePermissions": "Manage Permissions"
+  },
+  "search": {
+    "placeholder": "Search role..."
+  },
+  "permissions": {
+    "title": "Permissions",
+    "selectAll": "Select All",
+    "clearAll": "Clear All",
+    "noPermissions": "No permissions available"
+  },
+  "stats": {
+    "totalRoles": "Total Roles",
+    "adminRoles": "Admin Roles",
+    "managerRoles": "Manager Roles",
+    "userRoles": "User Roles"
+  },
+  "buttons": {
+    "create": "Create",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "updating": "Updating"
+  }
+}
