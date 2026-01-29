@@ -1,23 +1,30 @@
 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
   <div class="sb-sidenav-menu">
     <div class="nav">
+      {# === Core Section === #}
       <div class="sb-sidenav-menu-heading">Core</div>
+
+      {# Dashboard - exact match #}
       <a
-        class="nav-link {% if url == '/admin' or url == '/admin/' %}active{% endif %}"
+        class="nav-link{% if url == '/admin' or url == '/admin/' %} active{% endif %}"
         href="/admin"
       >
         <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
         {{ t('sidebar.dashboard') or 'Dashboard' }}
       </a>
+
+      {# Profile - contains pattern for nested routes #}
       <a
-        class="nav-link {% if url.includes('/admin/profile') %}active{% endif %}"
+        class="nav-link{% if url.includes('/admin/profile') %} active{% endif %}"
         href="/admin/profile"
       >
         <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
         {{ t('sidebar.profile') or 'Profile' }}
       </a>
+
+      {# Module - collapsible parent with prefix match #}
       <a
-        class="nav-link {% if url.includes('/admin/overview') or url.includes('/admin/submodule') %}{% else %}collapsed{% endif %}"
+        class="nav-link{% if url.includes('/admin/overview') or url.includes('/admin/submodule') %} active{% else %} collapsed{% endif %}"
         href="#"
         data-bs-toggle="collapse"
         data-bs-target="#collapseLayouts"
@@ -31,33 +38,32 @@
         </div>
       </a>
       <div
-        class="collapse {% if url.includes('/admin/overview') or url.includes('/admin/submodule') %}show{% endif %}"
+        class="collapse{% if url.includes('/admin/overview') or url.includes('/admin/submodule') %} show{% endif %}"
         id="collapseLayouts"
         aria-labelledby="headingOne"
         data-bs-parent="#sidenavAccordion"
       >
         <nav class="sb-sidenav-menu-nested nav">
           <a
-            class="nav-link {% if url.includes('/admin/overview') %}active{% endif %}"
+            class="nav-link{% if url.includes('/admin/overview') %} active{% endif %}"
             href="/admin/overview"
-            >{{ t('sidebar.overview') or 'Overview' }}</a
-          >
+          >{{ t('sidebar.overview') or 'Overview' }}</a>
           <a
-            class="nav-link {% if url.includes('/admin/submodule') %}active{% endif %}"
+            class="nav-link{% if url.includes('/admin/submodule') %} active{% endif %}"
             href="/admin/submodule"
-            >{{ t('sidebar.submodule') or 'Sub Module' }}</a
-          >
+          >{{ t('sidebar.submodule') or 'Sub Module' }}</a>
         </nav>
       </div>
 
+      {# === Administration Section === #}
       {% if hasAnyPermission(permissions, ['view_users', 'manage_users', 'view_permissions', 'manage_permissions', 'view_roles', 'manage_roles']) %}
       <div class="sb-sidenav-menu-heading">Administration</div>
       {% endif %}
 
       {% if hasAnyPermission(permissions, ['view_users', 'manage_users']) %}
-      <!-- User Management -->
+      {# User Management - collapsible parent #}
       <a
-        class="nav-link {% if url.includes('/admin/user') %}{% else %}collapsed{% endif %}"
+        class="nav-link{% if url.includes('/admin/user') %} active{% else %} collapsed{% endif %}"
         href="#"
         data-bs-toggle="collapse"
         data-bs-target="#collapseLayoutsUser"
@@ -71,30 +77,28 @@
         </div>
       </a>
       <div
-        class="collapse {% if url.includes('/admin/user') %}show{% endif %}"
+        class="collapse{% if url.includes('/admin/user') %} show{% endif %}"
         id="collapseLayoutsUser"
         aria-labelledby="headingOne"
         data-bs-parent="#sidenavAccordion"
       >
         <nav class="sb-sidenav-menu-nested nav">
           <a
-            class="nav-link {% if url.includes('/admin/user/overview') %}active{% endif %}"
+            class="nav-link{% if url.includes('/admin/user/overview') %} active{% endif %}"
             href="/admin/user/overview"
-            >{{ t('sidebar.overview') or 'Overview' }}</a
-          >
+          >{{ t('sidebar.overview') or 'Overview' }}</a>
           <a
-            class="nav-link {% if url.includes('/admin/user/index') %}active{% endif %}"
+            class="nav-link{% if url.includes('/admin/user/index') %} active{% endif %}"
             href="/admin/user/index"
-            >{{ t('sidebar.users') or 'Users' }}</a
-          >
+          >{{ t('sidebar.users') or 'Users' }}</a>
         </nav>
       </div>
       {% endif %}
 
       {% if hasPermission(permissions, 'manage_permissions') %}
-      <!-- Permissions Management -->
+      {# Permissions & Roles - collapsible parent #}
       <a
-        class="nav-link {% if url.includes('/admin/permissions') or url.includes('/admin/roles') %}{% else %}collapsed{% endif %}"
+        class="nav-link{% if url.includes('/admin/permissions') or url.includes('/admin/roles') %} active{% else %} collapsed{% endif %}"
         href="#"
         data-bs-toggle="collapse"
         data-bs-target="#collapseLayoutsPermissions"
@@ -108,34 +112,33 @@
         </div>
       </a>
       <div
-        class="collapse {% if url.includes('/admin/permissions') or url.includes('/admin/roles') %}show{% endif %}"
+        class="collapse{% if url.includes('/admin/permissions') or url.includes('/admin/roles') %} show{% endif %}"
         id="collapseLayoutsPermissions"
         aria-labelledby="headingOne"
         data-bs-parent="#sidenavAccordion"
       >
         <nav class="sb-sidenav-menu-nested nav">
           <a
-            class="nav-link {% if url.includes('/admin/permissions') and not url.includes('/admin/roles') %}active{% endif %}"
+            class="nav-link{% if url.includes('/admin/permissions') and not url.includes('/admin/roles') %} active{% endif %}"
             href="/admin/permissions"
-            >{{ t('sidebar.allPermissions') or 'All Permissions' }}</a
-          >
+          >{{ t('sidebar.allPermissions') or 'All Permissions' }}</a>
           <a
-            class="nav-link {% if url.includes('/admin/roles') %}active{% endif %}"
+            class="nav-link{% if url.includes('/admin/roles') %} active{% endif %}"
             href="/admin/roles"
-            >{{ t('sidebar.roles') or 'Roles' }}</a
-          >
+          >{{ t('sidebar.roles') or 'Roles' }}</a>
         </nav>
       </div>
       {% endif %}
 
+      {# === System Section === #}
       {% if hasAnyPermission(permissions, ['manage_cache', 'manage_queue', 'view_logs']) %}
       <div class="sb-sidenav-menu-heading">System</div>
       {% endif %}
 
       {% if hasPermission(permissions, 'manage_cache') %}
-      <!-- Cache Management -->
+      {# Cache Management - direct link #}
       <a
-        class="nav-link {% if url.includes('/admin/cache') %}active{% endif %}"
+        class="nav-link{% if url.includes('/admin/cache') %} active{% endif %}"
         href="/admin/cache/stats"
       >
         <div class="sb-nav-link-icon"><i class="fas fa-database"></i></div>
@@ -144,9 +147,9 @@
       {% endif %}
 
       {% if hasPermission(permissions, 'manage_queue') %}
-      <!-- Queue Management -->
+      {# Queue Management - collapsible parent #}
       <a
-        class="nav-link {% if url.includes('/admin/queue') %}{% else %}collapsed{% endif %}"
+        class="nav-link{% if url.includes('/admin/queue') %} active{% else %} collapsed{% endif %}"
         href="#"
         data-bs-toggle="collapse"
         data-bs-target="#collapseLayoutsQueue"
@@ -160,35 +163,32 @@
         </div>
       </a>
       <div
-        class="collapse {% if url.includes('/admin/queue') %}show{% endif %}"
+        class="collapse{% if url.includes('/admin/queue') %} show{% endif %}"
         id="collapseLayoutsQueue"
         aria-labelledby="headingOne"
         data-bs-parent="#sidenavAccordion"
       >
         <nav class="sb-sidenav-menu-nested nav">
           <a
-            class="nav-link {% if url == '/admin/queue' %}active{% endif %}"
+            class="nav-link{% if url == '/admin/queue' %} active{% endif %}"
             href="/admin/queue"
-            >{{ t('sidebar.statistics') or 'Statistics' }}</a
-          >
+          >{{ t('sidebar.statistics') or 'Statistics' }}</a>
           <a
-            class="nav-link {% if url.includes('/admin/queue/jobs') %}active{% endif %}"
+            class="nav-link{% if url.includes('/admin/queue/jobs') %} active{% endif %}"
             href="/admin/queue/jobs"
-            >{{ t('sidebar.allJobs') or 'All Jobs' }}</a
-          >
+          >{{ t('sidebar.allJobs') or 'All Jobs' }}</a>
           <a
-            class="nav-link {% if url.includes('/admin/queue/failed') %}active{% endif %}"
+            class="nav-link{% if url.includes('/admin/queue/failed') %} active{% endif %}"
             href="/admin/queue/failed"
-            >{{ t('sidebar.failedJobs') or 'Failed Jobs' }}</a
-          >
+          >{{ t('sidebar.failedJobs') or 'Failed Jobs' }}</a>
         </nav>
       </div>
       {% endif %}
 
       {% if hasPermission(permissions, 'view_logs') %}
-      <!-- Activity Logs -->
+      {# Activity Logs - direct link #}
       <a
-        class="nav-link {% if url.includes('/admin/log') %}active{% endif %}"
+        class="nav-link{% if url.includes('/admin/log') %} active{% endif %}"
         href="/admin/log/index"
       >
         <div class="sb-nav-link-icon"><i class="fas fa-file-alt"></i></div>

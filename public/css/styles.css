@@ -11038,10 +11038,15 @@ body {
   color: #fff;
 }
 .sb-sidenav-dark .sb-sidenav-menu .nav-link.active {
-  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+  border-left: 4px solid #4e73df !important;
+  margin-left: -4px !important;
 }
-.sb-sidenav-dark .sb-sidenav-menu .nav-link.active .sb-nav-link-icon {
-  color: #fff;
+.sb-sidenav-dark .sb-sidenav-menu .nav-link.active .sb-nav-link-icon i,
+.sb-sidenav-dark .sb-sidenav-menu .nav-link.active .sb-sidenav-collapse-arrow i {
+  color: #fff !important;
+}
 }
 .sb-sidenav-dark .sb-sidenav-footer {
   background-color: #343a40;
@@ -11240,4 +11245,10 @@ body {
   width: 20px !important;
   font-size: 0.75rem;
   border-radius: 0.375rem !important;
+}
+/* Fix for top-level sidebar items to show active blue indicator */
+.sb-sidenav-dark .sb-sidenav-menu > .nav > .nav-link.active {
+  margin-left: 0 !important;
+  border-left: none !important;
+  box-shadow: inset 4px 0 0 0 #4e73df !important;
 }
