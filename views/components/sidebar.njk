@@ -1,17 +1,20 @@
 <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
   <div class="sb-sidenav-menu">
     <div class="nav">
+      <div class="sb-sidenav-menu-heading">Core</div>
       <a
         class="nav-link {% if url == '/admin' or url == '/admin/' %}active{% endif %}"
         href="/admin"
       >
-        {{ t('sidebar.dashboard') }}
+        <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+        {{ t('sidebar.dashboard') or 'Dashboard' }}
       </a>
       <a
         class="nav-link {% if url.includes('/admin/profile') %}active{% endif %}"
         href="/admin/profile"
       >
-        {{ t('sidebar.profile') }}
+        <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
+        {{ t('sidebar.profile') or 'Profile' }}
       </a>
       <a
         class="nav-link {% if url.includes('/admin/overview') or url.includes('/admin/submodule') %}{% else %}collapsed{% endif %}"
@@ -21,7 +24,8 @@
         aria-expanded="{% if url.includes('/admin/overview') or url.includes('/admin/submodule') %}true{% else %}false{% endif %}"
         aria-controls="collapseLayouts"
       >
-        {{ t('sidebar.module') }}
+        <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+        {{ t('sidebar.module') or 'Module' }}
         <div class="sb-sidenav-collapse-arrow">
           <i class="fas fa-angle-down"></i>
         </div>
@@ -36,17 +40,22 @@
           <a
             class="nav-link {% if url.includes('/admin/overview') %}active{% endif %}"
             href="/admin/overview"
-            >{{ t('sidebar.overview') }}</a
+            >{{ t('sidebar.overview') or 'Overview' }}</a
           >
           <a
             class="nav-link {% if url.includes('/admin/submodule') %}active{% endif %}"
             href="/admin/submodule"
-            >{{ t('sidebar.submodule') }}</a
+            >{{ t('sidebar.submodule') or 'Sub Module' }}</a
           >
         </nav>
       </div>
+
+      {% if hasAnyPermission(permissions, ['view_users', 'manage_users', 'view_permissions', 'manage_permissions', 'view_roles', 'manage_roles']) %}
+      <div class="sb-sidenav-menu-heading">Administration</div>
+      {% endif %}
+
       {% if hasAnyPermission(permissions, ['view_users', 'manage_users']) %}
-      <!-- User Management - Based on permissions -->
+      <!-- User Management -->
       <a
         class="nav-link {% if url.includes('/admin/user') %}{% else %}collapsed{% endif %}"
         href="#"
@@ -55,7 +64,8 @@
         aria-expanded="{% if url.includes('/admin/user') %}true{% else %}false{% endif %}"
         aria-controls="collapseLayoutsUser"
       >
-        {{ t('sidebar.users') }}
+        <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+        {{ t('sidebar.users') or 'Users' }}
         <div class="sb-sidenav-collapse-arrow">
           <i class="fas fa-angle-down"></i>
         </div>
@@ -70,19 +80,19 @@
           <a
             class="nav-link {% if url.includes('/admin/user/overview') %}active{% endif %}"
             href="/admin/user/overview"
-            >{{ t('sidebar.overview') }}</a
+            >{{ t('sidebar.overview') or 'Overview' }}</a
           >
           <a
             class="nav-link {% if url.includes('/admin/user/index') %}active{% endif %}"
             href="/admin/user/index"
-            >{{ t('sidebar.users') }}</a
+            >{{ t('sidebar.users') or 'Users' }}</a
           >
         </nav>
       </div>
       {% endif %}
 
       {% if hasPermission(permissions, 'manage_permissions') %}
-      <!-- Permissions Management - Based on permissions -->
+      <!-- Permissions Management -->
       <a
         class="nav-link {% if url.includes('/admin/permissions') or url.includes('/admin/roles') %}{% else %}collapsed{% endif %}"
         href="#"
@@ -91,7 +101,8 @@
         aria-expanded="{% if url.includes('/admin/permissions') or url.includes('/admin/roles') %}true{% else %}false{% endif %}"
         aria-controls="collapseLayoutsPermissions"
       >
-        {{ t('sidebar.permissions') }}
+        <div class="sb-nav-link-icon"><i class="fas fa-shield-alt"></i></div>
+        {{ t('sidebar.permissions') or 'Permissions' }}
         <div class="sb-sidenav-collapse-arrow">
           <i class="fas fa-angle-down"></i>
         </div>
@@ -106,29 +117,34 @@
           <a
             class="nav-link {% if url.includes('/admin/permissions') and not url.includes('/admin/roles') %}active{% endif %}"
             href="/admin/permissions"
-            >{{ t('sidebar.allPermissions') }}</a
+            >{{ t('sidebar.allPermissions') or 'All Permissions' }}</a
           >
           <a
             class="nav-link {% if url.includes('/admin/roles') %}active{% endif %}"
             href="/admin/roles"
-            >{{ t('sidebar.roles') }}</a
+            >{{ t('sidebar.roles') or 'Roles' }}</a
           >
         </nav>
       </div>
       {% endif %}
 
+      {% if hasAnyPermission(permissions, ['manage_cache', 'manage_queue', 'view_logs']) %}
+      <div class="sb-sidenav-menu-heading">System</div>
+      {% endif %}
+
       {% if hasPermission(permissions, 'manage_cache') %}
-      <!-- Cache Management - Based on permissions -->
+      <!-- Cache Management -->
       <a
         class="nav-link {% if url.includes('/admin/cache') %}active{% endif %}"
         href="/admin/cache/stats"
       >
-        {{ t('sidebar.cache') }}
+        <div class="sb-nav-link-icon"><i class="fas fa-database"></i></div>
+        {{ t('sidebar.cache') or 'Cache' }}
       </a>
       {% endif %}
 
       {% if hasPermission(permissions, 'manage_queue') %}
-      <!-- Queue Management - Based on permissions -->
+      <!-- Queue Management -->
       <a
         class="nav-link {% if url.includes('/admin/queue') %}{% else %}collapsed{% endif %}"
         href="#"
@@ -137,7 +153,8 @@
         aria-expanded="{% if url.includes('/admin/queue') %}true{% else %}false{% endif %}"
         aria-controls="collapseLayoutsQueue"
       >
-        {{ t('sidebar.queue') }}
+        <div class="sb-nav-link-icon"><i class="fas fa-tasks"></i></div>
+        {{ t('sidebar.queue') or 'Queue' }}
         <div class="sb-sidenav-collapse-arrow">
           <i class="fas fa-angle-down"></i>
         </div>
@@ -152,35 +169,36 @@
           <a
             class="nav-link {% if url == '/admin/queue' %}active{% endif %}"
             href="/admin/queue"
-            >{{ t('sidebar.statistics') }}</a
+            >{{ t('sidebar.statistics') or 'Statistics' }}</a
           >
           <a
             class="nav-link {% if url.includes('/admin/queue/jobs') %}active{% endif %}"
             href="/admin/queue/jobs"
-            >{{ t('sidebar.allJobs') }}</a
+            >{{ t('sidebar.allJobs') or 'All Jobs' }}</a
           >
           <a
             class="nav-link {% if url.includes('/admin/queue/failed') %}active{% endif %}"
             href="/admin/queue/failed"
-            >{{ t('sidebar.failedJobs') }}</a
+            >{{ t('sidebar.failedJobs') or 'Failed Jobs' }}</a
           >
         </nav>
       </div>
       {% endif %}
 
       {% if hasPermission(permissions, 'view_logs') %}
-      <!-- Activity Logs - Based on permissions -->
+      <!-- Activity Logs -->
       <a
         class="nav-link {% if url.includes('/admin/log') %}active{% endif %}"
         href="/admin/log/index"
       >
-        {{ t('sidebar.logs') }}
+        <div class="sb-nav-link-icon"><i class="fas fa-file-alt"></i></div>
+        {{ t('sidebar.logs') or 'Logs' }}
       </a>
       {% endif %}
     </div>
   </div>
   <div class="sb-sidenav-footer">
-    <div class="small">{{ t('sidebar.loggedInAs') }}:</div>
+    <div class="small">{{ t('sidebar.loggedInAs') or 'Logged in as' }}:</div>
     <span class="fw-bold">{{ user.username }}</span>
   </div>
 </nav>

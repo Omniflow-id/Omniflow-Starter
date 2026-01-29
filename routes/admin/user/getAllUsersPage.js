@@ -28,6 +28,7 @@ const getAllUsersPage = async (req, res) => {
     // Render page with roles only - DataTable will load users via AJAX
     res.render("pages/admin/user/index", {
       roles: result.data.roles,
+      permissions: req.session.permissions || [], // Explicitly pass permissions
       session_user_id: req.session.user.id, // For preventing self-deactivation
       cacheInfo: {
         source: result.source,

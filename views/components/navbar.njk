@@ -41,14 +41,12 @@
         aria-labelledby="languageDropdown"
       >
         {% for lang in languages %}
-          {% if not lang.isActive %}
-            <li>
-              <a class="dropdown-item d-flex align-items-center" href="{{ lang.href }}">
-                <span class="me-2">{{ lang.flag }}</span>
-                {{ lang.name }}
-              </a>
-            </li>
-          {% endif %}
+          <li>
+            <a class="dropdown-item d-flex align-items-center {% if lang.isActive %}active fw-bold{% endif %}" href="{{ lang.href }}">
+              <span class="me-2">{{ lang.flag }}</span>
+              {{ lang.name }}
+            </a>
+          </li>
         {% endfor %}
       </ul>
     </li>
