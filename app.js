@@ -282,6 +282,9 @@ const apiRouter = require("./routes/api/api.router");
 const adminRouter = require("./routes/admin/admin.router");
 const clientRouter = require("./routes/client/client.router");
 
+// Docker health check redirect - /health -> /api/health
+app.get("/health", (_req, res) => res.redirect("/api/health"));
+
 app.use("/api", apiRouter);
 app.use("/", clientRouter);
 app.use("/admin", adminRouter);
