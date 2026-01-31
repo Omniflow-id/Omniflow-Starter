@@ -12,7 +12,7 @@ services:
       - "9096:9096"
     volumes:
       - ./logs:/app/logs
-      - ./uploads:/app/uploads
+
     networks:
       - omniflow_network
     restart: unless-stopped
