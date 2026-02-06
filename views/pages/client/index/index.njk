@@ -1,5 +1,5 @@
 {% extends "layout/clientMasterLayout.njk" %} {% block content %}
-<div class="lang-switcher" style="position: absolute; top: 20px; right: 20px; z-index: 1000;">
+<div class="lang-switcher" style="position: fixed; top: 30px; right: 30px; z-index: 1000;">
   <div class="btn-group shadow-sm" role="group" aria-label="Language switcher">
     {% for lang in languages %}
     <a
