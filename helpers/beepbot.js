@@ -1,5 +1,6 @@
 // === Core modules ===
 const https = require("node:https");
+const os = require("node:os");
 
 /**
  * BeepBot Notification Helper
@@ -117,8 +118,11 @@ function formatMessage(message, options) {
   const { level, component, timestamp, metadata, emoji } = options;
 
   // Use plain text formatting to avoid Telegram markdown issues
-  let formatted = `${emoji} OMNIFLOW ALERT\n\n`;
+  const appName = (process.env.APP_NAME || "OMNIFLOW").toUpperCase();
+  let formatted = `${emoji} ${appName} ALERT\n\n`;
   formatted += `Level: ${level.toUpperCase()}\n`;
+  formatted += `Application: ${process.env.APP_NAME || "Omniflow Starter"}\n`;
+  formatted += `Instance: ${os.hostname()}\n`;
   formatted += `Component: ${component}\n`;
   formatted += `Time: ${timestamp}\n`;
   formatted += `Environment: ${process.env.NODE_ENV || "development"}\n\n`;

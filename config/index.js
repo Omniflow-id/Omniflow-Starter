@@ -7,7 +7,7 @@ validateEnvVariables();
 
 const config = {
   app: {
-    name: "Omniflow Starter",
+    name: process.env.APP_NAME || "Omniflow Starter",
     url: process.env.APP_URL || "http://localhost",
     port: process.env.PORT || 1234,
     env: process.env.NODE_ENV || "development",
