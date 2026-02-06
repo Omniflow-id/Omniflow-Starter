@@ -77,6 +77,18 @@ const validateEnvVariables = () => {
       optional: ["BEEPBOT_CHAT_ID"],
       description: "BeepBot notifications",
     },
+    llm: {
+      enableFlag: "LLM_ENABLED",
+      required: ["LLM_API_KEY"],
+      optional: [
+        "LLM_MODEL_NAME",
+        "LLM_API_URL",
+        "LANGFUSE_PUBLIC_KEY",
+        "LANGFUSE_SECRET_KEY",
+        "LANGFUSE_HOST",
+      ],
+      description: "AI Chat Assistant",
+    },
   };
 
   // Variables with defaults (always optional)

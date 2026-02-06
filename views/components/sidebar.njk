@@ -97,12 +97,13 @@
 
       {% if hasPermission(permissions, 'manage_permissions') %}
       {# Permissions & Roles - collapsible parent #}
+      {% set isPermissionsActive = url and (url.includes('/admin/permissions') or url.includes('/admin/roles')) %}
       <a
-        class="nav-link{% if url.includes('/admin/permissions') or url.includes('/admin/roles') %} active{% else %} collapsed{% endif %}"
+        class="nav-link{% if isPermissionsActive %} active{% else %} collapsed{% endif %}"
         href="#"
         data-bs-toggle="collapse"
         data-bs-target="#collapseLayoutsPermissions"
-        aria-expanded="{% if url.includes('/admin/permissions') or url.includes('/admin/roles') %}true{% else %}false{% endif %}"
+        aria-expanded="{% if isPermissionsActive %}true{% else %}false{% endif %}"
         aria-controls="collapseLayoutsPermissions"
       >
         <div class="sb-nav-link-icon"><i class="fas fa-shield-alt"></i></div>
@@ -112,7 +113,7 @@
         </div>
       </a>
       <div
-        class="collapse{% if url.includes('/admin/permissions') or url.includes('/admin/roles') %} show{% endif %}"
+        class="collapse{% if isPermissionsActive %} show{% endif %}"
         id="collapseLayoutsPermissions"
         aria-labelledby="headingOne"
         data-bs-parent="#sidenavAccordion"

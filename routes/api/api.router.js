@@ -11,6 +11,7 @@ router.use("/cache", cache);
 router.use("/datatable", datatable);
 router.use("/health", health);
 router.use("/session", session);
+router.use("/chat", require("./chat/chat.api.router"));
 router.use("/", index);
 
 module.exports = router;

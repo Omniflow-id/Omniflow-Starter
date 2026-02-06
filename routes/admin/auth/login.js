@@ -197,6 +197,7 @@ const login = asyncHandler(async (req, res) => {
       full_name: user.full_name,
       email: user.email,
       role_id: user.role_id,
+      role_name: user.role_name,
     };
     req.session.permissions = userPermissions;
 

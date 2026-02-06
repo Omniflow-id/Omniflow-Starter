@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Voice to Text Demo</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .controls { margin-bottom: 20px; }
+        button { padding: 10px 20px; cursor: pointer; font-size: 16px; }
+        #status { margin-left: 10px; color: #666; font-style: italic; }
+        #output { width: 100%; height: 200px; padding: 10px; font-size: 16px; }
+        .listening { background-color: #ffdddd; border-color: red; color: red; }
+    </style>
+</head>
+<body>
+    <h1>Voice to Text Demo (Native)</h1>
+    
+    <div class="controls">
+        <button id="micBtn">🎤 Mulai Bicara</button>
+        <button id="speakBtn">🔊 Baca Teks</button>
+        <span id="status">Siap...</span>
+    </div>
+
+    <textarea id="output" placeholder="Hasil suara akan muncul di sini..."></textarea>
+
+    <script>
+        const micBtn = document.getElementById('micBtn');
+        const speakBtn = document.getElementById('speakBtn');
+        const statusEl = document.getElementById('status');
+        const outputEl = document.getElementById('output');
+        
+        // 1. Check Support
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            alert("Browser Anda tidak mendukung Web Speech API (Gunakan Chrome/Edge/Brave).");
+            micBtn.disabled = true;
+        } else {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const recognition = new SpeechRecognition();
+            
+            recognition.continuous = true; // Bisa ngomong panjang
+            recognition.interimResults = true; // Teks muncul langsung (abu-abu)
+            recognition.lang = 'id-ID'; // Bahasa Indonesia
+
+            let isListening = false;
+
+            recognition.onstart = () => {
+                isListening = true;
+                statusEl.textContent = "Mendengarkan... (Silakan bicara)";
+                micBtn.textContent = "⏹️ Stop";
+                micBtn.classList.add('listening');
+            };
+
+            recognition.onend = () => {
+                isListening = false;
+                statusEl.textContent = "Berhenti.";
+                micBtn.textContent = "🎤 Mulai Bicara";
+                micBtn.classList.remove('listening');
+            };
+
+            recognition.onerror = (event) => {
+                console.error("Speech Error:", event.error);
+                statusEl.textContent = "Error: " + event.error;
+            };
+
+            recognition.onresult = (event) => {
+                let finalTranscript = '';
+                let interimTranscript = '';
+
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+
+                if (finalTranscript) {
+                    // Append text
+                    outputEl.value += (outputEl.value ? ' ' : '') + finalTranscript;
+                }
+            };
+
+            micBtn.addEventListener('click', () => {
+                if (isListening) {
+                    recognition.stop();
+                } else {
+                    recognition.start();
+                }
+            });
+        }
+
+        // 2. TTS (Output Suara)
+        speakBtn.addEventListener('click', () => {
+            const text = outputEl.value || "Tulis sesuatu dulu dong biar saya baca.";
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'id-ID';
+            window.speechSynthesis.speak(utterance);
+        });
+    </script>
+</body>
+</html>

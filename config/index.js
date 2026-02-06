@@ -84,9 +84,9 @@ const config = {
     ssl:
       process.env.DB_SSL_ENABLED === "true"
         ? {
-            rejectUnauthorized:
-              process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
-          }
+          rejectUnauthorized:
+            process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
+        }
         : false,
   },
 
@@ -150,7 +150,32 @@ const config = {
     helmetConfig: {
       contentSecurityPolicy: {
         directives: {
-          defaultSrc: ["'self'"],
+          defaultSrc: [
+            "'self'",
+            "https://connectivitycheck.gstatic.com",
+            "https://*.google.com",
+            "https://*.googleapis.com",
+            "https://*.gstatic.com",
+            "wss://*.google.com",
+          ],
+          connectSrc: [
+            "'self'",
+            "https://connectivitycheck.gstatic.com",
+            "https://*.google.com",
+            "https://*.googleapis.com",
+            "https://*.gstatic.com",
+            "wss://*.google.com",
+          ],
+          mediaSrc: ["'self'", "https://*.google.com", "blob:", "data:"],
+          frameSrc: ["'self'", "https://*.google.com"],
+          workerSrc: ["'self'", "blob:"],
+          imgSrc: [
+            "'self'",
+            "data:",
+            "https://*.google.com",
+            "https://*.googleapis.com",
+            "https://*.gstatic.com"
+          ],
           scriptSrc: [
             "'self'",
             "'unsafe-inline'",
@@ -162,6 +187,7 @@ const config = {
           upgradeInsecureRequests:
             process.env.NODE_ENV === "production" ? [] : null,
         },
+        reportOnly: false,
       },
       crossOriginEmbedderPolicy: process.env.NODE_ENV === "production",
       crossOriginOpenerPolicy: {
@@ -176,10 +202,10 @@ const config = {
       hsts:
         process.env.NODE_ENV === "production"
           ? {
-              maxAge: 63072000,
-              includeSubDomains: true,
-              preload: true,
-            }
+            maxAge: 63072000,
+            includeSubDomains: true,
+            preload: true,
+          }
           : false,
       ieNoOpen: true,
       noSniff: true,
@@ -273,6 +299,13 @@ const config = {
     defaultMessageOptions: {
       persistent: process.env.RABBITMQ_MESSAGE_PERSISTENT !== "false", // Default: true
     },
+  },
+
+  llm: {
+    enabled: process.env.LLM_ENABLED === "true", // Feature flag
+    modelName: process.env.LLM_MODEL_NAME || "gpt-4o-mini",
+    apiUrl: process.env.LLM_API_URL, // Optional
+    apiKey: process.env.LLM_API_KEY, // Strict: No fallback to OPENAI_API_KEY
   },
 };
 

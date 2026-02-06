@@ -1,0 +1,998 @@
+<style>
+/* Chat Widget Container */
+#ai-chat-widget {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 9999;
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+/* Floating Toggle Button */
+#ai-chat-toggle {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  background: #2563eb; /* Primary Blue */
+  color: white;
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#ai-chat-toggle:hover {
+  transform: scale(1.05);
+  background: #1d4ed8;
+}
+
+#ai-chat-toggle i {
+  font-size: 1.5rem;
+}
+
+/* Chat Sidebar/Panel */
+#ai-chat-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100%; /* Fallback for older browsers */
+  height: 100dvh; /* Use dynamic viewport height for mobile */
+  width: 400px; /* Default sidebar width */
+  max-width: 100vw;
+  background: white;
+  box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease; /* Animate width too */
+  display: flex;
+  flex-direction: column;
+  z-index: 10000;
+}
+
+#ai-chat-panel.open {
+  transform: translateX(0);
+}
+
+#ai-chat-panel.expanded {
+  width: 50vw; /* Wide mode when triggered */
+  min-width: 400px;
+}
+
+@media (max-width: 768px) {
+  #ai-chat-panel {
+    width: 100%;
+    /* On mobile, standard width is already full width */
+  }
+  #ai-chat-panel.expanded {
+    width: 100%; /* Keep full width on mobile even if expanded */
+  }
+  /* Hide Expand Button on Mobile because it's always full width */
+  #ai-expand-chat {
+    display: none !important;
+  }
+}
+
+/* Header */
+.ai-chat-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8fafc;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0; /* Prevent header from shrinking */
+}
+
+.ai-chat-title {
+  font-weight: 600;
+  color: #1e293b;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ai-context-indicator {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  background: #dbeafe;
+  color: #1e40af;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+.ai-close-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  transition: background 0.2s;
+}
+
+.ai-close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.ai-expand-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-right: 0.25rem;
+}
+
+.ai-expand-btn:hover {
+  background: #e2e8f0;
+  color: #2563eb;
+  transform: scale(1.1);
+}
+
+.ai-expand-btn i {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Messages Area */
+.ai-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: #ffffff;
+}
+
+.message {
+  max-width: 85%;
+  padding: 0.75rem 1rem;
+  border-radius: 1rem;
+  line-height: 1.5;
+  font-size: 0.95rem;
+  animation: fadeIn 0.3s ease;
+}
+
+.message.user {
+  align-self: flex-end;
+  background: #2563eb;
+  color: white;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.message.ai {
+  align-self: flex-start;
+  background: #f1f5f9;
+  color: #334155;
+  border-bottom-left-radius: 0.25rem;
+}
+
+.message.system {
+  align-self: center;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 0.85rem;
+  text-align: center;
+  font-style: italic;
+}
+
+/* Input Area */
+.ai-chat-input-area {
+  padding: 1.5rem;
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom)); /* Safe area fix */
+  border-top: 1px solid #e5e7eb;
+  background: white;
+  flex-shrink: 0; /* Prevent shrinking */
+}
+
+.ai-input-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  background: #f8fafc;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  transition: border-color 0.2s;
+}
+
+.ai-input-wrapper:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+}
+
+#ai-chat-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 0.5rem;
+  font-size: 0.95rem;
+  outline: none;
+  resize: none;
+  max-height: 200px; /* Increased for better desktop experience */
+  min-height: 24px;
+  overflow-y: auto; /* Enable vertical rolling */
+}
+
+#ai-send-btn {
+  background: none;
+  border: none;
+  color: #2563eb;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: background 0.2s;
+}
+
+.ai-tts-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 0.8rem;
+    cursor: pointer;
+    margin-top: 0.25rem;
+    padding: 0.25rem;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+.ai-tts-btn:hover {
+    opacity: 1;
+    color: #2563eb;
+}
+
+#ai-mic-btn {
+  background: none;
+  border: none;
+  color: #64748b;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+#ai-mic-btn:hover {
+  background: #f1f5f9;
+  color: #2563eb;
+}
+
+#ai-mic-btn.listening {
+  color: #ef4444; /* Red when recording */
+  animation: pulse 1.5s infinite;
+}
+
+#ai-send-btn:hover {
+  background: #dbeafe;
+}
+
+/* Typography & Utilities */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* Typing Indicator */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 4px 8px;
+  align-items: center;
+}
+.typing-dot {
+  width: 6px;
+  height: 6px;
+  background: #94a3b8;
+  border-radius: 50%;
+  animation: bounce 1.4s infinite ease-in-out both;
+}
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0); }
+  40% { transform: scale(1); }
+}
+</style>
+
+<!-- Add Markdown Parser (Marked.js) -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+// Configure marked.js to open all links in new tab
+marked.setOptions({
+  breaks: true,
+  gfm: true,
+  headerIds: false,
+});
+// Add target="_blank" to all links
+const originalRenderer = marked.renderer;
+marked.renderer = Object.assign({}, originalRenderer, {
+  link: function(href, title, text) {
+    const link = originalRenderer.link.call(this, href, title, text);
+    return link.replace('<a ', '<a target="_blank" rel="noopener noreferrer" ');
+  }
+});
+</script>
+
+<style>
+/* Markdown Content Styling */
+.message-content {
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.message-content p {
+  margin-bottom: 0.5rem;
+}
+.message-content p:last-child {
+  margin-bottom: 0;
+}
+
+.message-content h1, .message-content h2, .message-content h3 {
+  font-weight: 600;
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+  font-size: 1.1em;
+}
+
+.message-content ul, .message-content ol {
+  margin-left: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.message-content li {
+  margin-bottom: 0.25rem;
+}
+
+.message-content code {
+  background: rgba(0,0,0,0.1);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.message-content pre {
+  background: #1e1e1e;
+  color: #d4d4d4;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 0.5rem 0;
+}
+
+.message-content pre code {
+  background: transparent;
+  padding: 0;
+  color: inherit;
+  font-size: 0.85em;
+}
+
+.message.user .message-content code {
+  background: rgba(255,255,255,0.2);
+}
+
+.message.user .message-content p, .message.user .message-content li {
+  color: white;
+}
+
+/* Chat Link Styling */
+.message-content a {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(37, 99, 235, 0.1);
+  transition: all 0.2s;
+}
+
+.message-content a:hover {
+  background: rgba(37, 99, 235, 0.2);
+  text-decoration: underline;
+}
+
+.message-content a:active {
+  transform: scale(0.98);
+}
+
+/* Show pointer cursor on links */
+.message-content {
+  cursor: default;
+}
+
+.message-content a {
+  cursor: pointer;
+}
+
+/* Extra space for last message to prevent keyboard cutout */
+.message:last-child {
+  margin-bottom: 1rem;
+}
+</style>
+
+<!-- Floating Toggle -->
+<div id="ai-chat-widget">
+  <button id="ai-chat-toggle" aria-label="Open AI Assistant">
+    <i class="fas fa-robot"></i>
+  </button>
+</div>
+
+<!-- Sidebar Component -->
+<div id="ai-chat-panel">
+  <!-- Header -->
+  <div class="ai-chat-header">
+    <div class="ai-chat-title">
+      <i class="fas fa-robot text-primary"></i>
+      <span class="ai-title-text">OMNI Assistant</span>
+      <span class="ai-context-indicator" id="ai-context-label">Home</span>
+    </div>
+    <div class="ai-header-controls">
+      <button class="ai-expand-btn" id="ai-expand-chat" title="Toggle Wide Mode">
+        <i class="fas fa-expand-alt"></i>
+      </button>
+      <button class="ai-close-btn" id="ai-close-chat" title="Close">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Messages -->
+  <div class="ai-chat-messages" id="ai-messages">
+    <div class="message system">
+      Selamat datang! Saya siap membantu Anda berdasarkan halaman yang sedang Anda buka.
+    </div>
+    <div class="message ai">
+      Halo! Ada yang bisa saya bantu terkait halaman ini?
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="ai-chat-input-area">
+    <div class="ai-input-wrapper">
+      <button id="ai-mic-btn" title="Speak">
+        <i class="fas fa-microphone"></i>
+      </button>
+      <textarea 
+        id="ai-chat-input" 
+        rows="1" 
+        placeholder="Tanya sesuatu..."
+        oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
+      ></textarea>
+      <button id="ai-send-btn" title="Send">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+    <div id="ai-disclaimer" style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.5rem; text-align: center;">
+      AI dapat membuat kesalahan. Periksa informasi penting.
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleBtn = document.getElementById('ai-chat-toggle');
+    const closeBtn = document.getElementById('ai-close-chat');
+    const panel = document.getElementById('ai-chat-panel');
+    const input = document.getElementById('ai-chat-input');
+    const sendBtn = document.getElementById('ai-send-btn');
+    const messagesContainer = document.getElementById('ai-messages');
+    const contextLabel = document.getElementById('ai-context-label');
+
+    // 1. Determine Context (Page ID)
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    let currentPageId = pathSegments.length > 0 ? pathSegments[pathSegments.length - 1] : 'home';
+    
+    // Normalize 'admin' root to 'index'
+    if (currentPageId === 'admin' || currentPageId === 'dashboard') currentPageId = 'index';
+
+    // Determine language first
+    const currentLang = document.documentElement.lang || 'id';
+
+    contextLabel.textContent = currentPageId.charAt(0).toUpperCase() + currentPageId.slice(1);
+
+    // Update title based on language
+    const titleEl = document.querySelector('.ai-title-text');
+    if (titleEl) {
+        titleEl.textContent = currentLang === 'id' ? 'OMNI Asisten' : 'OMNI Assistant';
+    }
+
+    // Dynamic Welcome Message based on Document Language
+    // currentLang already defined above
+    const welcomeText = currentLang === 'id'
+        ? 'Selamat datang! Saya siap membantu Anda berdasarkan halaman yang sedang Anda buka.'
+        : 'Welcome! I am ready to help you based on the current page you are viewing.';
+    const greetingText = currentLang === 'id'
+        ? 'Halo! Ada yang bisa saya bantu terkait halaman ini?'
+        : 'Hello! How can I assist you with this page?';
+    
+    // UI Translations
+    const placeholderText = currentLang === 'id' ? 'Tanya sesuatu...' : 'Ask something...';
+    const disclaimerText = currentLang === 'id' 
+        ? 'AI dapat membuat kesalahan. Periksa informasi penting.' 
+        : 'AI can make mistakes. Please verify important information.';
+
+    document.querySelector('.message.system').textContent = welcomeText;
+    document.querySelector('.message.ai').textContent = greetingText;
+    
+    const inputField = document.getElementById('ai-chat-input');
+    if (inputField) inputField.placeholder = placeholderText;
+
+    const disclaimerEl = document.getElementById('ai-disclaimer');
+    if (disclaimerEl) disclaimerEl.textContent = disclaimerText;
+
+    const expandBtn = document.getElementById('ai-expand-chat');
+
+    const micBtn = document.getElementById('ai-mic-btn');
+    let recognition;
+
+    // Speech Recognition Setup
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        recognition = new SpeechRecognition();
+        recognition.continuous = true; // Allow long dictation
+        recognition.interimResults = true; // Show text immediately
+        
+        // Auto-detect language based on document lang
+        recognition.lang = document.documentElement.lang === 'id' ? 'id-ID' : 'en-US';
+
+        micBtn.addEventListener('click', () => {
+             if (micBtn.classList.contains('listening')) {
+                 recognition.stop();
+             } else {
+                 input.placeholder = "Mendengarkan... (Silakan bicara)";
+                 recognition.start();
+             }
+        });
+
+        recognition.onstart = () => {
+             micBtn.classList.add('listening');
+             micBtn.innerHTML = '<i class="fas fa-stop"></i>'; 
+        };
+
+        recognition.onend = () => {
+             micBtn.classList.remove('listening');
+             micBtn.innerHTML = '<i class="fas fa-microphone"></i>'; 
+             input.placeholder = "Tanya sesuatu...";
+             // Don't auto-focus if user clicked stop manually, but good UX generally
+             if (!input.value) input.focus(); 
+        };
+
+        let finalTranscript = '';
+
+        recognition.onresult = (event) => {
+             let interimTranscript = '';
+
+             for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript += event.results[i][0].transcript;
+                } else {
+                    interimTranscript += event.results[i][0].transcript;
+                }
+             }
+
+             // Update input with Final + Interim
+             // Note: simpler approach for chat input is just replacing current session's input
+             // But user might have typed before. 
+             // Ideally: Text = (Existing Text) + (Final Transcript of this session) + (Interim)
+             // But sync is hard. 
+             // Simple version: Just append? No, interim updates repeatedly.
+             
+             // Smart strategy: we only update the current 'voice segment'
+             // For now, let's just set the input value.
+             // Warning: This overrides manual typing if mixed.
+             if (document.activeElement === input) {
+                 // If user is editing, we might overwrite. 
+                 // Let's assume voice mode takes over.
+                 // We need to keep track of what was there before *this* recording session started
+                 // For now, simpler: just flush to input.
+             }
+             
+             // Just append final, show interim in placeholder? Or append interim temporary?
+             // Let's use the standard "append final, ignore interim visual for now" or "append both"
+             // If we use continuous, 'final' keeps coming.
+             
+             const currentContent = input.getAttribute('data-pre-voice') || input.value;
+             input.setAttribute('data-pre-voice', currentContent); // Save state? No.
+
+             // Realtime display logic usually requires a separate overlay or complex input manipulation.
+             // Let's stick to: Append FINAL results only to input, to avoid cursor jumping issues.
+             // BUT user wants smooth UX. @SCOPPI uses: deskripsiUsulanTextarea.value = finalTranscript; (Rewrites whole)
+             
+             // Hybrid Approach:
+             // On result, just keep appending?
+             // If I set interimResults=true, 'onresult' fires often.
+             // I need to only append the NEW final part.
+             
+             if (event.results[event.results.length - 1].isFinal) {
+                 const newFinal = event.results[event.results.length - 1][0].transcript;
+                 input.value += (input.value && !input.value.endsWith(' ') ? ' ' : '') + newFinal;
+                 input.scrollTop = input.scrollHeight;
+                 input.style.height = 'auto';
+                 input.style.height = input.scrollHeight + 'px';
+              }
+        };
+    } else {
+        // Fallback: Hide mic button if speech recognition is not supported
+        if (micBtn) micBtn.style.display = 'none';
+    }
+
+    // Text to Speech (TTS) Native
+    function speakText(text) {
+        if ('speechSynthesis' in window) {
+            // Cancel any current speaking
+            window.speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = document.documentElement.lang === 'id' ? 'id-ID' : 'en-US';
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
+
+            window.speechSynthesis.speak(utterance);
+        }
+    }
+
+    // UI State Management
+    function openChatUI() {
+        panel.classList.add('open');
+        toggleBtn.style.display = 'none';
+        input.focus();
+    }
+
+    function closeChatUI() {
+        panel.classList.remove('open');
+        setTimeout(() => {
+            toggleBtn.style.display = 'flex';
+        }, 300);
+    }
+
+    // Toggle Sidebar (Open)
+    toggleBtn.addEventListener('click', () => {
+        openChatUI();
+        // Push state to history so "Back" button closes chat instead of navigating away
+        // Especially important for mobile users
+        history.pushState({ chatOpen: true }, "", "");
+    });
+
+    // Close Button
+    closeBtn.addEventListener('click', () => {
+        // If we have history state, go back (which triggers popstate -> closeChatUI)
+        // This keeps history clean
+        if (history.state && history.state.chatOpen) {
+            history.back();
+        } else {
+            closeChatUI();
+        }
+    });
+
+    // Handle Browser Back Button
+    window.addEventListener('popstate', (event) => {
+        // If state is null or chatOpen is false, we should be closed
+        if (!event.state || !event.state.chatOpen) {
+            closeChatUI();
+        } 
+        // If user goes Forward to a chatOpen state
+        else if (event.state && event.state.chatOpen) {
+            openChatUI();
+        }
+    });
+
+    // Expand/Collapse Width with Microinteraction
+    if (expandBtn) {
+        // Initialize icon based on current expanded state
+        const initExpandIcon = () => {
+            const icon = expandBtn.querySelector('i');
+            if (icon && panel.classList.contains('expanded')) {
+                icon.className = 'fas fa-compress-arrows-alt';
+            }
+        };
+        initExpandIcon();
+
+        expandBtn.addEventListener('click', () => {
+            const icon = expandBtn.querySelector('i');
+            const isExpanded = panel.classList.toggle('expanded');
+            
+            if (icon) {
+                // Add rotation animation
+                icon.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+                icon.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
+                
+                // Change icon after rotation
+                setTimeout(() => {
+                    icon.className = isExpanded ? 'fas fa-compress-arrows-alt' : 'fas fa-expand-arrows-alt';
+                    icon.style.transform = 'rotate(0deg)';
+                }, 150);
+            }
+            
+            // Add button press effect
+            expandBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                expandBtn.style.transform = 'scale(1)';
+            }, 100);
+        });
+        
+        // Hover animation
+        expandBtn.addEventListener('mouseenter', () => {
+            expandBtn.style.transform = 'scale(1.1)';
+        });
+        expandBtn.addEventListener('mouseleave', () => {
+            expandBtn.style.transform = 'scale(1)';
+        });
+    }
+
+    // Mobile Keyboard Fix: Aggressively scroll to bottom when input gets focus
+    // This ensures that even if user was scrolling up, focusing input snaps them back to latest
+    input.addEventListener('focus', () => {
+        // Trigger multiple times to catch different stages of keyboard animation
+        setTimeout(scrollToBottom, 100);
+        setTimeout(scrollToBottom, 300);
+        setTimeout(scrollToBottom, 500);
+    });
+    
+    // Also listen to visual viewport resize if supported (modern mobile browsers)
+    if (window.visualViewport) {
+        window.visualViewport.addEventListener('resize', () => {
+             if (document.activeElement === input) {
+                 scrollToBottom();
+             }
+        });
+    }
+
+    // Send Message (Streaming)
+    async function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+
+
+        // Add User Message
+        appendMessage('user', text);
+        input.value = '';
+        input.style.height = 'auto'; // Reset height
+
+        // Show Typing Indicator
+        const typingId = showTypingIndicator();
+
+        try {
+            const response = await fetch(`/api/chat/stream?lang=${document.documentElement.lang}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    currentPageId: currentPageId,
+                    userRole: 'user', // In a real app, inject this from server template
+                    message: text
+                })
+            });
+
+            // Remove Typing Indicator
+            removeMessage(typingId);
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                appendMessage('system', errorData.error || 'Maaf, terjadi kesalahan pada server AI.');
+                return;
+            }
+
+            // Create AI message container for streaming
+            const aiDiv = document.createElement('div');
+            aiDiv.className = 'message ai';
+
+            const container = document.createElement('div');
+            container.className = 'message-content';
+            aiDiv.appendChild(container);
+
+            // Add TTS button container (will be added after streaming completes)
+            const ttsBtnContainer = document.createElement('div');
+            ttsBtnContainer.style.marginTop = '0.25rem';
+            aiDiv.appendChild(ttsBtnContainer);
+
+            messagesContainer.appendChild(aiDiv);
+
+            // Handle streaming response with real-time markdown parsing
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let accumulatedText = '';
+            const typingSpeed = 10; // ms per character (slightly faster)
+            const markdownEnabled = typeof marked !== 'undefined';
+
+            // Track scroll position before update
+            let wasAtBottom = messagesContainer.scrollTop + messagesContainer.offsetHeight >= messagesContainer.scrollHeight - 10;
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+
+                // Parse SSE format: "data: {...}\n\n"
+                const lines = buffer.split('\n\n');
+                buffer = lines.pop() || '';
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        try {
+                            const data = JSON.parse(line.slice(6));
+
+                            if (data.type === 'chunk') {
+                                // Typing effect with real-time markdown parsing
+                                const newContent = data.content;
+                                for (let i = 0; i < newContent.length; i++) {
+                                    accumulatedText += newContent[i];
+
+                                    // Parse markdown in real-time
+                                    if (markdownEnabled) {
+                                        try {
+                                            container.innerHTML = marked.parse(accumulatedText);
+                                        } catch (e) {
+                                            // If partial markdown breaks, show raw text temporarily
+                                            container.textContent = accumulatedText;
+                                        }
+                                    } else {
+                                        container.textContent = accumulatedText;
+                                    }
+
+                                    scrollToBottom();
+                                    // Small delay for typing effect
+                                    await new Promise(resolve => setTimeout(resolve, typingSpeed));
+                                }
+                            } else if (data.type === 'done') {
+                                // Final parse to ensure completeness
+                                if (markdownEnabled) {
+                                    container.innerHTML = marked.parse(accumulatedText);
+                                }
+                                // Add TTS button
+                                addTTSButton(ttsBtnContainer, accumulatedText);
+                                scrollToBottom();
+                                return;
+                            } else if (data.type === 'error') {
+                                appendMessage('system', 'Error: ' + data.message);
+                                return;
+                            }
+                        } catch (e) {
+                            // Skip invalid JSON
+                        }
+                    }
+                }
+            }
+
+            // Handle any remaining buffer
+            if (buffer.startsWith('data: ')) {
+                try {
+                    const data = JSON.parse(buffer.slice(6));
+                    if (data.type === 'chunk') {
+                        for (let i = 0; i < data.content.length; i++) {
+                            accumulatedText += data.content[i];
+                            if (markdownEnabled) {
+                                try {
+                                    container.innerHTML = marked.parse(accumulatedText);
+                                } catch (e) {
+                                    container.textContent = accumulatedText;
+                                }
+                            } else {
+                                container.textContent = accumulatedText;
+                            }
+                            await new Promise(resolve => setTimeout(resolve, typingSpeed));
+                        }
+                    }
+                } catch (e) {
+                    // Skip
+                }
+            }
+
+            // Final parse
+            if (markdownEnabled) {
+                container.innerHTML = marked.parse(accumulatedText);
+            }
+            addTTSButton(ttsBtnContainer, accumulatedText);
+            scrollToBottom();
+
+        } catch (error) {
+            removeMessage(typingId);
+            appendMessage('system', 'Gagal terhubung ke server. Cek koneksi internet Anda.');
+            console.error(error);
+        }
+    }
+
+    // Add TTS button for AI messages
+    function addTTSButton(container, text) {
+        container.innerHTML = '';
+        const ttsBtn = document.createElement('button');
+        ttsBtn.className = 'ai-tts-btn';
+        ttsBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+        ttsBtn.title = 'Baca dengan suara';
+        ttsBtn.onclick = () => speakText(text);
+        container.appendChild(ttsBtn);
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    // Helpers
+    function appendMessage(role, text) {
+        const div = document.createElement('div');
+        div.className = `message ${role}`;
+        
+        let container = document.createElement('div');
+        container.className = 'message-content';
+
+        if (role === 'system') {
+             container.textContent = text;
+        } else if (typeof marked !== 'undefined') {
+             // Use Marked to parse markdown
+             container.innerHTML = marked.parse(text);
+        } else {
+             // Fallback if marked is missing
+             container.innerHTML = text.replace(/\n/g, '<br>');
+        }
+        
+        div.appendChild(container);
+
+        // Add TTS button for AI messages
+        if (role === 'ai') {
+            const ttsBtn = document.createElement('button');
+            ttsBtn.className = 'ai-tts-btn';
+            ttsBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+            ttsBtn.onclick = () => speakText(text); // Native TTS call
+            div.appendChild(ttsBtn);
+        }
+
+        messagesContainer.appendChild(div);
+        scrollToBottom();
+        return div;
+    }
+
+    function showTypingIndicator() {
+        const id = 'typing-' + Date.now();
+        const div = document.createElement('div');
+        div.id = id;
+        div.className = 'message ai';
+        div.innerHTML = `
+            <div class="typing-indicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        `;
+        messagesContainer.appendChild(div);
+        scrollToBottom();
+        return id;
+    }
+
+    function removeMessage(id) {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+    }
+
+    function scrollToBottom() {
+        // Force scroll with a small delay to handle layout shifts
+        setTimeout(() => {
+             messagesContainer.scrollTop = messagesContainer.scrollHeight;
+             // Secondary attempt using window scroll for mobile
+             if (window.innerWidth <= 480) {
+                 window.scrollTo(0, document.body.scrollHeight);
+                 // Also ensure the container itself is scrolled
+                 const lastMsg = messagesContainer.lastElementChild;
+                 if (lastMsg) lastMsg.scrollIntoView(false);
+             }
+        }, 50);
+    }
+});
+</script>
