@@ -48,10 +48,11 @@
   background: white;
   box-shadow: -4px 0 15px rgba(0, 0, 0, 0.1);
   transform: translateX(100%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease; /* Animate width too */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease, height 0.15s ease;
   display: flex;
   flex-direction: column;
   z-index: 10000;
+  overflow: hidden; /* Prevent content overflow during resize */
 }
 
 #ai-chat-panel.open {
@@ -127,18 +128,39 @@
   cursor: pointer;
   padding: 0.5rem;
   border-radius: 0.375rem;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: background 0.2s, color 0.2s;
   margin-right: 0.25rem;
 }
 
 .ai-expand-btn:hover {
   background: #e2e8f0;
   color: #2563eb;
-  transform: scale(1.1);
 }
 
+.ai-expand-btn svg,
 .ai-expand-btn i {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.ai-expand-btn:hover svg,
+.ai-expand-btn:hover i {
+  transform: scale(1.15);
+}
+
+.ai-expand-btn:active svg,
+.ai-expand-btn:active i {
+  transform: scale(0.85);
+}
+
+.ai-expand-btn.icon-swap {
+  animation: iconSwap 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes iconSwap {
+  0%   { transform: scale(1) rotate(0deg); opacity: 1; }
+  40%  { transform: scale(0) rotate(90deg); opacity: 0; }
+  60%  { transform: scale(0) rotate(-90deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
 /* Messages Area */
@@ -687,65 +709,67 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Expand/Collapse Width with Microinteraction
+    // Note: FA6 JS replaces <i> with <svg>, so we must use innerHTML replacement
     if (expandBtn) {
-        // Initialize icon based on current expanded state
-        const initExpandIcon = () => {
-            const icon = expandBtn.querySelector('i');
-            if (icon && panel.classList.contains('expanded')) {
-                icon.className = 'fas fa-compress-arrows-alt';
-            }
-        };
-        initExpandIcon();
+        // Initialize icon to match current state
+        if (panel.classList.contains('expanded')) {
+            expandBtn.innerHTML = '<i class="fas fa-compress-alt"></i>';
+            expandBtn.title = 'Collapse';
+        }
 
         expandBtn.addEventListener('click', () => {
-            const icon = expandBtn.querySelector('i');
             const isExpanded = panel.classList.toggle('expanded');
-            
-            if (icon) {
-                // Add rotation animation
-                icon.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
-                icon.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0deg)';
-                
-                // Change icon after rotation
-                setTimeout(() => {
-                    icon.className = isExpanded ? 'fas fa-compress-arrows-alt' : 'fas fa-expand-arrows-alt';
-                    icon.style.transform = 'rotate(0deg)';
-                }, 150);
-            }
-            
-            // Add button press effect
-            expandBtn.style.transform = 'scale(0.95)';
+
+            // Animate the button (not the icon, since FA6 replaces <i> with <svg>)
+            expandBtn.classList.add('icon-swap');
+
+            // Swap icon at midpoint (button is invisible at 40% = ~140ms)
             setTimeout(() => {
-                expandBtn.style.transform = 'scale(1)';
-            }, 100);
-        });
-        
-        // Hover animation
-        expandBtn.addEventListener('mouseenter', () => {
-            expandBtn.style.transform = 'scale(1.1)';
-        });
-        expandBtn.addEventListener('mouseleave', () => {
-            expandBtn.style.transform = 'scale(1)';
+                const iconClass = isExpanded ? 'fa-compress-alt' : 'fa-expand-alt';
+                expandBtn.innerHTML = `<i class="fas ${iconClass}"></i>`;
+                expandBtn.title = isExpanded ? 'Collapse' : 'Expand';
+            }, 140);
+
+            // Cleanup animation class when done
+            expandBtn.addEventListener('animationend', () => {
+                expandBtn.classList.remove('icon-swap');
+            }, { once: true });
         });
     }
 
-    // Mobile Keyboard Fix: Aggressively scroll to bottom when input gets focus
-    // This ensures that even if user was scrolling up, focusing input snaps them back to latest
+    // Mobile Keyboard Fix: Resize panel to visual viewport when keyboard opens
+    // This ensures input area stays visible above the virtual keyboard
+    if (window.visualViewport) {
+        const updatePanelHeight = () => {
+            const vv = window.visualViewport;
+            // Set panel height to visible viewport height
+            panel.style.height = `${vv.height}px`;
+            // Offset top to match viewport scroll (handles address bar hiding)
+            panel.style.top = `${vv.offsetTop}px`;
+
+            if (document.activeElement === input) {
+                scrollToBottom();
+            }
+        };
+
+        window.visualViewport.addEventListener('resize', updatePanelHeight);
+        window.visualViewport.addEventListener('scroll', updatePanelHeight);
+    }
+
+    // Scroll to bottom when input gets focus (catches keyboard animation stages)
     input.addEventListener('focus', () => {
-        // Trigger multiple times to catch different stages of keyboard animation
         setTimeout(scrollToBottom, 100);
         setTimeout(scrollToBottom, 300);
         setTimeout(scrollToBottom, 500);
     });
-    
-    // Also listen to visual viewport resize if supported (modern mobile browsers)
-    if (window.visualViewport) {
-        window.visualViewport.addEventListener('resize', () => {
-             if (document.activeElement === input) {
-                 scrollToBottom();
-             }
-        });
-    }
+
+    // Reset panel height when keyboard closes
+    input.addEventListener('blur', () => {
+        setTimeout(() => {
+            panel.style.height = '';
+            panel.style.top = '';
+        }, 100);
+    });
 
     // Send Message (Streaming)
     async function sendMessage() {
