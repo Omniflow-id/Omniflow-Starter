@@ -41,6 +41,7 @@ const getUserOverviewPage = async (req, res) => {
     res.render("pages/admin/user/overview", {
       totalUsers: result.data.totalUsers,
       roleStats: result.data.roleStats,
+      permissions: req.session.permissions || [], // Pass permissions for sidebar navigation
       cacheInfo: {
         source: result.source,
         duration_ms: result.duration_ms,
