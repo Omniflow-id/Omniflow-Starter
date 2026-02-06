@@ -109,6 +109,40 @@ function getEmoji(level) {
 }
 
 /**
+ * Get internal IP address
+ * @returns {string} IP address
+ */
+/**
+ * Get internal network information
+ * @returns {Object} Network info with local and tailscale IPs
+ */
+function getNetworkInfo() {
+  const interfaces = os.networkInterfaces();
+  let localIP = "unknown";
+  let tailscaleIP = "not connected";
+
+  for (const name of Object.keys(interfaces)) {
+    // Identify virtual interfaces to avoid them overwriting physical ones
+    const isVirtual = /docker|veth|br-|br\./i.test(name);
+
+    for (const iface of interfaces[name]) {
+      if ((iface.family === "IPv4" || iface.family === 4) && !iface.internal) {
+        // Tailscale (usually 100.x.y.z)
+        if (iface.address.startsWith("100.") || name.toLowerCase().includes("tailscale")) {
+          tailscaleIP = iface.address;
+        } else {
+          // If it's not virtual, or we haven't found any IP yet, use it
+          if (localIP === "unknown" || !isVirtual) {
+            localIP = iface.address;
+          }
+        }
+      }
+    }
+  }
+  return { localIP, tailscaleIP };
+}
+
+/**
  * Format notification message
  * @param {string} message - Base message
  * @param {Object} options - Formatting options
@@ -116,6 +150,7 @@ function getEmoji(level) {
  */
 function formatMessage(message, options) {
   const { level, component, timestamp, metadata, emoji } = options;
+  const { localIP, tailscaleIP } = getNetworkInfo();
 
   // Use plain text formatting to avoid Telegram markdown issues
   const appName = (process.env.APP_NAME || "OMNIFLOW").toUpperCase();
@@ -123,6 +158,9 @@ function formatMessage(message, options) {
   formatted += `Level: ${level.toUpperCase()}\n`;
   formatted += `Application: ${process.env.APP_NAME || "Omniflow Starter"}\n`;
   formatted += `Instance: ${os.hostname()}\n`;
+  formatted += `Node: ${process.env.INSTANCE_NODE_NAME || "Thinkpad L15"}\n`;
+  formatted += `IP (Local): ${localIP}\n`;
+  formatted += `IP (Tailscale): ${tailscaleIP}\n`;
   formatted += `Component: ${component}\n`;
   formatted += `Time: ${timestamp}\n`;
   formatted += `Environment: ${process.env.NODE_ENV || "development"}\n\n`;
