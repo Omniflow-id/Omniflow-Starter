@@ -16,7 +16,11 @@
     "allJobs": "All Jobs",
     "failedJobs": "Failed Jobs",
     "logs": "Logs",
-    "loggedInAs": "Logged in as"
+    "loggedInAs": "Logged in as",
+    "aiManagement": "AI Management",
+    "aiModels": "AI Models",
+    "aiUseCases": "AI Use Cases",
+    "aiChat": "AI Chat"
   },
   "common": {
     "actions": {

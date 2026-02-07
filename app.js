@@ -194,12 +194,20 @@ app.use(async (req, res, next) => {
     }
 
     // Create translate function
-    const t = (key) => {
+    const t = (key, params = {}) => {
       if (!key) return "";
-      const result = key
+      let result = key
         .split(".")
         .reduce((o, i) => (o ? o[i] : undefined), commonLocale);
-      return result !== undefined ? result : key;
+
+      if (result === undefined) return key;
+
+      if (params && typeof params === "object") {
+        Object.keys(params).forEach((param) => {
+          result = result.replace(new RegExp(`{${param}}`, "g"), params[param]);
+        });
+      }
+      return result;
     };
 
     // Inject i18n data into res.locals (available to all templates)
@@ -226,8 +234,11 @@ app.use(async (req, res, next) => {
       // Check if context already has t from a page-specific wrapper (withLocale)
       // If withLocale runs before us, context.t would be set
       // If we run before withLocale, context.t would be undefined and we use global t
-      const tFunction = (currentT && currentT !== t) ? currentT : (context.t || t);
-      const pageLocale = (currentLocale && currentLocale !== commonLocale) ? currentLocale : (context.locale || commonLocale);
+      const tFunction = currentT && currentT !== t ? currentT : context.t || t;
+      const pageLocale =
+        currentLocale && currentLocale !== commonLocale
+          ? currentLocale
+          : context.locale || commonLocale;
 
       const mergedContext = {
         ...res.locals,

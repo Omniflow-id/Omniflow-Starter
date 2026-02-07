@@ -1,0 +1,160 @@
+{
+  "sidebar": {
+    "aiManagement": "Manajemen AI",
+    "aiModels": "Model AI",
+    "aiUseCases": "Use Case AI",
+    "aiChat": "Obrolan AI"
+  },
+  "ai": {
+    "models": {
+      "title": "Model AI",
+      "breadcrumb": "Manajemen Model AI",
+      "listTitle": "Daftar Model AI",
+      "addButton": "Tambah Model AI",
+      "addModalTitle": "Tambah Model AI",
+      "editModalTitle": "Edit Model AI",
+      "deleteConfirmTitle": "Konfirmasi Hapus",
+      "deleteConfirmMessage": "Apakah Anda yakin ingin menghapus Model AI <strong>{name}</strong>?",
+      "deleteWarning": "Tindakan ini tidak dapat dibatalkan.",
+      "fields": {
+        "name": "Nama Model",
+        "apiUrl": "URL API",
+        "apiKey": "Kunci API",
+        "modelVariant": "Varian Model",
+        "status": "Status"
+      },
+      "placeholders": {
+        "name": "Contoh: GPT-4 Turbo",
+        "apiUrl": "https://api.openai.com/v1/chat/completions",
+        "apiKey": "sk-...",
+        "modelVariant": "gpt-4-turbo-preview"
+      },
+      "selectStatus": "Pilih Status",
+      "statusActive": "Aktif",
+      "statusInactive": "Tidak Aktif",
+      "encryptedNote": "Kunci API akan dienkripsi sebelum penyimpanan.",
+      "keepKeyNote": "Biarkan nilai saat ini untuk mempertahankan kunci yang ada.",
+      "tableHeaders": {
+        "id": "ID",
+        "name": "Nama Model",
+        "apiUrl": "URL API",
+        "apiKey": "Kunci API",
+        "modelVariant": "Varian Model",
+        "status": "Status",
+        "actions": "Aksi"
+      },
+      "messages": {
+        "created": "Model AI berhasil dibuat",
+        "updated": "Model AI berhasil diperbarui",
+        "deleted": "Model AI berhasil dihapus",
+        "error": {
+          "required": "Semua kolom wajib diisi",
+          "invalidUrl": "Format URL API tidak valid",
+          "duplicateName": "Nama model sudah ada",
+          "notFound": "Model AI tidak ditemukan",
+          "decryptionError": "Gagal mendekripsi kunci API"
+        }
+      }
+    },
+    "useCases": {
+      "title": "Use Case AI",
+      "breadcrumb": "Manajemen Use Case AI",
+      "listTitle": "Daftar Use Case AI",
+      "addButton": "Tambah Use Case",
+      "addModalTitle": "Tambah Use Case AI",
+      "editModalTitle": "Edit Use Case AI",
+      "deleteConfirmTitle": "Konfirmasi Hapus",
+      "deleteConfirmMessage": "Apakah Anda yakin ingin menghapus Use Case AI <strong>{name}</strong>?",
+      "deleteWarning": "Tindakan ini tidak dapat dibatalkan.",
+      "fields": {
+        "name": "Nama Use Case",
+        "description": "Deskripsi",
+        "baseKnowledge": "Pengetahuan Dasar",
+        "prompt": "Prompt Sistem",
+        "allowedRoles": "Role yang Diizinkan",
+        "status": "Status"
+      },
+      "placeholders": {
+        "name": "Contoh: Asisten Kebijakan HR",
+        "description": "Deskripsi singkat tentang use case ini",
+        "baseKnowledge": "Pengetahuan dasar yang akan digunakan AI (aturan perusahaan, kebijakan, dll)",
+        "prompt": "Instruksi untuk AI tentang cara merespons"
+      },
+      "selectStatus": "Pilih Status",
+      "statusActive": "Aktif",
+      "statusInactive": "Tidak Aktif",
+      "tableHeaders": {
+        "id": "ID",
+        "name": "Nama",
+        "description": "Deskripsi",
+        "roles": "Role",
+        "status": "Status",
+        "actions": "Aksi"
+      },
+      "messages": {
+        "created": "Use Case AI berhasil dibuat",
+        "updated": "Use Case AI berhasil diperbarui",
+        "deleted": "Use Case AI berhasil dihapus",
+        "error": {
+          "required": "Nama, deskripsi, prompt, dan status wajib diisi",
+          "duplicateName": "Nama use case sudah ada",
+          "notFound": "Use Case AI tidak ditemukan"
+        }
+      }
+    },
+    "chat": {
+      "title": "Obrolan AI",
+      "breadcrumb": "Percakapan AI",
+      "welcomeTitle": "Selamat Datang di Obrolan AI",
+      "welcomeSubtitle": "Pilih percakapan atau mulai obrolan baru untuk memulai",
+      "conversations": "Percakapan",
+      "newChat": "Baru",
+      "searchPlaceholder": "Cari...",
+      "noResults": "Tidak ada hasil",
+      "startNewChat": "Mulai Percakapan Baru",
+      "newChatModalTitle": "Mulai Percakapan Baru",
+      "you": "Anda",
+      "assistant": "Asisten AI",
+      "default": "Default",
+      "general": "Umum",
+      "fields": {
+        "useCase": "Use Case AI",
+        "model": "Model AI",
+        "title": "Judul Percakapan (Opsional)"
+      },
+      "placeholders": {
+        "title": "Masukkan judul percakapan"
+      },
+      "editTitle": "Edit Judul Percakapan",
+      "editTitleModalTitle": "Edit Judul Percakapan",
+      "inputPlaceholder": "Ketik pesan Anda...",
+      "sendButton": "Kirim",
+      "stopButton": "Berhenti",
+      "keyboardHint": "Tekan <strong>Enter</strong> untuk mengirim • <strong>Shift + Enter</strong> untuk baris baru",
+      "generatingResponse": "Membuat respons...",
+      "regeneratingResponse": "Membuat ulang respons...",
+      "error": {
+        "response": "Gagal membuat respons",
+        "notFound": "Percakapan tidak ditemukan",
+        "useCaseRequired": "Use case wajib dipilih",
+        "modelRequired": "Model AI wajib dipilih",
+        "titleRequired": "Judul tidak boleh kosong",
+        "messageEmpty": "Pesan tidak boleh kosong"
+      },
+      "deleteConfirm": "Apakah Anda yakin ingin menghapus percakapan ini?",
+      "actions": {
+        "save": "Simpan",
+        "saveRegenerate": "Simpan & Buat Ulang",
+        "cancel": "Batal",
+        "delete": "Hapus"
+      },
+      "messages": {
+        "created": "Percakapan berhasil dibuat",
+        "titleUpdated": "Judul berhasil diperbarui",
+        "deleted": "Percakapan berhasil dihapus",
+        "messageSaved": "Pesan disimpan",
+        "messageDeleted": "Pesan dihapus"
+      }
+    }
+  }
+}

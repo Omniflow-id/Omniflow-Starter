@@ -128,7 +128,10 @@ function getNetworkInfo() {
     for (const iface of interfaces[name]) {
       if ((iface.family === "IPv4" || iface.family === 4) && !iface.internal) {
         // Tailscale (usually 100.x.y.z)
-        if (iface.address.startsWith("100.") || name.toLowerCase().includes("tailscale")) {
+        if (
+          iface.address.startsWith("100.") ||
+          name.toLowerCase().includes("tailscale")
+        ) {
           tailscaleIP = iface.address;
         } else {
           // If it's not virtual, or we haven't found any IP yet, use it

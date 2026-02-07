@@ -26,19 +26,34 @@ async function seedRolePermissions() {
         "manage_queue",
         "view_logs",
         "view_profile",
+        // AI Management permissions
+        "manage_ai_models",
+        "manage_ai_use_cases",
+        "use_ai_chat",
+        "view_ai_logs",
       ],
     },
 
     // Manager (role_id: 2) - User management + cache/queue monitoring
     {
       role_name: "Manager",
-      permissions: ["view_users", "view_logs", "view_profile"],
+      permissions: [
+        "view_users",
+        "view_logs",
+        "view_profile",
+        // AI access for Managers
+        "use_ai_chat",
+      ],
     },
 
     // User (role_id: 3) - Can view logs and manage own profile
     {
       role_name: "User",
-      permissions: ["view_profile"],
+      permissions: [
+        "view_profile",
+        // AI access for Users
+        "use_ai_chat",
+      ],
     },
   ];
 

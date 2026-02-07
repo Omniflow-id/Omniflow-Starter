@@ -39,4 +39,16 @@ function decrypt(text) {
   return decrypted;
 }
 
-module.exports = { encrypt, decrypt };
+/**
+ * Mask API key for display purposes (shows first 4 and last 4 characters)
+ * @param {string} apiKey - The API key to mask
+ * @returns {string} Masked API key
+ */
+function maskApiKey(apiKey) {
+  if (!apiKey || apiKey.length < 8) {
+    return "****";
+  }
+  return apiKey.substring(0, 4) + "****" + apiKey.substring(apiKey.length - 4);
+}
+
+module.exports = { encrypt, decrypt, maskApiKey };

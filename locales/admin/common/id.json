@@ -16,7 +16,11 @@
     "allJobs": "Semua Jobs",
     "failedJobs": "Failed Jobs",
     "logs": "Log Aktivitas",
-    "loggedInAs": "Masuk sebagai"
+    "loggedInAs": "Masuk sebagai",
+    "aiManagement": "AI Management",
+    "aiModels": "AI Models",
+    "aiUseCases": "AI Use Cases",
+    "aiChat": "AI Chat"
   },
   "common": {
     "actions": {

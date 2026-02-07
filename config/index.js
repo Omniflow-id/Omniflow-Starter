@@ -84,9 +84,9 @@ const config = {
     ssl:
       process.env.DB_SSL_ENABLED === "true"
         ? {
-          rejectUnauthorized:
-            process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
-        }
+            rejectUnauthorized:
+              process.env.DB_SSL_REJECT_UNAUTHORIZED !== "false",
+          }
         : false,
   },
 
@@ -174,7 +174,7 @@ const config = {
             "data:",
             "https://*.google.com",
             "https://*.googleapis.com",
-            "https://*.gstatic.com"
+            "https://*.gstatic.com",
           ],
           scriptSrc: [
             "'self'",
@@ -202,10 +202,10 @@ const config = {
       hsts:
         process.env.NODE_ENV === "production"
           ? {
-            maxAge: 63072000,
-            includeSubDomains: true,
-            preload: true,
-          }
+              maxAge: 63072000,
+              includeSubDomains: true,
+              preload: true,
+            }
           : false,
       ieNoOpen: true,
       noSniff: true,

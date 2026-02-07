@@ -1,0 +1,423 @@
+{% extends "layout/masterLayout.njk" %} {% block content %}
+<div class="container-fluid px-4">
+  <h1 class="mt-4">{{ t('ai.models.title') }}</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item active">{{ t('ai.models.breadcrumb') }}</li>
+  </ol>
+
+  {% include "components/cache_info.njk" %}
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header">
+          <div
+            class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2"
+          >
+            <span class="mb-2 mb-sm-0">{{ t('ai.models.listTitle') }}</span>
+            <div class="d-flex flex-wrap gap-2">
+              <button
+                class="btn btn-primary btn-sm"
+                id="btnTambah"
+                data-bs-toggle="modal"
+                data-bs-target="#tambahModal"
+              >
+                <i class="fas fa-plus me-1"></i>
+                <span class="d-none d-sm-inline">{{ t('ai.models.addButton') }}</span>
+                <span class="d-inline d-sm-none">Add</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table
+              id="datatablesSimple"
+              class="table table-striped"
+              style="width: 100%"
+            >
+              <thead>
+                <tr>
+                  <th>{{ t('ai.models.tableHeaders.id') }}</th>
+                  <th>{{ t('ai.models.tableHeaders.name') }}</th>
+                  <th>{{ t('ai.models.tableHeaders.apiUrl') }}</th>
+                  <th>{{ t('ai.models.tableHeaders.apiKey') }}</th>
+                  <th>{{ t('ai.models.tableHeaders.modelVariant') }}</th>
+                  <th>{{ t('ai.models.tableHeaders.status') }}</th>
+                  <th>{{ t('ai.models.tableHeaders.actions') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for model in models %}
+                <tr>
+                  <td>{{ model.id }}</td>
+                  <td>{{ model.name }}</td>
+                  <td>{{ model.api_url | truncate(30) }}</td>
+                  <td><code>{{ model.api_key_masked }}</code></td>
+                  <td><span class="badge bg-info">{{ model.model_variant }}</span></td>
+                  <td>
+                    <span class="badge bg-{{ 'success' if model.is_active else 'secondary' }}">
+                      {{ t('ai.models.statusActive') if model.is_active else t('ai.models.statusInactive') }}
+                    </span>
+                  </td>
+                  <td>
+                    <button class="btn btn-primary btn-sm" onclick="editModel({{ model.id }}, {{ model.name | dump }}, {{ model.api_url | dump }}, {{ model.api_key_decrypted | dump }}, {{ model.model_variant | dump }}, {{ model.is_active }})">
+                      <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="confirmDeleteModel({{ model.id }}, {{ model.name | dump }})">
+                      <i class="fas fa-trash"></i> Delete
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Add AI Model -->
+<div
+  class="modal fade"
+  id="tambahModal"
+  tabindex="-1"
+  aria-labelledby="tambahModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tambahModalLabel">{{ t('ai.models.addModalTitle') }}</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form id="tambahForm" method="POST" action="/admin/ai_models/create">
+        {{ csrfField() | safe }}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="name" class="form-label">{{ t('ai.models.fields.name') }}:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              name="name"
+              placeholder="{{ t('ai.models.placeholders.name') }}"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="api_url" class="form-label">{{ t('ai.models.fields.apiUrl') }}:</label>
+            <input
+              type="url"
+              class="form-control"
+              id="api_url"
+              name="api_url"
+              placeholder="{{ t('ai.models.placeholders.apiUrl') }}"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="api_key" class="form-label">{{ t('ai.models.fields.apiKey') }}:</label>
+            <input
+              type="password"
+              class="form-control"
+              id="api_key"
+              name="api_key"
+              placeholder="{{ t('ai.models.placeholders.apiKey') }}"
+              required
+            />
+            <div class="form-text">{{ t('ai.models.encryptedNote') }}</div>
+          </div>
+          <div class="mb-3">
+            <label for="model_variant" class="form-label">{{ t('ai.models.fields.modelVariant') }}:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="model_variant"
+              name="model_variant"
+              placeholder="{{ t('ai.models.placeholders.modelVariant') }}"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="is_active" class="form-label">{{ t('ai.models.fields.status') }}:</label>
+            <select class="form-control" id="is_active" name="is_active" required>
+              <option value="">{{ t('ai.models.selectStatus') }}</option>
+              <option value="1">{{ t('ai.models.statusActive') }}</option>
+              <option value="0">{{ t('ai.models.statusInactive') }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" id="submitButton">
+            <span id="submitText">Save</span>
+            <span
+              id="loadingSpinner"
+              class="spinner-border spinner-border-sm d-none"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Edit AI Model -->
+<div
+  class="modal fade"
+  id="editModal"
+  tabindex="-1"
+  aria-labelledby="editModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">{{ t('ai.models.editModalTitle') }}</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form id="editForm" method="POST">
+        {{ csrfField() | safe }}
+        <div class="modal-body">
+          <input type="hidden" id="edit_id" name="id" />
+          <div class="mb-3">
+            <label for="edit_name" class="form-label">{{ t('ai.models.fields.name') }}:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="edit_name"
+              name="name"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="edit_api_url" class="form-label">{{ t('ai.models.fields.apiUrl') }}:</label>
+            <input
+              type="url"
+              class="form-control"
+              id="edit_api_url"
+              name="api_url"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="edit_api_key" class="form-label">{{ t('ai.models.fields.apiKey') }}:</label>
+            <input
+              type="password"
+              class="form-control"
+              id="edit_api_key"
+              name="api_key"
+              required
+            />
+            <div class="form-text">{{ t('ai.models.keepKeyNote') }}</div>
+          </div>
+          <div class="mb-3">
+            <label for="edit_model_variant" class="form-label">{{ t('ai.models.fields.modelVariant') }}:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="edit_model_variant"
+              name="model_variant"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="edit_is_active" class="form-label">{{ t('ai.models.fields.status') }}:</label>
+            <select class="form-control" id="edit_is_active" name="is_active" required>
+              <option value="1">{{ t('ai.models.statusActive') }}</option>
+              <option value="0">{{ t('ai.models.statusInactive') }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" id="editSubmitButton">
+            <span id="editSubmitText">Update</span>
+            <span
+              id="editLoadingSpinner"
+              class="spinner-border spinner-border-sm d-none"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Delete Confirmation -->
+<div
+  class="modal fade"
+  id="deleteModal"
+  tabindex="-1"
+  aria-labelledby="deleteModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">{{ t('ai.models.deleteConfirmTitle') }}</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ t('ai.models.deleteConfirmMessage', { name: '<strong id="deleteModelName"></strong>' }) | safe }}</p>
+        <p class="text-danger">{{ t('ai.models.deleteWarning') }}</p>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          id="confirmDeleteBtn"
+          onclick="deleteModel()"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block scripts %}
+<script>
+  $(document).ready(function () {
+    $("#datatablesSimple").DataTable({
+      responsive: true,
+      pageLength: 25,
+      language: {
+        search: "Search:",
+        lengthMenu: "Show _MENU_ entries",
+        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+        paginate: {
+          first: "First",
+          last: "Last",
+          next: "Next",
+          previous: "Previous"
+        }
+      }
+    });
+
+    // Handle add form submission
+    $('#tambahForm').submit(function() {
+      $('#submitText').text('Saving...');
+      $('#loadingSpinner').removeClass('d-none');
+      $('#submitButton').prop('disabled', true);
+    });
+
+    // Handle edit form submission
+    $('#editForm').submit(function() {
+      $('#editSubmitText').text('Updating...');
+      $('#editLoadingSpinner').removeClass('d-none');
+      $('#editSubmitButton').prop('disabled', true);
+    });
+
+    // Show toast notifications
+    {% if success_msg and success_msg.length > 0 %}
+      Toastify({
+        text: '{{ success_msg[0] }}',
+        duration: 3000,
+        close: true,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: '#28a745',
+        style: {
+          marginTop: "50px",
+        },
+      }).showToast();
+    {% endif %}
+    {% if error_msg and error_msg.length > 0 %}
+      Toastify({
+        text: '{{ error_msg[0] }}',
+        duration: 3000,
+        close: true,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: '#dc3545',
+        style: {
+          marginTop: "50px",
+        },
+      }).showToast();
+    {% endif %}
+  });
+
+  function editModel(id, name, api_url, api_key, model_variant, is_active) {
+    document.getElementById('edit_id').value = id;
+    document.getElementById('edit_name').value = name;
+    document.getElementById('edit_api_url').value = api_url;
+    document.getElementById('edit_api_key').value = api_key;
+    document.getElementById('edit_model_variant').value = model_variant;
+    document.getElementById('edit_is_active').value = is_active ? '1' : '0';
+
+    document.getElementById('editForm').action = '/admin/ai_models/update/' + id;
+
+    var editModal = new bootstrap.Modal(document.getElementById('editModal'));
+    editModal.show();
+  }
+
+  let deleteModelId = null;
+
+  function confirmDeleteModel(id, name) {
+    deleteModelId = id;
+    document.getElementById('deleteModelName').textContent = name;
+    var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    deleteModal.show();
+  }
+
+  function deleteModel() {
+    if (deleteModelId) {
+      var form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/admin/ai_models/delete/' + deleteModelId;
+
+      // Add CSRF token
+      var csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = '_csrf';
+      csrfInput.value = '{{ csrf }}';
+      form.appendChild(csrfInput);
+
+      document.body.appendChild(form);
+      form.submit();
+    }
+  }
+</script>
+{% endblock %}

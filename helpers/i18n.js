@@ -288,7 +288,7 @@ function withLocale(page, _options = {}) {
       }
 
       // Merge admin common locale with page locale (page locale takes precedence)
-      const mergedLocale = { ...adminCommonLocale, ...locale };
+      const mergedLocale = deepMerge(adminCommonLocale, locale);
 
       // Inject locale data into res.locals
       res.locals.locale = mergedLocale;
@@ -297,12 +297,20 @@ function withLocale(page, _options = {}) {
       res.locals.currentLanguage = currentLanguage;
 
       // Create a 't' (translate) function for template usage
-      const pageT = (key) => {
+      const pageT = (key, params = {}) => {
         if (!key) return "";
-        const result = key
+        let result = key
           .split(".")
           .reduce((o, i) => (o ? o[i] : undefined), mergedLocale);
-        return result !== undefined ? result : key;
+
+        if (result === undefined) return key;
+
+        if (params && typeof params === "object") {
+          Object.keys(params).forEach((param) => {
+            result = result.replace(new RegExp(`{${param}}`, "g"), params[param]);
+          });
+        }
+        return result;
       };
       res.locals.t = pageT;
 
@@ -396,15 +404,23 @@ function createLocalizedRenderer({
       }
 
       // Merge admin common locale with page locale (page locale takes precedence)
-      const mergedLocale = { ...adminCommonLocale, ...locale };
+      const mergedLocale = deepMerge(adminCommonLocale, locale);
 
       // Create translate function
-      const t = (key) => {
+      const t = (key, params = {}) => {
         if (!key) return "";
-        const result = key
+        let result = key
           .split(".")
           .reduce((o, i) => (o ? o[i] : undefined), mergedLocale);
-        return result !== undefined ? result : key;
+
+        if (result === undefined) return key;
+
+        if (params && typeof params === "object") {
+          Object.keys(params).forEach((param) => {
+            result = result.replace(new RegExp(`{${param}}`, "g"), params[param]);
+          });
+        }
+        return result;
       };
 
       // Build base context
@@ -438,6 +454,33 @@ function createLocalizedRenderer({
       next(error);
     }
   };
+}
+
+/**
+ * Deep merges two objects
+ * @param {Object} target - Target object
+ * @param {Object} source - Source object
+ * @returns {Object} Merged object
+ */
+function deepMerge(target, source) {
+  if (typeof target !== "object" || target === null) return source;
+  if (typeof source !== "object" || source === null) return target;
+
+  const result = { ...target };
+  for (const key of Object.keys(source)) {
+    if (
+      source[key] instanceof Object &&
+      key in target &&
+      target[key] instanceof Object &&
+      !Array.isArray(source[key]) &&
+      !Array.isArray(target[key])
+    ) {
+      result[key] = deepMerge(target[key], source[key]);
+    } else {
+      result[key] = source[key];
+    }
+  }
+  return result;
 }
 
 module.exports = {

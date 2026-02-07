@@ -1,7 +1,14 @@
-const { asyncHandler, ValidationError, AuthenticationError } = require("@middlewares/errorHandler");
+const {
+  asyncHandler,
+  ValidationError,
+  AuthenticationError,
+} = require("@middlewares/errorHandler");
 const { db, getPoolStats, testConnection } = require("@db/db");
 const { getRedisStats, isConnected: isRedisConnected } = require("@db/redis");
-const { getConnectionStatus: getRabbitMQStatus, getStats: getRabbitMQStats } = require("@helpers/queue");
+const {
+  getConnectionStatus: getRabbitMQStatus,
+  getStats: getRabbitMQStats,
+} = require("@helpers/queue");
 const config = require("@config");
 
 const getHealthAPI = asyncHandler(async (_req, res) => {
@@ -36,7 +43,8 @@ const getHealthAPI = asyncHandler(async (_req, res) => {
     healthMessage = "Database connection is critical - system may be impaired";
   } else if (!redisHealthy || !rabbitHealthy) {
     overallStatus = "degraded";
-    healthMessage = "Optional services are unavailable - core functionality intact";
+    healthMessage =
+      "Optional services are unavailable - core functionality intact";
   }
 
   // Calculate pool utilization
@@ -166,7 +174,7 @@ const getHealthDetailedAPI = asyncHandler(async (_req, res) => {
   const rabbitStatus = getRabbitMQStatus();
 
   // Get database info
-  let dbInfo = { version: "unknown", connected: false };
+  const dbInfo = { version: "unknown", connected: false };
   try {
     const [versionResult] = await db.query("SELECT VERSION() as version");
     if (versionResult && versionResult.length > 0) {

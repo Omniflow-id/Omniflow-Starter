@@ -1,0 +1,923 @@
+{% extends "layout/masterLayout.njk" %}
+
+{% block content %}
+<style>
+/* ... other styles if any ... */
+</style>
+<div class="container-fluid px-4" style="height: calc(100vh - 120px); margin-bottom: 80px;">
+    <h1 class="mt-4">{{ t('ai.chat.title') }}</h1>
+    
+    <div class="row h-100">
+        <!-- Sidebar with conversations -->
+        <div class="col-md-3">
+            <div class="card h-100">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <h6 class="mb-0"><i class="fas fa-comments me-2"></i>{{ t('ai.chat.conversations') }}</h6>
+                        <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#newChatModal">
+                            <i class="fas fa-plus"></i> {{ t('ai.chat.newChat') }}
+                        </button>
+                    </div>
+                    <div class="search-container">
+                        <div class="input-group input-group-sm">
+                            <span class="input-group-text bg-white"><i class="fas fa-search"></i></span>
+                            <input type="text" class="form-control" id="searchInput" placeholder="{{ t('ai.chat.searchPlaceholder') }}" autocomplete="off">
+                            <button class="btn btn-outline-light" type="button" id="clearSearchBtn" style="display: none;">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0 overflow-auto" style="max-height: 70vh;">
+                    <div id="conversationsList">
+                        {% for conv in conversations %}
+                        <div class="conversation-item p-3 border-bottom cursor-pointer" data-conversation-id="{{ conv.id }}">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <small class="text-muted">{{ conv.usecase_name }}</small>
+                                <small class="text-muted">{{ conv.updated_at | formatDate('MMM DD') }}</small>
+                            </div>
+                            <div class="fw-bold text-truncate">{{ conv.title }}</div>
+                            <small class="text-muted">{{ conv.model_name }}</small>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat area -->
+        <div class="col-md-9">
+            <div class="card h-100">
+                <div class="card-header" id="chatHeader" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center">
+                                <h5 class="mb-0 me-2" id="chatTitle">{{ t('ai.chat.editTitle') }}</h5>
+                                <button class="btn btn-sm btn-outline-secondary" id="editTitleBtn" title="{{ t('ai.chat.editTitle') }}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                            <small class="text-muted" id="chatInfo">Usecase • Model</small>
+                        </div>
+                        <div>
+                            <form id="deleteConversationForm" method="POST" style="display: inline;">
+                                {{ csrfField() | safe }}
+                                <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ t('ai.useCases.deleteConfirmTitle') }}" onclick="return confirm('{{ t('ai.chat.deleteConfirm') }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body d-flex flex-column" style="height: 70vh;">
+                    <!-- Welcome message -->
+                    <div id="welcomeMessage" class="text-center py-5">
+                        <i class="fas fa-comments fa-3x text-muted mb-3"></i>
+                        <h5>{{ t('ai.chat.welcomeTitle') }}</h5>
+                        <p class="text-muted">{{ t('ai.chat.welcomeSubtitle') }}</p>
+                    </div>
+
+                    <!-- Chat messages -->
+                    <div id="chatMessages" class="flex-grow-1 overflow-auto mb-3" style="display: none;">
+                        <!-- Messages will be loaded here -->
+                    </div>
+
+                    <!-- Message input -->
+                    <div id="messageInput" style="display: none;">
+                        <div class="input-group">
+                            <textarea class="form-control" id="messageText" placeholder="{{ t('ai.chat.inputPlaceholder') }}" rows="1" style="resize: none; overflow-y: auto; max-height: 150px;"></textarea>
+                            <button class="btn btn-primary" id="sendMessageButton" type="button">
+                                <i class="fas fa-paper-plane"></i> {{ t('ai.chat.sendButton') }}
+                            </button>
+                            <button class="btn btn-outline-danger" id="stopStreamButton" type="button" disabled>
+                                <i class="fas fa-stop"></i> {{ t('ai.chat.stopButton') }}
+                            </button>
+                        </div>
+                        <small class="text-muted d-block mt-1">
+                            <i class="fas fa-keyboard me-1"></i>
+                            {{ t('ai.chat.keyboardHint') | safe }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Title Modal -->
+<div class="modal fade" id="editTitleModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ t('ai.chat.editTitleModalTitle') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editTitleForm">
+                {{ csrfField() | safe }}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="newTitle" class="form-label">{{ t('ai.useCases.fields.name') }}:</label>
+                        <input type="text" class="form-control" id="newTitle" maxlength="100" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('ai.chat.actions.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ t('ai.chat.actions.save') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- New Chat Modal -->
+<div class="modal fade" id="newChatModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ t('ai.chat.newChatModalTitle') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="newChatForm">
+                {{ csrfField() | safe }}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="usecase_id" class="form-label">{{ t('ai.chat.fields.useCase') }}:</label>
+                        <select class="form-select" id="usecase_id" name="usecase_id" required>
+                            {% for usecase in useCases %}
+                            <option value="{{ usecase.id }}" {% if loop.first %}selected{% endif %}>{{ usecase.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="model_id" class="form-label">{{ t('ai.chat.fields.model') }}:</label>
+                        <select class="form-select" id="model_id" name="model_id" required>
+                            {% for model in models %}
+                            <option value="{{ model.id }}" {% if loop.first %}selected{% endif %}>{{ model.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="title" class="form-label">{{ t('ai.chat.fields.title') }}:</label>
+                        <input type="text" class="form-control" id="title" name="title" placeholder="{{ t('ai.chat.placeholders.title') }}">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ t('ai.chat.actions.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ t('ai.chat.startNewChat') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/js/marked.js"></script>
+<script>
+    // Configure marked options
+    marked.setOptions({
+        breaks: true,
+        gfm: true,
+        headerIds: false
+    });
+</script>
+<script>
+// CSRF token for AJAX requests
+const csrfToken = '{{ csrf }}';
+
+let currentConversationId = null;
+let isStreaming = false;
+let activeStreamController = null;
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    setupEventListeners();
+    setupTextareaAutoResize();
+});
+
+function setupEventListeners() {
+    // New chat form
+    document.getElementById('newChatForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        createNewConversation();
+    });
+
+    // Edit title form
+    document.getElementById('editTitleForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        updateConversationTitle();
+    });
+
+    // Edit title button
+    document.getElementById('editTitleBtn')?.addEventListener('click', function() {
+        const currentTitle = document.getElementById('chatTitle').textContent;
+        document.getElementById('newTitle').value = currentTitle;
+        new bootstrap.Modal(document.getElementById('editTitleModal')).show();
+    });
+
+    // Send message
+    document.getElementById('sendMessageButton')?.addEventListener('click', sendMessage);
+
+    // Stop streaming
+    document.getElementById('stopStreamButton')?.addEventListener('click', stopStreaming);
+
+    // Message textarea keypress
+    document.getElementById('messageText')?.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            if (!isStreaming) {
+                sendMessage();
+            }
+        }
+    });
+
+    // Conversation items
+    document.querySelectorAll('.conversation-item').forEach(item => {
+        item.addEventListener('click', function() {
+            const conversationId = this.getAttribute('data-conversation-id');
+            loadConversation(parseInt(conversationId));
+        });
+    });
+
+    // Search
+    document.getElementById('searchInput')?.addEventListener('input', debounce(function() {
+        const query = this.value.trim();
+        if (query.length >= 2) {
+            searchConversations(query);
+        } else if (query.length === 0) {
+            refreshConversationsList();
+        }
+    }, 300));
+
+    document.getElementById('clearSearchBtn')?.addEventListener('click', function() {
+        document.getElementById('searchInput').value = '';
+        refreshConversationsList();
+    });
+}
+
+function setupTextareaAutoResize() {
+    const textarea = document.getElementById('messageText');
+    if (textarea) {
+        textarea.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 150) + 'px';
+        });
+    }
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+async function createNewConversation() {
+    const usecase_id = document.getElementById('usecase_id').value;
+    const model_id = document.getElementById('model_id').value;
+    const title = document.getElementById('title').value;
+
+    if (!usecase_id || !model_id) {
+        showToast('{{ t('ai.chat.error.useCaseRequired') }}', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('/admin/chat/conversations', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
+            },
+            body: JSON.stringify({ usecase_id, model_id, title })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            bootstrap.Modal.getInstance(document.getElementById('newChatModal')).hide();
+            document.getElementById('newChatForm').reset();
+            await refreshConversationsList();
+            loadConversation(data.conversation_id);
+            showToast('{{ t('ai.chat.messages.created') }}', 'success');
+        } else {
+            showToast(data.message || '{{ t('ai.chat.error.notFound') }}', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('{{ t('ai.useCases.messages.error.required') }}', 'error');
+    }
+}
+
+async function loadConversation(conversationId) {
+    if (isStreaming) {
+        stopStreaming();
+    }
+
+    currentConversationId = conversationId;
+
+    // Update active state
+    document.querySelectorAll('.conversation-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    document.querySelector(`[data-conversation-id="${conversationId}"]`)?.classList.add('active');
+
+    try {
+        const response = await fetch(`/admin/chat/conversations/${conversationId}`);
+        const data = await response.json();
+
+        if (data.success) {
+            // Show chat interface
+            document.getElementById('welcomeMessage').style.display = 'none';
+            document.getElementById('chatHeader').style.display = 'block';
+            document.getElementById('chatMessages').style.display = 'block';
+            document.getElementById('messageInput').style.display = 'block';
+
+            // Update header
+            document.getElementById('chatTitle').textContent = data.data.conversation.title;
+            document.getElementById('chatInfo').textContent = `${data.data.conversation.usecase_name} • ${data.data.conversation.model_name}`;
+
+            // Update delete form action
+            document.getElementById('deleteConversationForm').action = `/admin/chat/conversations/${conversationId}/delete`;
+
+            // Load messages
+            const messagesContainer = document.getElementById('chatMessages');
+            messagesContainer.innerHTML = '';
+
+            data.data.messages.forEach(message => {
+                addMessageToChat(message.role, message.content, message.id);
+            });
+
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error loading conversation');
+    }
+}
+
+async function sendMessage() {
+    if (isStreaming) return;
+
+    const messageInput = document.getElementById('messageText');
+    const messageText = messageInput.value.trim();
+
+    if (!messageText || !currentConversationId) {
+        showToast('{{ t('ai.chat.error.messageEmpty') }}', 'error');
+        return;
+    }
+
+    // Add user message to chat
+    addMessageToChat('user', messageText);
+    messageInput.value = '';
+    messageInput.style.height = 'auto';
+
+    // Create streaming placeholder
+    const streamingDiv = document.createElement('div');
+    streamingDiv.className = 'mb-3 streaming-response';
+    streamingDiv.innerHTML = `
+        <div class="d-flex">
+            <div class="message-bubble assistant-message p-3 rounded">
+                <small class="d-block fw-bold mb-2">{{ t('ai.chat.assistant') }}</small>
+                <div class="message-content">
+                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                    <span class="ms-2">{{ t('ai.chat.generatingResponse') }}</span>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.appendChild(streamingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    const controller = new AbortController();
+    activeStreamController = controller;
+    isStreaming = true;
+    updateUIState();
+
+    try {
+        const response = await fetch('/admin/chat/message/send-stream', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            signal: controller.signal,
+            body: JSON.stringify({
+                conversation_id: currentConversationId,
+                message: messageText
+            })
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let rawContent = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop();
+
+            for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                    try {
+                        const data = JSON.parse(line.slice(6));
+
+                        if (data.type === 'content') {
+                            const newContent = data.content;
+                            // Simulate typing effect
+                            for (let i = 0; i < newContent.length; i++) {
+                                rawContent += newContent[i];
+                                const contentDiv = streamingDiv.querySelector('.message-content');
+                                if (contentDiv) {
+                                    contentDiv.innerHTML = marked.parse(rawContent);
+                                }
+                                chatMessages.scrollTop = chatMessages.scrollHeight;
+                                // Small delay for typing effect
+                                await new Promise(resolve => setTimeout(resolve, 10)); // 10ms delay
+                            }
+                        } else if (data.type === 'done') {
+                            streamingDiv.remove();
+                            addMessageToChat('assistant', rawContent, data.ai_message_id);
+                            isStreaming = false;
+                            activeStreamController = null;
+                            updateUIState();
+                            return;
+                        } else if (data.type === 'error') {
+                            streamingDiv.remove();
+                            addMessageToChat('assistant', '{{ t('ai.chat.error.response') }}');
+                            isStreaming = false;
+                            activeStreamController = null;
+                            updateUIState();
+                            return;
+                        }
+                    } catch (e) {
+                        // Ignore parse errors
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        if (error.name !== 'AbortError') {
+            console.error('Error:', error);
+            streamingDiv.remove();
+            addMessageToChat('assistant', '{{ t('ai.chat.error.response') }}');
+        }
+        isStreaming = false;
+        activeStreamController = null;
+        updateUIState();
+    }
+}
+
+function stopStreaming() {
+    if (activeStreamController) {
+        activeStreamController.abort();
+        isStreaming = false;
+        updateUIState();
+    }
+}
+
+function updateUIState() {
+    const sendBtn = document.getElementById('sendMessageButton');
+    const stopBtn = document.getElementById('stopStreamButton');
+    const messageInput = document.getElementById('messageText');
+
+    if (sendBtn) sendBtn.disabled = isStreaming;
+    if (stopBtn) stopBtn.disabled = !isStreaming;
+    if (messageInput) messageInput.disabled = isStreaming;
+}
+
+function addMessageToChat(role, content, messageId = null) {
+    const messagesContainer = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'mb-3';
+    messageDiv.setAttribute('data-message-id', messageId);
+
+    const roleLabel = role === 'user' ? '{{ t("ai.chat.you") }}' : '{{ t("ai.chat.assistant") }}';
+    const messageClass = role === 'user' ? 'user-message' : 'assistant-message';
+
+    const processedContent = marked.parse(content);
+
+    // Edit and delete buttons for user messages
+    const actionsHtml = messageId && role === 'user' ? `
+        <div class="message-actions">
+            <button class="btn btn-sm btn-outline-light edit-btn" data-message-id="${messageId}" title="{{ t('ai.chat.editTitle') }}">
+                <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-light delete-btn" data-message-id="${messageId}" title="{{ t('ai.chat.actions.delete') }}">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+    ` : '';
+
+    messageDiv.innerHTML = `
+        <div class="d-flex">
+            <div class="message-bubble ${messageClass} p-3 rounded position-relative">
+                ${actionsHtml}
+                <small class="d-block fw-bold mb-2">${roleLabel}</small>
+                <div class="message-content">${processedContent}</div>
+                <div class="edit-form" style="display: none;">
+                    <textarea class="form-control edit-textarea mb-2" rows="3">${content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-primary btn-sm save-edit-btn" data-message-id="${messageId}">{{ t('ai.chat.actions.save') }}</button>
+                        <button class="btn btn-secondary btn-sm save-regenerate-btn" data-message-id="${messageId}">{{ t('ai.chat.actions.saveRegenerate') }}</button>
+                        <button class="btn btn-outline-secondary btn-sm cancel-edit-btn" data-message-id="${messageId}">{{ t('ai.chat.actions.cancel') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    messagesContainer.appendChild(messageDiv);
+
+    // Add event listeners for edit and delete buttons
+    if (messageId && role === 'user') {
+        const editBtn = messageDiv.querySelector('.edit-btn');
+        const deleteBtn = messageDiv.querySelector('.delete-btn');
+        const saveBtn = messageDiv.querySelector('.save-edit-btn');
+        const saveRegenerateBtn = messageDiv.querySelector('.save-regenerate-btn');
+        const cancelBtn = messageDiv.querySelector('.cancel-edit-btn');
+
+        if (editBtn) {
+            editBtn.addEventListener('click', () => editMessage(messageId, content));
+        }
+        if (deleteBtn) {
+            deleteBtn.addEventListener('click', () => deleteMessage(messageId));
+        }
+        if (saveBtn) {
+            saveBtn.addEventListener('click', () => saveEditOnly(messageId));
+        }
+        if (saveRegenerateBtn) {
+            saveRegenerateBtn.addEventListener('click', () => saveEditAndRegenerate(messageId));
+        }
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => cancelEdit(messageId));
+        }
+    }
+
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+async function updateConversationTitle() {
+    const newTitle = document.getElementById('newTitle').value.trim();
+
+    if (!newTitle || !currentConversationId) {
+        showToast('{{ t('ai.chat.error.titleRequired') }}', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch(`/admin/chat/conversations/${currentConversationId}/title`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
+            },
+            body: JSON.stringify({ title: newTitle })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            document.getElementById('chatTitle').textContent = newTitle;
+            bootstrap.Modal.getInstance(document.getElementById('editTitleModal')).hide();
+            refreshConversationsList();
+            showToast('{{ t('ai.chat.messages.titleUpdated') }}', 'success');
+        } else {
+            showToast(data.message || '{{ t('ai.useCases.messages.error.required') }}', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('{{ t('ai.useCases.messages.error.required') }}', 'error');
+    }
+}
+
+async function refreshConversationsList() {
+    try {
+        const response = await fetch('/admin/chat/conversations');
+        const data = await response.json();
+
+        if (data.success) {
+            const container = document.getElementById('conversationsList');
+            container.innerHTML = '';
+
+            data.data.forEach(conv => {
+                const date = new Date(conv.updated_at);
+                const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                const div = document.createElement('div');
+                div.className = 'conversation-item p-3 border-bottom';
+                div.setAttribute('data-conversation-id', conv.id);
+                div.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <small class="text-muted">${conv.usecase_name}</small>
+                        <small class="text-muted">${formattedDate}</small>
+                    </div>
+                    <div class="fw-bold text-truncate">${conv.title}</div>
+                    <small class="text-muted">${conv.model_name}</small>
+                `;
+                div.addEventListener('click', () => loadConversation(conv.id));
+                container.appendChild(div);
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+async function searchConversations(query) {
+    try {
+        const response = await fetch(`/admin/chat/conversations/search?q=${encodeURIComponent(query)}`);
+        const data = await response.json();
+
+        if (data.success) {
+            const container = document.getElementById('conversationsList');
+            container.innerHTML = '';
+
+            if (data.data.length === 0) {
+                container.innerHTML = '<div class="p-3 text-muted text-center">No results found</div>';
+                return;
+            }
+
+            data.data.forEach(conv => {
+                const date = new Date(conv.updated_at);
+                const formattedDate = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                const div = document.createElement('div');
+                div.className = 'conversation-item p-3 border-bottom';
+                div.setAttribute('data-conversation-id', conv.id);
+                div.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <small class="text-muted">${conv.usecase_name || '{{ t("ai.chat.general") }}'}</small>
+                        <small class="text-muted">${formattedDate}</small>
+                    </div>
+                    <div class="fw-bold text-truncate">${conv.title}</div>
+                    <small class="text-muted">${conv.model_name || '{{ t("ai.chat.default") }}'}</small>
+                `;
+                div.addEventListener('click', () => loadConversation(conv.id));
+                container.appendChild(div);
+            });
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
+function editMessage(messageId, currentContent) {
+    const messageDiv = document.querySelector(`[data-message-id="${messageId}"]`);
+    if (!messageDiv) return;
+
+    const messageContent = messageDiv.querySelector('.message-content');
+    const editForm = messageDiv.querySelector('.edit-form');
+
+    messageContent.style.display = 'none';
+    editForm.style.display = 'block';
+}
+
+function cancelEdit(messageId) {
+    const messageDiv = document.querySelector(`[data-message-id="${messageId}"]`);
+    if (!messageDiv) return;
+
+    const messageContent = messageDiv.querySelector('.message-content');
+    const editForm = messageDiv.querySelector('.edit-form');
+
+    messageContent.style.display = 'block';
+    editForm.style.display = 'none';
+}
+
+async function saveEditOnly(messageId) {
+    const messageDiv = document.querySelector(`[data-message-id="${messageId}"]`);
+    if (!messageDiv) return;
+
+    const textarea = messageDiv.querySelector('.edit-textarea');
+    const newContent = textarea.value.trim();
+
+    if (!newContent) {
+        alert('Message cannot be empty');
+        return;
+    }
+
+    try {
+        const response = await fetch('/admin/chat/message/edit-only', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': csrfToken
+            },
+            body: JSON.stringify({ message_id: messageId, new_content: newContent })
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            // Update message content
+            const messageContent = messageDiv.querySelector('.message-content');
+            messageContent.innerHTML = marked.parse(newContent);
+            cancelEdit(messageId);
+        } else {
+            alert('Error: ' + (data.message || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error saving message');
+    }
+}
+
+async function saveEditAndRegenerate(messageId) {
+    const messageDiv = document.querySelector(`[data-message-id="${messageId}"]`);
+    if (!messageDiv) return;
+
+    const textarea = messageDiv.querySelector('.edit-textarea');
+    const newContent = textarea.value.trim();
+
+    if (!newContent) {
+        alert('Message cannot be empty');
+        return;
+    }
+
+    cancelEdit(messageId);
+
+    // Update message content visually
+    const messageContent = messageDiv.querySelector('.message-content');
+    messageContent.innerHTML = marked.parse(newContent);
+
+    if (isStreaming) return;
+    isStreaming = true;
+    updateUIState();
+
+    // Remove all messages after this one
+    let nextSibling = messageDiv.nextElementSibling;
+    while (nextSibling) {
+        const toRemove = nextSibling;
+        nextSibling = nextSibling.nextElementSibling;
+        toRemove.remove();
+    }
+
+    // Create streaming placeholder
+    const streamingDiv = document.createElement('div');
+    streamingDiv.className = 'mb-3 streaming-response';
+    streamingDiv.innerHTML = `
+        <div class="d-flex">
+            <div class="message-bubble assistant-message p-3 rounded">
+                <small class="d-block fw-bold mb-2">{{ t('ai.chat.assistant') }}</small>
+                <div class="message-content">
+                    <div class="spinner-border spinner-border-sm" role="status"></div>
+                    <span class="ms-2">{{ t('ai.chat.regeneratingResponse') }}</span>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const chatMessages = document.getElementById('chatMessages');
+    chatMessages.appendChild(streamingDiv);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
+    try {
+        const response = await fetch('/admin/chat/message/edit-stream', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message_id: messageId, new_content: newContent })
+        });
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let rawContent = '';
+
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop();
+
+            for (const line of lines) {
+                if (line.startsWith('data: ')) {
+                    try {
+                        const data = JSON.parse(line.slice(6));
+
+                        if (data.type === 'content') {
+                            const newContent = data.content;
+                            // Simulate typing effect
+                            for (let i = 0; i < newContent.length; i++) {
+                                rawContent += newContent[i];
+                                const contentDiv = streamingDiv.querySelector('.message-content');
+                                if (contentDiv) {
+                                    contentDiv.innerHTML = marked.parse(rawContent);
+                                }
+                                chatMessages.scrollTop = chatMessages.scrollHeight;
+                                await new Promise(resolve => setTimeout(resolve, 10)); // 10ms delay
+                            }
+                        } else if (data.type === 'done') {
+                            streamingDiv.remove();
+                            addMessageToChat('assistant', rawContent, data.ai_message_id);
+                            isStreaming = false;
+                            updateUIState();
+                            return;
+                        } else if (data.type === 'error') {
+                            streamingDiv.remove();
+                            addMessageToChat('assistant', 'Error generating response');
+                            isStreaming = false;
+                            updateUIState();
+                            return;
+                        }
+                    } catch (e) {
+                        // Ignore parse errors
+                    }
+                }
+            }
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        streamingDiv.remove();
+        addMessageToChat('assistant', 'Error regenerating response');
+        isStreaming = false;
+        updateUIState();
+    }
+}
+
+async function deleteMessage(messageId) {
+    if (!confirm('Are you sure you want to delete this message and all subsequent messages?')) {
+        return;
+    }
+
+    try {
+        const response = await fetch(`/admin/chat/message/${messageId}/delete`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-Token': csrfToken
+            }
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            // Reload conversation
+            if (currentConversationId) {
+                loadConversation(currentConversationId);
+            }
+        } else {
+            alert('Error: ' + (data.message || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error deleting message');
+    }
+}
+</script>
+
+<style>
+.conversation-item {
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+.conversation-item:hover {
+    background-color: #f8f9fa;
+}
+.conversation-item.active {
+    background-color: #e3f2fd;
+    border-left: 3px solid #0d6efd;
+}
+.message-bubble {
+    max-width: 80%;
+    word-wrap: break-word;
+    line-height: 1.5;
+}
+.user-message {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: white;
+    margin-left: auto;
+}
+.assistant-message {
+    background-color: #f8f9fa;
+    color: #333;
+    margin-right: auto;
+    border: 1px solid #dee2e6;
+}
+.cursor-pointer {
+    cursor: pointer;
+}
+.message-actions {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    display: flex;
+    gap: 4px;
+}
+.message-bubble:hover .message-actions {
+    opacity: 1;
+}
+.message-bubble {
+    position: relative;
+}
+
+</style>
+{% endblock %}

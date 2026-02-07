@@ -1,0 +1,541 @@
+{% extends "layout/masterLayout.njk" %} {% block content %}
+<div class="container-fluid px-4">
+  <h1 class="mt-4">{{ t('ai.useCases.title') }}</h1>
+  <ol class="breadcrumb mb-4">
+    <li class="breadcrumb-item active">{{ t('ai.useCases.breadcrumb') }}</li>
+  </ol>
+
+  {% include "components/cache_info.njk" %}
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card mb-4">
+        <div class="card-header">
+          <div
+            class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2"
+          >
+            <span class="mb-2 mb-sm-0">{{ t('ai.useCases.listTitle') }}</span>
+            <div class="d-flex flex-wrap gap-2">
+              <button
+                class="btn btn-primary btn-sm"
+                id="btnTambah"
+                data-bs-toggle="modal"
+                data-bs-target="#tambahModal"
+              >
+                <i class="fas fa-plus me-1"></i>
+                <span class="d-none d-sm-inline">{{ t('ai.useCases.addButton') }}</span>
+                <span class="d-inline d-sm-none">Add</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table
+              id="datatablesSimple"
+              class="table table-striped"
+              style="width: 100%"
+            >
+              <thead>
+                <tr>
+                  <th>{{ t('ai.useCases.tableHeaders.id') }}</th>
+                  <th>{{ t('ai.useCases.tableHeaders.name') }}</th>
+                  <th>{{ t('ai.useCases.tableHeaders.description') }}</th>
+                  <th>{{ t('ai.useCases.tableHeaders.roles') }}</th>
+                  <th>{{ t('ai.useCases.tableHeaders.status') }}</th>
+                  <th>{{ t('ai.useCases.tableHeaders.actions') }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for useCase in useCases %}
+                <tr>
+                  <td>{{ useCase.id }}</td>
+                  <td>{{ useCase.name }}</td>
+                  <td>{{ useCase.description | truncate(50) }}</td>
+                  <td>
+                    {% for role in useCase.allowed_roles_array %}
+                    <span class="badge bg-info">{{ role }}</span>
+                    {% endfor %}
+                  </td>
+                  <td>
+                    <span class="badge bg-{{ 'success' if useCase.is_active else 'secondary' }}">
+                      {{ t('ai.useCases.statusActive') if useCase.is_active else t('ai.useCases.statusInactive') }}
+                    </span>
+                  </td>
+                  <td>
+                    <button class="btn btn-info btn-sm" onclick="viewUseCase({{ useCase.id }}, {{ useCase.name | dump }}, {{ useCase.description | dump }}, {{ useCase.base_knowledge | dump }}, {{ useCase.prompt | dump }}, {{ useCase.allowed_roles_string | dump }}, {{ useCase.is_active }})">
+                      <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn btn-primary btn-sm" onclick="editUseCase({{ useCase.id }}, {{ useCase.name | dump }}, {{ useCase.description | dump }}, {{ useCase.base_knowledge | dump }}, {{ useCase.prompt | dump }}, {{ useCase.allowed_roles_string | dump }}, {{ useCase.is_active }})">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="confirmDeleteUseCase({{ useCase.id }}, {{ useCase.name | dump }})">
+                      <i class="fas fa-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Add Use Case -->
+<div
+  class="modal fade"
+  id="tambahModal"
+  tabindex="-1"
+  aria-labelledby="tambahModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="tambahModalLabel">{{ t('ai.useCases.addModalTitle') }}</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form id="tambahForm" method="POST" action="/admin/ai_use_cases/create">
+        {{ csrfField() | safe }}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="name" class="form-label">{{ t('ai.useCases.fields.name') }}:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="name"
+              name="name"
+              placeholder="{{ t('ai.useCases.placeholders.name') }}"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="description" class="form-label">{{ t('ai.useCases.fields.description') }}:</label>
+            <textarea
+              class="form-control"
+              id="description"
+              name="description"
+              rows="2"
+              placeholder="{{ t('ai.useCases.placeholders.description') }}"
+              required
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="base_knowledge" class="form-label">{{ t('ai.useCases.fields.baseKnowledge') }}:</label>
+            <textarea
+              class="form-control"
+              id="base_knowledge"
+              name="base_knowledge"
+              rows="5"
+              placeholder="{{ t('ai.useCases.placeholders.baseKnowledge') }}"
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="prompt" class="form-label">{{ t('ai.useCases.fields.prompt') }}:</label>
+            <textarea
+              class="form-control"
+              id="prompt"
+              name="prompt"
+              rows="5"
+              placeholder="{{ t('ai.useCases.placeholders.prompt') }}"
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">{{ t('ai.useCases.fields.allowedRoles') }}:</label>
+            <div class="form-check">
+              {% for role in roles %}
+              <div class="mb-2">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="role_{{ role.role_id }}"
+                  name="allowed_roles[]"
+                  value="{{ role.role_name }}"
+                  checked
+                />
+                <label class="form-check-label" for="role_{{ role.role_id }}">
+                  {{ role.role_name }}
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="is_active" class="form-label">{{ t('ai.useCases.fields.status') }}:</label>
+            <select class="form-control" id="is_active" name="is_active" required>
+              <option value="">{{ t('ai.useCases.selectStatus') }}</option>
+              <option value="1">{{ t('ai.useCases.statusActive') }}</option>
+              <option value="0">{{ t('ai.useCases.statusInactive') }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" id="submitButton">
+            <span id="submitText">Save</span>
+            <span
+              id="loadingSpinner"
+              class="spinner-border spinner-border-sm d-none"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for View Use Case -->
+<div
+  class="modal fade"
+  id="viewModal"
+  tabindex="-1"
+  aria-labelledby="viewModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewModalLabel">{{ t('ai.useCases.editModalTitle') }}</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <h6><strong>Name:</strong></h6>
+        <p id="view_name"></p>
+
+        <h6><strong>Description:</strong></h6>
+        <p id="view_description"></p>
+
+        <h6><strong>Base Knowledge:</strong></h6>
+        <pre id="view_base_knowledge" style="white-space: pre-wrap; background: #f5f5f5; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto;"></pre>
+
+        <h6><strong>System Prompt:</strong></h6>
+        <pre id="view_prompt" style="white-space: pre-wrap; background: #f5f5f5; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto;"></pre>
+
+        <h6><strong>Allowed Roles:</strong></h6>
+        <p id="view_allowed_roles"></p>
+
+        <h6><strong>Status:</strong></h6>
+        <p id="view_status"></p>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Edit Use Case -->
+<div
+  class="modal fade"
+  id="editModal"
+  tabindex="-1"
+  aria-labelledby="editModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">{{ t('ai.useCases.editModalTitle') }}</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form id="editForm" method="POST">
+        {{ csrfField() | safe }}
+        <div class="modal-body">
+          <input type="hidden" id="edit_id" name="id" />
+          <div class="mb-3">
+            <label for="edit_name" class="form-label">{{ t('ai.useCases.fields.name') }}:</label>
+            <input
+              type="text"
+              class="form-control"
+              id="edit_name"
+              name="name"
+              required
+            />
+          </div>
+          <div class="mb-3">
+            <label for="edit_description" class="form-label">{{ t('ai.useCases.fields.description') }}:</label>
+            <textarea
+              class="form-control"
+              id="edit_description"
+              name="description"
+              rows="2"
+              required
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="edit_base_knowledge" class="form-label">{{ t('ai.useCases.fields.baseKnowledge') }}:</label>
+            <textarea
+              class="form-control"
+              id="edit_base_knowledge"
+              name="base_knowledge"
+              rows="5"
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="edit_prompt" class="form-label">{{ t('ai.useCases.fields.prompt') }}:</label>
+            <textarea
+              class="form-control"
+              id="edit_prompt"
+              name="prompt"
+              rows="5"
+            ></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">{{ t('ai.useCases.fields.allowedRoles') }}:</label>
+            <div class="form-check" id="edit_roles_container">
+              {% for role in roles %}
+              <div class="mb-2">
+                <input
+                  class="form-check-input edit-role-checkbox"
+                  type="checkbox"
+                  id="edit_role_{{ role.role_id }}"
+                  name="allowed_roles[]"
+                  value="{{ role.role_name }}"
+                />
+                <label class="form-check-label" for="edit_role_{{ role.role_id }}">
+                  {{ role.role_name }}
+                </label>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          <div class="mb-3">
+            <label for="edit_is_active" class="form-label">{{ t('ai.useCases.fields.status') }}:</label>
+            <select class="form-control" id="edit_is_active" name="is_active" required>
+              <option value="1">{{ t('ai.useCases.statusActive') }}</option>
+              <option value="0">{{ t('ai.useCases.statusInactive') }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary" id="editSubmitButton">
+            <span id="editSubmitText">Update</span>
+            <span
+              id="editLoadingSpinner"
+              class="spinner-border spinner-border-sm d-none"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Delete Confirmation -->
+<div
+  class="modal fade"
+  id="deleteModal"
+  tabindex="-1"
+  aria-labelledby="deleteModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteModalLabel">{{ t('ai.useCases.deleteConfirmTitle') }}</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <p>{{ t('ai.useCases.deleteConfirmMessage', { name: '<strong id="deleteUseCaseName"></strong>' }) | safe }}</p>
+        <p class="text-danger">{{ t('ai.useCases.deleteWarning') }}</p>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          data-bs-dismiss="modal"
+        >
+          Cancel
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          id="confirmDeleteBtn"
+          onclick="deleteUseCase()"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block scripts %}
+<script>
+  $(document).ready(function () {
+    $("#datatablesSimple").DataTable({
+      responsive: true,
+      pageLength: 25,
+      language: {
+        search: "Search:",
+        lengthMenu: "Show _MENU_ entries",
+        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+        paginate: {
+          first: "First",
+          last: "Last",
+          next: "Next",
+          previous: "Previous"
+        }
+      }
+    });
+
+    // Handle add form submission
+    $('#tambahForm').submit(function() {
+      $('#submitText').text('Saving...');
+      $('#loadingSpinner').removeClass('d-none');
+      $('#submitButton').prop('disabled', true);
+    });
+
+    // Handle edit form submission
+    $('#editForm').submit(function() {
+      $('#editSubmitText').text('Updating...');
+      $('#editLoadingSpinner').removeClass('d-none');
+      $('#editSubmitButton').prop('disabled', true);
+    });
+
+    // Show toast notifications
+    {% if success_msg and success_msg.length > 0 %}
+      Toastify({
+        text: '{{ success_msg[0] }}',
+        duration: 3000,
+        close: true,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: '#28a745',
+        style: {
+          marginTop: "50px",
+        },
+      }).showToast();
+    {% endif %}
+    {% if error_msg and error_msg.length > 0 %}
+      Toastify({
+        text: '{{ error_msg[0] }}',
+        duration: 3000,
+        close: true,
+        gravity: 'top',
+        position: 'right',
+        backgroundColor: '#dc3545',
+        style: {
+          marginTop: "50px",
+        },
+      }).showToast();
+    {% endif %}
+  });
+
+  function viewUseCase(id, name, description, base_knowledge, prompt, allowed_roles, is_active) {
+    document.getElementById('view_name').textContent = name;
+    document.getElementById('view_description').textContent = description;
+    document.getElementById('view_base_knowledge').textContent = base_knowledge || '(None)';
+    document.getElementById('view_prompt').textContent = prompt || '(None)';
+    document.getElementById('view_allowed_roles').textContent = allowed_roles || 'All';
+    document.getElementById('view_status').innerHTML = is_active
+      ? '<span class="badge bg-success">Active</span>'
+      : '<span class="badge bg-secondary">Inactive</span>';
+
+    var viewModal = new bootstrap.Modal(document.getElementById('viewModal'));
+    viewModal.show();
+  }
+
+  function editUseCase(id, name, description, base_knowledge, prompt, allowed_roles, is_active) {
+    document.getElementById('edit_id').value = id;
+    document.getElementById('edit_name').value = name;
+    document.getElementById('edit_description').value = description;
+    document.getElementById('edit_base_knowledge').value = base_knowledge || '';
+    document.getElementById('edit_prompt').value = prompt || '';
+    document.getElementById('edit_is_active').value = is_active ? '1' : '0';
+
+    // Reset all checkboxes
+    document.querySelectorAll('.edit-role-checkbox').forEach(checkbox => {
+      checkbox.checked = false;
+    });
+
+    // Check the allowed roles
+    if (allowed_roles) {
+      const rolesArray = allowed_roles.split(',').map(r => r.trim());
+      document.querySelectorAll('.edit-role-checkbox').forEach(checkbox => {
+        if (rolesArray.includes(checkbox.value)) {
+          checkbox.checked = true;
+        }
+      });
+    }
+
+    document.getElementById('editForm').action = '/admin/ai_use_cases/update/' + id;
+
+    var editModal = new bootstrap.Modal(document.getElementById('editModal'));
+    editModal.show();
+  }
+
+  let deleteUseCaseId = null;
+
+  function confirmDeleteUseCase(id, name) {
+    deleteUseCaseId = id;
+    document.getElementById('deleteUseCaseName').textContent = name;
+    var deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+    deleteModal.show();
+  }
+
+  function deleteUseCase() {
+    if (deleteUseCaseId) {
+      var form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/admin/ai_use_cases/delete/' + deleteUseCaseId;
+
+      // Add CSRF token
+      var csrfInput = document.createElement('input');
+      csrfInput.type = 'hidden';
+      csrfInput.name = '_csrf';
+      csrfInput.value = '{{ csrf }}';
+      form.appendChild(csrfInput);
+
+      document.body.appendChild(form);
+      form.submit();
+    }
+  }
+</script>
+{% endblock %}

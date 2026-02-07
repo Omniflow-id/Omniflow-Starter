@@ -52,6 +52,24 @@ async function seedPermissions() {
       permission_name: "view_profile",
       description: "View and edit own user profile",
     },
+
+    // AI Management (sesuai routes/admin/aiModels/ dan routes/admin/aiUseCases/)
+    {
+      permission_name: "manage_ai_models",
+      description: "Manage AI models and configurations",
+    },
+    {
+      permission_name: "manage_ai_use_cases",
+      description: "Manage AI use cases and personas",
+    },
+    {
+      permission_name: "use_ai_chat",
+      description: "Use AI chat functionality",
+    },
+    {
+      permission_name: "view_ai_logs",
+      description: "View AI request logs and analytics",
+    },
   ];
 
   for (const permission of permissions) {
