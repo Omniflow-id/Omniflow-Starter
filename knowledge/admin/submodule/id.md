@@ -268,6 +268,9 @@ Untuk setiap sub-module, buat:
 | Route | Tujuan |
 |-------|---------|
 | `/admin/user/*` | Operasi management user |
+| `/admin/ai_models` | Management AI Models |
+| `/admin/ai_use_cases` | Management AI Use Cases |
+| `/admin/ai_analysis_settings` | Konfigurasi global AI |
 | `/admin/queue/*` | Management job queue |
 | `/admin/cache/*` | Operasi cache |
 | `/admin/log/*` | Melihat activity log |

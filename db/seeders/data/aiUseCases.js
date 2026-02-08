@@ -2,12 +2,12 @@ require("module-alias/register");
 
 /**
  * Seed the ai_use_cases table with default AI use cases.
- * These use cases define different AI personas and contexts.
+ * IDEMPOTENT: Safe to run multiple times - will skip existing use cases.
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
 const seedAIUseCases = async (knex) => {
-  console.log("🌱 [SEEDER] Seeding AI use cases...");
+  console.log("🌱 [SEEDER] Checking AI use cases...");
 
   const useCases = [
     {
@@ -63,11 +63,32 @@ const seedAIUseCases = async (knex) => {
     },
   ];
 
-  await knex("ai_use_cases").insert(useCases);
+  let added = 0;
+  let skipped = 0;
 
-  console.log(
-    `✅ [SEEDER] Successfully seeded ${useCases.length} AI use cases`
-  );
+  for (const useCase of useCases) {
+    const exists = await knex("ai_use_cases")
+      .where("name", useCase.name)
+      .first();
+
+    if (!exists) {
+      await knex("ai_use_cases").insert({
+        ...useCase,
+        created_at: knex.fn.now(),
+        updated_at: knex.fn.now(),
+      });
+      added++;
+    } else {
+      skipped++;
+    }
+  }
+
+  if (added > 0) {
+    console.log(`✅ [SEEDER] Added ${added} AI use cases`);
+  }
+  if (skipped > 0) {
+    console.log(`⏭️  [SEEDER] Skipped ${skipped} existing AI use cases`);
+  }
 };
 
 module.exports = { seedAIUseCases };

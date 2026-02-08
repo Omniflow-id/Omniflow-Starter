@@ -1,6 +1,7 @@
 {
   "sidebar": {
     "aiManagement": "Manajemen AI",
+    "aiAnalysisSettings": "Pengaturan Analisis AI",
     "aiModels": "Model AI",
     "aiUseCases": "Use Case AI",
     "aiChat": "Obrolan AI"
@@ -99,6 +100,59 @@
           "required": "Nama, deskripsi, prompt, dan status wajib diisi",
           "duplicateName": "Nama use case sudah ada",
           "notFound": "Use Case AI tidak ditemukan"
+        }
+      }
+    },
+    "analysisSettings": {
+      "title": "Pengaturan Analisis AI",
+      "breadcrumb": "Pengaturan Analisis AI",
+      "currentConfig": "Konfigurasi Saat Ini",
+      "updateSettings": "Perbarui Pengaturan",
+      "updateDescription": "Pilih model AI yang berbeda atau sesuaikan parameter",
+      "info": {
+        "title": "Informasi",
+        "aboutTitle": "Tentang Pengaturan Analisis AI",
+        "description": "Konfigurasi ini menentukan model AI mana yang digunakan untuk semua fitur analisis:",
+        "features": [
+          "Analisis Screen Reader AI",
+          "Analisis Data Sistem",
+          "Rekomendasi Sistem",
+          "Dan fitur-fitur AI lainnya"
+        ],
+        "tip": "Perubahan pada pengaturan ini akan langsung berlaku untuk semua permintaan analisis baru. Tidak perlu restart server!"
+      },
+      "fields": {
+        "selectedModel": "Model AI",
+        "description": "Deskripsi",
+        "maxTokens": "Max Tokens",
+        "temperature": "Temperature",
+        "modelName": "Nama Model",
+        "modelVariant": "Varian Model",
+        "apiUrl": "URL API",
+        "lastUpdated": "Terakhir Diperbarui",
+        "params": "Parameter",
+        "selectModel": "-- Pilih Model AI --"
+      },
+      "placeholders": {
+        "description": "contoh: Pengaturan produksi dengan GPT-4"
+      },
+      "helpText": {
+        "maxTokens": "Maksimal token untuk respons AI",
+        "temperature": "Keacakan respons AI (0.0 - 2.0, default: 0.10)"
+      },
+      "loading": "Memuat pengaturan...",
+      "noSettings": "Belum ada pengaturan aktif. Silakan buat pengaturan baru.",
+      "buttons": {
+        "update": "Perbarui Pengaturan",
+        "updating": "Memperbarui..."
+      },
+      "messages": {
+        "updated": "Pengaturan berhasil diperbarui!",
+        "error": {
+          "loadFailed": "Gagal memuat pengaturan",
+          "updateFailed": "Gagal memperbarui pengaturan",
+          "modelRequired": "Model AI harus dipilih",
+          "modelNotAvailable": "Model AI yang dipilih tidak tersedia"
         }
       }
     },

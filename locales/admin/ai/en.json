@@ -1,6 +1,7 @@
 {
   "sidebar": {
     "aiManagement": "AI Management",
+    "aiAnalysisSettings": "AI Analysis Settings",
     "aiModels": "AI Models",
     "aiUseCases": "AI Use Cases",
     "aiChat": "AI Chat"
@@ -99,6 +100,59 @@
           "required": "Name, description, prompt, and status are required",
           "duplicateName": "Use case name already exists",
           "notFound": "AI Use Case not found"
+        }
+      }
+    },
+    "analysisSettings": {
+      "title": "AI Analysis Settings",
+      "breadcrumb": "AI Analysis Settings",
+      "currentConfig": "Current Configuration",
+      "updateSettings": "Update Settings",
+      "updateDescription": "Select a different AI model or adjust parameters",
+      "info": {
+        "title": "Information",
+        "aboutTitle": "About AI Analysis Settings",
+        "description": "This configuration determines which AI model is used for all analysis features:",
+        "features": [
+          "AI Screen Reader Analysis",
+          "System Data Analysis",
+          "System Recommendations",
+          "And other AI features"
+        ],
+        "tip": "Changes to this setting will take effect immediately for all new analysis requests. No server restart required!"
+      },
+      "fields": {
+        "selectedModel": "AI Model",
+        "description": "Description",
+        "maxTokens": "Max Tokens",
+        "temperature": "Temperature",
+        "modelName": "Model Name",
+        "modelVariant": "Model Variant",
+        "apiUrl": "API URL",
+        "lastUpdated": "Last Updated",
+        "params": "Parameters",
+        "selectModel": "-- Select AI Model --"
+      },
+      "placeholders": {
+        "description": "e.g., Production settings with GPT-4"
+      },
+      "helpText": {
+        "maxTokens": "Maximum tokens for AI response",
+        "temperature": "AI response randomness (0.0 - 2.0, default: 0.10)"
+      },
+      "loading": "Loading settings...",
+      "noSettings": "No active settings found. Please create new settings.",
+      "buttons": {
+        "update": "Update Settings",
+        "updating": "Updating..."
+      },
+      "messages": {
+        "updated": "Settings updated successfully!",
+        "error": {
+          "loadFailed": "Failed to load settings",
+          "updateFailed": "Failed to update settings",
+          "modelRequired": "AI model must be selected",
+          "modelNotAvailable": "Selected AI model is not available"
         }
       }
     },

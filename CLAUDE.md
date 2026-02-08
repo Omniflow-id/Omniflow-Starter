@@ -41,6 +41,7 @@ The project uses `module-alias` for cleaner import paths:
 - `@helpers` - Helper utilities (./helpers)
 - `@middlewares` - Express middlewares (./middlewares)
 - `@routes` - Route handlers (./routes)
+- `@services` - Service layer (./services)
 - `@views` - Nunjucks templates (./views)
 - `@public` - Static files (./public)
 

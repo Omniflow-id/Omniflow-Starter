@@ -29,6 +29,7 @@
     "setup:prod": "npm ci --only=production && npm run docker:prod",
     "db:migrate": "knex migrate:latest",
     "db:seed": "knex seed:run",
+    "db:seed:clean": "cross-env FORCE_SEED_CLEANUP=true knex seed:run",
     "db:reset": "knex migrate:rollback --all && knex migrate:latest && knex seed:run",
     "db:setup": "npm run db:migrate && npm run db:seed",
     "db:status": "knex migrate:status"
@@ -106,7 +107,8 @@
     "uuid": "^11.1.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.1.2"
+    "@biomejs/biome": "^2.1.2",
+    "cross-env": "^10.1.0"
   },
   "_moduleAliases": {
     "@": ".",
@@ -115,6 +117,7 @@
     "@helpers": "./helpers",
     "@middlewares": "./middlewares",
     "@routes": "./routes",
+    "@services": "./services",
     "@views": "./views",
     "@public": "./public"
   }

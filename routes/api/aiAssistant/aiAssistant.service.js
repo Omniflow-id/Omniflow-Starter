@@ -1,6 +1,32 @@
-const config = require("../../../config");
 const { getKnowledgeContext } = require("../../../helpers/contextLoader");
-const { openai, langfuse } = require("../../../services/aiService");
+const { langfuse, getOpenAIClient } = require("../../../services/aiChatService");
+const aiAnalysisService = require("../../../services/aiAnalysisService");
+const { db } = require("../../../db/db");
+
+/**
+ * Log AI Assistant interaction to database
+ * @param {Object} params
+ */
+const logAssistantInteraction = async ({
+	userId,
+	pageId,
+	userMessage,
+	aiResponse,
+	modelId,
+	tokenUsage,
+	sessionId,
+}) => {
+	try {
+		await db.query(
+			`INSERT INTO ai_assistant_logs 
+			(user_id, page_id, user_message, ai_response, model_id, token_usage, session_id) 
+			VALUES (?, ?, ?, ?, ?, ?, ?)`,
+			[userId, pageId, userMessage, aiResponse, modelId, tokenUsage, sessionId],
+		);
+	} catch (error) {
+		console.error("[AI Assistant] Failed to log interaction:", error);
+	}
+};
 
 /**
  * Handle updated chat context request (Non-streaming)
@@ -10,25 +36,34 @@ const { openai, langfuse } = require("../../../services/aiService");
 const getChatContext = async (req, res) => {
   const { currentPageId, userRole, message } = req.body;
 
-  if (!openai) {
-    return res.status(503).json({
-      error:
-        "AI service logic is not fully configured (missing keys or dependencies).",
-    });
-  }
-
   try {
-    // 1. Determine User Role (Securely from Session)
+    // 1. Get AI Model Config and OpenAI Client from AI Analysis Settings
+    let modelConfig;
+    let openai;
+    try {
+      const clientData = await getOpenAIClient();
+      openai = clientData.openai;
+      modelConfig = clientData.modelConfig;
+    } catch (error) {
+      return res.status(503).json({
+        error: "No AI model available. Please configure AI Analysis Settings.",
+      });
+    }
+
+    // Get completion config for temperature and max_tokens
+    const completionConfig = await aiAnalysisService.getAICompletionConfig();
+
+    // 2. Determine User Role (Securely from Session)
     const roleName = req.session.user?.role_name || userRole || "User";
 
-    // 2. Resolve Context from Knowledge Base
+    // 3. Resolve Context from Knowledge Base
     const contextContent = await getKnowledgeContext(
       roleName,
       currentPageId || "index",
       req.query.lang || "en"
     );
 
-    // 3. User Info for Personalization
+    // 4. User Info for Personalization
     const currentUser = req.session.user || {
       username: "Guest",
       full_name: "Guest User",
@@ -70,9 +105,9 @@ When responding:
 6. End with an open question to continue the conversation if appropriate
 `;
 
-    const modelName = config.llm.modelName || "gpt-4o-mini";
+    const modelName = modelConfig.model_variant;
 
-    // 2. Setup Langfuse Trace (if configured)
+    // 5. Setup Langfuse Trace (if configured)
     let trace;
     let generation;
 
@@ -85,6 +120,7 @@ When responding:
           currentPageId,
           userRole,
           model: modelName,
+          source: "ai_analysis_settings"
         },
       });
 
@@ -98,19 +134,32 @@ When responding:
       });
     }
 
-    // 3. Call OpenAI (or compatible)
+    // 6. Call OpenAI (or compatible)
     const completion = await openai.chat.completions.create({
       model: modelName,
       messages: [
         { role: "system", content: systemPrompt },
         { role: "user", content: message || "Hello" },
       ],
-      temperature: 0.7,
+      temperature: completionConfig.temperature,
+      max_tokens: completionConfig.max_tokens,
     });
 
     const reply = completion.choices[0].message.content;
+    const tokenUsage = completion.usage?.total_tokens || 0;
 
-    // 4. End Trace
+    // 7. Log to database (fire and forget)
+    logAssistantInteraction({
+      userId: req.session.user?.id,
+      pageId: currentPageId,
+      userMessage: message,
+      aiResponse: reply,
+      modelId: modelConfig.id,
+      tokenUsage: tokenUsage,
+      sessionId: req.sessionID,
+    });
+
+    // 8. End Trace
     if (generation) {
       generation.end({
         output: reply,
@@ -120,6 +169,8 @@ When responding:
     res.json({
       reply,
       contextFound: !!contextContent,
+      model: modelName,
+      source: "ai_analysis_settings"
     });
   } catch (error) {
     console.error("[ChatController] Error processing request:", error);
@@ -135,25 +186,34 @@ When responding:
 const getChatContextStream = async (req, res) => {
   const { currentPageId, userRole, message } = req.body;
 
-  if (!openai) {
-    return res.status(503).json({
-      error:
-        "AI service logic is not fully configured (missing keys or dependencies).",
-    });
-  }
-
   try {
-    // 1. Determine User Role (Securely from Session)
+    // 1. Get AI Model Config and OpenAI Client from AI Analysis Settings
+    let modelConfig;
+    let openai;
+    try {
+      const clientData = await getOpenAIClient();
+      openai = clientData.openai;
+      modelConfig = clientData.modelConfig;
+    } catch (error) {
+      return res.status(503).json({
+        error: "No AI model available. Please configure AI Analysis Settings.",
+      });
+    }
+
+    // Get completion config for temperature and max_tokens
+    const completionConfig = await aiAnalysisService.getAICompletionConfig();
+
+    // 2. Determine User Role (Securely from Session)
     const roleName = req.session.user?.role_name || userRole || "User";
 
-    // 2. Resolve Context from Knowledge Base
+    // 3. Resolve Context from Knowledge Base
     const contextContent = await getKnowledgeContext(
       roleName,
       currentPageId || "index",
       req.query.lang || "en"
     );
 
-    // 3. User Info for Personalization
+    // 4. User Info for Personalization
     const currentUser = req.session.user || {
       username: "Guest",
       full_name: "Guest User",
@@ -203,7 +263,7 @@ RESPONSE GUIDELINES:
    - Use code blocks for any technical identifiers, error codes, or snippets.
 `;
 
-    const modelName = config.llm.modelName || "gpt-4o-mini";
+    const modelName = modelConfig.model_variant;
 
     // Setup SSE headers
     res.setHeader("Content-Type", "text/event-stream");
@@ -224,6 +284,7 @@ RESPONSE GUIDELINES:
           currentPageId,
           userRole,
           model: modelName,
+          source: "ai_analysis_settings"
         },
       });
 
@@ -239,7 +300,9 @@ RESPONSE GUIDELINES:
 
     // Send initial metadata
     res.write(
-      `data: ${JSON.stringify({ type: "metadata", contextFound: !!contextContent })}\n\n`
+      `data: ${JSON.stringify({ type: "metadata", contextFound: !!contextContent, model: modelName })}
+
+`
     );
 
     // Call OpenAI with streaming
@@ -249,7 +312,8 @@ RESPONSE GUIDELINES:
         { role: "system", content: systemPrompt },
         { role: "user", content: message || "Hello" },
       ],
-      temperature: 0.7,
+      temperature: completionConfig.temperature,
+      max_tokens: completionConfig.max_tokens,
       stream: true,
     });
 
@@ -260,7 +324,9 @@ RESPONSE GUIDELINES:
       if (content) {
         fullResponse += content;
         // Send chunk to client
-        res.write(`data: ${JSON.stringify({ type: "chunk", content })}\n\n`);
+        res.write(`data: ${JSON.stringify({ type: "chunk", content })}
+
+`);
       }
     }
 
@@ -271,8 +337,21 @@ RESPONSE GUIDELINES:
       });
     }
 
+    // Log to database (fire and forget)
+    logAssistantInteraction({
+      userId: req.session.user?.id,
+      pageId: currentPageId,
+      userMessage: message,
+      aiResponse: fullResponse,
+      modelId: modelConfig.id,
+      tokenUsage: null, // Streaming doesn't provide token count easily
+      sessionId: req.sessionID,
+    });
+
     // Send completion signal
-    res.write(`data: ${JSON.stringify({ type: "done" })}\n\n`);
+    res.write(`data: ${JSON.stringify({ type: "done" })}
+
+`);
     res.end();
   } catch (error) {
     console.error(
@@ -281,7 +360,9 @@ RESPONSE GUIDELINES:
     );
     // Send error event
     res.write(
-      `data: ${JSON.stringify({ type: "error", message: error.message })}\n\n`
+      `data: ${JSON.stringify({ type: "error", message: error.message })}
+
+`
     );
     res.end();
   }

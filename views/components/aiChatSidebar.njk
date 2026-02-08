@@ -691,7 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const typingId = showTypingIndicator();
 
         try {
-            const response = await fetch(`/api/chat/stream?lang=${document.documentElement.lang}`, {
+            const response = await fetch(`/api/ai-assistant/stream?lang=${document.documentElement.lang}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

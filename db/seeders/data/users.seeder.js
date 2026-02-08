@@ -1,15 +1,14 @@
 require("module-alias/register");
 const bcrypt = require("bcrypt");
-const { db } = require("@db/db");
 
 /**
  * Seed the users table with default admin, manager, and user accounts.
- * This seeder is idempotent and can be run multiple times safely.
+ * IDEMPOTENT: Safe to run multiple times - will skip existing users.
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
 const seedUsers = async (knex) => {
-  console.log("🌱 [SEEDER] Seeding users...");
+  console.log("🌱 [SEEDER] Checking users...");
 
   // Hash passwords with policy-compliant patterns
   const adminPassword = await bcrypt.hash("Admin12345.", 10);
@@ -17,23 +16,22 @@ const seedUsers = async (knex) => {
   const userPassword = await bcrypt.hash("User12345.", 10);
 
   // Get role IDs
-  const [adminRole] = await db.query(
-    "SELECT role_id FROM roles WHERE role_name = 'Admin'"
-  );
-  const [managerRole] = await db.query(
-    "SELECT role_id FROM roles WHERE role_name = 'Manager'"
-  );
-  const [userRole] = await db.query(
-    "SELECT role_id FROM roles WHERE role_name = 'User'"
-  );
+  const adminRole = await knex("roles").where("role_name", "Admin").first();
+  const managerRole = await knex("roles").where("role_name", "Manager").first();
+  const userRole = await knex("roles").where("role_name", "User").first();
 
-  await knex("users").insert([
+  if (!adminRole || !managerRole || !userRole) {
+    console.log("⚠️  [SEEDER] Required roles not found, skipping user seeding");
+    return;
+  }
+
+  const users = [
     {
       username: "admin",
       email: "admin@omniflow.id",
       password_hash: adminPassword,
-      full_name: "Admin",
-      role_id: adminRole[0].role_id,
+      full_name: "Administrator",
+      role_id: adminRole.role_id,
       is_active: true,
     },
     {
@@ -41,21 +39,41 @@ const seedUsers = async (knex) => {
       email: "manager@omniflow.id",
       password_hash: managerPassword,
       full_name: "Manager",
-      role_id: managerRole[0].role_id,
+      role_id: managerRole.role_id,
       is_active: true,
     },
     {
       username: "user",
       email: "user@omniflow.id",
       password_hash: userPassword,
-      full_name: "User",
-      role_id: userRole[0].role_id,
+      full_name: "Regular User",
+      role_id: userRole.role_id,
       is_active: true,
     },
-  ]);
+  ];
 
-  console.log("✅ [SEEDER] Successfully seeded 3 users");
+  let added = 0;
+  let skipped = 0;
+
+  for (const user of users) {
+    const exists = await knex("users")
+      .where("username", user.username)
+      .first();
+
+    if (!exists) {
+      await knex("users").insert(user);
+      added++;
+    } else {
+      skipped++;
+    }
+  }
+
+  if (added > 0) {
+    console.log(`✅ [SEEDER] Added ${added} users`);
+  }
+  if (skipped > 0) {
+    console.log(`⏭️  [SEEDER] Skipped ${skipped} existing users`);
+  }
 };
 
-// Export the seed function for the master seeder
 module.exports = { seedUsers };

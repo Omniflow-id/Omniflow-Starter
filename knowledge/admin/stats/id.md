@@ -113,6 +113,8 @@ Semua cache key mengikuti pattern terstruktur:
 - `admin:logs:filters` - Opsi filter log
 - `admin:permissions:roles` - Roles dengan permissions
 - `admin:queue:stats` - Statistik queue
+- `admin:ai:*` - Konfigurasi dan metadata AI
+- `ai_analysis_settings:*` - Pengaturan global AI
 
 **DataTables:**
 - `datatable:users:{base64_query}` - Hasil DataTable user

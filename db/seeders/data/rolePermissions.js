@@ -1,19 +1,12 @@
-const { db } = require("@db/db");
-
 /**
  * Seed role_permissions mapping data
+ * IDEMPOTENT: Safe to run multiple times - will skip existing mappings.
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
  */
-async function seedRolePermissions() {
-  console.log("🌱 [SEEDER] Seeding role_permissions mapping...");
+async function seedRolePermissions(knex) {
+  console.log("🌱 [SEEDER] Checking role_permissions mapping...");
 
-  // Clear existing data
-  await db.query("DELETE FROM role_permissions");
-
-  // Define role-permission mappings based on instruction example:
-  // Admin Marketing → manage_blog
-  // Admin Finance → view_finance
-  // Manager HR → approve_leave
-  // User → view_blog
   const roleMappings = [
     // Admin (role_id: 1) - Full system access
     {
@@ -26,11 +19,11 @@ async function seedRolePermissions() {
         "manage_queue",
         "view_logs",
         "view_profile",
+        "view_roles",
         // AI Management permissions
         "manage_ai_models",
         "manage_ai_use_cases",
         "use_ai_chat",
-        "view_ai_logs",
       ],
     },
 
@@ -57,51 +50,76 @@ async function seedRolePermissions() {
     },
   ];
 
+  let totalAdded = 0;
+  let totalSkipped = 0;
+
   for (const roleMapping of roleMappings) {
     // Get role_id
-    const [roles] = await db.query(
-      "SELECT role_id FROM roles WHERE role_name = ?",
-      [roleMapping.role_name]
-    );
+    const role = await knex("roles")
+      .where("role_name", roleMapping.role_name)
+      .first();
 
-    if (roles.length === 0) {
+    if (!role) {
       console.log(
         `⚠️  [SEEDER] Role '${roleMapping.role_name}' not found, skipping...`
       );
       continue;
     }
 
-    const roleId = roles[0].role_id;
+    const roleId = role.role_id;
+    let roleAdded = 0;
+    let roleSkipped = 0;
 
     for (const permissionName of roleMapping.permissions) {
       // Get permission_id
-      const [permissions] = await db.query(
-        "SELECT permission_id FROM permissions WHERE permission_name = ?",
-        [permissionName]
-      );
+      const permission = await knex("permissions")
+        .where("permission_name", permissionName)
+        .first();
 
-      if (permissions.length === 0) {
+      if (!permission) {
         console.log(
           `⚠️  [SEEDER] Permission '${permissionName}' not found, skipping...`
         );
         continue;
       }
 
-      const permissionId = permissions[0].permission_id;
+      const permissionId = permission.permission_id;
 
-      // Insert role_permission mapping
-      await db.query(
-        "INSERT INTO role_permissions (role_id, permission_id, created_at) VALUES (?, ?, NOW())",
-        [roleId, permissionId]
-      );
+      // Check if mapping already exists
+      const exists = await knex("role_permissions")
+        .where({
+          role_id: roleId,
+          permission_id: permissionId,
+        })
+        .first();
+
+      if (!exists) {
+        await knex("role_permissions").insert({
+          role_id: roleId,
+          permission_id: permissionId,
+          created_at: knex.fn.now(),
+        });
+        roleAdded++;
+        totalAdded++;
+      } else {
+        roleSkipped++;
+        totalSkipped++;
+      }
     }
 
-    console.log(
-      `✅ [SEEDER] Mapped ${roleMapping.permissions.length} permissions to '${roleMapping.role_name}' role`
-    );
+    if (roleAdded > 0) {
+      console.log(
+        `✅ [SEEDER] Added ${roleAdded} permissions to '${roleMapping.role_name}'`
+      );
+    }
   }
 
-  console.log("✅ [SEEDER] Successfully seeded role_permissions mappings");
+  if (totalAdded > 0) {
+    console.log(`✅ [SEEDER] Total ${totalAdded} role-permission mappings added`);
+  }
+  if (totalSkipped > 0) {
+    console.log(`⏭️  [SEEDER] Total ${totalSkipped} existing mappings skipped`);
+  }
 }
 
 module.exports = { seedRolePermissions };

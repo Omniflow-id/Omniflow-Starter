@@ -54,11 +54,13 @@ function readLocaleFile(page, lang) {
   }
 
   const filePath = path.join(localesRoot, page, `${lang}.json`);
+  // Debug: console.log(`[i18n] Loading locale from: ${filePath}`);
   let data;
 
   try {
     const raw = fs.readFileSync(filePath, "utf8");
     data = JSON.parse(raw);
+    // Debug: console.log(`[i18n] Successfully loaded ${page}:${lang}, keys:`, Object.keys(data));
   } catch (error) {
     // If requested language file not found, fallback to default language
     if (lang !== DEFAULT_LANG) {

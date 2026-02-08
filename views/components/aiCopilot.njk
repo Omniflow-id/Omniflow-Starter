@@ -1,0 +1,876 @@
+<style>
+  /* AI Copilot FAB */
+  #ai-copilot-fab {
+    position: fixed;
+    bottom: 6rem;
+    right: 2rem;
+    z-index: 9998;
+  }
+
+  .btn-copilot {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    border: none;
+    color: white;
+    font-size: 1.25rem;
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-copilot:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
+  }
+
+  .btn-copilot:active {
+    transform: scale(0.95);
+  }
+
+  .btn-copilot.analyzing {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  /* AI Copilot Modal */
+  #aiCopilotModal .modal-dialog {
+    max-width: 900px;
+  }
+  
+  #aiCopilotModal .modal-content {
+    border: none;
+    border-radius: 1rem;
+    overflow: hidden;
+  }
+
+  #aiCopilotModal .modal-header {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    color: white;
+    border-bottom: none;
+    padding: 1.25rem 1.5rem;
+  }
+
+  #aiCopilotModal .modal-title {
+    font-weight: 600;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  #aiCopilotModal .modal-header .btn-close {
+    filter: invert(1);
+    opacity: 0.8;
+  }
+
+  #aiCopilotModal .modal-header .btn-close:hover {
+    opacity: 1;
+  }
+
+  #aiCopilotModal .modal-body {
+    padding: 1.5rem;
+  }
+
+  #aiCopilotModal .modal-footer {
+    border-top: 1px solid #e5e7eb;
+    padding: 1rem 1.5rem;
+  }
+
+  /* Query Input */
+  .ai-copilot-query-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  #aiCopilotQuery {
+    border-radius: 0.5rem;
+    border: 1px solid #d1d5db;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  #aiCopilotQuery:focus {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+    outline: none;
+  }
+
+  /* Action Buttons */
+  .ai-copilot-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .btn-analyze {
+    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+    border: none;
+    color: white;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-analyze:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+  }
+
+  .btn-analyze:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-stop {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    border: none;
+    color: white;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-stop:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  }
+
+  .btn-secondary-ai {
+    background: #f3f4f6;
+    border: 1px solid #d1d5db;
+    color: #374151;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-secondary-ai:hover {
+    background: #e5e7eb;
+  }
+
+  .btn-copy {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    border: none;
+    color: white;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-copy:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+
+  /* Result Section */
+  .ai-copilot-result-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    display: block;
+  }
+
+  #aiCopilotResult {
+    min-height: 200px;
+    max-height: 400px;
+    overflow-y: auto;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+
+  /* Markdown Content Styling */
+  #aiCopilotResult h1,
+  #aiCopilotResult h2,
+  #aiCopilotResult h3,
+  #aiCopilotResult h4 {
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    color: #111827;
+  }
+
+  #aiCopilotResult p {
+    margin-bottom: 0.75rem;
+    color: #374151;
+  }
+
+  #aiCopilotResult ul,
+  #aiCopilotResult ol {
+    margin-left: 1.5rem;
+    margin-bottom: 0.75rem;
+  }
+
+  #aiCopilotResult code {
+    background: #e5e7eb;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
+    font-family: monospace;
+    font-size: 0.8125rem;
+  }
+
+  #aiCopilotResult pre {
+    background: #1f2937;
+    color: #f9fafb;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    overflow-x: auto;
+    margin-bottom: 0.75rem;
+  }
+
+  #aiCopilotResult pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+  }
+
+  #aiCopilotResult blockquote {
+    border-left: 4px solid #8b5cf6;
+    padding-left: 1rem;
+    margin-left: 0;
+    color: #6b7280;
+    font-style: italic;
+  }
+
+  #aiCopilotResult table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 0.75rem;
+  }
+
+  #aiCopilotResult th,
+  #aiCopilotResult td {
+    border: 1px solid #e5e7eb;
+    padding: 0.5rem;
+    text-align: left;
+  }
+
+  #aiCopilotResult th {
+    background: #f3f4f6;
+    font-weight: 600;
+  }
+
+  /* Loading Spinner */
+  .ai-copilot-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    color: #6b7280;
+    padding: 2rem;
+  }
+
+  .ai-copilot-spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #8b5cf6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* Error State */
+  .ai-copilot-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    color: #dc2626;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .ai-copilot-error i {
+    font-size: 1.25rem;
+  }
+
+  /* Mobile Responsive */
+  @media (max-width: 768px) {
+    #ai-copilot-fab {
+      bottom: 5rem;
+      right: 1rem;
+    }
+
+    .btn-copilot {
+      width: 3rem;
+      height: 3rem;
+      font-size: 1rem;
+    }
+
+    #aiCopilotModal .modal-dialog {
+      margin: 0;
+      max-width: 100vw;
+      height: 100vh;
+      max-height: 100vh;
+    }
+
+    #aiCopilotModal .modal-content {
+      height: 100vh;
+      border-radius: 0;
+    }
+
+    #aiCopilotModal .modal-header {
+      padding: 0.875rem 1rem;
+      padding-top: max(0.875rem, env(safe-area-inset-top));
+    }
+
+    #aiCopilotModal .modal-footer {
+      padding-bottom: max(0.75rem, env(safe-area-inset-bottom));
+    }
+
+    #aiCopilotModal .modal-body {
+      padding: 1rem;
+      max-height: calc(100vh - 140px);
+    }
+
+    #aiCopilotModal .modal-footer {
+      padding: 0.75rem 1rem;
+    }
+
+    .ai-copilot-actions {
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .btn-analyze,
+    .btn-stop {
+      flex: 1;
+      justify-content: center;
+      padding: 0.625rem 1rem;
+      font-size: 0.875rem;
+    }
+
+    #aiCopilotResult {
+      max-height: calc(100vh - 280px);
+      min-height: 200px;
+    }
+
+    .ai-copilot-query {
+      font-size: 16px; /* Prevent zoom on iOS */
+    }
+  }
+</style>
+
+<!-- AI Copilot Floating Action Button -->
+<div id="ai-copilot-fab">
+  <button class="btn-copilot" id="aiCopilotFabBtn" title="AI Copilot">
+    <i class="fa-solid fa-wand-magic-sparkles"></i>
+  </button>
+</div>
+
+<!-- AI Copilot Modal -->
+<div class="modal fade" id="aiCopilotModal" tabindex="-1" aria-labelledby="aiCopilotModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="aiCopilotModalLabel">
+          <i class="fa-solid fa-robot"></i>
+          AI Copilot
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <label class="ai-copilot-query-label">Pertanyaan (Opsional)</label>
+        <input type="text" class="form-control" id="aiCopilotQuery" placeholder="Tanyakan apa yang ingin Anda ketahui dari data ini...">
+        
+        <div class="ai-copilot-actions">
+          <button class="btn-analyze" id="aiCopilotAnalyzeBtn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            Analisis Layar
+          </button>
+          <button class="btn-stop" id="aiCopilotStopBtn" style="display: none;">
+            <i class="fa-solid fa-stop"></i>
+            Berhenti
+          </button>
+        </div>
+
+        <label class="ai-copilot-result-label">Hasil Analisis</label>
+        <div id="aiCopilotResult">
+          <div class="text-muted text-center py-4">
+            <i class="fa-solid fa-lightbulb text-warning mb-2" style="font-size: 2rem;"></i>
+            <p class="mb-0">Klik "Analisis Layar" untuk memulai analisis konten halaman ini.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary-ai" data-bs-dismiss="modal">Tutup</button>
+        <button class="btn-copy" id="aiCopilotCopyBtn" style="display: none;">
+          <i class="fa-solid fa-copy"></i>
+          Salin
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script>
+  class AICopilot {
+    constructor() {
+      this.elements = {};
+      this.abortController = null;
+      this.isAnalyzing = false;
+      this.typingQueue = [];
+      this.isTyping = false;
+      this.currentContent = '';
+    }
+
+    init() {
+      this.bindElements();
+      this.bindEvents();
+      this.updateVisibility();
+    }
+
+    bindElements() {
+      this.elements = {
+        fab: document.getElementById('aiCopilotFabBtn'),
+        modal: document.getElementById('aiCopilotModal'),
+        queryInput: document.getElementById('aiCopilotQuery'),
+        analyzeBtn: document.getElementById('aiCopilotAnalyzeBtn'),
+        stopBtn: document.getElementById('aiCopilotStopBtn'),
+        copyBtn: document.getElementById('aiCopilotCopyBtn'),
+        resultDiv: document.getElementById('aiCopilotResult'),
+        fabContainer: document.getElementById('ai-copilot-fab')
+      };
+
+      // Initialize Bootstrap modal
+      if (this.elements.modal && typeof bootstrap !== 'undefined') {
+        this.modalInstance = new bootstrap.Modal(this.elements.modal);
+      }
+    }
+
+    bindEvents() {
+      if (this.elements.fab) {
+        this.elements.fab.addEventListener('click', () => this.openModal());
+      }
+
+      if (this.elements.analyzeBtn) {
+        this.elements.analyzeBtn.addEventListener('click', () => this.startAnalysis());
+      }
+
+      if (this.elements.stopBtn) {
+        this.elements.stopBtn.addEventListener('click', () => this.stopAnalysis());
+      }
+
+      if (this.elements.copyBtn) {
+        this.elements.copyBtn.addEventListener('click', () => this.copyResult());
+      }
+
+      // Enter key on input triggers analysis
+      if (this.elements.queryInput) {
+        this.elements.queryInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter' && !this.isAnalyzing) {
+            this.startAnalysis();
+          }
+        });
+      }
+    }
+
+    openModal() {
+      if (this.modalInstance) {
+        this.modalInstance.show();
+      } else if (this.elements.modal) {
+        // Fallback for non-Bootstrap environments
+        this.elements.modal.style.display = 'block';
+      }
+    }
+
+    captureScreenContent() {
+      const data = {
+        url: window.location.href,
+        title: document.title,
+        timestamp: new Date().toISOString(),
+        tables: [],
+        forms: [],
+        headings: [],
+        dataCards: []
+      };
+
+      // Capture tables
+      document.querySelectorAll('table.dataTable, .table').forEach((table, index) => {
+        const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent.trim());
+        const rows = [];
+        table.querySelectorAll('tbody tr').forEach(row => {
+          const rowData = Array.from(row.querySelectorAll('td')).map(td => td.textContent.trim());
+          if (rowData.some(cell => cell)) {
+            rows.push(rowData);
+          }
+        });
+        if (headers.length || rows.length) {
+          data.tables.push({ index, headers, rows });
+        }
+      });
+
+      // Capture forms
+      document.querySelectorAll('form').forEach((form, index) => {
+        const inputs = [];
+        form.querySelectorAll('input:not([type="hidden"]), select, textarea').forEach(input => {
+          const label = form.querySelector(`label[for="${input.id}"]`) || input.closest('label');
+          inputs.push({
+            label: label ? label.textContent.trim() : input.name || input.placeholder || 'Unknown',
+            value: input.value,
+            type: input.type || input.tagName.toLowerCase()
+          });
+        });
+        if (inputs.length) {
+          data.forms.push({ index, inputs });
+        }
+      });
+
+      // Capture headings
+      document.querySelectorAll('h1, h2, h3, .page-title, .card-title').forEach((heading, index) => {
+        data.headings.push({
+          level: heading.tagName || 'DIV',
+          text: heading.textContent.trim()
+        });
+      });
+
+      // Capture data cards
+      document.querySelectorAll('.card, .info-box, .stat-card').forEach((card, index) => {
+        const title = card.querySelector('.card-title, .info-box-text, .stat-label')?.textContent.trim();
+        const value = card.querySelector('.card-text, .info-box-number, .stat-value, h3, h4')?.textContent.trim();
+        if (title || value) {
+          data.dataCards.push({ index, title, value });
+        }
+      });
+
+      return data;
+    }
+
+    formatScreenContent(data) {
+      let formatted = `=== Halaman: ${data.title} ===\n`;
+      formatted += `URL: ${data.url}\n`;
+      formatted += `Waktu: ${data.timestamp}\n\n`;
+
+      if (data.headings.length) {
+        formatted += '=== JUDUL DAN HEADER ===\n';
+        data.headings.forEach(h => {
+          formatted += `[${h.level}] ${h.text}\n`;
+        });
+        formatted += '\n';
+      }
+
+      if (data.dataCards.length) {
+        formatted += '=== DATA KARTU ===\n';
+        data.dataCards.forEach(card => {
+          formatted += `${card.title || 'Card'}: ${card.value || 'N/A'}\n`;
+        });
+        formatted += '\n';
+      }
+
+      if (data.tables.length) {
+        formatted += '=== TABEL DATA ===\n';
+        data.tables.forEach((table, idx) => {
+          formatted += `Tabel #${idx + 1}:\n`;
+          if (table.headers.length) {
+            formatted += `Kolom: ${table.headers.join(' | ')}\n`;
+          }
+          formatted += `Baris data: ${table.rows.length}\n`;
+          table.rows.slice(0, 5).forEach(row => {
+            formatted += `  - ${row.join(' | ')}\n`;
+          });
+          if (table.rows.length > 5) {
+            formatted += `  ... dan ${table.rows.length - 5} baris lainnya\n`;
+          }
+          formatted += '\n';
+        });
+      }
+
+      if (data.forms.length) {
+        formatted += '=== FORMULIR ===\n';
+        data.forms.forEach((form, idx) => {
+          formatted += `Form #${idx + 1}:\n`;
+          form.inputs.forEach(input => {
+            formatted += `  - ${input.label}: ${input.value || '(kosong)'}\n`;
+          });
+          formatted += '\n';
+        });
+      }
+
+      return formatted;
+    }
+
+    async startAnalysis() {
+      if (this.isAnalyzing) return;
+
+      this.isAnalyzing = true;
+      this.typingQueue = [];
+      this.currentContent = '';
+      this.isTyping = false;
+      this.updateUIState(true);
+
+      const query = this.elements.queryInput?.value?.trim() || '';
+      const screenData = this.captureScreenContent();
+      const formattedContent = this.formatScreenContent(screenData);
+
+      this.elements.resultDiv.innerHTML = `
+        <div class="ai-copilot-loading">
+          <div class="ai-copilot-spinner"></div>
+          <span>Menganalisis konten halaman...</span>
+        </div>
+      `;
+
+      this.abortController = new AbortController();
+
+      try {
+        const response = await fetch('/api/ai-copilot/analyze', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userQuery: query,
+            screenContext: formattedContent
+          }),
+          signal: this.abortController.signal
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        // Handle SSE streaming
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let accumulatedContent = '';
+
+        this.elements.resultDiv.innerHTML = '<div class="markdown-content"></div>';
+        const contentContainer = this.elements.resultDiv.querySelector('.markdown-content');
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          const lines = chunk.split('\n');
+
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              try {
+                const data = JSON.parse(line.slice(6));
+                if (data.content) {
+                  // Add to typing queue for typewriter effect
+                  this.typingQueue.push(...data.content.split(''));
+                  if (!this.isTyping) {
+                    this.processTypingQueue(contentContainer);
+                  }
+                }
+                if (data.error) {
+                  this.showError(data.error);
+                  return;
+                }
+              } catch (e) {
+                // Ignore parse errors for non-JSON lines
+              }
+            }
+          }
+        }
+
+        this.showCopyButton();
+
+      } catch (error) {
+        if (error.name === 'AbortError') {
+          this.elements.resultDiv.innerHTML = `
+            <div class="text-muted text-center py-4">
+              <i class="fa-solid fa-circle-stop text-secondary mb-2" style="font-size: 2rem;"></i>
+              <p class="mb-0">Analisis dihentikan.</p>
+            </div>
+          `;
+        } else {
+          this.showError(error.message || 'Terjadi kesalahan saat menganalisis.');
+        }
+      } finally {
+        this.isAnalyzing = false;
+        this.updateUIState(false);
+        this.abortController = null;
+      }
+    }
+
+    stopAnalysis() {
+      if (this.abortController) {
+        this.abortController.abort();
+      }
+    }
+
+    updateUIState(analyzing) {
+      this.isAnalyzing = analyzing;
+
+      if (this.elements.analyzeBtn) {
+        this.elements.analyzeBtn.style.display = analyzing ? 'none' : 'flex';
+        this.elements.analyzeBtn.disabled = analyzing;
+      }
+
+      if (this.elements.stopBtn) {
+        this.elements.stopBtn.style.display = analyzing ? 'flex' : 'none';
+      }
+
+      if (this.elements.fab) {
+        if (analyzing) {
+          this.elements.fab.classList.add('analyzing');
+        } else {
+          this.elements.fab.classList.remove('analyzing');
+        }
+      }
+
+      if (this.elements.queryInput) {
+        this.elements.queryInput.disabled = analyzing;
+      }
+    }
+
+    renderContent(container, content) {
+      if (!container) return;
+      
+      try {
+        // Use marked.js to render markdown
+        if (typeof marked !== 'undefined') {
+          container.innerHTML = marked.parse(content);
+        } else {
+          // Fallback to plain text with line breaks
+          container.innerHTML = content.replace(/\n/g, '<br>');
+        }
+
+        // Auto-scroll to bottom
+        container.scrollTop = container.scrollHeight;
+      } catch (error) {
+        container.innerHTML = `<pre>${content}</pre>`;
+      }
+    }
+
+    async processTypingQueue(container) {
+      this.isTyping = true;
+      const typingSpeed = 15; // ms per character
+      
+      while (this.typingQueue.length > 0) {
+        if (!this.isAnalyzing && this.typingQueue.length === 0) break;
+        
+        const char = this.typingQueue.shift();
+        this.currentContent += char;
+        
+        this.renderContent(container, this.currentContent);
+        
+        // Small delay for typewriter effect
+        await new Promise(resolve => setTimeout(resolve, typingSpeed));
+      }
+      
+      this.isTyping = false;
+    }
+
+    showError(message) {
+      if (this.elements.resultDiv) {
+        this.elements.resultDiv.innerHTML = `
+          <div class="ai-copilot-error">
+            <i class="fa-solid fa-circle-exclamation"></i>
+            <span>${message}</span>
+          </div>
+        `;
+      }
+    }
+
+    showCopyButton() {
+      if (this.elements.copyBtn) {
+        this.elements.copyBtn.style.display = 'flex';
+      }
+    }
+
+    async copyResult() {
+      const resultContent = this.elements.resultDiv?.textContent || '';
+      
+      try {
+        await navigator.clipboard.writeText(resultContent);
+        
+        // Visual feedback
+        const originalText = this.elements.copyBtn.innerHTML;
+        this.elements.copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> Tersalin!';
+        this.elements.copyBtn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
+        
+        setTimeout(() => {
+          this.elements.copyBtn.innerHTML = originalText;
+          this.elements.copyBtn.style.background = '';
+        }, 2000);
+      } catch (err) {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = resultContent;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+    }
+
+    updateVisibility() {
+      // Hide on auth pages (login, register, forgot password)
+      const isAuthPage = document.body.classList.contains('auth-page') ||
+                        document.querySelector('.auth-wrapper') ||
+                        window.location.pathname.includes('/login') ||
+                        window.location.pathname.includes('/register') ||
+                        window.location.pathname.includes('/forgot-password');
+
+      // Only show for logged-in users (check for admin layout elements)
+      const isLoggedIn = document.querySelector('.sb-nav-fixed') ||
+                        document.querySelector('#layoutSidenav') ||
+                        document.body.classList.contains('sb-nav-fixed');
+
+      if (this.elements.fabContainer) {
+        if (isAuthPage || !isLoggedIn) {
+          this.elements.fabContainer.style.display = 'none';
+        } else {
+          this.elements.fabContainer.style.display = 'block';
+        }
+      }
+    }
+  }
+
+  // Auto-initialize on DOMContentLoaded
+  document.addEventListener('DOMContentLoaded', () => {
+    // Check if user is logged in (has admin layout)
+    const isLoggedIn = document.querySelector('.sb-nav-fixed') ||
+                      document.querySelector('#layoutSidenav') ||
+                      document.body.classList.contains('sb-nav-fixed');
+
+    if (isLoggedIn) {
+      const aiCopilot = new AICopilot();
+      aiCopilot.init();
+    }
+  });
+</script>

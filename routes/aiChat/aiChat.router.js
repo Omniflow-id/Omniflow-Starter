@@ -4,7 +4,7 @@ const { doubleCsrfProtection } = require("@middlewares/csrfProtection");
 const { checkPermission } = require("@middlewares/checkPermission");
 const { withLocale } = require("@helpers/i18n");
 
-const chat = require("./chat.controller");
+const aiChat = require("./aiChat.controller");
 const messageActions = require("./messageActions.controller");
 const sendMessageStream = require("./sendMessageStream.controller");
 
@@ -13,45 +13,45 @@ router.get(
   "/",
   withLocale("admin/ai"),
   checkPermission("use_ai_chat"),
-  chat.getChatPage
+  aiChat.getChatPage
 );
 
 // API routes for conversations
 router.get(
   "/conversations",
   checkPermission("use_ai_chat"),
-  chat.getUserConversations
+  aiChat.getUserConversations
 );
 router.get(
   "/conversations/:id",
   checkPermission("use_ai_chat"),
-  chat.getConversation
+  aiChat.getConversation
 );
 router.post(
   "/conversations",
   withLocale("admin/ai"),
   checkPermission("use_ai_chat"),
   doubleCsrfProtection,
-  chat.createConversation
+  aiChat.createConversation
 );
 router.post(
   "/conversations/:id/title",
   withLocale("admin/ai"),
   checkPermission("use_ai_chat"),
   doubleCsrfProtection,
-  chat.updateConversationTitle
+  aiChat.updateConversationTitle
 );
 router.post(
   "/conversations/:id/delete",
   withLocale("admin/ai"),
   checkPermission("use_ai_chat"),
   doubleCsrfProtection,
-  chat.deleteConversation
+  aiChat.deleteConversation
 );
 router.get(
   "/conversations/search",
   checkPermission("use_ai_chat"),
-  chat.searchConversations
+  aiChat.searchConversations
 );
 
 // Message routes

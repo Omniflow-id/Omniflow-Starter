@@ -16,6 +16,7 @@ router.get(
 
 // API routes
 router.get("/api/ai_models", aiModels.getAllAIModels);
+router.get("/all", aiModels.getAllAIModelsAPI);
 
 // CRUD routes with CSRF protection (Handled globally or relaxed for now)
 router.post(

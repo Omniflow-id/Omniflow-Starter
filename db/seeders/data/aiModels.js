@@ -3,12 +3,12 @@ const { encrypt } = require("@helpers/encryption");
 
 /**
  * Seed the ai_models table with default AI model configurations.
- * This seeder creates default models for OpenAI and other providers.
+ * IDEMPOTENT: Safe to run multiple times - will skip existing models.
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
 const seedAIModels = async (knex) => {
-  console.log("🌱 [SEEDER] Seeding AI models...");
+  console.log("🌱 [SEEDER] Checking AI models...");
 
   // Check if ENCRYPTION_KEY is set
   if (!process.env.ENCRYPTION_KEY) {
@@ -43,16 +43,39 @@ const seedAIModels = async (knex) => {
         api_url: "https://api.openai.com/v1/chat/completions",
         api_key: encryptedKey,
         model_variant: "gpt-3.5-turbo",
-        is_active: false, // Inactive by default
+        is_active: false,
       },
     ];
 
-    await knex("ai_models").insert(models);
+    let added = 0;
+    let skipped = 0;
 
-    console.log(`✅ [SEEDER] Successfully seeded ${models.length} AI models`);
-    console.log(
-      "⚠️ [SEEDER] Note: Please update the API keys in production with real values"
-    );
+    for (const model of models) {
+      const exists = await knex("ai_models")
+        .where("name", model.name)
+        .first();
+
+      if (!exists) {
+        await knex("ai_models").insert({
+          ...model,
+          created_at: knex.fn.now(),
+          updated_at: knex.fn.now(),
+        });
+        added++;
+      } else {
+        skipped++;
+      }
+    }
+
+    if (added > 0) {
+      console.log(`✅ [SEEDER] Added ${added} AI models`);
+      console.log(
+        "⚠️  [SEEDER] Note: Please update the API keys in production with real values"
+      );
+    }
+    if (skipped > 0) {
+      console.log(`⏭️  [SEEDER] Skipped ${skipped} existing AI models`);
+    }
   } catch (error) {
     console.error("❌ [SEEDER] Failed to seed AI models:", error.message);
     throw error;

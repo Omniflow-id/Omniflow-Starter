@@ -10,10 +10,36 @@ Selamat datang di **Omniflow Advanced ERP**. Dashboard ini adalah pusat kendali 
 | [Users](/admin/users) | `/admin/users` | Mengelola user aplikasi |
 | [Roles](/admin/roles) | `/admin/roles` | Mengelola role & permissions |
 | [Permissions](/admin/permissions) | `/admin/permissions` | Konfigurasi akses |
+| [AI Management](#ai-management) | `/admin/ai_models` | Manajemen AI features |
 | [Cache](/admin/cache) | `/admin/cache` | Monitor Redis cache |
 | [Queue](/admin/queue) | `/admin/queue` | Monitor background jobs |
 | [Logs](/admin/logs) | `/admin/logs` | Lihat log aktivitas sistem |
 | [Profile](/admin/profile) | `/admin/profile` | Kelola profil Anda |
+
+## AI Management (Baru!)
+
+Sistem dilengkapi dengan **4 fitur AI** yang saling terintegrasi:
+
+### 1. AI Models ([/admin/ai_models](/admin/ai_models))
+Konfigurasi model AI (OpenAI, API key, model variant).
+
+### 2. AI Use Cases ([/admin/ai_use_cases](/admin/ai_use_cases))
+Setup use cases dan knowledge base untuk AI Chat.
+
+### 3. AI Analysis Settings ([/admin/ai_analysis_settings](/admin/ai_analysis_settings))
+Pengaturan global untuk AI Assistant & AI Copilot:
+- Model default
+- Max tokens & temperature
+- Enable context features
+
+### 4. AI Chat ([/admin/chat](/admin/chat))
+Interface percakapan AI berbasis web dengan riwayat.
+
+### AI Assistant (Sidebar 🤖)
+Tombol **biru** di pojok kanan bawah - bantuan cepat context-aware.
+
+### AI Copilot (FAB ✨)
+Tombol **ungu** di pojok kanan bawah - analisis layar real-time.
 
 ## Fitur Utama (Admin)
 

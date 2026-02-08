@@ -287,9 +287,35 @@ const deleteAIModel = asyncHandler(async (req, res) => {
   res.redirect("/admin/ai_models");
 });
 
+/**
+ * Get all AI models for dropdown (API endpoint)
+ * Route: GET /admin/ai_models/all
+ */
+const getAllAIModelsAPI = asyncHandler(async (req, res) => {
+  const result = await handleCache({
+    key: "api:ai_models:all",
+    ttl: 300, // 5 minutes
+    dbQueryFn: async () => {
+      const [models] = await db.query(
+        `SELECT id, name, api_url, model_variant, is_active, created_at, updated_at
+         FROM ai_models
+         WHERE is_active = TRUE
+         ORDER BY name`
+      );
+      return { models };
+    },
+  });
+
+  res.json({
+    success: true,
+    data: result.data.models,
+  });
+});
+
 module.exports = {
   getAIModelsPage,
   getAllAIModels,
+  getAllAIModelsAPI,
   createNewAIModel,
   updateAIModel,
   deleteAIModel,

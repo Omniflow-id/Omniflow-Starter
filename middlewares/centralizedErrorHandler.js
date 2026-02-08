@@ -221,10 +221,16 @@ const centralizedErrorHandler = async (err, req, res, _next) => {
   };
 
   const renderError = (view, context) => {
+    // Merge locale data with context - ensure error locale takes precedence
+    // and our t function is not overwritten by global i18n middleware
+    const mergedLocale = { ...res.locals.locale, ...locale };
+    
     res.status(statusCode).render(view, {
       ...context,
-      ...locale,
-      t,
+      ...mergedLocale,
+      locale: mergedLocale,
+      t, // Custom t function for error pages with error locale
+      __errorPageRender: true, // Flag to indicate this is error page render
     });
   };
 
@@ -279,13 +285,18 @@ const notFoundHandler = (req, res, _next) => {
     return result !== undefined ? result : key;
   };
 
+  // Merge with existing locale from res.locals and mark as error page render
+  const mergedLocale = { ...res.locals.locale, ...locale };
+  
   res.status(404).render("pages/admin/errors/404", {
     error: {
       message: t("404.message"),
       statusCode: 404,
     },
-    ...locale,
+    ...mergedLocale,
+    locale: mergedLocale,
     t,
+    __errorPageRender: true, // Flag to prevent global i18n middleware from overriding t
   });
 };
 

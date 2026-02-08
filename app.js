@@ -224,6 +224,19 @@ app.use(async (req, res, next) => {
     }
     const originalRender = res.render.__original;
     res.render = function (view, context = {}) {
+      // If this is an error page render, don't override the t function
+      // Error handler provides its own t function with error locale
+      if (context.__errorPageRender) {
+        const mergedContext = {
+          ...res.locals,
+          ...context,
+          currentLang: lang,
+          languages: languageOptions,
+          currentLanguage,
+        };
+        return originalRender.call(this, view, mergedContext);
+      }
+      
       // Priority for t function and locale:
       // 1. context.t from withLocale (page-specific) - set in withLocale's wrapped render
       // 2. res.locals.t (set by withLocale middleware)
@@ -269,12 +282,16 @@ app.use((req, res, next) => {
   res.locals.info_msg = req.flash("info");
 
   // Debugging
-  console.log("Flash Messages:", {
-    success: res.locals.success_msg,
-    error: res.locals.error_msg,
-    warning: res.locals.warning_msg,
-    info: res.locals.info_msg,
-  });
+  // Log flash messages only if any exist
+  if (res.locals.success_msg.length || res.locals.error_msg.length || 
+      res.locals.warning_msg.length || res.locals.info_msg.length) {
+    console.log("Flash Messages:", {
+      success: res.locals.success_msg,
+      error: res.locals.error_msg,
+      warning: res.locals.warning_msg,
+      info: res.locals.info_msg,
+    });
+  }
 
   next();
 });

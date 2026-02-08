@@ -1,6 +1,5 @@
 // === Absolute / alias imports ===
 const { db } = require("@db/db");
-const { decrypt } = require("@helpers/encryption");
 const {
   logUserActivity,
   ACTION_TYPES,
@@ -12,10 +11,11 @@ const {
   endGeneration,
   endTrace,
   flushLangfuse,
-  isEnabled: isLangfuseEnabled,
 } = require("@helpers/langfuse");
 const { asyncHandler, ValidationError } = require("@middlewares/errorHandler");
-const OpenAI = require("openai");
+const aiAnalysisService = require("@services/aiAnalysisService");
+const { getOpenAIClient } = require("@services/aiChatService");
+
 
 /**
  * Send message with streaming response (Server-Sent Events)
@@ -32,12 +32,11 @@ const sendMessageStream = asyncHandler(async (req, res) => {
   const userEmail = req.session.user.email || "unknown";
   const username = req.session.user.username || "unknown";
 
-  // Get conversation details with model info
+  // Get conversation details with use case info
   const [conversation] = await db.query(
-    `SELECT c.*, uc.base_knowledge, uc.prompt, m.api_key, m.api_url, m.model_variant
+    `SELECT c.*, uc.base_knowledge, uc.prompt
      FROM ai_conversations c
      LEFT JOIN ai_use_cases uc ON c.usecase_id = uc.id
-     LEFT JOIN ai_models m ON c.model_id = m.id
      WHERE c.id = ? AND c.user_id = ?`,
     [conversation_id, userId]
   );
@@ -47,6 +46,17 @@ const sendMessageStream = asyncHandler(async (req, res) => {
   }
 
   const conv = conversation[0];
+
+  // Get AI model config from global AI Analysis Settings
+  let modelConfig;
+  try {
+    modelConfig = await aiAnalysisService.getAIModelConfig();
+  } catch (error) {
+    throw new ValidationError("No AI model available. Please configure AI Analysis Settings.");
+  }
+
+  // Get AI completion config (temperature, max_tokens) from global settings
+  const completionConfig = await aiAnalysisService.getAICompletionConfig();
   const now = new Date();
 
   // Get current user details for context
@@ -180,41 +190,44 @@ const sendMessageStream = asyncHandler(async (req, res) => {
     },
   });
 
-  // Decrypt API key and setup OpenAI
-  const decryptedApiKey = decrypt(conv.api_key);
+  // Get OpenAI client with AI Analysis Settings config
+  let openai;
+  try {
+    const clientData = await getOpenAIClient();
+    openai = clientData.openai;
+  } catch (error) {
+    throw new ValidationError("Failed to initialize AI client: " + error.message);
+  }
 
   let fullResponse = "";
   let tokenCount = 0;
 
   try {
-    const openai = new OpenAI({
-      apiKey: decryptedApiKey,
-      baseURL: conv.api_url.replace("/chat/completions", ""),
-    });
 
     // Create Langfuse generation span
     const langfuseGeneration = createGeneration(langfuseTrace, {
       name: "chat-completion",
-      model: conv.model_variant,
+      model: modelConfig.model_variant,
       input: {
         messages: aiMessages.map((m) => ({
           role: m.role,
           content: m.content.substring(0, 100), // Truncate for storage
         })),
-        max_tokens: 4096,
-        temperature: 0.7,
+        max_tokens: completionConfig.max_tokens,
+        temperature: completionConfig.temperature,
       },
       metadata: {
         stream: true,
-        apiUrl: conv.api_url,
+        apiUrl: modelConfig.api_url,
+        useGlobalSettings: true,
       },
     });
 
     const stream = await openai.chat.completions.create({
-      model: conv.model_variant,
+      model: modelConfig.model_variant,
       messages: aiMessages,
-      max_tokens: 4096,
-      temperature: 0.7,
+      max_tokens: completionConfig.max_tokens,
+      temperature: completionConfig.temperature,
       stream: true,
     });
 
@@ -282,7 +295,7 @@ const sendMessageStream = asyncHandler(async (req, res) => {
       [
         conversation_id,
         aiMessageResult.insertId,
-        conv.model_id,
+        modelConfig.id,
         JSON.stringify(aiMessages),
         fullResponse,
         tokenCount || 0,
@@ -318,9 +331,10 @@ const sendMessageStream = asyncHandler(async (req, res) => {
         metadata: {
           messageLength: message.length,
           responseLength: fullResponse.length,
-          model: conv.model_variant,
+          model: modelConfig.model_variant,
           useCase: conv.usecase_name,
           tokenUsage: tokenCount,
+          usedGlobalSettings: true,
         },
       },
       req

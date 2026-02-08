@@ -1,40 +1,42 @@
-const { db } = require("@db/db");
-
 /**
- * Seed roles data
+ * Seed the roles table with default system roles.
+ * IDEMPOTENT: Safe to run multiple times - will skip existing roles.
+ * @param { import("knex").Knex } knex
+ * @returns { Promise<void> }
  */
-async function seedRoles() {
-  console.log("🌱 [SEEDER] Seeding roles...");
-
-  // Clear existing data
-  await db.query("DELETE FROM roles");
-
-  // Reset auto increment
-  await db.query("ALTER TABLE roles AUTO_INCREMENT = 1");
+const seedRoles = async (knex) => {
+  console.log("🌱 [SEEDER] Checking roles...");
 
   const roles = [
-    {
-      role_name: "Admin",
-      description: "Administrator with full permissions",
-    },
-    {
-      role_name: "Manager",
-      description: "Manager with limited admin permissions",
-    },
-    {
-      role_name: "User",
-      description: "Regular user with basic permissions",
-    },
+    { role_id: 1, role_name: "Admin", description: "Full system access" },
+    { role_id: 2, role_name: "Manager", description: "User management and monitoring" },
+    { role_id: 3, role_name: "User", description: "Basic user access" },
   ];
 
+  let added = 0;
+  let skipped = 0;
+
   for (const role of roles) {
-    await db.query(
-      "INSERT INTO roles (role_name, description, created_at, updated_at) VALUES (?, ?, NOW(), NOW())",
-      [role.role_name, role.description]
-    );
+    const exists = await knex("roles").where("role_id", role.role_id).first();
+    
+    if (!exists) {
+      await knex("roles").insert({
+        ...role,
+        created_at: knex.fn.now(),
+        updated_at: knex.fn.now(),
+      });
+      added++;
+    } else {
+      skipped++;
+    }
   }
 
-  console.log(`✅ [SEEDER] Successfully seeded ${roles.length} roles`);
-}
+  if (added > 0) {
+    console.log(`✅ [SEEDER] Added ${added} roles`);
+  }
+  if (skipped > 0) {
+    console.log(`⏭️  [SEEDER] Skipped ${skipped} existing roles`);
+  }
+};
 
 module.exports = { seedRoles };

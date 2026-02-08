@@ -204,7 +204,7 @@
 
       {% if hasAnyPermission(permissions, ['manage_ai_models', 'manage_ai_use_cases']) %}
       {# AI Configuration - collapsible parent #}
-      {% set isAIActive = url and (url.includes('/admin/ai_models') or url.includes('/admin/ai_use_cases')) %}
+      {% set isAIActive = url and (url.includes('/admin/ai_models') or url.includes('/admin/ai_use_cases') or url.includes('/admin/ai_analysis_settings')) %}
       <a
         class="nav-link{% if isAIActive %} active{% else %} collapsed{% endif %}"
         href="#"
@@ -227,6 +227,10 @@
       >
         <nav class="sb-sidenav-menu-nested nav">
           {% if hasPermission(permissions, 'manage_ai_models') %}
+          <a
+            class="nav-link{% if url.includes('/admin/ai_analysis_settings') %} active{% endif %}"
+            href="/admin/ai_analysis_settings"
+          >{{ t('sidebar.aiAnalysisSettings') }}</a>
           <a
             class="nav-link{% if url.includes('/admin/ai_models') %} active{% endif %}"
             href="/admin/ai_models"

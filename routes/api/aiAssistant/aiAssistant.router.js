@@ -3,18 +3,18 @@ const router = express.Router();
 const {
   getChatContext,
   getChatContextStream,
-} = require("./chat.api.controller");
+} = require("./aiAssistant.controller");
 
 /**
- * POST /api/chat/context
- * Context-aware chat endpoint.
+ * POST /api/ai-assistant/context
+ * AI Assistant context-aware endpoint.
  * Expects: { currentPageId, userRole, message }
  */
 router.post("/context", getChatContext);
 
 /**
- * POST /api/chat/stream
- * Streaming chat endpoint with Server-Sent Events.
+ * POST /api/ai-assistant/stream
+ * AI Assistant streaming endpoint with Server-Sent Events.
  * Expects: { currentPageId, userRole, message }
  */
 router.post("/stream", getChatContextStream);

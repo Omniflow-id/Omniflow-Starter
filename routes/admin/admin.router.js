@@ -4,10 +4,11 @@ const router = express.Router();
 const { isLoggedInAndActive } = require("@middlewares/isLoggedIn");
 const { adminLimiter } = require("@middlewares/rateLimiter");
 
+const aiAnalysisSettings = require("./aiAnalysisSettings/aiAnalysisSettings.router");
 const aiModels = require("./aiModels/aiModels.router");
 const aiUseCases = require("./aiUseCases/aiUseCases.router");
 const auth = require("./auth/auth.router");
-const chat = require("../chat/chat.router");
+const aiChat = require("../aiChat/aiChat.router");
 const cache = require("./cache/cache.router");
 const index = require("./index/index.router");
 const log = require("./log/log.router");
@@ -48,9 +49,10 @@ router.use(async (req, res, next) => {
 });
 
 router.use("/", auth);
+router.use("/ai_analysis_settings", isLoggedInAndActive, adminLimiter, aiAnalysisSettings);
 router.use("/ai_models", isLoggedInAndActive, adminLimiter, aiModels);
 router.use("/ai_use_cases", isLoggedInAndActive, adminLimiter, aiUseCases);
-router.use("/chat", isLoggedInAndActive, adminLimiter, chat);
+router.use("/chat", isLoggedInAndActive, adminLimiter, aiChat);
 router.use("/cache", isLoggedInAndActive, adminLimiter, cache);
 router.use("/", isLoggedInAndActive, adminLimiter, index);
 router.use("/", isLoggedInAndActive, adminLimiter, log);
