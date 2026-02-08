@@ -283,7 +283,8 @@ ${screenContext}`;
       return {
         temperature:
           parseFloat(settings.temperature) || this.config.ai.temperature,
-        max_tokens: parseInt(settings.max_tokens) || this.config.ai.maxTokens,
+        max_tokens:
+          parseInt(settings.max_tokens, 10) || this.config.ai.maxTokens,
         enable_context:
           settings.enable_context !== undefined
             ? settings.enable_context

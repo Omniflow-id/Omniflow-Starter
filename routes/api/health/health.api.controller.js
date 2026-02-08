@@ -1,7 +1,7 @@
 const {
   asyncHandler,
-  ValidationError,
-  AuthenticationError,
+  // ValidationError,
+  // AuthenticationError,
 } = require("@middlewares/errorHandler");
 const { db, getPoolStats, testConnection } = require("@db/db");
 const { getRedisStats, isConnected: isRedisConnected } = require("@db/redis");

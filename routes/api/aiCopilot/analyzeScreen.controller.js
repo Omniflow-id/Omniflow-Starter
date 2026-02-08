@@ -4,9 +4,9 @@
  */
 
 const { db } = require("@db/db");
-const { decrypt } = require("@helpers/encryption");
+// const { decrypt } = require("@helpers/encryption");
 const { Langfuse } = require("langfuse");
-const OpenAI = require("openai");
+const _OpenAI = require("openai");
 const aiAnalysisService = require("@services/aiAnalysisService");
 const { getOpenAIClient } = require("@services/aiChatService");
 
@@ -270,7 +270,7 @@ const analyzeScreen = async (req, res) => {
         res.write(
           `data: ${JSON.stringify({
             type: "error",
-            error: "AI analysis service error: " + streamError.message,
+            error: `AI analysis service error: ${streamError.message}`,
           })}\n\n`
         );
       }

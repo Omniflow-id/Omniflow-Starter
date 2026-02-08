@@ -15,7 +15,7 @@ try {
       baseUrl: process.env.LANGFUSE_HOST || "https://cloud.langfuse.com",
     });
   }
-} catch (error) {
+} catch (_error) {
   console.warn("[AIService] Langfuse dependencies missing or failed to load.");
 }
 
@@ -91,7 +91,7 @@ try {
       baseURL: config.llm.apiUrl,
     });
   }
-} catch (error) {
+} catch (_error) {
   console.warn(
     "[AIService] OpenAI dependencies missing or failed to load. Please run: npm install openai"
   );

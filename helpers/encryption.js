@@ -48,7 +48,7 @@ function maskApiKey(apiKey) {
   if (!apiKey || apiKey.length < 8) {
     return "****";
   }
-  return apiKey.substring(0, 4) + "****" + apiKey.substring(apiKey.length - 4);
+  return `${apiKey.substring(0, 4)}****${apiKey.substring(apiKey.length - 4)}`;
 }
 
 module.exports = { encrypt, decrypt, maskApiKey };

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { doubleCsrfProtection } = require("@middlewares/csrfProtection");
+// const { doubleCsrfProtection } = require("@middlewares/csrfProtection");
 const { checkPermission } = require("@middlewares/checkPermission");
 const { withLocale } = require("@helpers/i18n");
 

@@ -5,7 +5,7 @@
 const { db } = require("@db/db");
 const { asyncHandler } = require("@middlewares/errorHandler");
 
-const getActiveSettings = asyncHandler(async (req, res) => {
+const getActiveSettings = asyncHandler(async (_req, res) => {
   const [settings] = await db.query(`
     SELECT s.*, m.name as model_name, m.model_variant, m.api_url
     FROM ai_analysis_settings s

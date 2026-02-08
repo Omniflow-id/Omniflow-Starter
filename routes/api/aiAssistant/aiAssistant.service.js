@@ -47,7 +47,7 @@ const getChatContext = async (req, res) => {
       const clientData = await getOpenAIClient();
       openai = clientData.openai;
       modelConfig = clientData.modelConfig;
-    } catch (error) {
+    } catch (_error) {
       return res.status(503).json({
         error: "No AI model available. Please configure AI Analysis Settings.",
       });
@@ -197,7 +197,7 @@ const getChatContextStream = async (req, res) => {
       const clientData = await getOpenAIClient();
       openai = clientData.openai;
       modelConfig = clientData.modelConfig;
-    } catch (error) {
+    } catch (_error) {
       return res.status(503).json({
         error: "No AI model available. Please configure AI Analysis Settings.",
       });

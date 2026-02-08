@@ -62,7 +62,7 @@ const getAIModelsPage = asyncHandler(async (req, res) => {
  * Get all active AI models (API endpoint)
  * Route: GET /api/ai_models
  */
-const getAllAIModels = asyncHandler(async (req, res) => {
+const getAllAIModels = asyncHandler(async (_req, res) => {
   const result = await handleCache({
     key: "api:ai_models:active",
     ttl: 600, // 10 minutes
@@ -291,7 +291,7 @@ const deleteAIModel = asyncHandler(async (req, res) => {
  * Get all AI models for dropdown (API endpoint)
  * Route: GET /admin/ai_models/all
  */
-const getAllAIModelsAPI = asyncHandler(async (req, res) => {
+const getAllAIModelsAPI = asyncHandler(async (_req, res) => {
   const result = await handleCache({
     key: "api:ai_models:all",
     ttl: 300, // 5 minutes

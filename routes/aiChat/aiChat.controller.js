@@ -1,7 +1,7 @@
 // === Absolute / alias imports ===
 const { db } = require("@db/db");
 const { handleCache, invalidateCache } = require("@helpers/cache");
-const { decrypt } = require("@helpers/encryption");
+// const { decrypt } = require("@helpers/encryption");
 const {
   logUserActivity,
   ACTION_TYPES,

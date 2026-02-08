@@ -66,7 +66,7 @@ async function getKnowledgeContext(roleName, pageId, lang = "en") {
     try {
       await fs.access(filePath);
       existenceCache.set(cacheKey, true);
-    } catch (error) {
+    } catch (_error) {
       console.warn(`[ContextLoader] Knowledge not found: ${filePath}`);
       existenceCache.set(cacheKey, false);
       return "";

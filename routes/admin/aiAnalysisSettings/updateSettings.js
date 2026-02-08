@@ -33,7 +33,7 @@ const updateSettings = asyncHandler(async (req, res) => {
 
   // Validate temperature range
   const tempValue = parseFloat(temperature);
-  if (isNaN(tempValue) || tempValue < 0 || tempValue > 2) {
+  if (Number.isNaN(tempValue) || tempValue < 0 || tempValue > 2) {
     throw new ValidationError(
       "Temperature harus antara 0.0 dan 2.0",
       "temperature"
@@ -41,8 +41,8 @@ const updateSettings = asyncHandler(async (req, res) => {
   }
 
   // Validate max_tokens
-  const tokensValue = parseInt(max_tokens);
-  if (isNaN(tokensValue) || tokensValue < 1 || tokensValue > 32768) {
+  const tokensValue = parseInt(max_tokens, 10);
+  if (Number.isNaN(tokensValue) || tokensValue < 1 || tokensValue > 32768) {
     throw new ValidationError(
       "Max tokens harus antara 1 dan 32768",
       "max_tokens"

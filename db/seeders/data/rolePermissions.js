@@ -68,7 +68,7 @@ async function seedRolePermissions(knex) {
 
     const roleId = role.role_id;
     let roleAdded = 0;
-    let roleSkipped = 0;
+    let _roleSkipped = 0;
 
     for (const permissionName of roleMapping.permissions) {
       // Get permission_id
@@ -102,7 +102,7 @@ async function seedRolePermissions(knex) {
         roleAdded++;
         totalAdded++;
       } else {
-        roleSkipped++;
+        _roleSkipped++;
         totalSkipped++;
       }
     }

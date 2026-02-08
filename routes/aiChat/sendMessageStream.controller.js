@@ -50,7 +50,7 @@ const sendMessageStream = asyncHandler(async (req, res) => {
   let modelConfig;
   try {
     modelConfig = await aiAnalysisService.getAIModelConfig();
-  } catch (error) {
+  } catch (_error) {
     throw new ValidationError(
       "No AI model available. Please configure AI Analysis Settings."
     );
@@ -198,7 +198,7 @@ const sendMessageStream = asyncHandler(async (req, res) => {
     openai = clientData.openai;
   } catch (error) {
     throw new ValidationError(
-      "Failed to initialize AI client: " + error.message
+      `Failed to initialize AI client: ${error.message}`
     );
   }
 
@@ -355,7 +355,7 @@ const sendMessageStream = asyncHandler(async (req, res) => {
       res.write(
         `data: ${JSON.stringify({
           type: "error",
-          error: "AI service error: " + streamError.message,
+          error: `AI service error: ${streamError.message}`,
         })}\n\n`
       );
     }
