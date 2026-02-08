@@ -49,7 +49,12 @@ router.use(async (req, res, next) => {
 });
 
 router.use("/", auth);
-router.use("/ai_analysis_settings", isLoggedInAndActive, adminLimiter, aiAnalysisSettings);
+router.use(
+  "/ai_analysis_settings",
+  isLoggedInAndActive,
+  adminLimiter,
+  aiAnalysisSettings
+);
 router.use("/ai_models", isLoggedInAndActive, adminLimiter, aiModels);
 router.use("/ai_use_cases", isLoggedInAndActive, adminLimiter, aiUseCases);
 router.use("/chat", isLoggedInAndActive, adminLimiter, aiChat);

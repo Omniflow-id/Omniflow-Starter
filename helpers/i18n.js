@@ -309,7 +309,10 @@ function withLocale(page, _options = {}) {
 
         if (params && typeof params === "object") {
           Object.keys(params).forEach((param) => {
-            result = result.replace(new RegExp(`{${param}}`, "g"), params[param]);
+            result = result.replace(
+              new RegExp(`{${param}}`, "g"),
+              params[param]
+            );
           });
         }
         return result;
@@ -419,7 +422,10 @@ function createLocalizedRenderer({
 
         if (params && typeof params === "object") {
           Object.keys(params).forEach((param) => {
-            result = result.replace(new RegExp(`{${param}}`, "g"), params[param]);
+            result = result.replace(
+              new RegExp(`{${param}}`, "g"),
+              params[param]
+            );
           });
         }
         return result;

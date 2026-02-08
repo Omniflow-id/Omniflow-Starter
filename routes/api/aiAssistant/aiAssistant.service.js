@@ -1,5 +1,8 @@
 const { getKnowledgeContext } = require("../../../helpers/contextLoader");
-const { langfuse, getOpenAIClient } = require("../../../services/aiChatService");
+const {
+  langfuse,
+  getOpenAIClient,
+} = require("../../../services/aiChatService");
 const aiAnalysisService = require("../../../services/aiAnalysisService");
 const { db } = require("../../../db/db");
 
@@ -8,24 +11,24 @@ const { db } = require("../../../db/db");
  * @param {Object} params
  */
 const logAssistantInteraction = async ({
-	userId,
-	pageId,
-	userMessage,
-	aiResponse,
-	modelId,
-	tokenUsage,
-	sessionId,
+  userId,
+  pageId,
+  userMessage,
+  aiResponse,
+  modelId,
+  tokenUsage,
+  sessionId,
 }) => {
-	try {
-		await db.query(
-			`INSERT INTO ai_assistant_logs 
+  try {
+    await db.query(
+      `INSERT INTO ai_assistant_logs 
 			(user_id, page_id, user_message, ai_response, model_id, token_usage, session_id) 
 			VALUES (?, ?, ?, ?, ?, ?, ?)`,
-			[userId, pageId, userMessage, aiResponse, modelId, tokenUsage, sessionId],
-		);
-	} catch (error) {
-		console.error("[AI Assistant] Failed to log interaction:", error);
-	}
+      [userId, pageId, userMessage, aiResponse, modelId, tokenUsage, sessionId]
+    );
+  } catch (error) {
+    console.error("[AI Assistant] Failed to log interaction:", error);
+  }
 };
 
 /**
@@ -120,7 +123,7 @@ When responding:
           currentPageId,
           userRole,
           model: modelName,
-          source: "ai_analysis_settings"
+          source: "ai_analysis_settings",
         },
       });
 
@@ -170,7 +173,7 @@ When responding:
       reply,
       contextFound: !!contextContent,
       model: modelName,
-      source: "ai_analysis_settings"
+      source: "ai_analysis_settings",
     });
   } catch (error) {
     console.error("[ChatController] Error processing request:", error);
@@ -221,13 +224,18 @@ const getChatContextStream = async (req, res) => {
     };
 
     const greeting = req.query.lang === "id" ? "Hai" : "Hi";
-    const currentDate = new Date().toLocaleDateString(req.query.lang === "id" ? "id-ID" : "en-US", {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-    const currentTime = new Date().toLocaleTimeString(req.query.lang === "id" ? "id-ID" : "en-US");
+    const currentDate = new Date().toLocaleDateString(
+      req.query.lang === "id" ? "id-ID" : "en-US",
+      {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }
+    );
+    const currentTime = new Date().toLocaleTimeString(
+      req.query.lang === "id" ? "id-ID" : "en-US"
+    );
 
     const systemPrompt = `${greeting} ${currentUser.full_name}! 👋
 
@@ -284,7 +292,7 @@ RESPONSE GUIDELINES:
           currentPageId,
           userRole,
           model: modelName,
-          source: "ai_analysis_settings"
+          source: "ai_analysis_settings",
         },
       });
 

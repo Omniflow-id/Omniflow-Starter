@@ -42,7 +42,10 @@ class AIAnalysisService {
       );
       return companyData[0] || {};
     } catch (error) {
-      console.error("[AIAnalysisService] Error getting company context:", error);
+      console.error(
+        "[AIAnalysisService] Error getting company context:",
+        error
+      );
       return {};
     }
   }

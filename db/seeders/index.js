@@ -8,13 +8,13 @@ const { seedAIUseCases } = require("./data/aiUseCases.js");
 
 /**
  * Master seeder file - SMART & SAFE VERSION
- * 
+ *
  * 🚨 PRODUCTION SAFETY:
  * - This seeder is IDEMPOTENT (safe to run multiple times)
  * - It will NOT delete existing data in production
  * - It only adds MISSING data
  * - For destructive reset in development, use: npm run db:reset
- * 
+ *
  * @param { import("knex").Knex } knex
  * @returns { Promise<void> }
  */
@@ -27,14 +27,18 @@ exports.seed = async (knex) => {
     console.log("🚨 [SEEDER] PRODUCTION WARNING:");
     console.log("   FORCE_SEED_CLEANUP=true detected!");
     console.log("   This will DELETE all existing data!");
-    console.log("   Aborting for safety. Use migrations for production data changes.");
-    throw new Error("Destructive seeding blocked in production. Use migrations instead.");
+    console.log(
+      "   Aborting for safety. Use migrations for production data changes."
+    );
+    throw new Error(
+      "Destructive seeding blocked in production. Use migrations instead."
+    );
   }
 
   // Handle FORCE_SEED_CLEANUP for non-production environments
   if (forceCleanup && !isProduction) {
     console.log("🧹 [SEEDER] FORCE_SEED_CLEANUP=true - Cleaning all data...");
-    
+
     // AI tables (clean up first due to foreign key constraints)
     await knex("ai_request_logs").del();
     await knex("ai_messages").del();
@@ -62,7 +66,9 @@ exports.seed = async (knex) => {
   const hasExistingData = userCount && userCount.count > 0;
 
   if (hasExistingData) {
-    console.log("📊 [SEEDER] Existing data detected. Running in SAFE MODE (idempotent)...");
+    console.log(
+      "📊 [SEEDER] Existing data detected. Running in SAFE MODE (idempotent)..."
+    );
     console.log("   - Will only add missing data");
     console.log("   - Will NOT delete existing data");
     console.log("   - To force reset in DEV: npm run db:reset");
@@ -72,7 +78,7 @@ exports.seed = async (knex) => {
 
   // --- SMART SEEDING PHASE ---
   // Each seeder checks if data exists before inserting (idempotent)
-  
+
   try {
     // 1. Seed roles first (users depend on roles)
     await seedRoles(knex);
@@ -96,9 +102,11 @@ exports.seed = async (knex) => {
     await seedAIAnalysisSettings(knex);
 
     console.log("✅ [SEEDER] Database seeding completed successfully.");
-    
+
     if (hasExistingData) {
-      console.log("   ℹ️  Existing data preserved. Only missing data was added.");
+      console.log(
+        "   ℹ️  Existing data preserved. Only missing data was added."
+      );
     }
   } catch (error) {
     console.error("❌ [SEEDER] Seeding failed:", error.message);

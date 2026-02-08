@@ -29,7 +29,9 @@
   "500": {
     "title": "Terjadi Kesalahan Server",
     "message": "Mohon maaf, terjadi kesalahan pada server. Silahkan coba lagi nanti.",
-    "pageTitle": "Kesalahan Server Internal"
+    "pageTitle": "Kesalahan Server Internal",
+    "adminInfo": "Info Admin",
+    "errorLogged": "Error dicatat dengan timestamp"
   },
   "common": {
     "back": "Kembali",

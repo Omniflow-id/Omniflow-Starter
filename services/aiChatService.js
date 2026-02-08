@@ -16,9 +16,7 @@ try {
     });
   }
 } catch (error) {
-  console.warn(
-    "[AIService] Langfuse dependencies missing or failed to load."
-  );
+  console.warn("[AIService] Langfuse dependencies missing or failed to load.");
 }
 
 /**
@@ -52,7 +50,10 @@ async function getOpenAIClient() {
       return { openai, modelConfig };
     }
   } catch (error) {
-    console.warn("[AIService] Failed to load AI Analysis Settings:", error.message);
+    console.warn(
+      "[AIService] Failed to load AI Analysis Settings:",
+      error.message
+    );
   }
 
   // Fallback to .env config
@@ -72,7 +73,9 @@ async function getOpenAIClient() {
     };
   }
 
-  throw new Error("No AI model configured. Please configure AI Analysis Settings or set LLM_API_KEY in .env");
+  throw new Error(
+    "No AI model configured. Please configure AI Analysis Settings or set LLM_API_KEY in .env"
+  );
 }
 
 /**

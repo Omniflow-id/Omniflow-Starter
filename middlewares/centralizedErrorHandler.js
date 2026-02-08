@@ -224,7 +224,7 @@ const centralizedErrorHandler = async (err, req, res, _next) => {
     // Merge locale data with context - ensure error locale takes precedence
     // and our t function is not overwritten by global i18n middleware
     const mergedLocale = { ...res.locals.locale, ...locale };
-    
+
     res.status(statusCode).render(view, {
       ...context,
       ...mergedLocale,
@@ -253,6 +253,14 @@ const centralizedErrorHandler = async (err, req, res, _next) => {
   if (statusCode === 404) {
     return renderError("pages/admin/errors/404", {
       error: { message, statusCode },
+    });
+  }
+
+  if (statusCode === 429) {
+    return renderError("pages/admin/errors/429", {
+      error: { message, statusCode },
+      error_msg: [message],
+      errorDescription: message,
     });
   }
 
@@ -287,7 +295,7 @@ const notFoundHandler = (req, res, _next) => {
 
   // Merge with existing locale from res.locals and mark as error page render
   const mergedLocale = { ...res.locals.locale, ...locale };
-  
+
   res.status(404).render("pages/admin/errors/404", {
     error: {
       message: t("404.message"),

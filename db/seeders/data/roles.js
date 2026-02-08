@@ -9,7 +9,11 @@ const seedRoles = async (knex) => {
 
   const roles = [
     { role_id: 1, role_name: "Admin", description: "Full system access" },
-    { role_id: 2, role_name: "Manager", description: "User management and monitoring" },
+    {
+      role_id: 2,
+      role_name: "Manager",
+      description: "User management and monitoring",
+    },
     { role_id: 3, role_name: "User", description: "Basic user access" },
   ];
 
@@ -18,7 +22,7 @@ const seedRoles = async (knex) => {
 
   for (const role of roles) {
     const exists = await knex("roles").where("role_id", role.role_id).first();
-    
+
     if (!exists) {
       await knex("roles").insert({
         ...role,

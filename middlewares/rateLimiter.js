@@ -8,6 +8,7 @@ const { log, LOG_LEVELS } = require("@helpers/log");
 const config = require("@config");
 const { RedisStore } = require("rate-limit-redis");
 const { getRedis } = require("@db/redis");
+const { getPageLocale, resolveRequestLanguage } = require("@helpers/i18n");
 
 // Factory function to create unique Redis stores for each limiter
 const createStore = (prefix) => {
@@ -33,6 +34,45 @@ const createStore = (prefix) => {
     // Ensure prefix ends with a colon if not provided
     prefix: prefix ? `${prefix}:` : "rl:",
   });
+};
+
+// Helper to create localized error page context for 429 responses
+const createErrorPageContext = (req, _res) => {
+  try {
+    const { lang } = resolveRequestLanguage(req);
+    const { data: locale } = getPageLocale("admin/errors", lang);
+
+    const t = (key) => {
+      if (!key) return "";
+      const result = key
+        .split(".")
+        .reduce((o, i) => (o ? o[i] : undefined), locale);
+      return result !== undefined ? result : key;
+    };
+
+    return {
+      t,
+      currentLang: lang,
+      locale,
+      errorDescription: t("429.message"),
+      error_msg: [t("429.message")],
+    };
+  } catch (err) {
+    console.error(
+      "[RATE-LIMIT] Failed to create error page context:",
+      err.message
+    );
+    return {
+      t: (key) => key,
+      currentLang: "id",
+      locale: {},
+      errorDescription:
+        "You have made too many requests. Please wait before trying again.",
+      error_msg: [
+        "You have made too many requests. Please wait before trying again.",
+      ],
+    };
+  }
 };
 
 // Use express-rate-limit's built-in IP key generator for proper IPv6 handling
@@ -104,15 +144,14 @@ const generalLimiter = rateLimit({
       console.error("Flash error in rate limiter:", flashError.message);
     }
 
+    const errorContext = createErrorPageContext(req, res);
     return res.status(429).render("pages/admin/errors/429", {
-      title: "Rate Limit Exceeded",
-      errorCode: 429,
-      errorMessage: "Too Many Requests",
-      errorDescription:
-        "You have made too many requests. Please wait before trying again.",
-      error_msg: [
-        "Too many requests from this IP, please try again after 15 minutes.",
-      ],
+      ...errorContext,
+      error: {
+        message: errorContext.errorDescription,
+        statusCode: 429,
+      },
+      __errorPageRender: true, // Prevent i18n middleware from overriding t function
     });
   },
 });
@@ -230,13 +269,14 @@ const adminLimiter = rateLimit({
       console.error("Flash error in rate limiter:", flashError.message);
     }
 
+    const errorContext = createErrorPageContext(req, res);
     return res.status(429).render("pages/admin/errors/429", {
-      title: "Rate Limit Exceeded",
-      errorCode: 429,
-      errorMessage: "Too Many Admin Requests",
-      errorDescription:
-        "You have made too many admin requests. Please wait before continuing.",
-      error_msg: ["Too many admin requests. Please slow down and try again."],
+      ...errorContext,
+      error: {
+        message: errorContext.errorDescription,
+        statusCode: 429,
+      },
+      __errorPageRender: true, // Prevent i18n middleware from overriding t function
     });
   },
 });

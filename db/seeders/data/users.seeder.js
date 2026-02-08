@@ -56,9 +56,7 @@ const seedUsers = async (knex) => {
   let skipped = 0;
 
   for (const user of users) {
-    const exists = await knex("users")
-      .where("username", user.username)
-      .first();
+    const exists = await knex("users").where("username", user.username).first();
 
     if (!exists) {
       await knex("users").insert(user);

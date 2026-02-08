@@ -115,7 +115,9 @@ async function seedRolePermissions(knex) {
   }
 
   if (totalAdded > 0) {
-    console.log(`✅ [SEEDER] Total ${totalAdded} role-permission mappings added`);
+    console.log(
+      `✅ [SEEDER] Total ${totalAdded} role-permission mappings added`
+    );
   }
   if (totalSkipped > 0) {
     console.log(`⏭️  [SEEDER] Total ${totalSkipped} existing mappings skipped`);

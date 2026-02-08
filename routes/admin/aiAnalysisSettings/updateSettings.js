@@ -69,13 +69,7 @@ const updateSettings = asyncHandler(async (req, res) => {
         updated_by = ?
       WHERE is_active = TRUE
     `,
-      [
-        selected_model_id,
-        description || null,
-        tokensValue,
-        tempValue,
-        userId,
-      ]
+      [selected_model_id, description || null, tokensValue, tempValue, userId]
     );
   } else {
     // Create new settings

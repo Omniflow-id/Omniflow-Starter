@@ -51,9 +51,7 @@ const seedAIModels = async (knex) => {
     let skipped = 0;
 
     for (const model of models) {
-      const exists = await knex("ai_models")
-        .where("name", model.name)
-        .first();
+      const exists = await knex("ai_models").where("name", model.name).first();
 
       if (!exists) {
         await knex("ai_models").insert({

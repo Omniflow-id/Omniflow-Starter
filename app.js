@@ -236,7 +236,7 @@ app.use(async (req, res, next) => {
         };
         return originalRender.call(this, view, mergedContext);
       }
-      
+
       // Priority for t function and locale:
       // 1. context.t from withLocale (page-specific) - set in withLocale's wrapped render
       // 2. res.locals.t (set by withLocale middleware)
@@ -283,8 +283,12 @@ app.use((req, res, next) => {
 
   // Debugging
   // Log flash messages only if any exist
-  if (res.locals.success_msg.length || res.locals.error_msg.length || 
-      res.locals.warning_msg.length || res.locals.info_msg.length) {
+  if (
+    res.locals.success_msg.length ||
+    res.locals.error_msg.length ||
+    res.locals.warning_msg.length ||
+    res.locals.info_msg.length
+  ) {
     console.log("Flash Messages:", {
       success: res.locals.success_msg,
       error: res.locals.error_msg,

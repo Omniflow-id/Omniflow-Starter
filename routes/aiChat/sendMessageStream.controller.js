@@ -16,7 +16,6 @@ const { asyncHandler, ValidationError } = require("@middlewares/errorHandler");
 const aiAnalysisService = require("@services/aiAnalysisService");
 const { getOpenAIClient } = require("@services/aiChatService");
 
-
 /**
  * Send message with streaming response (Server-Sent Events)
  * Route: POST /admin/chat/message/send-stream
@@ -52,7 +51,9 @@ const sendMessageStream = asyncHandler(async (req, res) => {
   try {
     modelConfig = await aiAnalysisService.getAIModelConfig();
   } catch (error) {
-    throw new ValidationError("No AI model available. Please configure AI Analysis Settings.");
+    throw new ValidationError(
+      "No AI model available. Please configure AI Analysis Settings."
+    );
   }
 
   // Get AI completion config (temperature, max_tokens) from global settings
@@ -196,14 +197,15 @@ const sendMessageStream = asyncHandler(async (req, res) => {
     const clientData = await getOpenAIClient();
     openai = clientData.openai;
   } catch (error) {
-    throw new ValidationError("Failed to initialize AI client: " + error.message);
+    throw new ValidationError(
+      "Failed to initialize AI client: " + error.message
+    );
   }
 
   let fullResponse = "";
   let tokenCount = 0;
 
   try {
-
     // Create Langfuse generation span
     const langfuseGeneration = createGeneration(langfuseTrace, {
       name: "chat-completion",

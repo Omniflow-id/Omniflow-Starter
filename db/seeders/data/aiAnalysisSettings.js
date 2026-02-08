@@ -15,9 +15,7 @@ const seedAIAnalysisSettings = async (knex) => {
     .first();
 
   if (existingSettings) {
-    console.log(
-      "⏭️  [SEEDER] AI Analysis Settings already exist. Skipping..."
-    );
+    console.log("⏭️  [SEEDER] AI Analysis Settings already exist. Skipping...");
     return;
   }
 
@@ -35,9 +33,7 @@ const seedAIAnalysisSettings = async (knex) => {
   }
 
   // Get first admin user (role_id = 1 is typically Admin)
-  const adminUser = await knex("users")
-    .where("role_id", 1)
-    .first();
+  const adminUser = await knex("users").where("role_id", 1).first();
 
   const userId = adminUser ? adminUser.id : null;
 
