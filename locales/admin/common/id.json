@@ -17,11 +17,11 @@
     "failedJobs": "Failed Jobs",
     "logs": "Log Aktivitas",
     "loggedInAs": "Masuk sebagai",
-    "aiManagement": "AI Management",
+    "aiManagement": "Manajemen AI",
     "aiAnalysisSettings": "Pengaturan Analisis AI",
-    "aiModels": "AI Models",
-    "aiUseCases": "AI Use Cases",
-    "aiChat": "AI Chat"
+    "aiModels": "Model AI",
+    "aiUseCases": "Use Case AI",
+    "aiChat": "Obrolan AI"
   },
   "common": {
     "actions": {
