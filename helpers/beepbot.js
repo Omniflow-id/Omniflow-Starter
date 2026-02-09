@@ -161,7 +161,7 @@ function formatMessage(message, options) {
   formatted += `Level: ${level.toUpperCase()}\n`;
   formatted += `Application: ${process.env.APP_NAME || "Omniflow Starter"}\n`;
   formatted += `Instance: ${os.hostname()}\n`;
-  formatted += `Node: ${process.env.INSTANCE_NODE_NAME || "Thinkpad L15"}\n`;
+  formatted += `Node: ${process.env.INSTANCE_NODE_NAME}\n`;
   formatted += `IP (Local): ${localIP}\n`;
   formatted += `IP (Tailscale): ${tailscaleIP}\n`;
   formatted += `Component: ${component}\n`;
