@@ -176,13 +176,20 @@ const config = {
             "https://*.googleapis.com",
             "https://*.gstatic.com",
           ],
-          scriptSrc: [
+          scriptSrc: ["'self'", "cdn.jsdelivr.net", "cdnjs.cloudflare.com"],
+          scriptSrcAttr: ["'unsafe-inline'"],
+          styleSrc: [
             "'self'",
             "'unsafe-inline'",
             "cdn.jsdelivr.net",
-            "use.fontawesome.com",
+            "cdnjs.cloudflare.com",
           ],
-          scriptSrcAttr: ["'unsafe-inline'"],
+          fontSrc: [
+            "'self'",
+            "cdn.jsdelivr.net",
+            "cdnjs.cloudflare.com",
+            "data:",
+          ],
           objectSrc: ["'none'"],
           upgradeInsecureRequests:
             process.env.NODE_ENV === "production" ? [] : null,

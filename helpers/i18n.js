@@ -243,7 +243,7 @@ function setLanguageCookie(res, lang) {
 
   res.cookie(LANGUAGE_COOKIE, lang, {
     maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
-    httpOnly: false, // Accessible from JavaScript for client-side sync
+    httpOnly: true, // Security: Prevent XSS access to language cookie
     sameSite: "lax",
   });
 }
