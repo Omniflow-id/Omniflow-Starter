@@ -158,7 +158,7 @@
 
 {% endblock %}
 {% block scripts %}
-<script>
+<script nonce="{{ cspNonce }}">
   $(document).ready(function () {
     // Initialize DataTable with server-side processing
     $("#datatablesSimple").DataTable({

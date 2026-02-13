@@ -407,7 +407,7 @@
 </div>
 
 {% endblock %} {% block scripts %}
-<script>
+<script nonce="{{ cspNonce }}">
   $(document).ready(function () {
     $("#datatablesSimple").DataTable({
       responsive: true,

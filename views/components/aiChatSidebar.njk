@@ -329,7 +329,7 @@
 
 <!-- Add Markdown Parser (Marked.js) -->
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script>
+<script nonce="{{ cspNonce }}">
 // Configure marked.js to open all links in new tab
 marked.setOptions({
   breaks: true,
@@ -406,7 +406,7 @@ marked.renderer = Object.assign({}, originalRenderer, {
   </div>
 </div>
 
-<script>
+<script nonce="{{ cspNonce }}">
 document.addEventListener('DOMContentLoaded', () => {
     const toggleBtn = document.getElementById('ai-chat-toggle');
     const closeBtn = document.getElementById('ai-close-chat');

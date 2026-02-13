@@ -179,7 +179,7 @@
 </div>
 {% endblock %}
 {% block scripts %}
-<script>
+<script nonce="{{ cspNonce }}">
   document.addEventListener("DOMContentLoaded", function () {
     const permissionModal = document.getElementById('permissionModal');
     permissionModal.addEventListener('show.bs.modal', function (event) {

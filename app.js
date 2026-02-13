@@ -30,6 +30,7 @@ const {
   compressionLogger,
 } = require("@middlewares/compressionMiddleware");
 const { createCorsMiddleware } = require("@middlewares/corsMiddleware");
+const { cspNonceMiddleware } = require("@middlewares/cspNonce");
 const { csrfGlobalMiddleware } = require("@middlewares/csrfProtection");
 const { generalLimiter } = require("@middlewares/rateLimiter");
 // === i18n imports ===
@@ -45,7 +46,12 @@ const { db } = require("@db/db");
 const config = require("./config");
 
 const app = express();
-app.use(helmet(config.security.helmetConfig));
+// Apply all security headers globally EXCEPT contentSecurityPolicy.
+// CSP is applied per-request by cspNonceMiddleware (after session/cookie setup)
+// to include a dynamic nonce in scriptSrc for inline script support.
+const { contentSecurityPolicy: _csp, ...helmetWithoutCsp } =
+  config.security.helmetConfig;
+app.use(helmet(helmetWithoutCsp));
 
 // CORS - apply early for cross-origin requests
 app.use(createCorsMiddleware());
@@ -164,6 +170,10 @@ app.use((req, _res, next) => {
 
 app.use(cookieParser());
 app.use(flash());
+
+// CSP Nonce middleware - generates per-request nonce and sets CSP header
+// Must run before template rendering so {{ cspNonce }} is available in views
+app.use(cspNonceMiddleware);
 
 // Global CSRF middleware - Laravel-style implementation
 app.use(csrfGlobalMiddleware);

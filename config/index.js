@@ -176,7 +176,11 @@ const config = {
             "https://*.googleapis.com",
             "https://*.gstatic.com",
           ],
+          // Base scriptSrc - cspNonceMiddleware appends 'nonce-<random>' per request.
+          // Do NOT add 'unsafe-inline' here; use nonce on inline <script> tags instead.
           scriptSrc: ["'self'", "cdn.jsdelivr.net", "cdnjs.cloudflare.com"],
+          // scriptSrcAttr covers inline event handlers (onclick, onerror, etc.)
+          // Alpine.js uses x-on: directives which rely on this being 'unsafe-inline'.
           scriptSrcAttr: ["'unsafe-inline'"],
           styleSrc: [
             "'self'",

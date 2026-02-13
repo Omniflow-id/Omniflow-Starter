@@ -104,7 +104,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
+<script nonce="{{ cspNonce }}">
   $(document).ready(function () {
     const currentStatus = '{{ currentStatus }}';
     const datatableLang = {

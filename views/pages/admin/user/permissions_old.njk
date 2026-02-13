@@ -205,7 +205,7 @@
 {% endblock %} 
 
 {% block scripts %}
-<script>
+<script nonce="{{ cspNonce }}">
   document.addEventListener("DOMContentLoaded", function () {
     const alertContainer = document.getElementById("alertContainer");
     const form = document.getElementById("userPermissionsForm");

@@ -70,7 +70,7 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
+<script nonce="{{ cspNonce }}">
   $(document).ready(function () {
     const datatableLang = {
       search: '{{ t('datatable.searchFailed') }}',

@@ -173,7 +173,7 @@
 
 {% block scripts %}
 <script src="/js/marked.js"></script>
-<script>
+<script nonce="{{ cspNonce }}">
     // Configure marked options
     marked.setOptions({
         breaks: true,
@@ -181,7 +181,7 @@
         headerIds: false
     });
 </script>
-<script>
+<script nonce="{{ cspNonce }}">
 // CSRF token for AJAX requests
 const csrfToken = '{{ csrf }}';
 

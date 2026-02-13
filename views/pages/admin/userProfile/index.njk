@@ -220,7 +220,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="{{ cspNonce }}">
 function copyToClipboard(text) {
   navigator.clipboard.writeText(text).then(function() {
     const toast = new bootstrap.Toast(document.getElementById('copyToast'));

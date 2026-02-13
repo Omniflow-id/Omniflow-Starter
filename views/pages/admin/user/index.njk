@@ -212,7 +212,7 @@
   </div>
 </div>
 
-<script>
+<script nonce="{{ cspNonce }}">
   document.getElementById("btnDownloadData").addEventListener("click", () => {
     window.location.href = "/admin/user/download";
     Toastify({
@@ -232,7 +232,7 @@
 </script>
 
 {% endblock %} {% block scripts %}
-<script>
+<script nonce="{{ cspNonce }}">
   $(document).ready(function () {
     $("#datatablesSimple").DataTable({
       processing: true,
