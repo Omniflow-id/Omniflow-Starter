@@ -39,7 +39,7 @@ const start = () => {
       }).catch((notifyErr) => {
         console.error(
           "❌ [BEEPBOT] Failed to send startup notification:",
-          notifyErr.message
+          notifyErr.message,
         );
       });
     });
@@ -54,7 +54,7 @@ process.on("SIGINT", gracefulShutdown);
 
 async function gracefulShutdown(signal) {
   console.log(
-    `\n🛑 [SHUTDOWN] Received ${signal}, starting graceful shutdown...`
+    `\n🛑 [SHUTDOWN] Received ${signal}, starting graceful shutdown...`,
   );
 
   // Send shutdown notification
@@ -66,7 +66,7 @@ async function gracefulShutdown(signal) {
   }).catch((notifyErr) => {
     console.error(
       "❌ [BEEPBOT] Failed to send shutdown notification:",
-      notifyErr.message
+      notifyErr.message,
     );
   });
 
@@ -91,7 +91,7 @@ async function gracefulShutdown(signal) {
     } catch (error) {
       console.error(
         "❌ [SHUTDOWN] Error during graceful shutdown:",
-        error.message
+        error.message,
       );
       process.exit(1);
     }

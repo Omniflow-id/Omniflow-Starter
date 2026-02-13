@@ -1,6 +1,6 @@
 node_modules
-.env
-.env.prod
+# .env
+# .env.prod
 logs/app.log
 logs/app.log
 /logs
