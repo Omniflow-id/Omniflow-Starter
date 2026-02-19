@@ -32,7 +32,7 @@ const createStore = (prefix) => {
       }
     },
     // Ensure prefix ends with a colon if not provided
-    prefix: prefix ? `${prefix}:` : "rl:",
+    prefix: prefix ? `${prefix}:` : "starter:",
   });
 };
 
@@ -80,7 +80,7 @@ const createErrorPageContext = (req, _res) => {
 
 // Basic rate limiter - general requests
 const generalLimiter = rateLimit({
-  store: createStore("rl:general"),
+  store: createStore("starter:general"),
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 1000, // limit each IP to 100 requests per windowMs
   message: {
@@ -158,7 +158,7 @@ const generalLimiter = rateLimit({
 
 // Strict rate limiter - authentication endpoints
 const authLimiter = rateLimit({
-  store: createStore("rl:auth"),
+  store: createStore("starter:auth"),
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 5, // limit each IP to 5 login attempts per windowMs
   message: {
@@ -221,7 +221,7 @@ const authLimiter = rateLimit({
 
 // Admin operation limiter - admin-only operations
 const adminLimiter = rateLimit({
-  store: createStore("rl:admin"),
+  store: createStore("starter:admin"),
   windowMs: 15 * 60 * 1000, // 5 minutes
   max: 100, // limit each IP to 50 admin requests per windowMs
   message: {
@@ -283,7 +283,7 @@ const adminLimiter = rateLimit({
 
 // File upload limiter - file operations
 const uploadLimiter = rateLimit({
-  store: createStore("rl:upload"),
+  store: createStore("starter:upload"),
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10, // limit each IP to 10 file uploads per windowMs
   message: {
@@ -337,7 +337,7 @@ const uploadLimiter = rateLimit({
 
 // Export limiter - data export operations
 const exportLimiter = rateLimit({
-  store: createStore("rl:export"),
+  store: createStore("starter:export"),
   windowMs: 5 * 60 * 1000, // 5 minutes
   max: 20, // limit each IP to 20 exports per windowMs
   message: {
