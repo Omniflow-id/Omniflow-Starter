@@ -142,7 +142,7 @@ const analyzeScreen = async (req, res) => {
         user: req.session.user.username,
         userId: req.session.user.id,
         userEmail: req.session.user.email,
-        userRole: req.session.user.role,
+        userRole: req.session.user.role_name,
         modelId: modelConfig.id,
         contextLength: screenContext.length,
         hasUserQuery: !!userQuery,

@@ -122,7 +122,7 @@ const editMessageStream = asyncHandler(async (req, res) => {
 
   // Get current user details for context
   const [userData] = await db.query(
-    `SELECT u.full_name, u.email, r.role_name as role
+    `SELECT u.full_name, u.email, r.role_name
      FROM users u
      LEFT JOIN roles r ON u.role_id = r.role_id
      WHERE u.id = ?`,
@@ -169,7 +169,7 @@ const editMessageStream = asyncHandler(async (req, res) => {
 ## USER CONTEXT
 - Name: ${user.full_name || "Unknown"}
 - Email: ${user.email || "Unknown"}
-- Role: ${user.role || "Unknown"}
+- Role: ${user.role_name || "Unknown"}
 
 ## SYSTEM CONTEXT
 - Date: ${currentDate}

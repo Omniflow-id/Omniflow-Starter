@@ -64,7 +64,7 @@ const getAIUseCasesPage = asyncHandler(async (req, res) => {
  * Route: GET /api/ai_use_cases
  */
 const getAllAIUseCases = asyncHandler(async (req, res) => {
-  const userRole = req.session.user?.role;
+  const userRole = req.session.user?.role_name;
 
   const result = await handleCache({
     key: `api:ai_use_cases:active:${userRole}`,

@@ -33,7 +33,7 @@ const getChatPage = asyncHandler(async (req, res) => {
   );
 
   // Get available use cases for this user
-  const userRole = req.session.user.role_name || req.session.user.role;
+  const userRole = req.session.user.role_name;
   const [useCases] = await db.query(
     `SELECT id, name, description, base_knowledge, prompt, allowed_roles
      FROM ai_use_cases
