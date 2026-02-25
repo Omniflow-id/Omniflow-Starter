@@ -155,7 +155,7 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
       user.id,
       user.username,
       user.email,
-      user.role || "No Role",
+      user.role_name || "No Role",
       user.is_active
         ? '<span class="badge bg-success">Active</span>'
         : '<span class="badge bg-secondary">Inactive</span>',

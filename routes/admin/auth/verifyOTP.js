@@ -119,7 +119,7 @@ const postVerifyOTP = asyncHandler(async (req, res) => {
       userInfo: {
         username: pending2FA.username,
         email: pending2FA.email,
-        role: pending2FA.role,
+        role_id: pending2FA.role_id,
       },
       requestInfo: {
         ip: clientIP,

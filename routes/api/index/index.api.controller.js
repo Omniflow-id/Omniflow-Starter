@@ -51,7 +51,7 @@ const loginAPI = asyncHandler(async (req, res) => {
     email: user.email,
     username: user.username,
     full_name: user.full_name,
-    role: user.role,
+    role_id: user.role_id,
   };
 
   const { accessToken, refreshToken } = generateTokens(payload);
@@ -69,7 +69,7 @@ const loginAPI = asyncHandler(async (req, res) => {
     userInfo: {
       username: user.username,
       email: user.email,
-      role: user.role,
+      role_id: user.role_id,
     },
     requestInfo: {
       ip: clientIP,
@@ -105,7 +105,7 @@ const refreshTokenAPI = asyncHandler(async (req, res) => {
     email: req.user.email,
     username: req.user.username,
     full_name: req.user.full_name,
-    role: req.user.role,
+    role_id: req.user.role_id,
   };
 
   const { accessToken, refreshToken } = generateTokens(payload);

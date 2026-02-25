@@ -25,7 +25,7 @@ const logout = async (req, res) => {
       userInfo: {
         username: user.username,
         email: user.email,
-        role: user.role,
+        role_id: user.role_id,
       },
       requestInfo: {
         ip: clientIP,

@@ -31,7 +31,7 @@ const invalidateCacheController = asyncHandler(async (req, res) => {
       userInfo: {
         username: req.session.user.username,
         email: req.session.user.email,
-        role: req.session.user.role,
+        role_id: req.session.user.role_id,
       },
       requestInfo: {
         ip: clientIP,
@@ -78,7 +78,7 @@ const invalidateCacheController = asyncHandler(async (req, res) => {
     userInfo: {
       username: req.session.user.username,
       email: req.session.user.email,
-      role: req.session.user.role,
+      role_id: req.session.user.role_id,
     },
     requestInfo: {
       ip: clientIP,

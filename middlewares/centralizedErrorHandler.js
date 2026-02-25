@@ -168,7 +168,7 @@ const centralizedErrorHandler = async (err, req, res, _next) => {
         ? {
             userId: req.session.user.id,
             username: req.session.user.username,
-            role: req.session.user.role,
+            role_id: req.session.user.role_id,
           }
         : null,
       ...(process.env.NODE_ENV === "development" &&

@@ -219,7 +219,7 @@ function adminCacheMiddleware({ ttl = 600 } = {}) {
     ttl,
     condition: (req) => {
       // Only cache for admin users
-      return req.session?.user?.role === "Admin";
+      return req.session?.user?.role_id === 1;
     },
   });
 }

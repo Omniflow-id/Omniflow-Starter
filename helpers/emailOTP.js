@@ -146,7 +146,7 @@ const createOTPSession = (user, otp) => {
     email: user.email,
     username: user.username,
     fullName: user.full_name,
-    role: user.role,
+    role_id: user.role_id,
     otp: otp,
     expiresAt: Date.now() + 5 * 60 * 1000, // 5 minutes from now
     createdAt: Date.now(),
