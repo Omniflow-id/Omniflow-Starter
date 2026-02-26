@@ -18,7 +18,7 @@ const getAIUseCasesPage = asyncHandler(async (req, res) => {
     ttl: 300, // 5 minutes
     dbQueryFn: async () => {
       const [useCases] = await db.query(
-        "SELECT * FROM ai_use_cases ORDER BY created_at DESC"
+        "SELECT * FROM ai_use_cases WHERE deleted_at IS NULL ORDER BY created_at DESC"
       );
 
       // Get all roles for the form
@@ -73,7 +73,7 @@ const getAllAIUseCases = asyncHandler(async (req, res) => {
       const [useCases] = await db.query(
         `SELECT id, name, description, base_knowledge, prompt, allowed_roles, is_active
          FROM ai_use_cases
-         WHERE is_active = TRUE
+         WHERE is_active = TRUE AND deleted_at IS NULL
          ORDER BY name`
       );
 
@@ -135,7 +135,7 @@ const createNewAIUseCase = asyncHandler(async (req, res) => {
 
   // Check if use case name already exists
   const [existingUseCase] = await db.query(
-    "SELECT id FROM ai_use_cases WHERE name = ?",
+    "SELECT id FROM ai_use_cases WHERE name = ? AND deleted_at IS NULL",
     [name]
   );
 
@@ -215,7 +215,7 @@ const updateAIUseCase = asyncHandler(async (req, res) => {
 
   // Check if use case exists
   const [existingUseCase] = await db.query(
-    "SELECT id FROM ai_use_cases WHERE id = ?",
+    "SELECT id FROM ai_use_cases WHERE id = ? AND deleted_at IS NULL",
     [id]
   );
 
@@ -225,7 +225,7 @@ const updateAIUseCase = asyncHandler(async (req, res) => {
 
   // Check if use case name already exists (excluding current use case)
   const [duplicateUseCase] = await db.query(
-    "SELECT id FROM ai_use_cases WHERE name = ? AND id != ?",
+    "SELECT id FROM ai_use_cases WHERE name = ? AND id != ? AND deleted_at IS NULL",
     [name, id]
   );
 
@@ -283,7 +283,7 @@ const deleteAIUseCase = asyncHandler(async (req, res) => {
 
   // Check if use case exists
   const [existingUseCase] = await db.query(
-    "SELECT name FROM ai_use_cases WHERE id = ?",
+    "SELECT name FROM ai_use_cases WHERE id = ? AND deleted_at IS NULL",
     [id]
   );
 
@@ -293,8 +293,10 @@ const deleteAIUseCase = asyncHandler(async (req, res) => {
 
   const useCaseName = existingUseCase[0].name;
 
-  // Delete AI use case
-  await db.query("DELETE FROM ai_use_cases WHERE id = ?", [id]);
+  // Soft delete AI use case
+  await db.query("UPDATE ai_use_cases SET deleted_at = NOW() WHERE id = ?", [
+    id,
+  ]);
 
   // Invalidate caches
   await invalidateCache("admin:ai_use_cases:*", true);

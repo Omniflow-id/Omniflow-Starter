@@ -18,16 +18,16 @@ const getChatPage = asyncHandler(async (req, res) => {
 
   // Get user's conversations with use case and model info
   const [conversations] = await db.query(
-    `SELECT 
+    `SELECT
       c.*,
       uc.name as usecase_name,
       uc.description as usecase_description,
       m.name as model_name,
       m.model_variant
      FROM ai_conversations c
-     LEFT JOIN ai_use_cases uc ON c.usecase_id = uc.id
-     LEFT JOIN ai_models m ON c.model_id = m.id
-     WHERE c.user_id = ?
+     LEFT JOIN ai_use_cases uc ON c.usecase_id = uc.id AND uc.deleted_at IS NULL
+     LEFT JOIN ai_models m ON c.model_id = m.id AND m.deleted_at IS NULL
+     WHERE c.user_id = ? AND c.deleted_at IS NULL
      ORDER BY c.updated_at DESC`,
     [userId]
   );
@@ -37,7 +37,7 @@ const getChatPage = asyncHandler(async (req, res) => {
   const [useCases] = await db.query(
     `SELECT id, name, description, base_knowledge, prompt, allowed_roles
      FROM ai_use_cases
-     WHERE is_active = TRUE
+     WHERE is_active = TRUE AND deleted_at IS NULL
      ORDER BY name`
   );
 
@@ -59,7 +59,7 @@ const getChatPage = asyncHandler(async (req, res) => {
   const [models] = await db.query(
     `SELECT id, name, model_variant
      FROM ai_models
-     WHERE is_active = TRUE
+     WHERE is_active = TRUE AND deleted_at IS NULL
      ORDER BY name`
   );
 
@@ -85,7 +85,7 @@ const createConversation = asyncHandler(async (req, res) => {
 
   // Verify use case exists and is active
   const [useCase] = await db.query(
-    "SELECT id FROM ai_use_cases WHERE id = ? AND is_active = TRUE",
+    "SELECT id FROM ai_use_cases WHERE id = ? AND is_active = TRUE AND deleted_at IS NULL",
     [usecase_id]
   );
 
@@ -95,7 +95,7 @@ const createConversation = asyncHandler(async (req, res) => {
 
   // Verify model exists and is active
   const [model] = await db.query(
-    "SELECT id FROM ai_models WHERE id = ? AND is_active = TRUE",
+    "SELECT id FROM ai_models WHERE id = ? AND is_active = TRUE AND deleted_at IS NULL",
     [model_id]
   );
 
@@ -146,7 +146,7 @@ const getConversation = asyncHandler(async (req, res) => {
     dbQueryFn: async () => {
       // Get conversation
       const [conversations] = await db.query(
-        `SELECT 
+        `SELECT
           c.*,
           uc.name as usecase_name,
           uc.base_knowledge,
@@ -156,9 +156,9 @@ const getConversation = asyncHandler(async (req, res) => {
           m.model_variant,
           m.api_key
          FROM ai_conversations c
-         LEFT JOIN ai_use_cases uc ON c.usecase_id = uc.id
-         LEFT JOIN ai_models m ON c.model_id = m.id
-         WHERE c.id = ? AND c.user_id = ?`,
+         LEFT JOIN ai_use_cases uc ON c.usecase_id = uc.id AND uc.deleted_at IS NULL
+         LEFT JOIN ai_models m ON c.model_id = m.id AND m.deleted_at IS NULL
+         WHERE c.id = ? AND c.user_id = ? AND c.deleted_at IS NULL`,
         [id, userId]
       );
 
@@ -211,7 +211,7 @@ const getUserConversations = asyncHandler(async (req, res) => {
     ttl: 120, // 2 minutes
     dbQueryFn: async () => {
       const [conversations] = await db.query(
-        `SELECT 
+        `SELECT
           c.id,
           c.title,
           c.created_at,
@@ -219,9 +219,9 @@ const getUserConversations = asyncHandler(async (req, res) => {
           uc.name as usecase_name,
           m.name as model_name
          FROM ai_conversations c
-         LEFT JOIN ai_use_cases uc ON c.usecase_id = uc.id
-         LEFT JOIN ai_models m ON c.model_id = m.id
-         WHERE c.user_id = ?
+         LEFT JOIN ai_use_cases uc ON c.usecase_id = uc.id AND uc.deleted_at IS NULL
+         LEFT JOIN ai_models m ON c.model_id = m.id AND m.deleted_at IS NULL
+         WHERE c.user_id = ? AND c.deleted_at IS NULL
          ORDER BY c.updated_at DESC`,
         [userId]
       );
@@ -255,7 +255,7 @@ const updateConversationTitle = asyncHandler(async (req, res) => {
 
   // Verify conversation belongs to user
   const [conversation] = await db.query(
-    "SELECT id FROM ai_conversations WHERE id = ? AND user_id = ?",
+    "SELECT id FROM ai_conversations WHERE id = ? AND user_id = ? AND deleted_at IS NULL",
     [id, userId]
   );
 
@@ -299,7 +299,7 @@ const deleteConversation = asyncHandler(async (req, res) => {
 
   // Verify conversation belongs to user
   const [conversation] = await db.query(
-    "SELECT title FROM ai_conversations WHERE id = ? AND user_id = ?",
+    "SELECT title FROM ai_conversations WHERE id = ? AND user_id = ? AND deleted_at IS NULL",
     [id, userId]
   );
 
@@ -307,7 +307,11 @@ const deleteConversation = asyncHandler(async (req, res) => {
     throw new ValidationError("Conversation not found");
   }
 
-  await db.query("DELETE FROM ai_conversations WHERE id = ?", [id]);
+  // Soft delete conversation
+  await db.query(
+    "UPDATE ai_conversations SET deleted_at = NOW() WHERE id = ?",
+    [id]
+  );
 
   // Invalidate cache
   await invalidateCache(`chat:conversation:${id}:*`, true);
@@ -349,7 +353,7 @@ const searchConversations = asyncHandler(async (req, res) => {
     `SELECT DISTINCT c.id, c.title, c.updated_at
      FROM ai_conversations c
      LEFT JOIN ai_messages m ON c.id = m.conversation_id
-     WHERE c.user_id = ?
+     WHERE c.user_id = ? AND c.deleted_at IS NULL
        AND (c.title LIKE ? OR m.content LIKE ?)
      ORDER BY c.updated_at DESC
      LIMIT 20`,

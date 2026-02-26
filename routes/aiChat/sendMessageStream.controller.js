@@ -35,8 +35,8 @@ const sendMessageStream = asyncHandler(async (req, res) => {
   const [conversation] = await db.query(
     `SELECT c.*, uc.base_knowledge, uc.prompt
      FROM ai_conversations c
-     LEFT JOIN ai_use_cases uc ON c.usecase_id = uc.id
-     WHERE c.id = ? AND c.user_id = ?`,
+     LEFT JOIN ai_use_cases uc ON c.usecase_id = uc.id AND uc.deleted_at IS NULL
+     WHERE c.id = ? AND c.user_id = ? AND c.deleted_at IS NULL`,
     [conversation_id, userId]
   );
 

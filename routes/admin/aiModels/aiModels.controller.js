@@ -19,7 +19,7 @@ const getAIModelsPage = asyncHandler(async (req, res) => {
     ttl: 300, // 5 minutes
     dbQueryFn: async () => {
       const [models] = await db.query(
-        "SELECT * FROM ai_models ORDER BY created_at DESC"
+        "SELECT * FROM ai_models WHERE deleted_at IS NULL ORDER BY created_at DESC"
       );
 
       // Process models to decrypt API keys and add masked version for display
@@ -70,7 +70,7 @@ const getAllAIModels = asyncHandler(async (_req, res) => {
       const [models] = await db.query(
         `SELECT id, name, api_url, model_variant, is_active, created_at, updated_at
          FROM ai_models
-         WHERE is_active = TRUE
+         WHERE is_active = TRUE AND deleted_at IS NULL
          ORDER BY id`
       );
       return { models };
@@ -121,7 +121,7 @@ const createNewAIModel = asyncHandler(async (req, res) => {
 
   // Check if model name already exists
   const [existingModel] = await db.query(
-    "SELECT id FROM ai_models WHERE name = ?",
+    "SELECT id FROM ai_models WHERE name = ? AND deleted_at IS NULL",
     [name]
   );
 
@@ -196,7 +196,7 @@ const updateAIModel = asyncHandler(async (req, res) => {
 
   // Check if model exists
   const [existingModel] = await db.query(
-    "SELECT id FROM ai_models WHERE id = ?",
+    "SELECT id FROM ai_models WHERE id = ? AND deleted_at IS NULL",
     [id]
   );
 
@@ -206,7 +206,7 @@ const updateAIModel = asyncHandler(async (req, res) => {
 
   // Check if model name already exists (excluding current model)
   const [duplicateModel] = await db.query(
-    "SELECT id FROM ai_models WHERE name = ? AND id != ?",
+    "SELECT id FROM ai_models WHERE name = ? AND id != ? AND deleted_at IS NULL",
     [name, id]
   );
 
@@ -254,7 +254,7 @@ const deleteAIModel = asyncHandler(async (req, res) => {
 
   // Check if model exists
   const [existingModel] = await db.query(
-    "SELECT name FROM ai_models WHERE id = ?",
+    "SELECT name FROM ai_models WHERE id = ? AND deleted_at IS NULL",
     [id]
   );
 
@@ -264,8 +264,8 @@ const deleteAIModel = asyncHandler(async (req, res) => {
 
   const modelName = existingModel[0].name;
 
-  // Delete AI model
-  await db.query("DELETE FROM ai_models WHERE id = ?", [id]);
+  // Soft delete AI model
+  await db.query("UPDATE ai_models SET deleted_at = NOW() WHERE id = ?", [id]);
 
   // Invalidate caches
   await invalidateCache("admin:ai_models:*", true);
@@ -299,7 +299,7 @@ const getAllAIModelsAPI = asyncHandler(async (_req, res) => {
       const [models] = await db.query(
         `SELECT id, name, api_url, model_variant, is_active, created_at, updated_at
          FROM ai_models
-         WHERE is_active = TRUE
+         WHERE is_active = TRUE AND deleted_at IS NULL
          ORDER BY name`
       );
       return { models };

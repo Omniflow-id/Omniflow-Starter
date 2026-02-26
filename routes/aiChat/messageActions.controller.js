@@ -25,7 +25,7 @@ const editMessageOnly = asyncHandler(async (req, res) => {
   const [message] = await db.query(
     `SELECT m.*, c.user_id
      FROM ai_messages m
-     JOIN ai_conversations c ON m.conversation_id = c.id
+     JOIN ai_conversations c ON m.conversation_id = c.id AND c.deleted_at IS NULL
      WHERE m.id = ? AND m.role = 'user'`,
     [message_id]
   );
@@ -91,7 +91,7 @@ const editMessageStream = asyncHandler(async (req, res) => {
   const [message] = await db.query(
     `SELECT m.*, c.user_id, c.id as conversation_id, c.model_id, c.usecase_id, c.title
      FROM ai_messages m
-     JOIN ai_conversations c ON m.conversation_id = c.id
+     JOIN ai_conversations c ON m.conversation_id = c.id AND c.deleted_at IS NULL
      WHERE m.id = ? AND m.role = 'user'`,
     [message_id]
   );
@@ -111,9 +111,9 @@ const editMessageStream = asyncHandler(async (req, res) => {
   const [conversation] = await db.query(
     `SELECT uc.base_knowledge, uc.prompt, m.api_key, m.api_url, m.model_variant
      FROM ai_conversations c
-     LEFT JOIN ai_use_cases uc ON c.usecase_id = uc.id
-     LEFT JOIN ai_models m ON c.model_id = m.id
-     WHERE c.id = ?`,
+     LEFT JOIN ai_use_cases uc ON c.usecase_id = uc.id AND uc.deleted_at IS NULL
+     LEFT JOIN ai_models m ON c.model_id = m.id AND m.deleted_at IS NULL
+     WHERE c.id = ? AND c.deleted_at IS NULL`,
     [msg.conversation_id]
   );
 
@@ -395,7 +395,7 @@ const deleteMessage = asyncHandler(async (req, res) => {
   const [message] = await db.query(
     `SELECT m.*, c.user_id, c.title
      FROM ai_messages m
-     JOIN ai_conversations c ON m.conversation_id = c.id
+     JOIN ai_conversations c ON m.conversation_id = c.id AND c.deleted_at IS NULL
      WHERE m.id = ?`,
     [id]
   );

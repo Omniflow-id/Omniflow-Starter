@@ -13,6 +13,7 @@ exports.up = (knex) =>
     table
       .timestamp("updated_at")
       .defaultTo(knex.raw("CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP"));
+    table.timestamp("deleted_at").nullable();
 
     // Foreign keys
     table
