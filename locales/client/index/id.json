@@ -65,6 +65,26 @@
       }
     }
   },
+  "features": {
+    "title": "Keunggulan Kami",
+    "subtitle": "Apa yang membuat kami berbeda",
+    "delivery": {
+      "title": "Delivery Tepat Waktu",
+      "description": "Komitmen untuk menyelesaikan proyek sesuai timeline yang disepakati"
+    },
+    "quality": {
+      "title": "Kualitas Terjamin",
+      "description": "Standar kualitas tinggi dengan testing dan quality assurance yang ketat"
+    },
+    "support": {
+      "title": "Support 24/7",
+      "description": "Tim support yang siap membantu kapan saja Anda membutuhkan"
+    },
+    "price": {
+      "title": "Harga Kompetitif",
+      "description": "Solusi berkualitas dengan harga yang sesuai dengan budget Anda"
+    }
+  },
   "whyChooseUs": {
     "title": "Mengapa Memilih ",
     "subtitle": "Keunggulan yang membedakan kami dari yang lain",
@@ -83,6 +103,26 @@
     "pricing": {
       "title": "Harga Kompetitif",
       "description": "Solusi berkualitas dengan harga yang sesuai dengan budget Anda"
+    }
+  },
+  "buttons": {
+    "contactUs": "Hubungi Kami",
+    "ourServices": "Layanan Kami",
+    "startConsultation": "Mulai Konsultasi"
+  },
+  "nav": {
+    "contact": "Hubungi Kami"
+  },
+  "form": {
+    "email": "Email",
+    "phone": "Telepon"
+  },
+  "labels": {
+    "address": "Alamat"
+  },
+  "common": {
+    "actions": {
+      "viewMore": "Lihat Selengkapnya"
     }
   },
   "contact": {
