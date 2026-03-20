@@ -85,6 +85,13 @@
     "url": "URL",
     "device": "设备",
     "email": "邮箱",
+    "application": "应用",
+    "environment": "环境",
+    "server": "服务器",
+    "processId": "进程ID",
+    "memoryUsage": "内存使用",
+    "duration": "耗时",
+    "dataShort": "数据",
     "loading": "加载中...",
     "downloadStarted": "下载已开始！请检查您的下载文件夹。"
   }

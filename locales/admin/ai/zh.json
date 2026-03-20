@@ -55,6 +55,10 @@
           "notFound": "AI模型未找到",
           "decryptionError": "API密钥解密失败"
         }
+      },
+      "buttons": {
+        "saving": "保存中...",
+        "updating": "更新中..."
       }
     },
     "useCases": {
@@ -101,6 +105,10 @@
           "duplicateName": "用例名称已存在",
           "notFound": "AI用例未找到"
         }
+      },
+      "buttons": {
+        "saving": "保存中...",
+        "updating": "更新中..."
       }
     },
     "analysisSettings": {
@@ -159,6 +167,18 @@
     "chat": {
       "title": "AI对话",
       "breadcrumb": "AI对话",
+      "assistantTitle": "OMNI助手",
+      "contextHome": "首页",
+      "disclaimer": "AI可能会犯错。请核实重要信息。",
+      "openLabel": "打开AI助手",
+      "closeLabel": "关闭",
+      "expandLabel": "启用宽模式",
+      "collapseLabel": "返回正常模式",
+      "speakLabel": "说话",
+      "sendLabel": "发送",
+      "listeningPlaceholder": "正在听...（请说话）",
+      "welcomeMessage": "欢迎！根据您当前浏览的页面，我准备为您提供帮助。",
+      "greetingMessage": "您好！有什么可以帮您关于这个页面的吗？",
       "welcomeTitle": "欢迎使用AI对话",
       "welcomeSubtitle": "选择对话或开始新聊天以开始",
       "conversations": "对话",
@@ -174,10 +194,14 @@
       "fields": {
         "useCase": "AI用例",
         "model": "AI模型",
-        "title": "对话标题（可选）"
+        "title": "对话标题（可选）",
+        "query": "问题（可选）",
+        "result": "分析结果"
       },
       "placeholders": {
-        "title": "输入对话标题"
+        "title": "输入对话标题",
+        "askSomething": "问点什么...",
+        "copilotQuery": "问问您想了解的数据..."
       },
       "editTitle": "编辑对话标题",
       "editTitleModalTitle": "编辑对话标题",
@@ -207,8 +231,31 @@
         "titleUpdated": "标题更新成功",
         "deleted": "对话删除成功",
         "messageSaved": "消息已保存",
-        "messageDeleted": "消息已删除"
-      }
+        "messageDeleted": "消息已删除",
+        "serverError": "AI服务发生错误",
+        "loadError": "加载对话失败",
+        "saveError": "保存消息失败",
+        "regenerateError": "重新生成响应失败",
+        "deleteError": "删除消息失败",
+        "unknownError": "发生未知错误"
+      },
+      "confirmDeleteMessage": "确定要删除此消息及其后的所有消息吗？"
+    },
+    "copilot": {
+      "title": "AI副驾驶",
+      "queryLabel": "问题（可选）",
+      "queryPlaceholder": "问问您想了解的数据...",
+      "analyzeButton": "分析屏幕",
+      "stopButton": "停止",
+      "resultLabel": "分析结果",
+      "emptyState": "点击「分析屏幕」开始分析此页面内容。",
+      "closeButton": "关闭",
+      "copyButton": "复制",
+      "copiedButton": "已复制！",
+      "loading": "加载分析中...",
+      "analyzing": "正在分析页面内容...",
+      "stopped": "分析已停止",
+      "error": "AI分析处理失败"
     }
   }
 }

@@ -132,7 +132,16 @@
     "phone": "电话",
     "address": "地址",
     "website": "网站",
-    "cta": "联系我们"
+    "cta": "联系我们",
+    "details": {
+      "emailValue": "info@omniflow.id",
+      "phoneValue": "+62 821 2560 9413",
+      "addressValue": "Jakarta, Indonesia",
+      "websiteValue": "omniflow.id"
+    }
+  },
+  "language": {
+    "switch": "切换语言"
   },
   "cta": {
     "title": "准备好开始数字化转型了吗？",

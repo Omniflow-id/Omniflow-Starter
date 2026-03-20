@@ -12,6 +12,14 @@
     "status": "状态",
     "defaultTTL": "默认TTL",
     "keyPrefix": "键前缀",
+    "source": "来源",
+    "responseTime": "响应时间",
+    "generated": "生成",
+    "users": "用户",
+    "logs": "日志",
+    "cacheKey": "缓存键",
+    "ttl": "TTL",
+    "showingKeys": "显示 {shown} 个，共 {total} 个键（模式：{pattern}）",
     "patternPlaceholder": "admin:users:*, user:*, logs:*",
     "patternExample": "模式（例如：user:*）",
     "wildcardInfo": "使用*作为通配符（例如：admin:* 匹配所有admin键）",
@@ -40,7 +48,11 @@
     "source": "来源",
     "cacheHit": "缓存命中",
     "cacheMiss": "缓存未命中",
-    "benchmark": "运行基准测试"
+    "benchmark": "运行基准测试",
+    "running": "测试中...",
+    "runPerformanceTest": "运行性能测试",
+    "performanceTitle": "缓存性能",
+    "dataTitle": "测试数据"
   },
   "health": {
     "title": "健康检查",
@@ -61,24 +73,57 @@
     "test": "测试",
     "cancel": "取消",
     "confirm": "确认",
-    "invalidate": "使失效"
+    "invalidate": "使失效",
+    "refreshing": "重新加载中...",
+    "invalidating": "使失效中..."
   },
   "modals": {
     "confirmAction": "确认操作",
-    "confirmMessage": "确定要继续吗？"
+    "confirmMessage": "确定要继续吗？",
+    "deleteKey": "确定要删除此缓存键吗？<p><strong>键：</strong> <code>{key}</code></p>",
+    "flushWarning": "<p><strong>警告：</strong>这将永久删除所有缓存数据！</p><p>确定要清除所有缓存吗？</p>",
+    "invalidatePattern": "确定要使与此模式匹配的缓存键失效吗？<p><strong>模式：</strong> <code>{pattern}</code></p>"
   },
   "messages": {
     "flushSuccess": "缓存清除成功",
     "flushError": "缓存清除失败",
     "invalidateSuccess": "模式使失效成功",
     "invalidateError": "模式使失效失败",
-    "testSuccess": "测试成功",
+    "testSuccess": "缓存测试成功！",
     "benchmarkSuccess": "基准测试完成",
     "redisUnavailable": "Redis不可用。使用数据库回退。",
     "cacheStatsUnavailable": "缓存统计不可用",
     "keysWillAppear": "缓存键将显示在这里",
     "clickRefresh": "点击刷新以加载现有缓存键",
     "realtimeReady": "实时统计已就绪",
-    "clickRefreshStats": "点击刷新按钮加载当前缓存统计"
+    "clickRefreshStats": "点击刷新按钮加载当前缓存统计",
+    "statsRefreshed": "缓存统计已更新！",
+    "deleteKeySuccess": "缓存键已删除！",
+    "flushFallbackSuccess": "缓存已清除！",
+    "invalidateFallbackSuccess": "缓存模式已使失效！",
+    "emptyPattern": "请输入要使失效的模式",
+    "noKeysFound": "没有找到匹配模式的键：{pattern}",
+    "tryDifferentPattern": "尝试其他模式或先创建缓存数据",
+    "unableToLoadKeys": "无法加载缓存键：{error}",
+    "errorLoadingKeys": "加载缓存键时发生错误：{error}",
+    "errorLoadingStatistics": "加载统计时发生错误：{error}",
+    "failedRefreshStatistics": "刷新统计失败：{error}",
+    "failedDeleteKey": "删除键失败：{error}",
+    "failedDeleteKeyStatus": "删除键失败（{status}）：{statusText}",
+    "errorDeletingKey": "删除键时发生错误：{error}",
+    "failedFlushCache": "清除缓存失败：{error}",
+    "errorInvalidatingCache": "使缓存失效时发生错误：{error}",
+    "failedInvalidateCache": "使缓存失效失败：{error}",
+    "loadKeysWarning": "无法加载缓存键",
+    "errorLoadingStatsTitle": "加载统计时发生错误",
+    "errorLoadingKeysTitle": "加载键时发生错误",
+    "unableToLoadKeysTitle": "无法加载键"
+  },
+  "status": {
+    "noTTL": "无TTL",
+    "expired": "已过期"
+  },
+  "table": {
+    "actions": "操作"
   }
 }

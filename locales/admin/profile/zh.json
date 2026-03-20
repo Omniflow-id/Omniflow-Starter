@@ -46,6 +46,15 @@
     "passwordHelp": "密码必须至少8个字符，包含大写、小写、数字和符号。",
     "submit": "更改密码",
     "cancel": "取消",
+    "messages": {
+      "strengthLabel": "密码强度",
+      "weak": "弱",
+      "fair": "一般",
+      "good": "良好",
+      "strong": "强",
+      "passwordsDoNotMatch": "密码不匹配",
+      "chooseStrongerPassword": "请选择一个更强的密码以确保安全。"
+    },
     "securityTips": {
       "title": "密码安全提示",
       "length": "至少使用8个字符",
@@ -59,5 +68,8 @@
     "title": "已复制！",
     "message": "邮箱已复制到剪贴板",
     "fail": "复制邮箱失败"
+  },
+  "messages": {
+    "editProfileComingSoon": "资料更新功能即将推出！"
   }
 }
