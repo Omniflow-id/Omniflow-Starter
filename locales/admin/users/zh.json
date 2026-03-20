@@ -1,0 +1,144 @@
+{
+  "pageTitle": "用户管理",
+  "title": "用户管理",
+  "subtitle": "管理系统用户账户",
+  "createUser": "创建新用户",
+  "importUsers": "导入用户",
+  "exportUsers": "导出用户",
+  "downloadTemplate": "下载模板",
+  "downloadData": "下载数据",
+  "uploadDataUser": "上传用户数据",
+  "tambahUser": "添加用户",
+  "tambah": "添加",
+  "userList": "用户列表",
+  "table": {
+    "name": "姓名",
+    "email": "邮箱",
+    "role": "角色",
+    "status": "状态",
+    "lastLogin": "最后登录",
+    "createdAt": "创建时间",
+    "actions": "操作"
+  },
+  "status": {
+    "active": "活跃",
+    "inactive": "非活跃"
+  },
+  "form": {
+    "name": "全名",
+    "email": "邮箱",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "role": "角色",
+    "status": "状态",
+    "selectRole": "选择角色",
+    "selectStatus": "选择状态",
+    "active": "活跃",
+    "inactive": "非活跃",
+    "username": "用户名",
+    "chooseFile": "选择要上传的文件："
+  },
+  "messages": {
+    "createSuccess": "用户创建成功",
+    "updateSuccess": "用户更新成功",
+    "deleteSuccess": "用户删除成功",
+    "toggleSuccess": "用户状态已更改",
+    "importSuccess": "用户导入成功",
+    "importError": "导入时发生错误",
+    "emailExists": "邮箱已被注册",
+    "passwordGenerated": "生成的密码",
+    "passwordNote": "请记录此密码！密码将不再显示。",
+    "confirmDelete": "确定要删除此用户吗？",
+    "confirmToggle": "确定要更改此用户的状态吗？",
+    "downloadSuccess": "下载成功！请检查您的下载文件夹。"
+  },
+  "modals": {
+    "createUser": "创建新用户",
+    "editUser": "编辑用户",
+    "viewUser": "用户详情",
+    "deleteUser": "删除用户",
+    "importUsers": "从Excel导入用户",
+    "generatedPasswords": "生成的密码",
+    "permissions": "权限"
+  },
+  "tabs": {
+    "info": "信息",
+    "permissions": "权限",
+    "activity": "活动"
+  },
+  "search": {
+    "placeholder": "搜索用户..."
+  },
+  "import": {
+    "title": "导入用户",
+    "description": "上传符合格式的Excel文件(.xlsx)",
+    "dropzone": "拖放文件到此处或点击上传",
+    "note": "注意：将自动为每个用户生成密码",
+    "columns": "所需列：name, email, full_name, role",
+    "uploaded": " 位用户已上传",
+    "errors": " 个错误"
+  },
+  "overview": {
+    "pageTitle": "用户概览",
+    "totalUsers": "用户总数"
+  },
+  "datatable": {
+    "search": "搜索用户：",
+    "lengthMenu": "显示 _MENU_ 条用户/页",
+    "info": "显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条用户",
+    "infoEmpty": "暂无用户",
+    "infoFiltered": "（从 _MAX_ 条用户中筛选）",
+    "processing": "处理中...",
+    "loadingRecords": "加载中...",
+    "zeroRecords": "无匹配数据"
+  },
+  "permissions": {
+    "pageTitle": "用户权限管理",
+    "breadcrumb": {
+      "dashboard": "仪表盘",
+      "users": "用户",
+      "permissions": "用户权限"
+    },
+    "userInfo": "用户信息",
+    "fullName": "全名",
+    "username": "用户名",
+    "email": "邮箱",
+    "role": "角色",
+    "permissionOverride": "权限覆盖系统",
+    "howItWorks": "工作原理：",
+    "rolePermissions": "角色权限",
+    "userOverrides": "用户覆盖",
+    "finalResult": "最终结果",
+    "formula": "(角色权限 + 用户授予) - 用户撤销 = 有效权限",
+    "permissionManagement": "权限管理",
+    "manageFor": "管理所有权限：",
+    "userGrant": "用户授予",
+    "revoked": "已撤销",
+    "notAssigned": "未分配",
+    "action": {
+      "inheritedFromRole": "从角色继承",
+      "rolePermissionRevoked": "角色权限（被用户撤销）",
+      "additionalUserPermission": "用户额外权限",
+      "notGranted": "未授予"
+    },
+    "buttons": {
+      "updatePermissions": "更新用户权限",
+      "grantAll": "全部授予",
+      "revokeAll": "全部撤销",
+      "resetToRole": "重置为角色默认值"
+    },
+    "summary": {
+      "title": "权限摘要",
+      "effectivePermissions": "有效权限",
+      "fromRole": "来自角色",
+      "userGrants": "用户授予",
+      "userRevokes": "用户撤销"
+    },
+    "alerts": {
+      "success": "权限更新成功：",
+      "successDetails": "权限更新成功：已授予 {grants}，已撤销 {revokes}",
+      "failed": "权限更新失败",
+      "networkError": "更新权限时发生网络错误"
+    }
+  }
+}

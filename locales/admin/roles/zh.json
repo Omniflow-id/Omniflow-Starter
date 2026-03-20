@@ -1,0 +1,73 @@
+{
+  "pageTitle": "角色与权限",
+  "title": "角色与权限",
+  "subtitle": "管理角色和分配权限",
+  "createRole": "创建角色",
+  "createNewRole": "创建新角色",
+  "rolesPermissions": "角色与权限",
+  "noRolesFound": "未找到角色",
+  "assignedPermissions": "已分配的权限",
+  "editRole": "编辑角色",
+  "saveRole": "保存角色",
+  "updatePermissions": "更新权限",
+  "selectAll": "全选",
+  "clearAll": "清除全部",
+  "permissionDistribution": "权限分布摘要",
+  "totalRoles": "角色总数",
+  "totalPermissions": "权限总数",
+  "mostPrivilegedRole": "最高权限角色",
+  "none": "无",
+  "contactAdmin": "请联系系统管理员设置用户角色。",
+  "table": {
+    "name": "角色名称",
+    "description": "描述",
+    "users": "用户数",
+    "permissions": "权限",
+    "createdAt": "创建时间"
+  },
+  "form": {
+    "name": "角色名称",
+    "description": "描述",
+    "selectRole": "选择角色"
+  },
+  "messages": {
+    "createSuccess": "角色创建成功",
+    "updateSuccess": "角色更新成功",
+    "deleteSuccess": "角色删除成功",
+    "assignSuccess": "权限分配成功",
+    "confirmDelete": "确定要删除此角色吗？",
+    "updateSuccessTitle": "成功！",
+    "error": "权限更新失败：",
+    "networkError": "更新权限时发生网络错误"
+  },
+  "modals": {
+    "createRole": "创建新角色",
+    "editRole": "编辑角色",
+    "deleteRole": "删除角色",
+    "managePermissions": "管理权限"
+  },
+  "search": {
+    "placeholder": "搜索角色..."
+  },
+  "permissions": {
+    "title": "权限",
+    "selectAll": "全选",
+    "clearAll": "清除全部",
+    "noPermissions": "无可用权限"
+  },
+  "stats": {
+    "totalRoles": "角色总数",
+    "adminRoles": "管理员角色",
+    "managerRoles": "经理角色",
+    "userRoles": "用户角色"
+  },
+  "buttons": {
+    "create": "创建",
+    "edit": "编辑",
+    "delete": "删除",
+    "save": "保存",
+    "cancel": "取消",
+    "close": "关闭",
+    "updating": "更新中"
+  }
+}

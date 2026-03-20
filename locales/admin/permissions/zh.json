@@ -1,0 +1,52 @@
+{
+  "pageTitle": "权限管理",
+  "title": "权限管理",
+  "subtitle": "管理系统权限",
+  "createPermission": "创建权限",
+  "createNewPermission": "创建新权限",
+  "allSystemPermissions": "所有系统权限",
+  "permission": "权限",
+  "noPermissionsFound": "未找到权限",
+  "editPermission": "编辑权限",
+  "savePermission": "保存权限",
+  "table": {
+    "name": "权限名称",
+    "description": "描述",
+    "createdAt": "创建时间"
+  },
+  "form": {
+    "name": "权限名称",
+    "description": "描述",
+    "placeholderName": "例如：view_users",
+    "placeholderDescription": "此权限的描述"
+  },
+  "messages": {
+    "createSuccess": "权限创建成功",
+    "updateSuccess": "权限更新成功",
+    "deleteSuccess": "权限删除成功",
+    "confirmDelete": "确定要删除此权限吗？"
+  },
+  "modals": {
+    "createPermission": "创建新权限",
+    "editPermission": "编辑权限",
+    "deletePermission": "删除权限"
+  },
+  "search": {
+    "placeholder": "搜索权限..."
+  },
+  "stats": {
+    "total": "权限总数",
+    "systemPermissions": "系统权限",
+    "viewPermissions": "查看权限",
+    "actionPermissions": "操作权限",
+    "manageRolePermissions": "管理角色权限"
+  },
+  "buttons": {
+    "create": "创建",
+    "edit": "编辑",
+    "delete": "删除",
+    "save": "保存",
+    "cancel": "取消",
+    "close": "关闭"
+  }
+}

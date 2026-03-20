@@ -1,0 +1,113 @@
+{
+  "pageTitle": "队列管理",
+  "title": "队列管理",
+  "subtitle": "管理系统任务队列",
+  "nav": {
+    "dashboard": "仪表盘",
+    "queue": "队列管理"
+  },
+  "labels": {
+    "status": "状态",
+    "testJobDescription": "向工作进程发送测试任务",
+    "retryDescription": "重试最多10个失败任务",
+    "recentFailed": "最近失败的任务",
+    "noError": "无错误信息",
+    "viewAllFailed": "查看所有失败任务",
+    "noFailedJobs": "无失败任务",
+    "allJobs": "所有任务",
+    "jobs": "任务",
+    "total": "总计",
+    "failedJobs": "失败任务",
+    "noJobs": "无任务"
+  },
+  "filters": {
+    "all": "全部",
+    "pending": "待处理",
+    "processing": "处理中",
+    "completed": "已完成",
+    "failed": "失败"
+  },
+  "stats": {
+    "title": "队列统计",
+    "pending": "待处理",
+    "processing": "处理中",
+    "completed": "已完成",
+    "failed": "失败",
+    "retrying": "重试中",
+    "total": "任务总数",
+    "connectionStatus": "连接状态",
+    "connected": "已连接",
+    "disconnected": "已断开"
+  },
+  "tabs": {
+    "allJobs": "所有任务",
+    "failedJobs": "失败任务"
+  },
+  "table": {
+    "id": "ID",
+    "queue": "队列",
+    "status": "状态",
+    "attempts": "尝试次数",
+    "data": "数据",
+    "createdAt": "创建时间",
+    "startedAt": "开始时间",
+    "completedAt": "完成时间",
+    "error": "错误",
+    "nextRetry": "下次重试"
+  },
+  "status": {
+    "pending": "待处理",
+    "processing": "处理中",
+    "completed": "已完成",
+    "failed": "失败",
+    "retrying": "重试中"
+  },
+  "actions": {
+    "retry": "重试任务",
+    "retryAll": "重试全部",
+    "sendTest": "发送测试任务",
+    "confirmRetry": "确定要重试此任务吗？",
+    "confirmRetryAll": "确定要重试所有失败任务吗？"
+  },
+  "buttons": {
+    "refresh": "刷新",
+    "view": "查看",
+    "retry": "重试全部",
+    "retryFailed": "重试失败",
+    "retrySelected": "重试所选",
+    "sendTest": "发送测试",
+    "back": "返回队列统计"
+  },
+  "messages": {
+    "retrySuccess": "任务重试成功",
+    "retryAllSuccess": "所有失败任务重试成功",
+    "testSuccess": "测试任务发送成功",
+    "noJobs": "无任务",
+    "rabbitmqReady": "RabbitMQ已准备好处理任务",
+    "reconnecting": "正在重新连接",
+    "rabbitmqFailed": "RabbitMQ连接失败",
+    "allSuccess": "所有任务处理成功！",
+    "noJobsCreated": "尚未创建任何任务。",
+    "noStatusJobs": "未找到{status}的任务。"
+  },
+  "datatable": {
+    "search": "搜索任务：",
+    "lengthMenu": "显示 _MENU_ 条任务/页",
+    "info": "显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条任务",
+    "infoEmpty": "无任务",
+    "infoFiltered": "（从 _MAX_ 条任务中筛选）",
+    "processing": "处理中...",
+    "loadingRecords": "加载中...",
+    "zeroRecords": "无匹配任务",
+    "searchFailed": "搜索失败任务：",
+    "lengthMenuFailed": "显示 _MENU_ 条失败任务/页",
+    "infoFailed": "显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条失败任务",
+    "infoEmptyFailed": "无失败任务",
+    "infoFilteredFailed": "（从 _MAX_ 条失败任务中筛选）"
+  },
+  "modals": {
+    "jobDetails": "任务详情",
+    "jobData": "任务数据",
+    "errorDetails": "错误详情"
+  }
+}

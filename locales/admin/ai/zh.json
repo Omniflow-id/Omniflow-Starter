@@ -1,0 +1,214 @@
+{
+  "sidebar": {
+    "aiManagement": "AI管理",
+    "aiAnalysisSettings": "AI分析设置",
+    "aiModels": "AI模型",
+    "aiUseCases": "AI用例",
+    "aiChat": "AI对话"
+  },
+  "ai": {
+    "models": {
+      "title": "AI模型",
+      "breadcrumb": "AI模型管理",
+      "listTitle": "AI模型列表",
+      "addButton": "添加AI模型",
+      "addModalTitle": "添加AI模型",
+      "editModalTitle": "编辑AI模型",
+      "deleteConfirmTitle": "确认删除",
+      "deleteConfirmMessage": "确定要删除AI模型 <strong>{name}</strong> 吗？",
+      "deleteWarning": "此操作无法撤销。",
+      "fields": {
+        "name": "模型名称",
+        "apiUrl": "API URL",
+        "apiKey": "API密钥",
+        "modelVariant": "模型变体",
+        "status": "状态"
+      },
+      "placeholders": {
+        "name": "例如：GPT-4 Turbo",
+        "apiUrl": "https://api.openai.com/v1/chat/completions",
+        "apiKey": "sk-...",
+        "modelVariant": "gpt-4-turbo-preview"
+      },
+      "selectStatus": "选择状态",
+      "statusActive": "活跃",
+      "statusInactive": "非活跃",
+      "encryptedNote": "API密钥将在存储前加密。",
+      "keepKeyNote": "保留当前值以保持现有密钥。",
+      "tableHeaders": {
+        "id": "ID",
+        "name": "模型名称",
+        "apiUrl": "API URL",
+        "apiKey": "API密钥",
+        "modelVariant": "模型变体",
+        "status": "状态",
+        "actions": "操作"
+      },
+      "messages": {
+        "created": "AI模型创建成功",
+        "updated": "AI模型更新成功",
+        "deleted": "AI模型删除成功",
+        "error": {
+          "required": "所有字段必填",
+          "invalidUrl": "API URL格式无效",
+          "duplicateName": "模型名称已存在",
+          "notFound": "AI模型未找到",
+          "decryptionError": "API密钥解密失败"
+        }
+      }
+    },
+    "useCases": {
+      "title": "AI用例",
+      "breadcrumb": "AI用例管理",
+      "listTitle": "AI用例列表",
+      "addButton": "添加用例",
+      "addModalTitle": "添加AI用例",
+      "editModalTitle": "编辑AI用例",
+      "deleteConfirmTitle": "确认删除",
+      "deleteConfirmMessage": "确定要删除AI用例 <strong>{name}</strong> 吗？",
+      "deleteWarning": "此操作无法撤销。",
+      "fields": {
+        "name": "用例名称",
+        "description": "描述",
+        "baseKnowledge": "基础知识",
+        "prompt": "系统提示",
+        "allowedRoles": "允许的角色",
+        "status": "状态"
+      },
+      "placeholders": {
+        "name": "例如：HR政策助手",
+        "description": "关于此用例的简要描述",
+        "baseKnowledge": "AI将使用的基础知识（公司规则、政策等）",
+        "prompt": "AI响应方式的指示"
+      },
+      "selectStatus": "选择状态",
+      "statusActive": "活跃",
+      "statusInactive": "非活跃",
+      "tableHeaders": {
+        "id": "ID",
+        "name": "名称",
+        "description": "描述",
+        "roles": "角色",
+        "status": "状态",
+        "actions": "操作"
+      },
+      "messages": {
+        "created": "AI用例创建成功",
+        "updated": "AI用例更新成功",
+        "deleted": "AI用例删除成功",
+        "error": {
+          "required": "名称、描述、提示和状态必填",
+          "duplicateName": "用例名称已存在",
+          "notFound": "AI用例未找到"
+        }
+      }
+    },
+    "analysisSettings": {
+      "title": "AI分析设置",
+      "breadcrumb": "AI分析设置",
+      "currentConfig": "当前配置",
+      "updateSettings": "更新设置",
+      "updateDescription": "选择不同的AI模型或调整参数",
+      "info": {
+        "title": "信息",
+        "aboutTitle": "关于AI分析设置",
+        "description": "此配置决定用于所有分析功能的AI模型：",
+        "features": [
+          "AI屏幕阅读器分析",
+          "系统数据分析",
+          "系统推荐",
+          "以及其他AI功能"
+        ],
+        "tip": "对此设置的更改将立即对新分析请求生效。无需重启服务器！"
+      },
+      "fields": {
+        "selectedModel": "AI模型",
+        "description": "描述",
+        "maxTokens": "最大令牌数",
+        "temperature": "温度",
+        "modelName": "模型名称",
+        "modelVariant": "模型变体",
+        "apiUrl": "API URL",
+        "lastUpdated": "最后更新",
+        "params": "参数",
+        "selectModel": "-- 选择AI模型 --"
+      },
+      "placeholders": {
+        "description": "例如：GPT-4生产设置"
+      },
+      "helpText": {
+        "maxTokens": "AI响应的最大令牌数",
+        "temperature": "AI响应随机性（0.0 - 2.0，默认：0.10）"
+      },
+      "loading": "加载设置中...",
+      "noSettings": "尚无活动设置。请创建新设置。",
+      "buttons": {
+        "update": "更新设置",
+        "updating": "更新中..."
+      },
+      "messages": {
+        "updated": "设置更新成功！",
+        "error": {
+          "loadFailed": "加载设置失败",
+          "updateFailed": "更新设置失败",
+          "modelRequired": "必须选择AI模型",
+          "modelNotAvailable": "所选AI模型不可用"
+        }
+      }
+    },
+    "chat": {
+      "title": "AI对话",
+      "breadcrumb": "AI对话",
+      "welcomeTitle": "欢迎使用AI对话",
+      "welcomeSubtitle": "选择对话或开始新聊天以开始",
+      "conversations": "对话",
+      "newChat": "新建",
+      "searchPlaceholder": "搜索...",
+      "noResults": "无结果",
+      "startNewChat": "开始新对话",
+      "newChatModalTitle": "开始新对话",
+      "you": "您",
+      "assistant": "AI助手",
+      "default": "默认",
+      "general": "通用",
+      "fields": {
+        "useCase": "AI用例",
+        "model": "AI模型",
+        "title": "对话标题（可选）"
+      },
+      "placeholders": {
+        "title": "输入对话标题"
+      },
+      "editTitle": "编辑对话标题",
+      "editTitleModalTitle": "编辑对话标题",
+      "inputPlaceholder": "输入您的消息...",
+      "sendButton": "发送",
+      "stopButton": "停止",
+      "keyboardHint": "按 <strong>Enter</strong> 发送 • <strong>Shift + Enter</strong> 换行",
+      "generatingResponse": "生成响应中...",
+      "regeneratingResponse": "重新生成响应中...",
+      "error": {
+        "response": "生成响应失败",
+        "notFound": "未找到对话",
+        "useCaseRequired": "必须选择用例",
+        "modelRequired": "必须选择AI模型",
+        "titleRequired": "标题不能为空",
+        "messageEmpty": "消息不能为空"
+      },
+      "deleteConfirm": "确定要删除此对话吗？",
+      "actions": {
+        "save": "保存",
+        "saveRegenerate": "保存并重新生成",
+        "cancel": "取消",
+        "delete": "删除"
+      },
+      "messages": {
+        "created": "对话创建成功",
+        "titleUpdated": "标题更新成功",
+        "deleted": "对话删除成功",
+        "messageSaved": "消息已保存",
+        "messageDeleted": "消息已删除"
+      }
+    }
+  }
+}

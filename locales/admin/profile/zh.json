@@ -1,0 +1,63 @@
+{
+  "pageTitle": "我的资料",
+  "title": "我的资料",
+  "subtitle": "管理您的账户信息",
+  "breadcrumb": {
+    "dashboard": "仪表盘",
+    "profile": "用户资料"
+  },
+  "sections": {
+    "profile": {
+      "title": "资料",
+      "activeAccount": "活跃账户",
+      "inactiveAccount": "非活跃账户",
+      "memberSince": "注册时间"
+    },
+    "info": {
+      "title": "账户信息",
+      "personalInfo": "个人信息",
+      "fullName": "全名",
+      "username": "用户名",
+      "email": "邮箱地址",
+      "notProvided": "未提供",
+      "copyEmail": "复制邮箱",
+      "accountStatus": "账户状态",
+      "accountId": "账户ID",
+      "role": "角色",
+      "status": "状态",
+      "memberSince": "注册时间"
+    },
+    "quickActions": {
+      "title": "快捷操作",
+      "changePassword": "更改密码",
+      "editProfile": "编辑资料",
+      "logout": "登出",
+      "updateComingSoon": "资料更新功能即将推出！",
+      "securityNote": "您的账户受基于会话的身份验证保护。24小时无活动后将结束会话。"
+    }
+  },
+  "changePassword": {
+    "pageTitle": "更改密码",
+    "cardTitle": "更改您的密码",
+    "backToProfile": "返回资料",
+    "currentPassword": "当前密码",
+    "newPassword": "新密码",
+    "confirmPassword": "确认密码",
+    "passwordHelp": "密码必须至少8个字符，包含大写、小写、数字和符号。",
+    "submit": "更改密码",
+    "cancel": "取消",
+    "securityTips": {
+      "title": "密码安全提示",
+      "length": "至少使用8个字符",
+      "case": "使用大写和小写字母",
+      "special": "添加数字和特殊字符",
+      "common": "避免使用常见词或个人信息",
+      "reuse": "不要使用旧密码"
+    }
+  },
+  "toast": {
+    "title": "已复制！",
+    "message": "邮箱已复制到剪贴板",
+    "fail": "复制邮箱失败"
+  }
+}

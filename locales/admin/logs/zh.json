@@ -1,0 +1,91 @@
+{
+  "pageTitle": "活动日志",
+  "title": "企业活动日志",
+  "subtitle": "系统和用户活动日志",
+  "breadcrumb": {
+    "dashboard": "仪表盘",
+    "logs": "活动日志"
+  },
+  "filters": {
+    "title": "筛选",
+    "activityType": "活动类型",
+    "allTypes": "所有类型",
+    "actionType": "操作类型",
+    "allActions": "所有操作",
+    "status": "状态",
+    "allStatus": "所有状态",
+    "user": "用户",
+    "allUsers": "所有用户",
+    "limit": "限制"
+  },
+  "table": {
+    "id": "ID",
+    "type": "类型",
+    "action": "操作",
+    "status": "状态",
+    "user": "用户",
+    "activity": "活动",
+    "time": "时间",
+    "details": "详情",
+    "records": "条记录"
+  },
+  "status": {
+    "success": "成功",
+    "failure": "失败",
+    "warning": "警告",
+    "info": "信息"
+  },
+  "messages": {
+    "noLogs": "暂无活动日志",
+    "exportSuccess": "日志导出成功",
+    "filterReset": "筛选器已重置",
+    "noLogsFound": "未找到日志",
+    "logDetailsNotFound": "未找到日志详情"
+  },
+  "modals": {
+    "viewDetails": "日志详情",
+    "close": "关闭",
+    "basicInfo": "基本信息",
+    "requestInfo": "请求信息",
+    "activity": "活动",
+    "userAgent": "用户代理",
+    "metadata": "元数据",
+    "systemInfo": "系统信息"
+  },
+  "buttons": {
+    "export": "导出CSV",
+    "resetFilters": "重置筛选",
+    "applyFilters": "应用筛选",
+    "downloadData": "下载数据",
+    "close": "关闭"
+  },
+  "search": {
+    "placeholder": "搜索日志...",
+    "searchLogs": "搜索日志："
+  },
+  "datatable": {
+    "search": "搜索日志：",
+    "lengthMenu": "显示 _MENU_ 条日志/页",
+    "info": "显示第 _START_ 至 _END_ 条，共 _TOTAL_ 条日志",
+    "infoEmpty": "暂无日志",
+    "infoFiltered": "（从 _MAX_ 条日志中筛选）",
+    "processing": "处理中...",
+    "loadingRecords": "加载中...",
+    "zeroRecords": "无匹配日志"
+  },
+  "labels": {
+    "activityType": "活动类型",
+    "actionType": "操作类型",
+    "resourceType": "资源类型",
+    "resourceId": "资源ID",
+    "requestId": "请求ID",
+    "errorCode": "错误代码",
+    "ipAddress": "IP地址",
+    "method": "方法",
+    "url": "URL",
+    "device": "设备",
+    "email": "邮箱",
+    "loading": "加载中...",
+    "downloadStarted": "下载已开始！请检查您的下载文件夹。"
+  }
+}

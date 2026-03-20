@@ -1,0 +1,142 @@
+{
+  "hero": {
+    "subheading": "引领您数字化转型的尖端数字解决方案",
+    "description": "我们带来技术创新，优化工作流程，提高效率，推动您的业务在数字时代增长。",
+    "primaryCta": "我们的服务",
+    "secondaryCta": "联系我们"
+  },
+  "about": {
+    "title": "关于 ",
+    "subtitle": "构建更美好的数字未来",
+    "innovation": {
+      "title": "创新",
+      "description": "提供符合时代发展和现代行业需求的前沿技术解决方案。"
+    },
+    "collaboration": {
+      "title": "协作",
+      "description": "与客户建立战略伙伴关系，通过个性化方法实现共同的业务目标。"
+    },
+    "growth": {
+      "title": "增长",
+      "description": "专注于可衡量和可持续的成果，推动长期业务增长。"
+    }
+  },
+  "services": {
+    "title": "我们的服务",
+    "subtitle": "满足您数字需求的综合解决方案",
+    "appDevelopment": {
+      "title": "应用开发",
+      "description": "构建符合您业务需求的响应式、可扩展、用户友好的Web和移动应用。",
+      "items": {
+        "web": "Web应用开发",
+        "mobile": "移动应用开发",
+        "api": "API集成",
+        "database": "数据库设计"
+      }
+    },
+    "automation": {
+      "title": "业务流程自动化",
+      "description": "通过减少手动工作并提高效率的自动化系统优化工作流程。",
+      "items": {
+        "workflow": "工作流自动化",
+        "document": "文档管理",
+        "reporting": "报告系统",
+        "integration": "集成解决方案"
+      }
+    },
+    "bi": {
+      "title": "商业智能",
+      "description": "将数据转化为可操作的洞察，以实现更好的业务决策。",
+      "items": {
+        "analytics": "数据分析",
+        "dashboard": "仪表盘开发",
+        "monitoring": "性能监控",
+        "predictive": "预测分析"
+      }
+    },
+    "consulting": {
+      "title": "IT咨询",
+      "description": "为数字化转型和技术基础设施优化提供战略指导。",
+      "items": {
+        "digital": "数字化转型",
+        "architecture": "系统架构",
+        "security": "安全评估",
+        "roadmap": "技术路线图"
+      }
+    }
+  },
+  "features": {
+    "title": "我们的优势",
+    "subtitle": "使我们与众不同的特点",
+    "delivery": {
+      "title": "准时交付",
+      "description": "承诺按约定的时间表完成项目"
+    },
+    "quality": {
+      "title": "质量保证",
+      "description": "严格测试和质量保证的高标准"
+    },
+    "support": {
+      "title": "全天候支持",
+      "description": "随时准备为您提供帮助的支持团队"
+    },
+    "price": {
+      "title": "有竞争力的价格",
+      "description": "符合您预算的优质解决方案"
+    }
+  },
+  "whyChooseUs": {
+    "title": "为什么选择 ",
+    "subtitle": "使我们与众不同的优势",
+    "timing": {
+      "title": "准时交付",
+      "description": "承诺按约定的时间表完成项目"
+    },
+    "quality": {
+      "title": "质量保证",
+      "description": "严格测试和质量保证的高标准"
+    },
+    "support": {
+      "title": "全天候支持",
+      "description": "随时准备为您提供帮助的支持团队"
+    },
+    "pricing": {
+      "title": "有竞争力的价格",
+      "description": "符合您预算的优质解决方案"
+    }
+  },
+  "buttons": {
+    "contactUs": "联系我们",
+    "ourServices": "我们的服务",
+    "startConsultation": "开始咨询"
+  },
+  "nav": {
+    "contact": "联系我们"
+  },
+  "form": {
+    "email": "邮箱",
+    "phone": "电话"
+  },
+  "labels": {
+    "address": "地址"
+  },
+  "common": {
+    "actions": {
+      "viewMore": "查看更多"
+    }
+  },
+  "contact": {
+    "title": "联系我们",
+    "subtitle": "让我们讨论您的业务数字需求",
+    "email": "邮箱",
+    "phone": "电话",
+    "address": "地址",
+    "website": "网站",
+    "cta": "联系我们"
+  },
+  "cta": {
+    "title": "准备好开始数字化转型了吗？",
+    "subtitle": "加入数百家已信任 的公司",
+    "button": "开始免费咨询"
+  }
+}

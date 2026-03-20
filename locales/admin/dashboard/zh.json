@@ -1,0 +1,82 @@
+{
+  "pageTitle": "管理面板",
+  "brand": {
+    "name": "Omniflow"
+  },
+  "nav": {
+    "dashboard": "仪表盘",
+    "profile": "个人资料",
+    "module": "模块",
+    "overview": "概览",
+    "submodule": "子模块",
+    "users": "用户管理",
+    "permissions": "权限",
+    "allPermissions": "所有权限",
+    "roles": "角色与权限",
+    "logs": "日志",
+    "cache": "缓存",
+    "queue": "队列",
+    "statistics": "统计",
+    "allJobs": "所有任务",
+    "failedJobs": "失败任务",
+    "loggedInAs": "登录为"
+  },
+  "greeting": "欢迎",
+  "welcome": "使用 Omniflow 管理面板",
+  "dashboard": {
+    "title": "仪表盘",
+    "subtitle": "系统活动概览",
+    "overview": "概览",
+    "quickStats": "快速统计",
+    "recentActivity": "最近活动",
+    "systemStatus": "系统状态"
+  },
+  "stats": {
+    "totalUsers": "用户总数",
+    "activeUsers": "活跃用户",
+    "totalLogs": "日志总数",
+    "todayLogs": "今日日志",
+    "cacheHitRate": "缓存命中率",
+    "queueJobs": "队列任务"
+  },
+  "table": {
+    "id": "ID",
+    "actions": "操作",
+    "status": "状态",
+    "createdAt": "创建时间",
+    "updatedAt": "更新时间"
+  },
+  "buttons": {
+    "viewAll": "查看全部",
+    "refresh": "刷新",
+    "export": "导出",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "create": "创建",
+    "search": "搜索",
+    "filter": "筛选"
+  },
+  "messages": {
+    "loading": "加载中...",
+    "noData": "暂无数据",
+    "success": "成功",
+    "error": "发生错误",
+    "confirmDelete": "确定要删除吗？",
+    "saved": "数据保存成功",
+    "deleted": "数据删除成功",
+    "updated": "数据更新成功"
+  },
+  "overview": {
+    "pageTitle": "概览页面",
+    "welcome": "欢迎来到概览"
+  },
+  "submodule": {
+    "pageTitle": "子模块页面",
+    "welcome": "欢迎来到子模块"
+  },
+  "footer": {
+    "copyright": "© 2025 Omniflow Starter. 保留所有权利。"
+  }
+}

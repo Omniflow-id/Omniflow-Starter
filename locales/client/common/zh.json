@@ -1,0 +1,44 @@
+{
+  "common": {
+    "appName": "Omniflow Starter",
+    "loading": "加载中...",
+    "error": "发生错误",
+    "success": "成功",
+    "save": "保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "edit": "编辑",
+    "create": "创建",
+    "search": "搜索",
+    "filter": "筛选",
+    "reset": "重置",
+    "confirm": "确认",
+    "yes": "是",
+    "no": "否",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "submit": "提交",
+    "close": "关闭",
+    "viewMore": "查看更多",
+    "viewLess": "收起"
+  },
+  "errors": {
+    "notFound": "页面未找到",
+    "unauthorized": "未授权 - 请登录",
+    "forbidden": "禁止访问",
+    "serverError": "服务器错误",
+    "validationError": "验证错误",
+    "networkError": "网络连接断开"
+  },
+  "session": {
+    "title": "会话即将结束",
+    "message": "您的会话将在 {seconds} 秒后结束。",
+    "extend": "保持登录",
+    "logout": "立即登出"
+  },
+  "language": {
+    "switch": "切换语言",
+    "current": "当前语言"
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "pageTitle": "缓存管理",
+  "title": "缓存管理",
+  "subtitle": "管理系统缓存",
+  "breadcrumb": {
+    "dashboard": "仪表盘",
+    "cache": "缓存管理"
+  },
+  "labels": {
+    "host": "主机",
+    "database": "数据库",
+    "status": "状态",
+    "defaultTTL": "默认TTL",
+    "keyPrefix": "键前缀",
+    "patternPlaceholder": "admin:users:*, user:*, logs:*",
+    "patternExample": "模式（例如：user:*）",
+    "wildcardInfo": "使用*作为通配符（例如：admin:* 匹配所有admin键）",
+    "cacheKeys": "缓存键",
+    "performanceTesting": "性能测试",
+    "testDescription": "测试缓存读写性能",
+    "realtimeStats": "实时统计",
+    "flushDescription": "清除所有缓存数据"
+  },
+  "stats": {
+    "title": "缓存统计",
+    "totalKeys": "键总数",
+    "memoryUsage": "内存使用",
+    "connected": "已连接",
+    "disconnected": "已断开",
+    "enabled": "已启用并运行"
+  },
+  "test": {
+    "title": "缓存测试",
+    "description": "通过读写操作测试缓存性能",
+    "setValue": "设置值",
+    "getValue": "获取值",
+    "deleteValue": "删除值",
+    "result": "结果",
+    "duration": "耗时",
+    "source": "来源",
+    "cacheHit": "缓存命中",
+    "cacheMiss": "缓存未命中",
+    "benchmark": "运行基准测试"
+  },
+  "health": {
+    "title": "健康检查",
+    "status": "状态",
+    "latency": "延迟",
+    "healthy": "健康",
+    "unhealthy": "不健康"
+  },
+  "actions": {
+    "flush": "清除所有缓存",
+    "invalidate": "使模式失效",
+    "confirmFlush": "确定要清除所有缓存吗？",
+    "confirmInvalidate": "确定要使此模式失效吗？"
+  },
+  "buttons": {
+    "refresh": "刷新",
+    "flush": "清除",
+    "test": "测试",
+    "cancel": "取消",
+    "confirm": "确认",
+    "invalidate": "使失效"
+  },
+  "modals": {
+    "confirmAction": "确认操作",
+    "confirmMessage": "确定要继续吗？"
+  },
+  "messages": {
+    "flushSuccess": "缓存清除成功",
+    "flushError": "缓存清除失败",
+    "invalidateSuccess": "模式使失效成功",
+    "invalidateError": "模式使失效失败",
+    "testSuccess": "测试成功",
+    "benchmarkSuccess": "基准测试完成",
+    "redisUnavailable": "Redis不可用。使用数据库回退。",
+    "cacheStatsUnavailable": "缓存统计不可用",
+    "keysWillAppear": "缓存键将显示在这里",
+    "clickRefresh": "点击刷新以加载现有缓存键",
+    "realtimeReady": "实时统计已就绪",
+    "clickRefreshStats": "点击刷新按钮加载当前缓存统计"
+  }
+}

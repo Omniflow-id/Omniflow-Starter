@@ -1,0 +1,42 @@
+{
+  "pageTitle": "管理员登录",
+  "title": "管理员登录",
+  "subtitle": "进入管理面板",
+  "email": "邮箱",
+  "password": "密码",
+  "rememberMe": "记住我",
+  "forgotPassword": "忘记密码？",
+  "loginButton": "登录",
+  "login": "登录",
+  "logout": "登出",
+  "registerLabel": "注册",
+  "labels": {
+    "emailAddress": "邮箱地址",
+    "emailPlaceholder": "name@example.com",
+    "loading": "加载中...",
+    "loggingIn": "登录中..."
+  },
+  "footer": {
+    "backToHome": "返回首页",
+    "needAccount": "需要账户？请联系管理员"
+  },
+  "messages": {
+    "loginSuccess": "登录成功",
+    "loginSuccessDev": "登录成功！（开发模式）",
+    "loginSuccessOtpBypass": "登录成功！（开发模式 - OTP已绕过）",
+    "loginError": "邮箱或密码错误",
+    "logoutSuccess": "登出成功",
+    "sessionExpired": "您的会话已过期，请重新登录",
+    "accountInactive": "您的账户未激活，请联系管理员",
+    "2faRequired": "需要2FA验证",
+    "2faInvalid": "OTP代码无效",
+    "otpSent": "OTP已生成。邮件正在发送中 - 请检查您的收件箱并在下方输入OTP代码。"
+  },
+  "register": {
+    "title": "注册新管理员",
+    "subtitle": "创建新的管理员账户",
+    "confirmPassword": "确认密码",
+    "registerButton": "注册",
+    "alreadyHaveAccount": "已有账户？"
+  }
+}

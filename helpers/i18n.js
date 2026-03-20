@@ -28,6 +28,13 @@ const LANGUAGE_OPTIONS = {
     ariaLabel: "Ganti bahasa situs ke Bahasa Indonesia",
     flag: "🇮🇩",
   },
+  zh: {
+    code: "zh",
+    shortLabel: "ZH",
+    name: "中文",
+    ariaLabel: "切换网站语言到中文",
+    flag: "🇨🇳",
+  },
 };
 
 const DEFAULT_LANG = "id"; // Default to Indonesian

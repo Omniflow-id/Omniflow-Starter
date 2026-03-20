@@ -1,0 +1,41 @@
+{
+  "400": {
+    "title": "无效请求",
+    "message": "您发送的数据不符合预期格式",
+    "pageTitle": "错误请求"
+  },
+  "401": {
+    "title": "未经授权",
+    "message": "您需要登录才能访问此页面",
+    "pageTitle": "未经授权",
+    "login": "登录",
+    "home": "首页"
+  },
+  "403": {
+    "title": "禁止访问",
+    "message": "您没有权限访问此页面",
+    "pageTitle": "禁止访问"
+  },
+  "404": {
+    "title": "哎呀！找不到您要的页面",
+    "message": "您要查找的页面不存在或已被移动",
+    "pageTitle": "页面未找到"
+  },
+  "429": {
+    "title": "请求过多",
+    "message": "您已达到请求限制。请稍等片刻后再试。",
+    "pageTitle": "请求过多"
+  },
+  "500": {
+    "title": "服务器发生错误",
+    "message": "抱歉，服务器发生错误。请稍后再试。",
+    "pageTitle": "内部服务器错误",
+    "adminInfo": "管理员信息",
+    "errorLogged": "错误已记录并带有时间戳"
+  },
+  "common": {
+    "back": "返回",
+    "dashboard": "仪表盘",
+    "rightsReserved": "保留所有权利。"
+  }
+}

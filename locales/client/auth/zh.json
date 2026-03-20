@@ -1,0 +1,49 @@
+{
+  "pageTitle": "身份验证",
+  "login": {
+    "title": "登录",
+    "subtitle": "登录到您的账户",
+    "email": "邮箱",
+    "password": "密码",
+    "rememberMe": "记住我",
+    "forgotPassword": "忘记密码？",
+    "button": "登录",
+    "noAccount": "还没有账户？",
+    "registerLink": "立即注册"
+  },
+  "register": {
+    "title": "注册",
+    "subtitle": "创建新账户",
+    "name": "全名",
+    "email": "邮箱",
+    "password": "密码",
+    "confirmPassword": "确认密码",
+    "button": "注册",
+    "hasAccount": "已有账户？",
+    "loginLink": "登录"
+  },
+  "forgotPassword": {
+    "title": "忘记密码",
+    "subtitle": "我们将向您的邮箱发送重置链接",
+    "email": "邮箱",
+    "button": "发送重置链接",
+    "backToLogin": "返回登录",
+    "success": "重置链接已发送到您的邮箱"
+  },
+  "resetPassword": {
+    "title": "重置密码",
+    "subtitle": "输入您的新密码",
+    "password": "新密码",
+    "confirmPassword": "确认密码",
+    "button": "重置密码",
+    "success": "密码重置成功"
+  },
+  "messages": {
+    "loginSuccess": "登录成功",
+    "loginError": "邮箱或密码错误",
+    "registerSuccess": "注册成功",
+    "registerError": "注册失败",
+    "logoutSuccess": "登出成功",
+    "sessionExpired": "您的会话已结束"
+  }
+}
