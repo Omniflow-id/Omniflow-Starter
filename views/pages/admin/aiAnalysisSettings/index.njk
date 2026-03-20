@@ -8,19 +8,7 @@
         <li class="breadcrumb-item active">{{ t('ai.analysisSettings.breadcrumb') }}</li>
     </ol>
 
-    {% if success_msg and success_msg.length > 0 %}
-    <div class="alert alert-success alert-dismissible fade show" role="alert">
-        {{ success_msg }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    {% endif %}
-
-    {% if error_msg and error_msg.length > 0 %}
-    <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        {{ error_msg }}
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-    {% endif %}
+    {% include "components/alert_flash_message.njk" %}
 
     <div class="card mb-4">
         <div class="card-header">
@@ -30,13 +18,13 @@
         <div class="card-body">
             <div id="loading" class="text-center">
                 <div class="spinner-border" role="status">
-                    <span class="visually-hidden">{{ t('common.loading') or 'Loading...' }}</span>
+                    <span class="visually-hidden">{{ t('common.status.loading') }}</span>
                 </div>
                 <p class="mt-2">{{ t('ai.analysisSettings.loading') }}</p>
             </div>
 
             <div id="error" class="alert alert-danger" style="display: none;">
-                <strong>{{ t('common.error') or 'Error!' }}</strong> <span id="error-message"></span>
+                <strong>{{ t('common.messages.errorOccurred') }}</strong> <span id="error-message"></span>
             </div>
 
             <div id="settings-content" style="display: none;">
@@ -54,7 +42,7 @@
                             <div class="mb-3">
                                 <label for="selected_model_id" class="form-label">{{ t('ai.analysisSettings.fields.selectedModel') }} <span class="text-danger">*</span></label>
                                 <select class="form-select" id="selected_model_id" name="selected_model_id" required>
-                                    <option value="">{{ t('common.loading') or 'Loading...' }}</option>
+                                    <option value="">{{ t('common.status.loading') }}</option>
                                 </select>
                                 <div class="form-text">{{ t('ai.analysisSettings.fields.selectedModel') }}</div>
                             </div>
@@ -112,7 +100,7 @@
 
             <div class="alert alert-info">
                 <i class="fas fa-lightbulb me-2"></i>
-                <strong>{{ t('common.tip') or 'Tip:' }}</strong> {{ t('ai.analysisSettings.info.tip') }}
+                <strong>{{ t('common.messages.pleaseWait') }}</strong> {{ t('ai.analysisSettings.info.tip') }}
             </div>
         </div>
     </div>

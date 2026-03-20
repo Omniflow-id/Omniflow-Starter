@@ -18,7 +18,7 @@ const { generateTokens } = require("@middlewares/jwtAuth");
 
 const indexAPI = (_req, res) => {
   res.status(200).json({
-    message: "Success fetching the API",
+    message: res.locals.t("common.messages.apiFetched"),
     success: true,
     data: null,
   });
@@ -28,7 +28,7 @@ const loginAPI = asyncHandler(async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    throw new ValidationError("Email and password are required");
+    throw new ValidationError(res.locals.t("common.errors.emailPasswordRequired"));
   }
 
   const [users] = await db.query("SELECT * FROM users WHERE email = ?", [
@@ -36,14 +36,14 @@ const loginAPI = asyncHandler(async (req, res) => {
   ]);
 
   if (users.length === 0) {
-    throw new AuthenticationError("Invalid email or password");
+    throw new AuthenticationError(res.locals.t("common.errors.invalidEmailOrPassword"));
   }
 
   const user = users[0];
   const isPasswordValid = await bcrypt.compare(password, user.password_hash);
 
   if (!isPasswordValid) {
-    throw new AuthenticationError("Invalid email or password");
+    throw new AuthenticationError(res.locals.t("common.errors.invalidEmailOrPassword"));
   }
 
   const payload = {
@@ -89,7 +89,7 @@ const loginAPI = asyncHandler(async (req, res) => {
   });
 
   res.status(200).json({
-    message: "Login successful",
+    message: res.locals.t("common.messages.loginSuccessful"),
     success: true,
     data: {
       user: payload,
@@ -111,7 +111,7 @@ const refreshTokenAPI = asyncHandler(async (req, res) => {
   const { accessToken, refreshToken } = generateTokens(payload);
 
   res.status(200).json({
-    message: "Token refreshed successfully",
+    message: res.locals.t("common.messages.tokenRefreshed"),
     success: true,
     data: {
       accessToken,
@@ -122,7 +122,7 @@ const refreshTokenAPI = asyncHandler(async (req, res) => {
 
 const protectedAPI = (req, res) => {
   res.status(200).json({
-    message: "This is a protected API endpoint",
+    message: res.locals.t("common.messages.protectedEndpoint"),
     success: true,
     data: {
       user: req.user,
@@ -173,7 +173,7 @@ const healthAPI = asyncHandler(async (_req, res) => {
 
   // Return appropriate status code
   res.status(isHealthy ? 200 : 503).json({
-    message: `System is ${healthData.status}`,
+    message: res.locals.t("common.messages.operationSuccess"),
     success: isHealthy,
     data: healthData,
   });

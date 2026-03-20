@@ -61,7 +61,7 @@ const centralizedErrorHandler = async (err, req, res, _next) => {
   // Handle specific error types
   if (err.name === "ValidationError" || err.name === "CastError") {
     statusCode = 400;
-    message = "Invalid input data";
+    message = err.message || "Invalid input data";
     isOperational = true;
   }
 

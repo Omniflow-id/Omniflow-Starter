@@ -40,18 +40,18 @@ const login = asyncHandler(async (req, res) => {
 
   // Input validation with custom errors
   if (!email || !password) {
-    throw new ValidationError("Email and password are required");
+    throw new ValidationError("messages.emailPasswordRequired");
   }
 
   // Email format validation
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    throw new ValidationError("Please provide a valid email address");
+    throw new ValidationError("messages.validEmailRequired");
   }
 
   // Basic password length check (detailed validation only for new passwords)
   if (password.length < 8) {
-    throw new ValidationError("Password must be at least 8 characters long");
+    throw new ValidationError("messages.passwordMinLength");
   }
 
   let userRows;
@@ -98,7 +98,7 @@ const login = asyncHandler(async (req, res) => {
       level: LOG_LEVELS.WARN,
     });
 
-    throw new AuthenticationError("Invalid email or password");
+    throw new AuthenticationError("messages.loginError");
   }
 
   const user = userRows[0];
@@ -138,9 +138,7 @@ const login = asyncHandler(async (req, res) => {
       level: LOG_LEVELS.WARN,
     });
 
-    throw new AuthenticationError(
-      "Your account has been deactivated. Please contact administrator."
-    );
+    throw new AuthenticationError("messages.accountDeactivatedContactAdmin");
   }
 
   const isValid = await bcrypt.compare(password, user.password_hash);
@@ -180,7 +178,7 @@ const login = asyncHandler(async (req, res) => {
       level: LOG_LEVELS.WARN,
     });
 
-    throw new AuthenticationError("Invalid email or password");
+    throw new AuthenticationError("messages.loginError");
   }
 
   // Check if 2FA bypass is enabled for development
@@ -331,7 +329,9 @@ const login = asyncHandler(async (req, res) => {
     return; // Response already sent
   } catch (otpError) {
     console.error("❌ [2FA] OTP generation/sending failed:", otpError.message);
-    throw new AuthenticationError("Failed to generate OTP. Please try again.");
+    throw new AuthenticationError(
+      `${t("common.messages.errorOccurred")}: ${otpError.message}`
+    );
   }
 });
 

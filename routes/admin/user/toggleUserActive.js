@@ -20,7 +20,7 @@ const toggleUserActive = async (req, res) => {
   try {
     // Check if trying to deactivate own account
     if (parseInt(userId, 10) === req.session.user.id) {
-      req.flash("error", "Cannot deactivate your own account");
+      req.flash("error", "messages.cannotDeactivateOwnAccount");
       return res.redirect("/admin/user/index");
     }
 
@@ -31,7 +31,7 @@ const toggleUserActive = async (req, res) => {
     );
 
     if (users.length === 0) {
-      req.flash("error", "User not found");
+      req.flash("error", "messages.userNotFound");
       return res.redirect("/admin/user/index");
     }
 
@@ -97,7 +97,14 @@ const toggleUserActive = async (req, res) => {
 
     req.flash(
       "success",
-      `User ${targetUser.username} has been ${newStatus ? "activated" : "deactivated"} successfully`
+      res.locals.t("messages.toggleStatusSuccessNamed", {
+        username: targetUser.username,
+        status: res.locals.t(
+          newStatus
+            ? "messages.toggleStatusActive"
+            : "messages.toggleStatusInactive"
+        ),
+      })
     );
     res.redirect("/admin/user/index");
   } catch (error) {
@@ -127,7 +134,7 @@ const toggleUserActive = async (req, res) => {
       req,
       level: LOG_LEVELS.ERROR,
     });
-    req.flash("error", "An error occurred while updating user status");
+    req.flash("error", "messages.toggleStatusError");
     res.redirect("/admin/user/index");
   }
 };

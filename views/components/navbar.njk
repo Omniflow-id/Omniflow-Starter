@@ -2,9 +2,9 @@
   <a class="navbar-brand ps-3 d-flex align-items-center" href="/">
     {{ appName.replace(' (Dev)', '') }}
     {% if isDevelopment %}
-      <span class="badge bg-warning text-dark ms-2 small">DEV</span>
+      <span class="badge bg-warning text-dark ms-2 small">{{ t('common.badges.dev') }}</span>
     {% elif isProduction %}
-      <span class="badge bg-success text-white ms-2 small">PRODUCTION</span>
+      <span class="badge bg-success text-white ms-2 small">{{ t('common.badges.production') }}</span>
     {% endif %}
   </a>
   <button
@@ -65,7 +65,7 @@
         class="dropdown-menu dropdown-menu-end"
         aria-labelledby="navbarDropdown"
       >
-        <li><form action="/admin/logout" method="post">{{ csrfField() | safe }}<button class="dropdown-item" type="submit">Keluar</button></form></li>
+        <li><form action="/admin/logout" method="post">{{ csrfField() | safe }}<button class="dropdown-item" type="submit">{{ t('common.actions.logout') }}</button></form></li>
       </ul>
     </li>
   </ul>

@@ -4,9 +4,9 @@
       <div class="text-muted d-flex align-items-center justify-content-center">
         Hak Cipta &copy; {{ appName.replace(' (Dev)', '') }} {{ currentYear }}
         {% if isDevelopment %}
-          <span class="badge bg-warning text-dark ms-2 small">DEVELOPMENT MODE</span>
+          <span class="badge bg-warning text-dark ms-2 small">{{ t('common.badges.developmentMode') }}</span>
         {% elif isProduction %}
-          <span class="badge bg-success text-white ms-2 small">PRODUCTION MODE</span>
+          <span class="badge bg-success text-white ms-2 small">{{ t('common.badges.productionMode') }}</span>
         {% endif %}
       </div>
     </div>

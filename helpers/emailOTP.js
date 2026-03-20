@@ -125,15 +125,15 @@ Thank you for using ${process.env.APP_NAME || "Omniflow Starter"}!
 // Verify OTP
 const verifyOTP = (inputOTP, sessionOTP, expiresAt) => {
   if (!inputOTP || !sessionOTP) {
-    return { valid: false, reason: "OTP is required" };
+    return { valid: false, reason: "messages.otpCodeRequired" };
   }
 
   if (Date.now() > expiresAt) {
-    return { valid: false, reason: "OTP has expired" };
+    return { valid: false, reason: "messages.otpExpiredLoginAgain" };
   }
 
   if (inputOTP.toString() !== sessionOTP.toString()) {
-    return { valid: false, reason: "Invalid OTP code" };
+    return { valid: false, reason: "messages.2faInvalid" };
   }
 
   return { valid: true };

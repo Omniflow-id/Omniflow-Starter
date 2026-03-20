@@ -21,7 +21,7 @@ const updateRolePermissions = asyncHandler(async (req, res) => {
     [roleId]
   );
   if (roles.length === 0) {
-    throw new ValidationError("Role not found");
+    throw new ValidationError(res.locals.t("common.errors.roleNotFound"));
   }
 
   const roleName = roles[0].role_name;
@@ -38,7 +38,7 @@ const updateRolePermissions = asyncHandler(async (req, res) => {
     );
 
     if (validPermissions.length !== permissionIds.length) {
-      throw new ValidationError("Some permissions are invalid");
+      throw new ValidationError(res.locals.t("common.errors.invalidPermissions"));
     }
   }
 
@@ -118,7 +118,7 @@ const updateRolePermissions = asyncHandler(async (req, res) => {
 
     res.json({
       success: true,
-      message: `Successfully updated permissions for role: ${roleName}`,
+      message: res.locals.t("common.messages.rolePermissionsUpdated"),
       data: {
         roleId: roleId,
         roleName: roleName,

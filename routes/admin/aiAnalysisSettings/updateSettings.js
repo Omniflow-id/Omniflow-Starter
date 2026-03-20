@@ -15,7 +15,10 @@ const updateSettings = asyncHandler(async (req, res) => {
 
   // Validate required fields
   if (!selected_model_id) {
-    throw new ValidationError("Model AI harus dipilih", "selected_model_id");
+    throw new ValidationError(
+      res.locals.t("common.errors.aiModelSelectionRequired"),
+      "selected_model_id"
+    );
   }
 
   // Check if model exists and is active
@@ -26,7 +29,7 @@ const updateSettings = asyncHandler(async (req, res) => {
 
   if (model.length === 0) {
     throw new ValidationError(
-      "Model AI yang dipilih tidak tersedia",
+      res.locals.t("common.errors.aiSelectedModelUnavailable"),
       "selected_model_id"
     );
   }
@@ -35,7 +38,7 @@ const updateSettings = asyncHandler(async (req, res) => {
   const tempValue = parseFloat(temperature);
   if (Number.isNaN(tempValue) || tempValue < 0 || tempValue > 2) {
     throw new ValidationError(
-      "Temperature harus antara 0.0 dan 2.0",
+      res.locals.t("common.errors.aiTemperatureRange"),
       "temperature"
     );
   }
@@ -44,7 +47,7 @@ const updateSettings = asyncHandler(async (req, res) => {
   const tokensValue = parseInt(max_tokens, 10);
   if (Number.isNaN(tokensValue) || tokensValue < 1 || tokensValue > 32768) {
     throw new ValidationError(
-      "Max tokens harus antara 1 dan 32768",
+      res.locals.t("common.errors.aiMaxTokensRange"),
       "max_tokens"
     );
   }
@@ -109,7 +112,7 @@ const updateSettings = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Pengaturan berhasil diperbarui!",
+    message: res.locals.t("common.messages.aiSettingsUpdated"),
   });
 });
 

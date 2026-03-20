@@ -85,6 +85,13 @@
     "url": "URL",
     "device": "Device",
     "email": "Email",
+    "application": "Aplikasi",
+    "environment": "Environment",
+    "server": "Server",
+    "processId": "Process ID",
+    "memoryUsage": "Penggunaan Memori",
+    "duration": "Durasi",
+    "dataShort": "Data",
     "loading": "Memuat...",
     "downloadStarted": "Download dimulai! Cek folder downloads Anda."
   }

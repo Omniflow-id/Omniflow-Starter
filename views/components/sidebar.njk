@@ -2,7 +2,7 @@
   <div class="sb-sidenav-menu">
     <div class="nav">
       {# === Core Section === #}
-      <div class="sb-sidenav-menu-heading">Core</div>
+      <div class="sb-sidenav-menu-heading">{{ t('sidebar.core') }}</div>
 
       {# Dashboard - exact match #}
       <a
@@ -57,7 +57,7 @@
 
       {# === Administration Section === #}
       {% if hasAnyPermission(permissions, ['view_users', 'manage_users', 'view_permissions', 'manage_permissions', 'view_roles', 'manage_roles']) %}
-      <div class="sb-sidenav-menu-heading">Administration</div>
+      <div class="sb-sidenav-menu-heading">{{ t('sidebar.administration') }}</div>
       {% endif %}
 
       {% if hasAnyPermission(permissions, ['view_users', 'manage_users']) %}
@@ -133,7 +133,7 @@
 
       {# === System Section === #}
       {% if hasAnyPermission(permissions, ['manage_cache', 'manage_queue', 'view_logs']) %}
-      <div class="sb-sidenav-menu-heading">System</div>
+      <div class="sb-sidenav-menu-heading">{{ t('sidebar.system') }}</div>
       {% endif %}
 
       {% if hasPermission(permissions, 'manage_cache') %}

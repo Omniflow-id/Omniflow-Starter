@@ -16,7 +16,7 @@ const editMessageOnly = asyncHandler(async (req, res) => {
   const { message_id, new_content } = req.body;
 
   if (!message_id || !new_content) {
-    throw new ValidationError("Message ID and new content are required");
+    throw new ValidationError(res.locals.t("common.errors.aiMessageContentRequired"));
   }
 
   const userId = req.session.user.id;
@@ -31,12 +31,12 @@ const editMessageOnly = asyncHandler(async (req, res) => {
   );
 
   if (message.length === 0) {
-    throw new ValidationError("Message not found");
+    throw new ValidationError(res.locals.t("common.errors.aiMessageNotFound"));
   }
 
   // Verify user owns this conversation
   if (message[0].user_id !== userId) {
-    throw new ValidationError("Unauthorized to edit this message");
+    throw new ValidationError(res.locals.t("common.errors.aiMessageEditUnauthorized"));
   }
 
   // Update the message
@@ -69,7 +69,7 @@ const editMessageOnly = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Message updated successfully",
+    message: res.locals.t("common.messages.aiMessageUpdated"),
   });
 });
 
@@ -81,7 +81,7 @@ const editMessageStream = asyncHandler(async (req, res) => {
   const { message_id, new_content } = req.body;
 
   if (!message_id || !new_content) {
-    throw new ValidationError("Message ID and new content are required");
+    throw new ValidationError(res.locals.t("common.errors.aiMessageContentRequired"));
   }
 
   const userId = req.session.user.id;
@@ -97,14 +97,14 @@ const editMessageStream = asyncHandler(async (req, res) => {
   );
 
   if (message.length === 0) {
-    throw new ValidationError("Message not found");
+    throw new ValidationError(res.locals.t("common.errors.aiMessageNotFound"));
   }
 
   const msg = message[0];
 
   // Verify user owns this conversation
   if (msg.user_id !== userId) {
-    throw new ValidationError("Unauthorized to edit this message");
+    throw new ValidationError(res.locals.t("common.errors.aiMessageEditUnauthorized"));
   }
 
   // Get model and use case info
@@ -370,7 +370,10 @@ const editMessageStream = asyncHandler(async (req, res) => {
 
     if (isResponseWritable()) {
       res.write(
-        `data: ${JSON.stringify({ type: "error", error: "AI service error" })}\n\n`
+        `data: ${JSON.stringify({
+          type: "error",
+          error: res.locals.t("ai.chat.messages.serverError"),
+        })}\n\n`
       );
     }
 
@@ -401,12 +404,12 @@ const deleteMessage = asyncHandler(async (req, res) => {
   );
 
   if (message.length === 0) {
-    throw new ValidationError("Message not found");
+    throw new ValidationError(res.locals.t("common.errors.aiMessageNotFound"));
   }
 
   // Verify user owns this conversation
   if (message[0].user_id !== userId) {
-    throw new ValidationError("Unauthorized to delete this message");
+    throw new ValidationError(res.locals.t("common.errors.aiMessageDeleteUnauthorized"));
   }
 
   const msg = message[0];
@@ -438,7 +441,7 @@ const deleteMessage = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Message deleted successfully",
+    message: res.locals.t("common.messages.aiMessageDeleted"),
   });
 });
 

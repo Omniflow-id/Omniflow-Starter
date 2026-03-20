@@ -173,7 +173,7 @@ const getFailedJobsDataTable = asyncHandler(async (req, res) => {
           data-bs-toggle="collapse"
           data-bs-target="#job-data-${job.id}"
         >
-          <i class="fas fa-eye"></i> View
+          <i class="fas fa-eye"></i> ${res.locals.t("common.actions.view")}
         </button>
         <div class="collapse mt-2" id="job-data-${job.id}">
           <pre class="small bg-light p-2 rounded"><code>${formattedData}</code></pre>
@@ -187,7 +187,7 @@ const getFailedJobsDataTable = asyncHandler(async (req, res) => {
           data-bs-toggle="collapse"
           data-bs-target="#job-error-${job.id}"
         >
-          <i class="fas fa-exclamation-triangle"></i> Error
+          <i class="fas fa-exclamation-triangle"></i> ${res.locals.t("common.messages.errorOccurred")}
         </button>
         <div class="collapse mt-2" id="job-error-${job.id}">
           <div class="alert alert-danger small mb-0">
@@ -248,7 +248,7 @@ const getFailedJobsDataTable = asyncHandler(async (req, res) => {
       recordsTotal: 0,
       recordsFiltered: 0,
       data: [],
-      error: "Failed to load data",
+      error: res.locals.t("common.messages.operationFailed"),
     });
   }
 });

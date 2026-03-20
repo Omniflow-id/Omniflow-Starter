@@ -18,7 +18,7 @@ const deletePermission = asyncHandler(async (req, res) => {
     [permissionId]
   );
   if (!permission) {
-    throw new ValidationError("Permission not found");
+    throw new ValidationError(res.locals.t("common.errors.permissionNotFound"));
   }
 
   // Soft delete the permission
@@ -39,10 +39,7 @@ const deletePermission = asyncHandler(async (req, res) => {
 
   await invalidateCache("permissions:*", true);
 
-  req.flash(
-    "success",
-    `Permission '${permission.permission_name}' deleted successfully.`
-  );
+  req.flash("success", "common.messages.permissionDeleted");
   res.redirect("/admin/permissions");
 });
 

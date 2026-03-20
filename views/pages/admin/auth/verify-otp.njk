@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ currentLang or 'en' }}">
   <head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -7,9 +7,9 @@
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
-    <meta name="description" content="Verify OTP - {{ appName }} Admin" />
+    <meta name="description" content="{{ t('verifyOtp.pageTitle') }} - {{ appName }} Admin" />
     <meta name="author" content="" />
-    <title>Verify OTP - {{ appName }}</title>
+    <title>{{ title }} - {{ appName }}</title>
     <link rel="icon" href="/img/logomark-blue.svg" />
     <link href="/css/styles.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/js/all.min.js" integrity="sha512-uKQ39gEGiyUJl4AI6L+ekBdGKpGw4xJ55+xyJG7YFlJokPNYegn9KwQ3P8A7aFQAUtUsAQHep+d/lrGqrbPIDQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
@@ -77,9 +77,9 @@
           <div class="mb-3">
             <i class="fas fa-shield-alt text-primary" style="font-size: 3rem;"></i>
           </div>
-          <h2 class="card-title fw-bold text-primary mb-2">Verify Your Identity</h2>
+          <h2 class="card-title fw-bold text-primary mb-2">{{ t('verifyOtp.title') }}</h2>
           <p class="text-muted">
-            We've sent a 6-digit OTP code to your email:
+            {{ t('verifyOtp.subtitle') }}
             <br><strong class="text-primary">{{ userEmail }}</strong>
           </p>
         </div>
@@ -90,8 +90,8 @@
           <div class="d-flex align-items-center">
             <i class="fas fa-code me-2"></i>
             <div>
-              <strong>Development Mode</strong><br>
-              <small>You can enter any 6-digit code or leave empty to bypass OTP verification.</small>
+              <strong>{{ t('verifyOtp.developmentMode') }}</strong><br>
+              <small>{{ t('verifyOtp.developmentHelp') }}</small>
             </div>
           </div>
         </div>
@@ -102,7 +102,7 @@
           <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center">
               <i class="fas fa-clock me-2"></i>
-              <span>Code expires in:</span>
+              <span>{{ t('verifyOtp.codeExpiresIn') }}</span>
             </div>
             <div class="fw-bold text-primary">
               <span id="countdown">{{ timeRemaining }}</span>s
@@ -120,14 +120,14 @@
           <div class="mb-4">
             <label for="otp" class="form-label fw-semibold">
               <i class="fas fa-key me-1"></i>
-              Enter OTP Code
+              {{ t('verifyOtp.enterOtpCode') }}
             </label>
             <input 
               type="text" 
               class="form-control form-control-lg text-center fw-bold" 
               id="otp" 
               name="otp" 
-              placeholder="000000"
+              placeholder="{{ t('verifyOtp.otpPlaceholder') }}"
               maxlength="6"
               pattern="[0-9]{6}"
               style="letter-spacing: 0.5rem; font-size: 1.5rem;"
@@ -137,10 +137,10 @@
             <div class="form-text text-center">
               {% if isDevelopment %}
                 <i class="fas fa-info-circle me-1"></i>
-                Development mode: Any 6-digit code works, or leave empty to bypass
+                {{ t('verifyOtp.developmentInputHelp') }}
               {% else %}
                 <i class="fas fa-info-circle me-1"></i>
-                Please check your email inbox and spam folder
+                {{ t('verifyOtp.inputHelp') }}
               {% endif %}
             </div>
           </div>
@@ -148,27 +148,27 @@
           <div class="d-grid gap-2 mb-4">
             <button type="submit" class="btn btn-primary btn-lg shadow-sm" id="verifyBtn">
               <i class="fas fa-check-circle me-2"></i>
-              Verify OTP
+              {{ t('verifyOtp.verifyButton') }}
             </button>
           </div>
         </form>
 
         <!-- Resend/Back Links -->
         <div class="text-center">
-          <p class="text-muted mb-2">Didn't receive the code?</p>
+          <p class="text-muted mb-2">{{ t('verifyOtp.didNotReceive') }}</p>
           <div class="d-flex gap-3 justify-content-center flex-wrap">
             <a href="/admin/login" class="btn btn-outline-secondary btn-sm">
               <i class="fas fa-arrow-left me-1"></i>
-              Back to Login
+              {{ t('verifyOtp.backToLogin') }}
             </a>
             <button type="button" class="btn btn-outline-primary btn-sm" id="resendBtn" disabled>
               <i class="fas fa-paper-plane me-1"></i>
-              Resend Code
+              {{ t('verifyOtp.resendCode') }}
             </button>
           </div>
           <small class="text-muted d-block mt-2">
             <i class="fas fa-info-circle me-1"></i>
-            Resend available after code expires
+            {{ t('verifyOtp.resendAvailableAfterExpiry') }}
           </small>
         </div>
 
@@ -178,8 +178,7 @@
             <i class="fas fa-shield-alt text-success me-2 mt-1"></i>
             <div>
               <small class="text-muted">
-                <strong>Security Notice:</strong> This OTP is valid for 5 minutes and can only be used once. 
-                If you didn't request this login, please contact your administrator immediately.
+                <strong>{{ t('verifyOtp.securityNoticeTitle') }}</strong> {{ t('verifyOtp.securityNoticeBody') }}
               </small>
             </div>
           </div>
@@ -270,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Handle form submission
   otpForm.addEventListener('submit', function(e) {
     verifyBtn.classList.add('btn-loading');
-    verifyBtn.innerHTML = '<span class="visually-hidden">Verifying...</span>';
+    verifyBtn.innerHTML = '<span class="visually-hidden">{{ t("verifyOtp.verifying") }}</span>';
   });
   
   // Countdown timer
@@ -303,13 +302,13 @@ document.addEventListener('DOMContentLoaded', function() {
       // Disable form and show expiry message
       otpInput.disabled = true;
       verifyBtn.disabled = true;
-      verifyBtn.innerHTML = '<i class="fas fa-times-circle me-2"></i>Code Expired';
+      verifyBtn.innerHTML = '<i class="fas fa-times-circle me-2"></i>{{ t("verifyOtp.codeExpiredButton") }}';
       verifyBtn.classList.remove('btn-primary');
       verifyBtn.classList.add('btn-danger');
       
       // Enable resend button
       resendBtn.disabled = false;
-      resendBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i>Login Again';
+      resendBtn.innerHTML = '<i class="fas fa-paper-plane me-1"></i>{{ t("verifyOtp.loginAgain") }}';
       resendBtn.onclick = () => window.location.href = '/admin/login';
       
       // Show alert
@@ -319,8 +318,8 @@ document.addEventListener('DOMContentLoaded', function() {
         <div class="d-flex align-items-center">
           <i class="fas fa-exclamation-triangle me-2"></i>
           <div>
-            <strong>Code Expired!</strong><br>
-            <small>Please return to the login page to request a new OTP code.</small>
+            <strong>{{ t('verifyOtp.expiredTitle') }}</strong><br>
+            <small>{{ t('verifyOtp.expiredHelp') }}</small>
           </div>
         </div>
       `;

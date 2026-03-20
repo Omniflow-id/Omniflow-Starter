@@ -199,13 +199,13 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
       const statusBadge = (() => {
         switch (job.status) {
           case "pending":
-            return '<span class="badge bg-warning">Pending</span>';
+            return `<span class="badge bg-warning">${res.locals.t("common.status.pending")}</span>`;
           case "processing":
-            return '<span class="badge bg-info">Processing</span>';
+            return `<span class="badge bg-info">${res.locals.t("common.status.processing")}</span>`;
           case "completed":
-            return '<span class="badge bg-success">Completed</span>';
+            return `<span class="badge bg-success">${res.locals.t("common.status.completed")}</span>`;
           case "failed":
-            return '<span class="badge bg-danger">Failed</span>';
+            return `<span class="badge bg-danger">${res.locals.t("common.status.failed")}</span>`;
           default:
             return `<span class="badge bg-secondary">${job.status}</span>`;
         }
@@ -217,7 +217,7 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
           data-bs-toggle="collapse"
           data-bs-target="#job-data-${job.id}"
         >
-          <i class="fas fa-eye"></i> View
+          <i class="fas fa-eye"></i> ${res.locals.t("common.actions.view")}
         </button>
         <div class="collapse mt-2" id="job-data-${job.id}">
           <pre class="small bg-light p-2 rounded"><code>${formattedData}</code></pre>
@@ -237,7 +237,7 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
           data-bs-toggle="collapse"
           data-bs-target="#job-error-${job.id}"
         >
-          <i class="fas fa-exclamation-triangle"></i> Error
+          <i class="fas fa-exclamation-triangle"></i> ${res.locals.t("common.messages.errorOccurred")}
         </button>
         <div class="collapse mt-2" id="job-error-${job.id}">
           <div class="alert alert-danger small mb-0">
@@ -291,7 +291,7 @@ const getAllJobsDataTable = asyncHandler(async (req, res) => {
       recordsTotal: 0,
       recordsFiltered: 0,
       data: [],
-      error: "Failed to load data",
+      error: res.locals.t("common.messages.operationFailed"),
     });
   }
 });

@@ -15,7 +15,7 @@ const updatePermission = asyncHandler(async (req, res) => {
   const { permission_name, description } = req.body;
 
   if (!permission_name) {
-    throw new ValidationError("Permission name is required");
+    throw new ValidationError(res.locals.t("common.errors.permissionNameRequired"));
   }
 
   const [[permissionBefore]] = await db.query(
@@ -23,7 +23,7 @@ const updatePermission = asyncHandler(async (req, res) => {
     [permissionId]
   );
   if (!permissionBefore) {
-    throw new ValidationError("Permission not found");
+    throw new ValidationError(res.locals.t("common.errors.permissionNotFound"));
   }
 
   await db.query(
@@ -47,7 +47,7 @@ const updatePermission = asyncHandler(async (req, res) => {
 
   await invalidateCache("permissions:*", true);
 
-  req.flash("success", `Permission '${permission_name}' updated successfully.`);
+  req.flash("success", "common.messages.permissionUpdated");
   res.redirect("/admin/permissions");
 });
 

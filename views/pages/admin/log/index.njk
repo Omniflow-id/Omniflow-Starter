@@ -102,7 +102,7 @@
               >
                 <i class="fas fa-file-excel me-1"></i>
                 <span class="d-none d-sm-inline">{{ t('buttons.downloadData') }}</span>
-                <span class="d-inline d-sm-none">Data</span>
+                <span class="d-inline d-sm-none">{{ t('labels.dataShort') }}</span>
               </button>
             </div>
           </div>
@@ -140,7 +140,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="logDetailModalLabel">{{ t('modals.viewDetails') }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('common.actions.close') }}"></button>
       </div>
       <div class="modal-body" id="logDetailContent">
         <div class="text-center">
@@ -275,13 +275,13 @@
           <div class="col-12">
             <h6><i class="fas fa-server me-2"></i>{{ t("modals.systemInfo") }}</h6>
             <div class="row">
-              <div class="col-md-3"><strong>Application:</strong> ${log.application || '-'}</div>
-              <div class="col-md-3"><strong>Environment:</strong> ${log.environment || '-'}</div>
-              <div class="col-md-3"><strong>Server:</strong> ${log.server_instance || '-'}</div>
-              <div class="col-md-3"><strong>Process ID:</strong> ${log.process_id || '-'}</div>
+              <div class="col-md-3"><strong>{{ t("labels.application") }}:</strong> ${log.application || '-'}</div>
+              <div class="col-md-3"><strong>{{ t("labels.environment") }}:</strong> ${log.environment || '-'}</div>
+              <div class="col-md-3"><strong>{{ t("labels.server") }}:</strong> ${log.server_instance || '-'}</div>
+              <div class="col-md-3"><strong>{{ t("labels.processId") }}:</strong> ${log.process_id || '-'}</div>
             </div>
-            ${log.memory_usage_mb ? `<div class="mt-2"><strong>Memory Usage:</strong> ${log.memory_usage_mb} MB</div>` : ''}
-            ${log.duration_ms && log.duration_ms > 0 ? `<div class="mt-1"><strong>Duration:</strong> ${log.duration_ms} ms</div>` : ''}
+            ${log.memory_usage_mb ? `<div class="mt-2"><strong>{{ t("labels.memoryUsage") }}:</strong> ${log.memory_usage_mb} MB</div>` : ''}
+            ${log.duration_ms && log.duration_ms > 0 ? `<div class="mt-1"><strong>{{ t("labels.duration") }}:</strong> ${log.duration_ms} ms</div>` : ''}
           </div>
         </div>`;
 

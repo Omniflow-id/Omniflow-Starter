@@ -24,7 +24,7 @@
               >
                 <i class="fas fa-plus me-1"></i>
                 <span class="d-none d-sm-inline">{{ t('ai.useCases.addButton') }}</span>
-                <span class="d-inline d-sm-none">Add</span>
+                <span class="d-inline d-sm-none">{{ t('common.actions.create') }}</span>
               </button>
             </div>
           </div>
@@ -100,7 +100,7 @@
           type="button"
           class="btn-close"
           data-bs-dismiss="modal"
-          aria-label="Close"
+          aria-label="{{ t('common.actions.close') }}"
         ></button>
       </div>
       <form id="tambahForm" method="POST" action="/admin/ai_use_cases/create">
@@ -183,10 +183,10 @@
             class="btn btn-secondary"
             data-bs-dismiss="modal"
           >
-            Cancel
+            {{ t('common.actions.cancel') }}
           </button>
           <button type="submit" class="btn btn-primary" id="submitButton">
-            <span id="submitText">Save</span>
+            <span id="submitText">{{ t('common.actions.save') }}</span>
             <span
               id="loadingSpinner"
               class="spinner-border spinner-border-sm d-none"
@@ -216,26 +216,26 @@
           type="button"
           class="btn-close"
           data-bs-dismiss="modal"
-          aria-label="Close"
+          aria-label="{{ t('common.actions.close') }}"
         ></button>
       </div>
       <div class="modal-body">
-        <h6><strong>Name:</strong></h6>
+        <h6><strong>{{ t('ai.useCases.fields.name') }}:</strong></h6>
         <p id="view_name"></p>
 
-        <h6><strong>Description:</strong></h6>
+        <h6><strong>{{ t('ai.useCases.fields.description') }}:</strong></h6>
         <p id="view_description"></p>
 
-        <h6><strong>Base Knowledge:</strong></h6>
+        <h6><strong>{{ t('ai.useCases.fields.baseKnowledge') }}:</strong></h6>
         <pre id="view_base_knowledge" style="white-space: pre-wrap; background: #f5f5f5; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto;"></pre>
 
-        <h6><strong>System Prompt:</strong></h6>
+        <h6><strong>{{ t('ai.useCases.fields.prompt') }}:</strong></h6>
         <pre id="view_prompt" style="white-space: pre-wrap; background: #f5f5f5; padding: 10px; border-radius: 5px; max-height: 200px; overflow-y: auto;"></pre>
 
-        <h6><strong>Allowed Roles:</strong></h6>
+        <h6><strong>{{ t('ai.useCases.fields.allowedRoles') }}:</strong></h6>
         <p id="view_allowed_roles"></p>
 
-        <h6><strong>Status:</strong></h6>
+        <h6><strong>{{ t('ai.useCases.fields.status') }}:</strong></h6>
         <p id="view_status"></p>
       </div>
       <div class="modal-footer">
@@ -244,7 +244,7 @@
           class="btn btn-secondary"
           data-bs-dismiss="modal"
         >
-          Close
+          {{ t('common.actions.close') }}
         </button>
       </div>
     </div>
@@ -267,7 +267,7 @@
           type="button"
           class="btn-close"
           data-bs-dismiss="modal"
-          aria-label="Close"
+          aria-label="{{ t('common.actions.close') }}"
         ></button>
       </div>
       <form id="editForm" method="POST">
@@ -345,10 +345,10 @@
             class="btn btn-secondary"
             data-bs-dismiss="modal"
           >
-            Cancel
+            {{ t('common.actions.cancel') }}
           </button>
           <button type="submit" class="btn btn-primary" id="editSubmitButton">
-            <span id="editSubmitText">Update</span>
+            <span id="editSubmitText">{{ t('common.actions.update') }}</span>
             <span
               id="editLoadingSpinner"
               class="spinner-border spinner-border-sm d-none"
@@ -378,7 +378,7 @@
           type="button"
           class="btn-close"
           data-bs-dismiss="modal"
-          aria-label="Close"
+          aria-label="{{ t('common.actions.close') }}"
         ></button>
       </div>
       <div class="modal-body">
@@ -391,7 +391,7 @@
           class="btn btn-secondary"
           data-bs-dismiss="modal"
         >
-          Cancel
+          {{ t('common.actions.cancel') }}
         </button>
         <button
           type="button"
@@ -399,7 +399,7 @@
           id="confirmDeleteBtn"
           onclick="deleteUseCase()"
         >
-          Delete
+          {{ t('common.actions.delete') }}
         </button>
       </div>
     </div>
@@ -413,28 +413,28 @@
       responsive: true,
       pageLength: 25,
       language: {
-        search: "Search:",
-        lengthMenu: "Show _MENU_ entries",
-        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+        search: "{{ t('common.actions.search') }}:",
+        lengthMenu: "{{ t('common.status.showing') }} _MENU_ {{ t('common.status.entries') }}",
+        info: "{{ t('common.status.showing') }} _START_ {{ t('common.status.of') }} _END_ {{ t('common.status.of') }} _TOTAL_ {{ t('common.status.entries') }}",
         paginate: {
-          first: "First",
-          last: "Last",
-          next: "Next",
-          previous: "Previous"
+          first: "{{ t('common.actions.previous') }}",
+          last: "{{ t('common.actions.next') }}",
+          next: "{{ t('common.actions.next') }}",
+          previous: "{{ t('common.actions.previous') }}"
         }
       }
     });
 
     // Handle add form submission
     $('#tambahForm').submit(function() {
-      $('#submitText').text('Saving...');
+      $('#submitText').text("{{ t('ai.useCases.buttons.saving') }}");
       $('#loadingSpinner').removeClass('d-none');
       $('#submitButton').prop('disabled', true);
     });
 
     // Handle edit form submission
     $('#editForm').submit(function() {
-      $('#editSubmitText').text('Updating...');
+      $('#editSubmitText').text("{{ t('ai.useCases.buttons.updating') }}");
       $('#editLoadingSpinner').removeClass('d-none');
       $('#editSubmitButton').prop('disabled', true);
     });
@@ -471,12 +471,12 @@
   function viewUseCase(id, name, description, base_knowledge, prompt, allowed_roles, is_active) {
     document.getElementById('view_name').textContent = name;
     document.getElementById('view_description').textContent = description;
-    document.getElementById('view_base_knowledge').textContent = base_knowledge || '(None)';
-    document.getElementById('view_prompt').textContent = prompt || '(None)';
-    document.getElementById('view_allowed_roles').textContent = allowed_roles || 'All';
+    document.getElementById('view_base_knowledge').textContent = base_knowledge || '{{ t("common.status.noData") }}';
+    document.getElementById('view_prompt').textContent = prompt || '{{ t("common.status.noData") }}';
+    document.getElementById('view_allowed_roles').textContent = allowed_roles || '{{ t("common.status.noData") }}';
     document.getElementById('view_status').innerHTML = is_active
-      ? '<span class="badge bg-success">Active</span>'
-      : '<span class="badge bg-secondary">Inactive</span>';
+      ? '<span class="badge bg-success">{{ t("ai.useCases.statusActive") }}</span>'
+      : '<span class="badge bg-secondary">{{ t("ai.useCases.statusInactive") }}</span>';
 
     var viewModal = new bootstrap.Modal(document.getElementById('viewModal'));
     viewModal.show();

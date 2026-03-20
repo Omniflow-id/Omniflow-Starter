@@ -395,7 +395,7 @@
 
 <!-- AI Copilot Floating Action Button -->
 <div id="ai-copilot-fab">
-  <button class="btn-copilot" id="aiCopilotFabBtn" title="AI Copilot">
+  <button class="btn-copilot" id="aiCopilotFabBtn" title="{{ t('ai.copilot.title') }}">
     <i class="fa-solid fa-wand-magic-sparkles"></i>
   </button>
 </div>
@@ -407,38 +407,38 @@
       <div class="modal-header">
         <h5 class="modal-title" id="aiCopilotModalLabel">
           <i class="fa-solid fa-robot"></i>
-          AI Copilot
+          {{ t('ai.copilot.title') }}
         </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('common.actions.close') }}"></button>
       </div>
       <div class="modal-body">
-        <label class="ai-copilot-query-label">Pertanyaan (Opsional)</label>
-        <input type="text" class="form-control" id="aiCopilotQuery" placeholder="Tanyakan apa yang ingin Anda ketahui dari data ini...">
+        <label class="ai-copilot-query-label">{{ t('ai.copilot.queryLabel') }}</label>
+        <input type="text" class="form-control" id="aiCopilotQuery" placeholder="{{ t('ai.copilot.queryPlaceholder') }}">
         
         <div class="ai-copilot-actions">
           <button class="btn-analyze" id="aiCopilotAnalyzeBtn">
             <i class="fa-solid fa-wand-magic-sparkles"></i>
-            Analisis Layar
+            {{ t('ai.copilot.analyzeButton') }}
           </button>
           <button class="btn-stop" id="aiCopilotStopBtn" style="display: none;">
             <i class="fa-solid fa-stop"></i>
-            Berhenti
+            {{ t('ai.copilot.stopButton') }}
           </button>
         </div>
 
-        <label class="ai-copilot-result-label">Hasil Analisis</label>
+        <label class="ai-copilot-result-label">{{ t('ai.copilot.resultLabel') }}</label>
         <div id="aiCopilotResult">
           <div class="text-muted text-center py-4">
             <i class="fa-solid fa-lightbulb text-warning mb-2" style="font-size: 2rem;"></i>
-            <p class="mb-0">Klik "Analisis Layar" untuk memulai analisis konten halaman ini.</p>
+            <p class="mb-0">{{ t('ai.copilot.emptyState') }}</p>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn-secondary-ai" data-bs-dismiss="modal">Tutup</button>
+        <button type="button" class="btn-secondary-ai" data-bs-dismiss="modal">{{ t('ai.copilot.closeButton') }}</button>
         <button class="btn-copy" id="aiCopilotCopyBtn" style="display: none;">
           <i class="fa-solid fa-copy"></i>
-          Salin
+          {{ t('ai.copilot.copyButton') }}
         </button>
       </div>
     </div>
@@ -455,6 +455,13 @@
       this.typingQueue = [];
       this.isTyping = false;
       this.currentContent = '';
+      this.i18n = {
+        analyzing: '{{ t("ai.copilot.analyzing") }}',
+        loading: '{{ t("ai.copilot.loading") }}',
+        stopped: '{{ t("ai.copilot.stopped") }}',
+        error: '{{ t("ai.copilot.error") }}',
+        copiedButton: '{{ t("ai.copilot.copiedButton") }}'
+      };
     }
 
     init() {
@@ -648,7 +655,7 @@
       this.elements.resultDiv.innerHTML = `
         <div class="ai-copilot-loading">
           <div class="ai-copilot-spinner"></div>
-          <span>Menganalisis konten halaman...</span>
+          <span>${this.i18n.analyzing}</span>
         </div>
       `;
 
@@ -713,11 +720,11 @@
           this.elements.resultDiv.innerHTML = `
             <div class="text-muted text-center py-4">
               <i class="fa-solid fa-circle-stop text-secondary mb-2" style="font-size: 2rem;"></i>
-              <p class="mb-0">Analisis dihentikan.</p>
+              <p class="mb-0">${this.i18n.stopped}</p>
             </div>
           `;
         } else {
-          this.showError(error.message || 'Terjadi kesalahan saat menganalisis.');
+          this.showError(error.message || this.i18n.error);
         }
       } finally {
         this.isAnalyzing = false;
@@ -820,7 +827,7 @@
         
         // Visual feedback
         const originalText = this.elements.copyBtn.innerHTML;
-        this.elements.copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> Tersalin!';
+        this.elements.copyBtn.innerHTML = `<i class="fa-solid fa-check"></i> ${this.i18n.copiedButton}`;
         this.elements.copyBtn.style.background = 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)';
         
         setTimeout(() => {

@@ -126,7 +126,7 @@ const botProtectionLimiter = rateLimit({
     return res.status(429).json({
       success: false,
       error: {
-        message: "Suspicious activity detected. Access temporarily restricted.",
+        message: res.locals.t("common.errors.botProtectionTriggered"),
         code: "BOT_PROTECTION_TRIGGERED",
         timestamp: new Date().toISOString(),
       },
@@ -139,7 +139,7 @@ const bannedIPLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
   max: 1, // Only 1 request per hour for banned patterns
   message: {
-    error: "IP temporarily banned due to malicious activity.",
+    error: "common.errors.ipTemporarilyBanned",
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -185,10 +185,10 @@ const bannedIPLimiter = rateLimit({
     return res.status(429).json({
       success: false,
       error: {
-        message: "IP temporarily banned due to malicious activity.",
+        message: res.locals.t("common.errors.ipTemporarilyBanned"),
         code: "IP_BANNED",
         timestamp: new Date().toISOString(),
-        contact: "Please contact support if you believe this is an error.",
+        contact: res.locals.t("common.errors.contactSupportIfError"),
       },
     });
   },

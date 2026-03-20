@@ -54,7 +54,7 @@
             <a href="/admin/change-password" class="btn btn-primary">
                <i class="fas fa-key me-2"></i>{{ t('sections.quickActions.changePassword') }}
             </a>
-            <button class="btn btn-outline-secondary" onclick="alert('{{ t(\'sections.quickActions.updateComingSoon\') }}')">
+            <button class="btn btn-outline-secondary" onclick="alert('{{ t(\'messages.editProfileComingSoon\') }}')">
                <i class="fas fa-user-edit me-2"></i>{{ t('sections.quickActions.editProfile') }}
             </button>
              <a href="/admin/logout" class="btn btn-danger">
@@ -215,7 +215,7 @@
       <div class="toast-body">
          <i class="fas fa-check-circle me-2"></i>{{ t('toast.message') }}
       </div>
-      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="{{ t('common.actions.close') }}"></button>
     </div>
   </div>
 </div>

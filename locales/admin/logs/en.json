@@ -85,6 +85,13 @@
     "url": "URL",
     "device": "Device",
     "email": "Email",
+    "application": "Application",
+    "environment": "Environment",
+    "server": "Server",
+    "processId": "Process ID",
+    "memoryUsage": "Memory Usage",
+    "duration": "Duration",
+    "dataShort": "Data",
     "loading": "Loading...",
     "downloadStarted": "Download started! Check your downloads folder."
   }

@@ -1,6 +1,6 @@
-{% extends "layout/masterLayout.njk" %} {% block content %}
+{% extends "layout/masterLayout.njk" %} {% block title %}{{ pageTitle }}{% endblock %} {% block content %}
 <div class="container-fluid px-4">
-  <h1 class="mt-4">{{ pageTitle or 'User Management' }}</h1>
+  <h1 class="mt-4">{{ pageTitle }}</h1>
 
 
   <div class="row">
@@ -10,15 +10,15 @@
           <div
             class="d-flex flex-column flex-sm-row justify-content-between align-items-start align-items-sm-center gap-2"
           >
-            <span class="mb-2 mb-sm-0">{{ userList or 'User List' }}</span>
+            <span class="mb-2 mb-sm-0">{{ userList }}</span>
             <div class="d-flex flex-wrap gap-2">
               <button
                 class="btn btn-info btn-sm text-white"
                 id="btnDownloadData"
               >
                 <i class="fas fa-file-excel me-1"></i>
-                <span class="d-none d-sm-inline">{{ downloadData or 'Download Data' }}</span>
-                <span class="d-inline d-sm-none">Data</span>
+                <span class="d-none d-sm-inline">{{ downloadData }}</span>
+                <span class="d-inline d-sm-none">{{ t('common.actions.download') }}</span>
               </button>
               <button
                 class="btn btn-secondary btn-sm text-white"
@@ -27,13 +27,13 @@
                 data-bs-target="#uploadModal"
               >
                 <i class="fas fa-upload me-1"></i>
-                <span class="d-none d-sm-inline">{{ uploadDataUser or 'Upload Data User' }}</span>
-                <span class="d-inline d-sm-none">Upload</span>
+                <span class="d-none d-sm-inline">{{ uploadDataUser }}</span>
+                <span class="d-inline d-sm-none">{{ t('common.actions.upload') }}</span>
               </button>
               <button class="btn btn-success btn-sm" id="btnDownloadTemplate">
                 <i class="fas fa-download me-1"></i>
-                <span class="d-none d-sm-inline">{{ downloadTemplate or 'Download Template' }}</span>
-                <span class="d-inline d-sm-none">Template</span>
+                <span class="d-none d-sm-inline">{{ downloadTemplate }}</span>
+                <span class="d-inline d-sm-none">{{ t('common.actions.download') }}</span>
               </button>
               <button
                 class="btn btn-primary btn-sm"
@@ -42,8 +42,8 @@
                 data-bs-target="#tambahModal"
               >
                 <i class="fas fa-plus me-1"></i>
-                <span class="d-none d-sm-inline">{{ tambahUser or 'Add User' }}</span>
-                <span class="d-inline d-sm-none">{{ tambah or 'Add' }}</span>
+                <span class="d-none d-sm-inline">{{ tambahUser }}</span>
+                <span class="d-inline d-sm-none">{{ tambah }}</span>
               </button>
             </div>
           </div>
@@ -56,12 +56,12 @@
           >
             <thead>
               <tr>
-                <th>{{ table.id or 'ID' }}</th>
-                <th>{{ table.name or 'Name' }}</th>
-                <th>{{ table.email or 'Email' }}</th>
-                <th>{{ table.role or 'Role' }}</th>
-                <th>{{ table.status or 'Status' }}</th>
-                <th>{{ table.actions or 'Actions' }}</th>
+                <th>{{ table.id }}</th>
+                <th>{{ table.name }}</th>
+                <th>{{ table.email }}</th>
+                <th>{{ table.role }}</th>
+                <th>{{ table.status }}</th>
+                <th>{{ table.actions }}</th>
               </tr>
             </thead>
           </table>
@@ -82,12 +82,12 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="uploadModalLabel">{{ modals.importUsers or 'Import Users' }}</h5>
+        <h5 class="modal-title" id="uploadModalLabel">{{ modals.importUsers }}</h5>
         <button
           type="button"
           class="btn-close"
           data-bs-dismiss="modal"
-          aria-label="Close"
+          aria-label="{{ t('common.actions.close') }}"
         ></button>
       </div>
       <form
@@ -100,7 +100,7 @@
           {{ csrfField() | safe }}
           <div class="mb-3">
             <label for="fileUpload" class="form-label"
-              >{{ form.chooseFile or 'Choose file to upload:' }}</label
+              >{{ form.chooseFile }}</label
             >
             <input
               type="file"
@@ -118,10 +118,10 @@
             class="btn btn-secondary"
             data-bs-dismiss="modal"
           >
-            {{ buttons.cancel or 'Cancel' }}
+            {{ t('common.actions.cancel') }}
           </button>
           <button type="submit" class="btn btn-primary" form="uploadForm">
-            Upload
+            {{ t('common.actions.upload') }}
           </button>
         </div>
       </form>
@@ -140,55 +140,57 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="tambahModalLabel">{{ modals.createUser or 'Create User' }}</h5>
+        <h5 class="modal-title" id="tambahModalLabel">{{ modals.createUser }}</h5>
         <button
           type="button"
           class="btn-close"
           data-bs-dismiss="modal"
-          aria-label="Close"
+          aria-label="{{ t('common.actions.close') }}"
         ></button>
       </div>
       <form id="tambahForm" method="POST" action="/admin/user/create">
         <div class="modal-body">
           {{ csrfField() | safe }}
           <div class="mb-3">
-            <label for="username" class="form-label">{{ form.username or 'Username' }}:</label>
+            <label for="username" class="form-label">{{ form.username }}:</label>
             <input
               type="text"
               class="form-control"
               id="username"
               name="username"
+              placeholder="{{ form.username }}"
               required
             />
           </div>
           <div class="mb-3">
-            <label for="email" class="form-label">{{ form.email or 'Email' }}:</label>
+            <label for="email" class="form-label">{{ form.email }}:</label>
             <input
               type="email"
               class="form-control"
               id="email"
               name="email"
+              placeholder="{{ form.email }}"
               required
             />
           </div>
           <div class="mb-3">
-            <label for="full_name" class="form-label">{{ form.name or 'Full Name' }}:</label>
+            <label for="full_name" class="form-label">{{ form.name }}:</label>
             <input
               type="text"
               class="form-control"
               id="full_name"
               name="full_name"
-              placeholder="Contoh: John Smith"
+              placeholder="{{ labels.fullNamePlaceholder }}"
               required
             />
             <div class="form-text">
-              {{ messages.passwordGenerated or 'Password will be auto-generated' }}: FullName@12345?.
+              {{ messages.passwordAutoGenerated }}
             </div>
           </div>
           <div class="mb-3">
-            <label for="role" class="form-label">{{ form.role or 'Role' }}:</label>
+            <label for="role" class="form-label">{{ form.role }}:</label>
             <select class="form-control" id="role" name="role_id" required>
-              <option value="">{{ form.selectRole or 'Select Role' }}</option>
+              <option value="">{{ form.selectRole }}</option>
               {% for role in roles %}
               <option value="{{ role.role_id }}">{{ role.role_name }}</option>
               {% endfor %}
@@ -201,10 +203,10 @@
             class="btn btn-secondary"
             data-bs-dismiss="modal"
           >
-            {{ buttons.cancel or 'Cancel' }}
+            {{ t('common.actions.cancel') }}
           </button>
           <button type="submit" class="btn btn-primary" form="tambahForm">
-            {{ buttons.save or 'Save' }}
+            {{ t('common.actions.save') }}
           </button>
         </div>
       </form>
@@ -216,7 +218,7 @@
   document.getElementById("btnDownloadData").addEventListener("click", () => {
     window.location.href = "/admin/user/download";
     Toastify({
-      text: "{{ messages.downloadSuccess or 'Download successful!' }}",
+      text: "{{ messages.downloadSuccess }}",
       duration: 5000,
       close: true,
       gravity: "top",
@@ -262,14 +264,14 @@
       pageLength: 25,
       responsive: true,
       language: {
-        search: "{{ datatable.search or 'Search users:' }}",
-        lengthMenu: "{{ datatable.lengthMenu or 'Show _MENU_ users per page' }}",
-        info: "{{ datatable.info or 'Showing _START_ to _END_ of _TOTAL_ users' }}",
-        infoEmpty: "{{ datatable.infoEmpty or 'No users found' }}",
-        infoFiltered: "{{ datatable.infoFiltered or '(filtered from _MAX_ total users)' }}",
-        processing: "{{ datatable.processing or 'Processing...' }}",
-        loadingRecords: "{{ datatable.loadingRecords or 'Loading...' }}",
-        zeroRecords: "{{ datatable.zeroRecords or 'No matching records found' }}"
+        search: "{{ datatable.search }}",
+        lengthMenu: "{{ datatable.lengthMenu }}",
+        info: "{{ datatable.info }}",
+        infoEmpty: "{{ datatable.infoEmpty }}",
+        infoFiltered: "{{ datatable.infoFiltered }}",
+        processing: "{{ datatable.processing }}",
+        loadingRecords: "{{ datatable.loadingRecords }}",
+        zeroRecords: "{{ datatable.zeroRecords }}"
       }
     });
   });
@@ -277,7 +279,7 @@
   $("#btnDownloadTemplate").on("click", function () {
     window.location.href = "/admin/user/download-template";
     Toastify({
-      text: "{{ messages.downloadSuccess or 'Download successful!' }}",
+      text: "{{ messages.downloadSuccess }}",
       duration: 5000,
       close: true,
       gravity: "top",
@@ -294,9 +296,7 @@
   // Handle Delete User
   $(document).on('click', '.btn-delete-user', function() {
     const userId = $(this).data('id');
-    const username = $(this).data('username');
-
-    if (confirm("{{ messages.confirmDelete or 'Are you sure you want to delete this user?' }}")) {
+    if (confirm("{{ messages.confirmDelete }}")) {
       $.ajax({
         url: `/admin/user/delete/${userId}`,
         type: 'POST',
@@ -320,7 +320,7 @@
         },
         error: function(xhr) {
           const response = xhr.responseJSON;
-          alert(response ? response.message : "{{ messages.error or 'An error occurred' }}");
+          alert(response ? response.message : "{{ t('common.messages.errorOccurred') }}");
         }
       });
     }

@@ -12,8 +12,8 @@ const importCacheAPI = asyncHandler(async (req, res) => {
   if (!redis) {
     return res.status(503).json({
       success: false,
-      error: "Redis not available",
-      message: "Cache import requires Redis connection",
+      error: res.locals.t("common.errors.redisNotAvailable"),
+      message: res.locals.t("common.errors.cacheImportRequiresRedis"),
     });
   }
 
@@ -23,9 +23,8 @@ const importCacheAPI = asyncHandler(async (req, res) => {
     if (!data || !Array.isArray(data)) {
       return res.status(400).json({
         success: false,
-        error: "Invalid data format",
-        message:
-          "Expected an array of cache entries with key, value, and optional ttl",
+        error: res.locals.t("common.messages.invalidInput"),
+        message: res.locals.t("common.errors.cacheInvalidDataFormat"),
       });
     }
 
@@ -66,7 +65,7 @@ const importCacheAPI = asyncHandler(async (req, res) => {
 
     res.json({
       success: true,
-      message: `Cache import completed. ${importedCount} entries imported, ${skippedCount} skipped`,
+      message: res.locals.t("common.messages.cacheImportCompleted"),
       imported_count: importedCount,
       skipped_count: skippedCount,
       total_entries: data.length,
@@ -76,7 +75,7 @@ const importCacheAPI = asyncHandler(async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: "Import failed",
+      error: res.locals.t("common.messages.operationFailed"),
       message: error.message,
     });
   }

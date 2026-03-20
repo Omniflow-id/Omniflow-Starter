@@ -1,6 +1,6 @@
 {% extends "layout/clientMasterLayout.njk" %} {% block content %}
 <div class="lang-switcher" style="position: fixed; top: 30px; right: 30px; z-index: 1000;">
-  <div class="btn-group shadow-sm" role="group" aria-label="Language switcher">
+  <div class="btn-group shadow-sm" role="group" aria-label="{{ language.switch }}">
     {% for lang in languages %}
     <a
       href="{{ lang.href if lang.href else '#' }}"
@@ -179,7 +179,7 @@
               <i class="fas fa-check text-success me-2"></i>{{ services.automation.items.document or 'Document Management' }}
             </li>
             <li>
-              <i class="fas fa-check text-success me-2"></i>{{ services.automation.items.reporting or 'Reporting System' }}
+              <i class="fas fa-check text-success me-2"></i>{{ services.automation.items.reporting or 'Sistem Pelaporan' }}
             </li>
             <li>
               <i class="fas fa-check text-success me-2"></i>{{ services.automation.items.integration or 'Integration Solutions' }}
@@ -240,7 +240,7 @@
               <i class="fas fa-check text-success me-2"></i>{{ services.consulting.items.digital or 'Digital Transformation' }}
             </li>
             <li>
-              <i class="fas fa-check text-success me-2"></i>{{ services.consulting.items.architecture or 'System Architecture' }}
+              <i class="fas fa-check text-success me-2"></i>{{ services.consulting.items.architecture or 'Arsitektur Sistem' }}
             </li>
             <li>
               <i class="fas fa-check text-success me-2"></i>{{ services.consulting.items.security or 'Security Assessment' }}
@@ -354,7 +354,7 @@
                 </div>
                 <div>
                   <h5 class="fw-bold mb-1">{{ contact.email or 'Email' }}</h5>
-                  <p class="text-muted mb-0">info@omniflow.id</p>
+                  <p class="text-muted mb-0">{{ contact.details.emailValue }}</p>
                 </div>
               </div>
             </div>
@@ -368,7 +368,7 @@
                 </div>
                 <div>
                   <h5 class="fw-bold mb-1">{{ contact.phone or 'Telepon' }}</h5>
-                  <p class="text-muted mb-0">+62 821 2560 9413</p>
+                  <p class="text-muted mb-0">{{ contact.details.phoneValue }}</p>
                 </div>
               </div>
             </div>
@@ -382,7 +382,7 @@
                 </div>
                 <div>
                   <h5 class="fw-bold mb-1">{{ contact.address or 'Alamat' }}</h5>
-                  <p class="text-muted mb-0">Jakarta, Indonesia</p>
+                  <p class="text-muted mb-0">{{ contact.details.addressValue }}</p>
                 </div>
               </div>
             </div>
@@ -396,7 +396,7 @@
                 </div>
                 <div>
                   <h5 class="fw-bold mb-1">{{ contact.website or 'Website' }}</h5>
-                  <p class="text-muted mb-0">omniflow.id</p>
+                  <p class="text-muted mb-0">{{ contact.details.websiteValue }}</p>
                 </div>
               </div>
             </div>

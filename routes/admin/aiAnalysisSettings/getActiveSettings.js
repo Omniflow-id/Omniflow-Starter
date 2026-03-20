@@ -18,7 +18,7 @@ const getActiveSettings = asyncHandler(async (_req, res) => {
   if (settings.length === 0) {
     return res.status(404).json({
       success: false,
-      message: "Tidak ada pengaturan aktif. Silakan buat pengaturan baru.",
+      message: "ai.analysisSettings.noSettings",
     });
   }
 

@@ -80,7 +80,7 @@ const getAllAIModels = asyncHandler(async (_req, res) => {
   if (result.data.models.length === 0) {
     return res.status(404).json({
       success: false,
-      message: "No AI models found",
+      message: res.locals.t("common.messages.aiModelsNotFound"),
     });
   }
 
@@ -109,14 +109,14 @@ const createNewAIModel = asyncHandler(async (req, res) => {
     !model_variant ||
     is_active === undefined
   ) {
-    throw new ValidationError("All fields are required");
+    throw new ValidationError(res.locals.t("common.errors.allFieldsRequired"));
   }
 
   // Validate URL format
   try {
     new URL(api_url);
   } catch {
-    throw new ValidationError("Invalid API URL format");
+    throw new ValidationError(res.locals.t("common.errors.invalidApiUrl"));
   }
 
   // Check if model name already exists
@@ -126,7 +126,7 @@ const createNewAIModel = asyncHandler(async (req, res) => {
   );
 
   if (existingModel.length > 0) {
-    throw new ValidationError("Model name already exists");
+    throw new ValidationError(res.locals.t("common.errors.modelNameExists"));
   }
 
   // Encrypt API key before storing
@@ -164,7 +164,7 @@ const createNewAIModel = asyncHandler(async (req, res) => {
     req
   );
 
-  req.flash("success", "AI Model created successfully");
+  req.flash("success", "common.messages.aiModelCreated");
   res.redirect("/admin/ai_models");
 });
 
@@ -184,14 +184,14 @@ const updateAIModel = asyncHandler(async (req, res) => {
     !model_variant ||
     is_active === undefined
   ) {
-    throw new ValidationError("All fields are required");
+    throw new ValidationError(res.locals.t("common.errors.allFieldsRequired"));
   }
 
   // Validate URL format
   try {
     new URL(api_url);
   } catch {
-    throw new ValidationError("Invalid API URL format");
+    throw new ValidationError(res.locals.t("common.errors.invalidApiUrl"));
   }
 
   // Check if model exists
@@ -201,7 +201,7 @@ const updateAIModel = asyncHandler(async (req, res) => {
   );
 
   if (existingModel.length === 0) {
-    throw new ValidationError("AI Model not found");
+    throw new ValidationError(res.locals.t("common.errors.aiModelNotFound"));
   }
 
   // Check if model name already exists (excluding current model)
@@ -211,7 +211,7 @@ const updateAIModel = asyncHandler(async (req, res) => {
   );
 
   if (duplicateModel.length > 0) {
-    throw new ValidationError("Model name already exists");
+    throw new ValidationError(res.locals.t("common.errors.modelNameExists"));
   }
 
   const isActive = is_active === "1" || is_active === true;
@@ -241,7 +241,7 @@ const updateAIModel = asyncHandler(async (req, res) => {
     req
   );
 
-  req.flash("success", "AI Model updated successfully");
+  req.flash("success", "common.messages.aiModelUpdated");
   res.redirect("/admin/ai_models");
 });
 
@@ -259,7 +259,7 @@ const deleteAIModel = asyncHandler(async (req, res) => {
   );
 
   if (existingModel.length === 0) {
-    throw new ValidationError("AI Model not found");
+    throw new ValidationError(res.locals.t("common.errors.aiModelNotFound"));
   }
 
   const modelName = existingModel[0].name;
@@ -283,7 +283,7 @@ const deleteAIModel = asyncHandler(async (req, res) => {
     req
   );
 
-  req.flash("success", "AI Model deleted successfully");
+  req.flash("success", "common.messages.aiModelDeleted");
   res.redirect("/admin/ai_models");
 });
 

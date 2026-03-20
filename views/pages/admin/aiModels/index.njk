@@ -24,7 +24,7 @@
               >
                 <i class="fas fa-plus me-1"></i>
                 <span class="d-none d-sm-inline">{{ t('ai.models.addButton') }}</span>
-                <span class="d-inline d-sm-none">Add</span>
+                <span class="d-inline d-sm-none">{{ t('common.actions.create') }}</span>
               </button>
             </div>
           </div>
@@ -95,7 +95,7 @@
           type="button"
           class="btn-close"
           data-bs-dismiss="modal"
-          aria-label="Close"
+          aria-label="{{ t('common.actions.close') }}"
         ></button>
       </div>
       <form id="tambahForm" method="POST" action="/admin/ai_models/create">
@@ -161,10 +161,10 @@
             class="btn btn-secondary"
             data-bs-dismiss="modal"
           >
-            Cancel
+            {{ t('common.actions.cancel') }}
           </button>
           <button type="submit" class="btn btn-primary" id="submitButton">
-            <span id="submitText">Save</span>
+            <span id="submitText">{{ t('common.actions.save') }}</span>
             <span
               id="loadingSpinner"
               class="spinner-border spinner-border-sm d-none"
@@ -194,7 +194,7 @@
           type="button"
           class="btn-close"
           data-bs-dismiss="modal"
-          aria-label="Close"
+          aria-label="{{ t('common.actions.close') }}"
         ></button>
       </div>
       <form id="editForm" method="POST">
@@ -256,10 +256,10 @@
             class="btn btn-secondary"
             data-bs-dismiss="modal"
           >
-            Cancel
+            {{ t('common.actions.cancel') }}
           </button>
           <button type="submit" class="btn btn-primary" id="editSubmitButton">
-            <span id="editSubmitText">Update</span>
+            <span id="editSubmitText">{{ t('common.actions.update') }}</span>
             <span
               id="editLoadingSpinner"
               class="spinner-border spinner-border-sm d-none"
@@ -289,7 +289,7 @@
           type="button"
           class="btn-close"
           data-bs-dismiss="modal"
-          aria-label="Close"
+          aria-label="{{ t('common.actions.close') }}"
         ></button>
       </div>
       <div class="modal-body">
@@ -302,7 +302,7 @@
           class="btn btn-secondary"
           data-bs-dismiss="modal"
         >
-          Cancel
+          {{ t('common.actions.cancel') }}
         </button>
         <button
           type="button"
@@ -310,7 +310,7 @@
           id="confirmDeleteBtn"
           onclick="deleteModel()"
         >
-          Delete
+          {{ t('common.actions.delete') }}
         </button>
       </div>
     </div>
@@ -324,28 +324,28 @@
       responsive: true,
       pageLength: 25,
       language: {
-        search: "Search:",
-        lengthMenu: "Show _MENU_ entries",
-        info: "Showing _START_ to _END_ of _TOTAL_ entries",
+        search: "{{ t('common.actions.search') }}:",
+        lengthMenu: "{{ t('common.status.showing') }} _MENU_ {{ t('common.status.entries') }}",
+        info: "{{ t('common.status.showing') }} _START_ {{ t('common.status.of') }} _END_ {{ t('common.status.of') }} _TOTAL_ {{ t('common.status.entries') }}",
         paginate: {
-          first: "First",
-          last: "Last",
-          next: "Next",
-          previous: "Previous"
+          first: "{{ t('common.actions.previous') }}",
+          last: "{{ t('common.actions.next') }}",
+          next: "{{ t('common.actions.next') }}",
+          previous: "{{ t('common.actions.previous') }}"
         }
       }
     });
 
     // Handle add form submission
     $('#tambahForm').submit(function() {
-      $('#submitText').text('Saving...');
+      $('#submitText').text("{{ t('ai.models.buttons.saving') }}");
       $('#loadingSpinner').removeClass('d-none');
       $('#submitButton').prop('disabled', true);
     });
 
     // Handle edit form submission
     $('#editForm').submit(function() {
-      $('#editSubmitText').text('Updating...');
+      $('#editSubmitText').text("{{ t('ai.models.buttons.updating') }}");
       $('#editLoadingSpinner').removeClass('d-none');
       $('#editSubmitButton').prop('disabled', true);
     });

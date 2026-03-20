@@ -15,7 +15,7 @@ const updateRole = asyncHandler(async (req, res) => {
   const { role_name, description } = req.body;
 
   if (!role_name) {
-    throw new ValidationError("Role name is required");
+    throw new ValidationError(res.locals.t("common.errors.roleNameRequired"));
   }
 
   const [[roleBefore]] = await db.query(
@@ -23,7 +23,7 @@ const updateRole = asyncHandler(async (req, res) => {
     [roleId]
   );
   if (!roleBefore) {
-    throw new ValidationError("Role not found");
+    throw new ValidationError(res.locals.t("common.errors.roleNotFound"));
   }
 
   await db.query(
@@ -44,7 +44,7 @@ const updateRole = asyncHandler(async (req, res) => {
 
   await invalidateCache("permissions:*", true);
 
-  req.flash("success", `Role '${role_name}' updated successfully.`);
+  req.flash("success", "common.messages.roleUpdated");
   res.redirect("/admin/roles");
 });
 

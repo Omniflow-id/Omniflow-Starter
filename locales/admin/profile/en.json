@@ -46,6 +46,15 @@
     "passwordHelp": "Password must be at least 8 characters with uppercase, lowercase, numbers, and symbols.",
     "submit": "Change Password",
     "cancel": "Cancel",
+    "messages": {
+      "strengthLabel": "Password strength",
+      "weak": "Weak",
+      "fair": "Fair",
+      "good": "Good",
+      "strong": "Strong",
+      "passwordsDoNotMatch": "Passwords do not match",
+      "chooseStrongerPassword": "Please choose a stronger password for better security."
+    },
     "securityTips": {
       "title": "Password Security Tips",
       "length": "Use at least 8 characters",
@@ -59,5 +68,8 @@
     "title": "Copied!",
     "message": "Email address copied to clipboard",
     "fail": "Failed to copy email address"
+  },
+  "messages": {
+    "editProfileComingSoon": "Update profile feature coming soon!"
   }
 }

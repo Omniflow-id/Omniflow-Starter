@@ -12,6 +12,14 @@
     "status": "Status",
     "defaultTTL": "Default TTL",
     "keyPrefix": "Key Prefix",
+    "source": "Source",
+    "responseTime": "Response Time",
+    "generated": "Generated",
+    "users": "Users",
+    "logs": "Logs",
+    "cacheKey": "Cache Key",
+    "ttl": "TTL",
+    "showingKeys": "Showing {shown} of {total} total keys (pattern: {pattern})",
     "patternPlaceholder": "admin:users:*, user:*, logs:*",
     "patternExample": "Pattern (e.g., user:*)",
     "wildcardInfo": "Use * for wildcard matching (e.g., admin:* matches all admin keys)",
@@ -40,7 +48,11 @@
     "source": "Source",
     "cacheHit": "Cache Hit",
     "cacheMiss": "Cache Miss",
-    "benchmark": "Run Benchmark"
+    "benchmark": "Run Benchmark",
+    "running": "Testing...",
+    "runPerformanceTest": "Run Performance Test",
+    "performanceTitle": "Cache Performance",
+    "dataTitle": "Test Data"
   },
   "health": {
     "title": "Health Check",
@@ -61,24 +73,57 @@
     "test": "Test",
     "cancel": "Cancel",
     "confirm": "Confirm",
-    "invalidate": "Invalidate"
+    "invalidate": "Invalidate",
+    "refreshing": "Refreshing...",
+    "invalidating": "Invalidating..."
   },
   "modals": {
     "confirmAction": "Confirm Action",
-    "confirmMessage": "Are you sure you want to proceed?"
+    "confirmMessage": "Are you sure you want to proceed?",
+    "deleteKey": "Are you sure you want to delete this cache key?<p><strong>Key:</strong> <code>{key}</code></p>",
+    "flushWarning": "<p><strong>Warning:</strong> This will permanently delete all cached data!</p><p>Are you sure you want to flush the entire cache?</p>",
+    "invalidatePattern": "Are you sure you want to invalidate cache keys matching this pattern?<p><strong>Pattern:</strong> <code>{pattern}</code></p>"
   },
   "messages": {
     "flushSuccess": "Cache cleared successfully",
     "flushError": "Failed to clear cache",
     "invalidateSuccess": "Pattern invalidated successfully",
     "invalidateError": "Failed to invalidate pattern",
-    "testSuccess": "Test successful",
+    "testSuccess": "Cache test completed successfully!",
     "benchmarkSuccess": "Benchmark completed",
     "redisUnavailable": "Redis is not available. Using database fallback.",
     "cacheStatsUnavailable": "Cache statistics unavailable",
     "keysWillAppear": "Cache keys will appear here",
     "clickRefresh": "Click refresh to load existing cache keys",
     "realtimeReady": "Real-time statistics ready",
-    "clickRefreshStats": "Click refresh button to load current cache statistics"
+    "clickRefreshStats": "Click refresh button to load current cache statistics",
+    "statsRefreshed": "Cache statistics refreshed successfully!",
+    "deleteKeySuccess": "Cache key deleted successfully!",
+    "flushFallbackSuccess": "Cache flushed successfully!",
+    "invalidateFallbackSuccess": "Cache pattern invalidated successfully!",
+    "emptyPattern": "Please enter a pattern to invalidate",
+    "noKeysFound": "No keys found matching pattern: {pattern}",
+    "tryDifferentPattern": "Try a different pattern or create some cache data first",
+    "unableToLoadKeys": "Unable to load cache keys: {error}",
+    "errorLoadingKeys": "Error loading cache keys: {error}",
+    "errorLoadingStatistics": "Error loading statistics: {error}",
+    "failedRefreshStatistics": "Failed to refresh statistics: {error}",
+    "failedDeleteKey": "Failed to delete key: {error}",
+    "failedDeleteKeyStatus": "Failed to delete key ({status}): {statusText}",
+    "errorDeletingKey": "Error deleting key: {error}",
+    "failedFlushCache": "Failed to flush cache: {error}",
+    "errorInvalidatingCache": "Error invalidating cache: {error}",
+    "failedInvalidateCache": "Failed to invalidate cache: {error}",
+    "loadKeysWarning": "Unable to load cache keys",
+    "errorLoadingStatsTitle": "Error loading statistics",
+    "errorLoadingKeysTitle": "Error loading keys",
+    "unableToLoadKeysTitle": "Unable to load keys"
+  },
+  "status": {
+    "noTTL": "No TTL",
+    "expired": "Expired"
+  },
+  "table": {
+    "actions": "Actions"
   }
 }

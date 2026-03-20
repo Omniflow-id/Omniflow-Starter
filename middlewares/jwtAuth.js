@@ -24,7 +24,7 @@ const verifyJWT = asyncHandler(async (req, _res, next) => {
     : null;
 
   if (!token) {
-    throw new AuthenticationError("Access token is required");
+    throw new AuthenticationError("common.errors.accessTokenRequired");
   }
 
   try {
@@ -33,12 +33,12 @@ const verifyJWT = asyncHandler(async (req, _res, next) => {
     next();
   } catch (error) {
     if (error.name === "TokenExpiredError") {
-      throw new AuthenticationError("Access token has expired");
+      throw new AuthenticationError("common.errors.accessTokenExpired");
     }
     if (error.name === "JsonWebTokenError") {
-      throw new AuthenticationError("Invalid access token");
+      throw new AuthenticationError("common.errors.invalidAccessToken");
     }
-    throw new AuthenticationError("Token verification failed");
+    throw new AuthenticationError("common.errors.tokenVerificationFailed");
   }
 });
 
@@ -46,7 +46,7 @@ const verifyRefreshToken = asyncHandler(async (req, _res, next) => {
   const { refreshToken } = req.body;
 
   if (!refreshToken) {
-    throw new AuthenticationError("Refresh token is required");
+    throw new AuthenticationError("common.errors.refreshTokenRequired");
   }
 
   try {
@@ -55,12 +55,12 @@ const verifyRefreshToken = asyncHandler(async (req, _res, next) => {
     next();
   } catch (error) {
     if (error.name === "TokenExpiredError") {
-      throw new AuthenticationError("Refresh token has expired");
+      throw new AuthenticationError("common.errors.refreshTokenExpired");
     }
     if (error.name === "JsonWebTokenError") {
-      throw new AuthenticationError("Invalid refresh token");
+      throw new AuthenticationError("common.errors.invalidRefreshToken");
     }
-    throw new AuthenticationError("Refresh token verification failed");
+    throw new AuthenticationError("common.errors.refreshTokenVerificationFailed");
   }
 });
 

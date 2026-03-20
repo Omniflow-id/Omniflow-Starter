@@ -31,17 +31,17 @@ const changePassword = asyncHandler(async (req, res) => {
 
   // Input validation
   if (!currentPassword || !newPassword || !confirmPassword) {
-    req.flash("error", "All fields are required");
+    req.flash("error", "common.errors.passwordFieldsRequired");
     return res.redirect("/admin/change-password");
   }
 
   if (newPassword !== confirmPassword) {
-    req.flash("error", "New passwords do not match");
+    req.flash("error", "common.errors.newPasswordsDoNotMatch");
     return res.redirect("/admin/change-password");
   }
 
   if (currentPassword === newPassword) {
-    req.flash("error", "New password must be different from current password");
+    req.flash("error", "common.errors.newPasswordMustDiffer");
     return res.redirect("/admin/change-password");
   }
 
@@ -52,7 +52,7 @@ const changePassword = asyncHandler(async (req, res) => {
   );
 
   if (users.length === 0) {
-    req.flash("error", "User not found");
+    req.flash("error", "common.errors.userNotFound");
     return res.redirect("/admin/change-password");
   }
 
@@ -90,7 +90,7 @@ const changePassword = asyncHandler(async (req, res) => {
       level: LOG_LEVELS.WARN,
     });
 
-    req.flash("error", "Current password is incorrect");
+    req.flash("error", "common.errors.currentPasswordIncorrect");
     return res.redirect("/admin/change-password");
   }
 
@@ -129,7 +129,9 @@ const changePassword = asyncHandler(async (req, res) => {
 
     req.flash(
       "error",
-      `Password requirements not met: ${passwordValidation.errors.join(", ")}`
+      res.locals.t("common.errors.passwordRequirementsNotMet", {
+        details: passwordValidation.errors.join(", "),
+      })
     );
     return res.redirect("/admin/change-password");
   }
@@ -178,7 +180,7 @@ const changePassword = asyncHandler(async (req, res) => {
   await invalidateCache(`users:${userId}:*`, true);
   await invalidateCache("users:*", true);
 
-  req.flash("success", "Password changed successfully!");
+  req.flash("success", "common.messages.profilePasswordChanged");
   res.redirect("/admin/profile");
 });
 

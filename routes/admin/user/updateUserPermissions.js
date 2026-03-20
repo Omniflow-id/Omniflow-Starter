@@ -24,7 +24,7 @@ const updateUserPermissions = asyncHandler(async (req, res) => {
     [userId]
   );
   if (users.length === 0) {
-    throw new ValidationError("User not found");
+    throw new ValidationError(res.locals.t("common.errors.userNotFound"));
   }
 
   const user = users[0];
@@ -46,7 +46,7 @@ const updateUserPermissions = asyncHandler(async (req, res) => {
     );
 
     if (validPermissions.length !== allPermissionIds.length) {
-      throw new ValidationError("Some permissions are invalid");
+      throw new ValidationError(res.locals.t("common.errors.invalidPermissions"));
     }
   }
 
@@ -122,7 +122,7 @@ const updateUserPermissions = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: `Successfully updated permissions for user: ${user.full_name}`,
+    message: res.locals.t("common.messages.userPermissionsUpdated"),
     data: {
       userId: userId,
       username: user.username,

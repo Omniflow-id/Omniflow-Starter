@@ -26,7 +26,7 @@ const getUserPermissionsPage = asyncHandler(async (req, res) => {
       );
 
       if (users.length === 0) {
-        throw new ValidationError("User not found");
+        throw new ValidationError(res.locals.t("common.errors.userNotFound"));
       }
 
       const user = users[0];
@@ -42,7 +42,7 @@ const getUserPermissionsPage = asyncHandler(async (req, res) => {
   });
 
   res.render("pages/admin/user/permissions", {
-    title: `User Permissions - ${result.data.user.full_name}`,
+    title: `${res.locals.t("permissions.pageTitle")} - ${result.data.user.full_name}`,
     ...result.data,
     cacheInfo: {
       source: result.source,

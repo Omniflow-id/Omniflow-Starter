@@ -55,6 +55,10 @@
           "notFound": "Model AI tidak ditemukan",
           "decryptionError": "Gagal mendekripsi kunci API"
         }
+      },
+      "buttons": {
+        "saving": "Menyimpan...",
+        "updating": "Memperbarui..."
       }
     },
     "useCases": {
@@ -101,6 +105,10 @@
           "duplicateName": "Nama use case sudah ada",
           "notFound": "Use Case AI tidak ditemukan"
         }
+      },
+      "buttons": {
+        "saving": "Menyimpan...",
+        "updating": "Memperbarui..."
       }
     },
     "analysisSettings": {
@@ -159,6 +167,18 @@
     "chat": {
       "title": "Obrolan AI",
       "breadcrumb": "Percakapan AI",
+      "assistantTitle": "OMNI Asisten",
+      "contextHome": "Beranda",
+      "disclaimer": "AI dapat membuat kesalahan. Periksa informasi penting.",
+      "openLabel": "Buka asisten AI",
+      "closeLabel": "Tutup",
+      "expandLabel": "Aktifkan mode lebar",
+      "collapseLabel": "Kembali ke mode normal",
+      "speakLabel": "Bicara",
+      "sendLabel": "Kirim",
+      "listeningPlaceholder": "Mendengarkan... (Silakan bicara)",
+      "welcomeMessage": "Selamat datang! Saya siap membantu Anda berdasarkan halaman yang sedang Anda buka.",
+      "greetingMessage": "Halo! Ada yang bisa saya bantu terkait halaman ini?",
       "welcomeTitle": "Selamat Datang di Obrolan AI",
       "welcomeSubtitle": "Pilih percakapan atau mulai obrolan baru untuk memulai",
       "conversations": "Percakapan",
@@ -174,10 +194,14 @@
       "fields": {
         "useCase": "Use Case AI",
         "model": "Model AI",
-        "title": "Judul Percakapan (Opsional)"
+        "title": "Judul Percakapan (Opsional)",
+        "query": "Pertanyaan (Opsional)",
+        "result": "Hasil Analisis"
       },
       "placeholders": {
-        "title": "Masukkan judul percakapan"
+        "title": "Masukkan judul percakapan",
+        "askSomething": "Tanya sesuatu...",
+        "copilotQuery": "Tanyakan apa yang ingin Anda ketahui dari data ini..."
       },
       "editTitle": "Edit Judul Percakapan",
       "editTitleModalTitle": "Edit Judul Percakapan",
@@ -207,8 +231,31 @@
         "titleUpdated": "Judul berhasil diperbarui",
         "deleted": "Percakapan berhasil dihapus",
         "messageSaved": "Pesan disimpan",
-        "messageDeleted": "Pesan dihapus"
-      }
+        "messageDeleted": "Pesan dihapus",
+        "serverError": "Terjadi kesalahan pada layanan AI",
+        "loadError": "Gagal memuat percakapan",
+        "saveError": "Gagal menyimpan pesan",
+        "regenerateError": "Gagal membuat ulang respons",
+        "deleteError": "Gagal menghapus pesan",
+        "unknownError": "Terjadi kesalahan yang tidak diketahui"
+      },
+      "confirmDeleteMessage": "Apakah Anda yakin ingin menghapus pesan ini dan semua pesan setelahnya?"
+    },
+    "copilot": {
+      "title": "AI Copilot",
+      "queryLabel": "Pertanyaan (Opsional)",
+      "queryPlaceholder": "Tanyakan apa yang ingin Anda ketahui dari data ini...",
+      "analyzeButton": "Analisis Layar",
+      "stopButton": "Berhenti",
+      "resultLabel": "Hasil Analisis",
+      "emptyState": "Klik \"Analisis Layar\" untuk memulai analisis konten halaman ini.",
+      "closeButton": "Tutup",
+      "copyButton": "Salin",
+      "copiedButton": "Tersalin!",
+      "loading": "Memuat analisis...",
+      "analyzing": "Menganalisis konten halaman...",
+      "stopped": "Analisis dihentikan",
+      "error": "Gagal memproses analisis AI"
     }
   }
 }

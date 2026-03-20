@@ -14,7 +14,7 @@ const createPermission = asyncHandler(async (req, res) => {
   const { permission_name, description } = req.body;
 
   if (!permission_name) {
-    throw new ValidationError("Permission name is required");
+    throw new ValidationError(res.locals.t("common.errors.permissionNameRequired"));
   }
 
   const [existingPermission] = await db.query(
@@ -22,7 +22,7 @@ const createPermission = asyncHandler(async (req, res) => {
     [permission_name]
   );
   if (existingPermission.length > 0) {
-    throw new ValidationError("Permission with this name already exists");
+    throw new ValidationError(res.locals.t("common.errors.permissionExists"));
   }
 
   const [result] = await db.query(
@@ -44,7 +44,7 @@ const createPermission = asyncHandler(async (req, res) => {
 
   await invalidateCache("permissions:*", true);
 
-  req.flash("success", `Permission '${permission_name}' created successfully.`);
+  req.flash("success", "common.messages.permissionCreated");
   res.redirect("/admin/permissions");
 });
 

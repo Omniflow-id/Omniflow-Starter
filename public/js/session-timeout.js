@@ -21,8 +21,9 @@ window.addEventListener("DOMContentLoaded", (event) => {
 
     // Timer to show warning modal
     warningTimer = setTimeout(() => {
+      const modalElement = document.getElementById("sessionTimeoutModal");
       const sessionModal = new bootstrap.Modal(
-        document.getElementById("sessionTimeoutModal")
+        modalElement
       );
       sessionModal.show();
 
@@ -135,6 +136,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
           }
           resetTimers();
         } else {
+          console.warn(data.message);
           submitLogoutForm();
         }
       })

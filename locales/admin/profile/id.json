@@ -46,6 +46,15 @@
     "passwordHelp": "Password harus minimal 8 karakter dengan huruf besar, kecil, angka, dan simbol.",
     "submit": "Ubah Password",
     "cancel": "Batal",
+    "messages": {
+      "strengthLabel": "Kekuatan password",
+      "weak": "Lemah",
+      "fair": "Cukup",
+      "good": "Bagus",
+      "strong": "Kuat",
+      "passwordsDoNotMatch": "Password tidak cocok",
+      "chooseStrongerPassword": "Silakan pilih password yang lebih kuat demi keamanan yang lebih baik."
+    },
     "securityTips": {
       "title": "Tips Keamanan Password",
       "length": "Gunakan minimal 8 karakter",
@@ -59,5 +68,8 @@
     "title": "Tersalin!",
     "message": "Alamat email disalin ke clipboard",
     "fail": "Gagal menyalin alamat email"
+  },
+  "messages": {
+    "editProfileComingSoon": "Fitur update profil akan segera hadir!"
   }
 }

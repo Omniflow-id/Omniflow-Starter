@@ -98,7 +98,7 @@ const getAllAIUseCases = asyncHandler(async (req, res) => {
   if (result.data.useCases.length === 0) {
     return res.status(404).json({
       success: false,
-      message: "No AI use cases found",
+      message: res.locals.t("common.messages.aiUseCasesNotFound"),
     });
   }
 
@@ -129,7 +129,7 @@ const createNewAIUseCase = asyncHandler(async (req, res) => {
   // Validate required fields
   if (!name || !description || !prompt || is_active === undefined) {
     throw new ValidationError(
-      "Name, description, prompt, and status are required"
+      res.locals.t("common.errors.aiUseCaseFieldsRequired")
     );
   }
 
@@ -140,7 +140,7 @@ const createNewAIUseCase = asyncHandler(async (req, res) => {
   );
 
   if (existingUseCase.length > 0) {
-    throw new ValidationError("Use case name already exists");
+    throw new ValidationError(res.locals.t("common.errors.useCaseNameExists"));
   }
 
   // Process allowed_roles
@@ -187,7 +187,7 @@ const createNewAIUseCase = asyncHandler(async (req, res) => {
     req
   );
 
-  req.flash("success", "AI Use Case created successfully");
+  req.flash("success", "common.messages.aiUseCaseCreated");
   res.redirect("/admin/ai_use_cases");
 });
 
@@ -209,7 +209,7 @@ const updateAIUseCase = asyncHandler(async (req, res) => {
   // Validate required fields
   if (!name || !description || !prompt || is_active === undefined) {
     throw new ValidationError(
-      "Name, description, prompt, and status are required"
+      res.locals.t("common.errors.aiUseCaseFieldsRequired")
     );
   }
 
@@ -220,7 +220,7 @@ const updateAIUseCase = asyncHandler(async (req, res) => {
   );
 
   if (existingUseCase.length === 0) {
-    throw new ValidationError("AI Use Case not found");
+    throw new ValidationError(res.locals.t("common.errors.aiUseCaseNotFound"));
   }
 
   // Check if use case name already exists (excluding current use case)
@@ -230,7 +230,7 @@ const updateAIUseCase = asyncHandler(async (req, res) => {
   );
 
   if (duplicateUseCase.length > 0) {
-    throw new ValidationError("Use case name already exists");
+    throw new ValidationError(res.locals.t("common.errors.useCaseNameExists"));
   }
 
   // Process allowed_roles
@@ -270,7 +270,7 @@ const updateAIUseCase = asyncHandler(async (req, res) => {
     req
   );
 
-  req.flash("success", "AI Use Case updated successfully");
+  req.flash("success", "common.messages.aiUseCaseUpdated");
   res.redirect("/admin/ai_use_cases");
 });
 
@@ -288,7 +288,7 @@ const deleteAIUseCase = asyncHandler(async (req, res) => {
   );
 
   if (existingUseCase.length === 0) {
-    throw new ValidationError("AI Use Case not found");
+    throw new ValidationError(res.locals.t("common.errors.aiUseCaseNotFound"));
   }
 
   const useCaseName = existingUseCase[0].name;
@@ -314,7 +314,7 @@ const deleteAIUseCase = asyncHandler(async (req, res) => {
     req
   );
 
-  req.flash("success", "AI Use Case deleted successfully");
+  req.flash("success", "common.messages.aiUseCaseDeleted");
   res.redirect("/admin/ai_use_cases");
 });
 

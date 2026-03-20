@@ -132,7 +132,16 @@
     "phone": "Telepon",
     "address": "Alamat",
     "website": "Website",
-    "cta": "Hubungi Kami"
+    "cta": "Hubungi Kami",
+    "details": {
+      "emailValue": "info@omniflow.id",
+      "phoneValue": "+62 821 2560 9413",
+      "addressValue": "Jakarta, Indonesia",
+      "websiteValue": "omniflow.id"
+    }
+  },
+  "language": {
+    "switch": "Ganti Bahasa"
   },
   "cta": {
     "title": "Siap Memulai Transformasi Digital?",

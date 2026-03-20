@@ -1,22 +1,22 @@
 <!-- Session Timeout Modal -->
-<div class="modal fade" id="sessionTimeoutModal" tabindex="-1" aria-labelledby="sessionTimeoutModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+<div class="modal fade" id="sessionTimeoutModal" tabindex="-1" aria-labelledby="sessionTimeoutModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false" data-session-extend-success="{{ t('common.session.extended') }}" data-session-no-active="{{ t('common.session.noActiveSession') }}">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="sessionTimeoutModalLabel">
-          <i class="fas fa-clock me-2"></i>Session Timeout Warning
+          <i class="fas fa-clock me-2"></i>{{ t('common.session.title') }}
         </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" disabled></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{{ t('common.actions.close') }}" disabled></button>
       </div>
       <div class="modal-body">
-        <p>Your session is about to expire due to inactivity.</p>
-        <p>You will be logged out in <strong id="sessionTimeoutCountdown" class="text-danger">120</strong> seconds.</p>
-        <p>Do you want to extend your session?</p>
+        <p>{{ t('common.session.aboutToExpire') }}</p>
+        <p>{{ t('common.session.logoutCountdown', { seconds: '<strong id="sessionTimeoutCountdown" class="text-danger">120</strong>' }) | safe }}</p>
+        <p>{{ t('common.session.extendPrompt') }}</p>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" id="logoutSessionBtn">Logout</button>
+        <button type="button" class="btn btn-secondary" id="logoutSessionBtn">{{ t('common.actions.logout') }}</button>
         <button type="button" class="btn btn-primary" id="extendSessionBtn">
-          <i class="fas fa-sync-alt me-2"></i>Extend Session
+          <i class="fas fa-sync-alt me-2"></i>{{ t('common.session.extend') }}
         </button>
       </div>
     </div>

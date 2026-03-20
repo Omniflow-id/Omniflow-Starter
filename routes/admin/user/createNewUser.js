@@ -28,14 +28,14 @@ const createNewUser = async (req, res) => {
   try {
     // Input validation
     if (!username || !email || !full_name || !role_id) {
-      req.flash("error", "All fields are required");
+      req.flash("error", "messages.allFieldsRequired");
       return res.redirect("/admin/user/index");
     }
 
     // Email format validation
     const emailRegex = /^[^S@]+@[^S@]+\.[^S@]+$/;
     if (!emailRegex.test(email)) {
-      req.flash("error", "Please provide a valid email address");
+      req.flash("error", "messages.validEmailRequired");
       return res.redirect("/admin/user/index");
     }
 
@@ -45,14 +45,14 @@ const createNewUser = async (req, res) => {
       [role_id]
     );
     if (roles.length === 0) {
-      req.flash("error", "Invalid role selected");
+      req.flash("error", "messages.invalidRoleSelected");
       return res.redirect("/admin/user/index");
     }
 
     // Generate predictable password from full name
     const generatedPassword = generatePredictablePassword(full_name);
     if (!generatedPassword) {
-      req.flash("error", "Could not generate password from full name");
+      req.flash("error", "messages.passwordGenerateFailed");
       return res.redirect("/admin/user/index");
     }
 
@@ -86,7 +86,7 @@ const createNewUser = async (req, res) => {
       });
       req.flash(
         "error",
-        "Generated password does not meet security requirements"
+        "messages.passwordValidationFailed"
       );
       return res.redirect("/admin/user/index");
     }
@@ -126,7 +126,7 @@ const createNewUser = async (req, res) => {
         req,
         level: LOG_LEVELS.WARN,
       });
-      req.flash("error", "Email already exists!");
+      req.flash("error", "messages.emailAlreadyExists");
       return res.redirect("/admin/user/index");
     }
 
@@ -194,7 +194,9 @@ const createNewUser = async (req, res) => {
 
     req.flash(
       "success",
-      `User created successfully! Generated password: ${generatedPassword}. Welcome email is being sent.`
+      res.locals.t("messages.createSuccessWithPassword", {
+        password: generatedPassword,
+      })
     );
     res.redirect("/admin/user/index");
 
@@ -294,7 +296,10 @@ const createNewUser = async (req, res) => {
       req,
       level: LOG_LEVELS.ERROR,
     });
-    req.flash("error", `Error creating user: ${err.message}`);
+    req.flash(
+      "error",
+      `${res.locals.t("common.messages.errorOccurred")}: ${err.message}`
+    );
     res.redirect("/admin/user/index");
   }
 };

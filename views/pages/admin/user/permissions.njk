@@ -61,9 +61,9 @@
         <div class="col-md-12">
           <p class="mb-2"><strong>{{ t('permissions.howItWorks') }}</strong></p>
           <ul class="mb-0">
-            <li><strong>{{ t('permissions.rolePermissions') }}:</strong> {{ t('permissions.rolePermissions') }} dasar yang diwarisi dari role <span class="badge bg-info">{{ user.role_name }}</span></li>
-            <li><strong>{{ t('permissions.userOverrides') }}:</strong> Anda dapat memberikan permission tambahan atau mencabut permission role untuk user spesifik ini</li>
-            <li><strong>{{ t('permissions.finalResult') }}:</strong> ({{ t('permissions.rolePermissions') }} + {{ t('permissions.userGrants') }}) - {{ t('permissions.userRevokes') }} = {{ t('permissions.summary.effectivePermissions') }}</li>
+            <li><strong>{{ t('permissions.rolePermissions') }}:</strong> {{ t('permissions.explanation.rolePermissions', { role: user.role_name }) }}</li>
+            <li><strong>{{ t('permissions.userOverrides') }}:</strong> {{ t('permissions.explanation.userOverrides') }}</li>
+            <li><strong>{{ t('permissions.finalResult') }}:</strong> {{ t('permissions.explanation.finalResult', { rolePermissions: t('permissions.rolePermissions'), userGrants: t('permissions.summary.userGrants'), userRevokes: t('permissions.summary.userRevokes'), effectivePermissions: t('permissions.summary.effectivePermissions') }) }}</li>
           </ul>
         </div>
       </div>

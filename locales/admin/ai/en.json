@@ -55,6 +55,10 @@
           "notFound": "AI Model not found",
           "decryptionError": "Failed to decrypt API key"
         }
+      },
+      "buttons": {
+        "saving": "Saving...",
+        "updating": "Updating..."
       }
     },
     "useCases": {
@@ -101,6 +105,10 @@
           "duplicateName": "Use case name already exists",
           "notFound": "AI Use Case not found"
         }
+      },
+      "buttons": {
+        "saving": "Saving...",
+        "updating": "Updating..."
       }
     },
     "analysisSettings": {
@@ -159,6 +167,18 @@
     "chat": {
       "title": "AI Chat",
       "breadcrumb": "AI Conversation",
+      "assistantTitle": "OMNI Assistant",
+      "contextHome": "Home",
+      "disclaimer": "AI can make mistakes. Please verify important information.",
+      "openLabel": "Open AI assistant",
+      "closeLabel": "Close",
+      "expandLabel": "Enable wide mode",
+      "collapseLabel": "Return to normal mode",
+      "speakLabel": "Speak",
+      "sendLabel": "Send",
+      "listeningPlaceholder": "Listening... (Please speak)",
+      "welcomeMessage": "Welcome! I am ready to help you based on the current page you are viewing.",
+      "greetingMessage": "Hello! How can I assist you with this page?",
       "welcomeTitle": "Welcome to AI Chat",
       "welcomeSubtitle": "Select a conversation or start a new chat to begin",
       "conversations": "Conversations",
@@ -174,10 +194,14 @@
       "fields": {
         "useCase": "AI Use Case",
         "model": "AI Model",
-        "title": "Conversation Title (Optional)"
+        "title": "Conversation Title (Optional)",
+        "query": "Question (Optional)",
+        "result": "Analysis Result"
       },
       "placeholders": {
-        "title": "Enter conversation title"
+        "title": "Enter conversation title",
+        "askSomething": "Ask something...",
+        "copilotQuery": "Ask what you want to know from this data..."
       },
       "editTitle": "Edit Conversation Title",
       "editTitleModalTitle": "Edit Conversation Title",
@@ -207,8 +231,31 @@
         "titleUpdated": "Title updated successfully",
         "deleted": "Conversation deleted successfully",
         "messageSaved": "Message saved",
-        "messageDeleted": "Message deleted"
-      }
+        "messageDeleted": "Message deleted",
+        "serverError": "An AI service error occurred",
+        "loadError": "Failed to load conversation",
+        "saveError": "Failed to save message",
+        "regenerateError": "Failed to regenerate response",
+        "deleteError": "Failed to delete message",
+        "unknownError": "An unknown error occurred"
+      },
+      "confirmDeleteMessage": "Are you sure you want to delete this message and all subsequent messages?"
+    },
+    "copilot": {
+      "title": "AI Copilot",
+      "queryLabel": "Question (Optional)",
+      "queryPlaceholder": "Ask what you want to know from this data...",
+      "analyzeButton": "Analyze Screen",
+      "stopButton": "Stop",
+      "resultLabel": "Analysis Result",
+      "emptyState": "Click \"Analyze Screen\" to start analyzing this page content.",
+      "closeButton": "Close",
+      "copyButton": "Copy",
+      "copiedButton": "Copied!",
+      "loading": "Loading analysis...",
+      "analyzing": "Analyzing page content...",
+      "stopped": "Analysis stopped",
+      "error": "Failed to process AI analysis"
     }
   }
 }

@@ -12,6 +12,14 @@
     "status": "Status",
     "defaultTTL": "Default TTL",
     "keyPrefix": "Key Prefix",
+    "source": "Sumber",
+    "responseTime": "Waktu Respons",
+    "generated": "Dibuat",
+    "users": "User",
+    "logs": "Log",
+    "cacheKey": "Kunci Cache",
+    "ttl": "TTL",
+    "showingKeys": "Menampilkan {shown} dari {total} key total (pattern: {pattern})",
     "patternPlaceholder": "admin:users:*, user:*, logs:*",
     "patternExample": "Pattern (contoh: user:*)",
     "wildcardInfo": "Gunakan * untuk wildcard (contoh: admin:* cocok dengan semua kunci admin)",
@@ -40,7 +48,11 @@
     "source": "Sumber",
     "cacheHit": "Cache Hit",
     "cacheMiss": "Cache Miss",
-    "benchmark": "Jalankan Benchmark"
+    "benchmark": "Jalankan Benchmark",
+    "running": "Menguji...",
+    "runPerformanceTest": "Jalankan Tes Performa",
+    "performanceTitle": "Performa Cache",
+    "dataTitle": "Data Uji"
   },
   "health": {
     "title": "Health Check",
@@ -61,24 +73,57 @@
     "test": "Test",
     "cancel": "Batal",
     "confirm": "Konfirmasi",
-    "invalidate": "Invalidate"
+    "invalidate": "Invalidate",
+    "refreshing": "Memuat ulang...",
+    "invalidating": "Meng-invalidate..."
   },
   "modals": {
     "confirmAction": "Konfirmasi Aksi",
-    "confirmMessage": "Apakah Anda yakin ingin melanjutkan?"
+    "confirmMessage": "Apakah Anda yakin ingin melanjutkan?",
+    "deleteKey": "Apakah Anda yakin ingin menghapus key cache ini?<p><strong>Key:</strong> <code>{key}</code></p>",
+    "flushWarning": "<p><strong>Peringatan:</strong> Ini akan menghapus permanen semua data cache!</p><p>Apakah Anda yakin ingin flush seluruh cache?</p>",
+    "invalidatePattern": "Apakah Anda yakin ingin meng-invalidate key cache yang cocok dengan pattern ini?<p><strong>Pattern:</strong> <code>{pattern}</code></p>"
   },
   "messages": {
     "flushSuccess": "Cache berhasil dihapus",
     "flushError": "Gagal menghapus cache",
     "invalidateSuccess": "Pattern berhasil di-invalidate",
     "invalidateError": "Gagal invalidate pattern",
-    "testSuccess": "Test berhasil",
+    "testSuccess": "Test cache berhasil!",
     "benchmarkSuccess": "Benchmark selesai",
     "redisUnavailable": "Redis tidak tersedia. Menggunakan fallback database.",
     "cacheStatsUnavailable": "Statistik cache tidak tersedia",
     "keysWillAppear": "Cache keys akan muncul di sini",
     "clickRefresh": "Klik refresh untuk memuat cache keys yang ada",
     "realtimeReady": "Statistik real-time siap",
-    "clickRefreshStats": "Klik tombol refresh untuk memuat statistik cache saat ini"
+    "clickRefreshStats": "Klik tombol refresh untuk memuat statistik cache saat ini",
+    "statsRefreshed": "Statistik cache berhasil diperbarui!",
+    "deleteKeySuccess": "Key cache berhasil dihapus!",
+    "flushFallbackSuccess": "Cache berhasil di-flush!",
+    "invalidateFallbackSuccess": "Pattern cache berhasil di-invalidate!",
+    "emptyPattern": "Silakan masukkan pattern untuk di-invalidate",
+    "noKeysFound": "Tidak ada key yang cocok dengan pattern: {pattern}",
+    "tryDifferentPattern": "Coba pattern lain atau buat dulu data cache",
+    "unableToLoadKeys": "Tidak dapat memuat key cache: {error}",
+    "errorLoadingKeys": "Terjadi kesalahan saat memuat key cache: {error}",
+    "errorLoadingStatistics": "Terjadi kesalahan saat memuat statistik: {error}",
+    "failedRefreshStatistics": "Gagal memperbarui statistik: {error}",
+    "failedDeleteKey": "Gagal menghapus key: {error}",
+    "failedDeleteKeyStatus": "Gagal menghapus key ({status}): {statusText}",
+    "errorDeletingKey": "Terjadi kesalahan saat menghapus key: {error}",
+    "failedFlushCache": "Gagal flush cache: {error}",
+    "errorInvalidatingCache": "Terjadi kesalahan saat invalidate cache: {error}",
+    "failedInvalidateCache": "Gagal invalidate cache: {error}",
+    "loadKeysWarning": "Tidak dapat memuat key cache",
+    "errorLoadingStatsTitle": "Terjadi kesalahan saat memuat statistik",
+    "errorLoadingKeysTitle": "Terjadi kesalahan saat memuat key",
+    "unableToLoadKeysTitle": "Tidak dapat memuat key"
+  },
+  "status": {
+    "noTTL": "Tanpa TTL",
+    "expired": "Kedaluwarsa"
+  },
+  "table": {
+    "actions": "Aksi"
   }
 }

@@ -36,15 +36,16 @@ const getHealthAPI = asyncHandler(async (_req, res) => {
   // System is healthy if database is healthy (core dependency)
   // Redis and RabbitMQ are optional, so degraded if they're down but DB is up
   let overallStatus = "healthy";
-  let healthMessage = "All systems operational";
+  let healthMessage = res.locals.t("common.messages.healthAllSystemsOperational");
 
   if (!dbHealthy) {
     overallStatus = "unhealthy";
-    healthMessage = "Database connection is critical - system may be impaired";
+    healthMessage = res.locals.t("common.messages.healthCoreDependencyCritical");
   } else if (!redisHealthy || !rabbitHealthy) {
     overallStatus = "degraded";
-    healthMessage =
-      "Optional services are unavailable - core functionality intact";
+    healthMessage = res.locals.t(
+      "common.messages.healthOptionalServicesUnavailable"
+    );
   }
 
   // Calculate pool utilization
@@ -78,8 +79,8 @@ const getHealthAPI = asyncHandler(async (_req, res) => {
       database: {
         status: databaseStatus,
         message: dbHealthy
-          ? "Database connection is active"
-          : "Database connection failed",
+          ? res.locals.t("common.messages.healthDatabaseConnected")
+          : res.locals.t("common.messages.healthDatabaseFailed"),
         details: {
           healthy: dbHealthy,
           host: config.database.host,
@@ -98,8 +99,8 @@ const getHealthAPI = asyncHandler(async (_req, res) => {
       redis: {
         status: redisStatus,
         message: redisHealthy
-          ? "Redis cache connection is active"
-          : "Redis cache connection failed",
+          ? res.locals.t("common.messages.healthRedisConnected")
+          : res.locals.t("common.messages.healthRedisFailed"),
         details: {
           healthy: redisStats.connected,
           host: config.redis?.host || "N/A",
@@ -114,8 +115,8 @@ const getHealthAPI = asyncHandler(async (_req, res) => {
       rabbitmq: {
         status: rabbitHealthStatus,
         message: rabbitHealthy
-          ? "RabbitMQ queue connection is active"
-          : "RabbitMQ queue connection failed",
+          ? res.locals.t("common.messages.healthRabbitmqConnected")
+          : res.locals.t("common.messages.healthRabbitmqFailed"),
         details: {
           healthy: rabbitStats.connected,
           host: config.rabbitmq?.host || "N/A",
@@ -198,8 +199,8 @@ const getHealthDetailedAPI = asyncHandler(async (_req, res) => {
       database: {
         status: dbInfo.connected ? "healthy" : "unhealthy",
         message: dbInfo.connected
-          ? "Database connection is active"
-          : "Database connection failed",
+          ? res.locals.t("common.messages.healthDatabaseConnected")
+          : res.locals.t("common.messages.healthDatabaseFailed"),
         details: {
           connected: dbInfo.connected,
           version: dbInfo.version,
@@ -228,8 +229,8 @@ const getHealthDetailedAPI = asyncHandler(async (_req, res) => {
       redis: {
         status: redisStats.connected ? "healthy" : "unhealthy",
         message: redisStats.connected
-          ? "Redis cache connection is active"
-          : "Redis cache connection failed",
+          ? res.locals.t("common.messages.healthRedisConnected")
+          : res.locals.t("common.messages.healthRedisFailed"),
         details: {
           connected: redisStats.connected,
           host: config.redis?.host || "N/A",
@@ -247,8 +248,8 @@ const getHealthDetailedAPI = asyncHandler(async (_req, res) => {
       rabbitmq: {
         status: rabbitStatus.connected ? "healthy" : "unhealthy",
         message: rabbitStatus.connected
-          ? "RabbitMQ queue connection is active"
-          : "RabbitMQ queue connection failed",
+          ? res.locals.t("common.messages.healthRabbitmqConnected")
+          : res.locals.t("common.messages.healthRabbitmqFailed"),
         details: {
           connected: rabbitStatus.connected,
           host: config.rabbitmq?.host || "N/A",
@@ -299,7 +300,7 @@ const getHealthDetailedAPI = asyncHandler(async (_req, res) => {
   };
 
   res.status(200).json({
-    message: "Detailed health check completed",
+    message: res.locals.t("common.messages.operationSuccess"),
     success: true,
     data: detailedHealthData,
   });
@@ -339,7 +340,7 @@ const getHealthReadyzAPI = asyncHandler(async (_req, res) => {
         redis: redisHealthy,
         rabbitmq: rabbitHealthy,
       },
-      message: "Not ready to receive traffic",
+      message: res.locals.t("common.messages.operationFailed"),
     });
   }
 });
@@ -352,13 +353,13 @@ const getHealthStartupAPI = asyncHandler(async (_req, res) => {
     res.status(200).json({
       started: true,
       uptime_seconds: Math.round(process.uptime()),
-      message: "Application startup completed",
+      message: res.locals.t("common.messages.operationSuccess"),
     });
   } else {
     res.status(503).json({
       started: false,
       uptime_seconds: Math.round(process.uptime()),
-      message: "Application still starting up",
+      message: res.locals.t("common.messages.pleaseWait"),
     });
   }
 });

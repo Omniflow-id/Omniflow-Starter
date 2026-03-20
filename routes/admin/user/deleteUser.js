@@ -21,7 +21,7 @@ const deleteUser = async (req, res) => {
     if (parseInt(userId, 10) === req.session.user.id) {
       return res.status(400).json({
         success: false,
-        message: "Cannot delete your own account",
+        message: res.locals.t("messages.cannotDeleteOwnAccount"),
       });
     }
 
@@ -34,7 +34,7 @@ const deleteUser = async (req, res) => {
     if (users.length === 0) {
       return res.status(404).json({
         success: false,
-        message: "User not found",
+        message: res.locals.t("messages.userNotFound"),
       });
     }
 
@@ -86,13 +86,15 @@ const deleteUser = async (req, res) => {
 
     res.json({
       success: true,
-      message: `User ${targetUser.username} deleted successfully`,
+      message: res.locals.t("messages.deleteSuccessNamed", {
+        username: targetUser.username,
+      }),
     });
   } catch (error) {
     console.error("❌ [USER-DELETE] Error:", error.message);
     res.status(500).json({
       success: false,
-      message: "Failed to delete user",
+      message: res.locals.t("messages.deleteFailed"),
       error: error.message,
     });
   }

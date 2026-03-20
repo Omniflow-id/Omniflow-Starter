@@ -80,7 +80,7 @@ const createConversation = asyncHandler(async (req, res) => {
   const userId = req.session.user.id;
 
   if (!usecase_id || !model_id) {
-    throw new ValidationError("Use case and model are required");
+    throw new ValidationError(res.locals.t("common.errors.aiUseCaseAndModelRequired"));
   }
 
   // Verify use case exists and is active
@@ -90,7 +90,7 @@ const createConversation = asyncHandler(async (req, res) => {
   );
 
   if (useCase.length === 0) {
-    throw new ValidationError("Use case not found or inactive");
+    throw new ValidationError(res.locals.t("common.errors.aiUseCaseInactive"));
   }
 
   // Verify model exists and is active
@@ -100,10 +100,11 @@ const createConversation = asyncHandler(async (req, res) => {
   );
 
   if (model.length === 0) {
-    throw new ValidationError("AI model not found or inactive");
+    throw new ValidationError(res.locals.t("common.errors.aiModelInactive"));
   }
 
-  const conversationTitle = title || "New Conversation";
+  const conversationTitle =
+    title || res.locals.t("ai.chat.startNewChat");
 
   const [result] = await db.query(
     `INSERT INTO ai_conversations (user_id, usecase_id, model_id, title, created_at, updated_at)
@@ -185,7 +186,7 @@ const getConversation = asyncHandler(async (req, res) => {
   if (!result.data) {
     return res.status(404).json({
       success: false,
-      message: "Conversation not found",
+      message: res.locals.t("common.errors.aiConversationNotFound"),
     });
   }
 
@@ -250,7 +251,7 @@ const updateConversationTitle = asyncHandler(async (req, res) => {
   const userId = req.session.user.id;
 
   if (!title) {
-    throw new ValidationError("Title is required");
+    throw new ValidationError(res.locals.t("common.errors.conversationTitleRequired"));
   }
 
   // Verify conversation belongs to user
@@ -260,7 +261,7 @@ const updateConversationTitle = asyncHandler(async (req, res) => {
   );
 
   if (conversation.length === 0) {
-    throw new ValidationError("Conversation not found");
+    throw new ValidationError(res.locals.t("common.errors.aiConversationNotFound"));
   }
 
   await db.query(
@@ -285,7 +286,7 @@ const updateConversationTitle = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: "Title updated successfully",
+    message: res.locals.t("ai.chat.messages.titleUpdated"),
   });
 });
 
@@ -304,7 +305,7 @@ const deleteConversation = asyncHandler(async (req, res) => {
   );
 
   if (conversation.length === 0) {
-    throw new ValidationError("Conversation not found");
+    throw new ValidationError(res.locals.t("common.errors.aiConversationNotFound"));
   }
 
   // Soft delete conversation
@@ -328,7 +329,7 @@ const deleteConversation = asyncHandler(async (req, res) => {
     req
   );
 
-  req.flash("success", "Conversation deleted successfully");
+  req.flash("success", "common.messages.aiConversationDeleted");
   res.redirect("/admin/chat");
 });
 

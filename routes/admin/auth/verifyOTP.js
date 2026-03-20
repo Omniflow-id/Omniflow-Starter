@@ -19,14 +19,14 @@ const {
 const getVerifyOTP = asyncHandler(async (req, res) => {
   // Check if there's a pending 2FA session
   if (!req.session.pending2FA) {
-    req.flash("error", "No pending OTP verification. Please login again.");
+    req.flash("error", "messages.pendingOtpMissing");
     return res.redirect("/admin/login");
   }
 
   // Check if OTP has expired
   if (Date.now() > req.session.pending2FA.expiresAt) {
     delete req.session.pending2FA;
-    req.flash("error", "OTP has expired. Please login again.");
+    req.flash("error", "messages.otpExpiredLoginAgain");
     return res.redirect("/admin/login");
   }
 
@@ -35,7 +35,7 @@ const getVerifyOTP = asyncHandler(async (req, res) => {
   );
 
   res.render("pages/admin/auth/verify-otp", {
-    title: "Verify OTP",
+    title: res.locals.t("verifyOtp.pageTitle"),
     userEmail: req.session.pending2FA.email,
     timeRemaining,
     isDevelopment: isDevelopmentBypass(),
@@ -48,7 +48,7 @@ const postVerifyOTP = asyncHandler(async (req, res) => {
 
   // Check if there's a pending 2FA session
   if (!req.session.pending2FA) {
-    req.flash("error", "No pending OTP verification. Please login again.");
+    req.flash("error", "messages.pendingOtpMissing");
     return res.redirect("/admin/login");
   }
 
@@ -69,7 +69,7 @@ const postVerifyOTP = asyncHandler(async (req, res) => {
 
     if (userRows.length === 0) {
       delete req.session.pending2FA;
-      throw new AuthenticationError("User not found");
+      throw new AuthenticationError("messages.accountNotFoundLoginAgain");
     }
 
     const user = userRows[0];
@@ -89,17 +89,17 @@ const postVerifyOTP = asyncHandler(async (req, res) => {
 
     await logSuccessfulLogin(user, req, "2fa_dev_bypass");
 
-    req.flash("success", "loginSuccessOtpBypass");
+    req.flash("success", "messages.loginSuccessOtpBypass");
     return res.redirect("/admin");
   }
 
   // Validate OTP input
   if (!otp) {
-    throw new ValidationError("OTP code is required");
+    throw new ValidationError("messages.otpCodeRequired");
   }
 
   if (!/^\d{6}$/.test(otp)) {
-    throw new ValidationError("OTP must be 6 digits");
+    throw new ValidationError("messages.otpMustBe6Digits");
   }
 
   // Verify OTP
@@ -161,7 +161,7 @@ const postVerifyOTP = asyncHandler(async (req, res) => {
 
     if (userRows.length === 0) {
       delete req.session.pending2FA;
-      throw new AuthenticationError("User not found");
+      throw new AuthenticationError("messages.accountNotFoundLoginAgain");
     }
 
     const user = userRows[0];
@@ -169,9 +169,7 @@ const postVerifyOTP = asyncHandler(async (req, res) => {
     // Check if user is still active
     if (!user.is_active) {
       delete req.session.pending2FA;
-      throw new AuthenticationError(
-        "Your account has been deactivated. Please contact administrator."
-      );
+      throw new AuthenticationError("messages.accountDeactivatedContactAdmin");
     }
 
     // Load user permissions
@@ -192,10 +190,7 @@ const postVerifyOTP = asyncHandler(async (req, res) => {
     // Log successful 2FA completion
     await logSuccessfulLogin(user, req, "2fa_complete");
 
-    req.flash(
-      "success",
-      `OTP verified successfully! Welcome to ${process.env.APP_NAME || "Omniflow"} Admin.`
-    );
+    req.flash("success", "messages.otpVerifiedWelcome");
     res.redirect("/admin");
   } catch (error) {
     // Clean up pending 2FA on any error

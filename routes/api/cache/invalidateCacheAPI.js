@@ -12,8 +12,8 @@ const invalidateCacheAPI = asyncHandler(async (req, res) => {
   if (!pattern) {
     return res.status(400).json({
       success: false,
-      error: "Pattern is required",
-      message: "Please provide a cache pattern to invalidate",
+      error: res.locals.t("common.errors.cachePatternRequired"),
+      message: res.locals.t("common.errors.cachePatternPromptRequired"),
     });
   }
 
@@ -21,7 +21,7 @@ const invalidateCacheAPI = asyncHandler(async (req, res) => {
 
   res.json({
     success: true,
-    message: `Invalidated ${deletedCount} cache entries matching pattern: ${pattern}`,
+    message: res.locals.t("common.messages.cacheInvalidated"),
     deleted_count: deletedCount,
     pattern,
     timestamp: new Date().toISOString(),

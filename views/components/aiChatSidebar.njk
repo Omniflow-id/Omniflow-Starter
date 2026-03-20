@@ -350,7 +350,7 @@ marked.renderer = Object.assign({}, originalRenderer, {
 
 <!-- Floating Toggle -->
 <div id="ai-chat-widget">
-  <button id="ai-chat-toggle" aria-label="Open AI Assistant">
+  <button id="ai-chat-toggle" aria-label="{{ t('ai.chat.openLabel') }}">
     <i class="fas fa-robot"></i>
   </button>
 </div>
@@ -361,14 +361,14 @@ marked.renderer = Object.assign({}, originalRenderer, {
   <div class="ai-chat-header">
     <div class="ai-chat-title">
       <i class="fas fa-robot text-primary"></i>
-      <span class="ai-title-text">OMNI Assistant</span>
-      <span class="ai-context-indicator" id="ai-context-label">Home</span>
+      <span class="ai-title-text">{{ t('ai.chat.assistantTitle') }}</span>
+      <span class="ai-context-indicator" id="ai-context-label">{{ t('ai.chat.contextHome') }}</span>
     </div>
     <div class="ai-header-controls">
-      <button class="ai-expand-btn" id="ai-expand-chat" title="Toggle Wide Mode">
+      <button class="ai-expand-btn" id="ai-expand-chat" title="{{ t('ai.chat.expandLabel') }}">
         <i class="fas fa-expand-alt"></i>
       </button>
-      <button class="ai-close-btn" id="ai-close-chat" title="Close">
+      <button class="ai-close-btn" id="ai-close-chat" title="{{ t('ai.chat.closeLabel') }}">
         <i class="fas fa-times"></i>
       </button>
     </div>
@@ -377,31 +377,31 @@ marked.renderer = Object.assign({}, originalRenderer, {
   <!-- Messages -->
   <div class="ai-chat-messages" id="ai-messages">
     <div class="message system">
-      Selamat datang! Saya siap membantu Anda berdasarkan halaman yang sedang Anda buka.
+      {{ t('ai.chat.welcomeMessage') }}
     </div>
     <div class="message ai">
-      Halo! Ada yang bisa saya bantu terkait halaman ini?
+      {{ t('ai.chat.greetingMessage') }}
     </div>
   </div>
 
   <!-- Input -->
   <div class="ai-chat-input-area">
     <div class="ai-input-wrapper">
-      <button id="ai-mic-btn" title="Speak">
+      <button id="ai-mic-btn" title="{{ t('ai.chat.speakLabel') }}">
         <i class="fas fa-microphone"></i>
       </button>
       <textarea 
         id="ai-chat-input" 
         rows="1" 
-        placeholder="Tanya sesuatu..."
+        placeholder="{{ t('ai.chat.placeholders.askSomething') }}"
         oninput="this.style.height = ''; this.style.height = this.scrollHeight + 'px'"
       ></textarea>
-      <button id="ai-send-btn" title="Send">
+      <button id="ai-send-btn" title="{{ t('ai.chat.sendLabel') }}">
         <i class="fas fa-paper-plane"></i>
       </button>
     </div>
     <div id="ai-disclaimer" style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.5rem; text-align: center;">
-      AI dapat membuat kesalahan. Periksa informasi penting.
+      {{ t('ai.chat.disclaimer') }}
     </div>
   </div>
 </div>
@@ -431,23 +431,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update title based on language
     const titleEl = document.querySelector('.ai-title-text');
     if (titleEl) {
-        titleEl.textContent = currentLang === 'id' ? 'OMNI Asisten' : 'OMNI Assistant';
+        titleEl.textContent = '{{ t("ai.chat.assistantTitle") }}';
     }
 
     // Dynamic Welcome Message based on Document Language
     // currentLang already defined above
-    const welcomeText = currentLang === 'id'
-        ? 'Selamat datang! Saya siap membantu Anda berdasarkan halaman yang sedang Anda buka.'
-        : 'Welcome! I am ready to help you based on the current page you are viewing.';
-    const greetingText = currentLang === 'id'
-        ? 'Halo! Ada yang bisa saya bantu terkait halaman ini?'
-        : 'Hello! How can I assist you with this page?';
+    const welcomeText = '{{ t("ai.chat.welcomeMessage") }}';
+    const greetingText = '{{ t("ai.chat.greetingMessage") }}';
     
     // UI Translations
-    const placeholderText = currentLang === 'id' ? 'Tanya sesuatu...' : 'Ask something...';
-    const disclaimerText = currentLang === 'id' 
-        ? 'AI dapat membuat kesalahan. Periksa informasi penting.' 
-        : 'AI can make mistakes. Please verify important information.';
+    const placeholderText = '{{ t("ai.chat.placeholders.askSomething") }}';
+    const disclaimerText = '{{ t("ai.chat.disclaimer") }}';
 
     document.querySelector('.message.system').textContent = welcomeText;
     document.querySelector('.message.ai').textContent = greetingText;
@@ -476,7 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
              if (micBtn.classList.contains('listening')) {
                  recognition.stop();
              } else {
-                 input.placeholder = "Mendengarkan... (Silakan bicara)";
+                 input.placeholder = '{{ t("ai.chat.listeningPlaceholder") }}';
                  recognition.start();
              }
         });
@@ -489,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
         recognition.onend = () => {
              micBtn.classList.remove('listening');
              micBtn.innerHTML = '<i class="fas fa-microphone"></i>'; 
-             input.placeholder = "Tanya sesuatu...";
+             input.placeholder = placeholderText;
              // Don't auto-focus if user clicked stop manually, but good UX generally
              if (!input.value) input.focus(); 
         };

@@ -67,7 +67,7 @@ const getAllUsersPage = async (req, res) => {
       level: LOG_LEVELS.ERROR,
     });
 
-    res.status(500).send("Internal Server Error");
+    res.status(500).send(res.locals.t("common.errors.internalServerError"));
   }
 };
 

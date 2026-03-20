@@ -13,8 +13,8 @@ const exportCacheAPI = asyncHandler(async (req, res) => {
   if (!redis) {
     return res.status(503).json({
       success: false,
-      error: "Redis not available",
-      message: "Cache export requires Redis connection",
+      error: res.locals.t("common.errors.redisNotAvailable"),
+      message: res.locals.t("common.errors.cacheExportRequiresRedis"),
     });
   }
 
@@ -28,7 +28,7 @@ const exportCacheAPI = asyncHandler(async (req, res) => {
     if (keys.length === 0) {
       return res.json({
         success: true,
-        message: "No cache keys found matching pattern",
+        message: res.locals.t("common.errors.cacheNoKeysFound"),
         pattern,
         data: [],
         count: 0,
@@ -68,7 +68,7 @@ const exportCacheAPI = asyncHandler(async (req, res) => {
 
     res.json({
       success: true,
-      message: `Exported ${keys.length} cache entries`,
+      message: res.locals.t("common.messages.cacheExported"),
       pattern,
       count: keys.length,
       exported_at: new Date().toISOString(),
@@ -77,7 +77,7 @@ const exportCacheAPI = asyncHandler(async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      error: "Export failed",
+      error: res.locals.t("common.messages.operationFailed"),
       message: error.message,
     });
   }

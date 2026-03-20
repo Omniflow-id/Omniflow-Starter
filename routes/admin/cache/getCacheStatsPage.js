@@ -19,81 +19,62 @@ const getCacheStatsPage = asyncHandler(async (_req, res) => {
   res.render("pages/admin/cache/stats", {
     cacheStats,
     redisStats,
-    // Use locale values with fallbacks
-    pageTitle: locale.pageTitle || "Cache Statistics",
-    title: locale.pageTitle || "Cache Statistics",
+    pageTitle: locale.pageTitle,
+    title: locale.pageTitle,
     nav: {
-      dashboard:
-        locale.breadcrumb?.dashboard || locale.nav?.dashboard || "Dashboard",
+      dashboard: locale.breadcrumb?.dashboard || locale.nav?.dashboard,
     },
     stats: {
-      connected: locale.stats?.connected || "Redis Connection Status",
-      disconnected: locale.stats?.disconnected || "Disconnected",
-      enabled: locale.stats?.enabled || "Enabled & Running",
-      title: locale.stats?.title || "Cache Statistics",
-      totalKeys: locale.stats?.totalKeys || "Total Keys",
-      connectedLabel: locale.stats?.connectedLabel || "Connected",
+      connected: locale.stats?.connected,
+      disconnected: locale.stats?.disconnected,
+      enabled: locale.stats?.enabled,
+      title: locale.stats?.title,
+      totalKeys: locale.stats?.totalKeys,
+      connectedLabel: locale.stats?.connectedLabel,
     },
     labels: {
-      host: locale.labels?.host || "Host",
-      database: locale.labels?.database || "Database",
-      status: locale.labels?.status || "Status",
-      defaultTTL: locale.labels?.defaultTTL || "Default TTL",
-      keyPrefix: locale.labels?.keyPrefix || "Key Prefix",
-      patternPlaceholder:
-        locale.labels?.patternPlaceholder || "admin:users:*, user:*, logs:*",
-      wildcardInfo:
-        locale.labels?.wildcardInfo ||
-        "Use * for wildcard matching (e.g., admin:* matches all admin keys)",
-      performanceTesting:
-        locale.labels?.performanceTesting || "Performance Testing",
-      testDescription:
-        locale.labels?.testDescription || "Tests cache read/write performance",
-      cacheKeys: locale.labels?.cacheKeys || "Cache Keys",
-      patternExample: locale.labels?.patternExample || "Pattern (e.g., user:*)",
-      realtimeStats: locale.labels?.realtimeStats || "Real-time Statistics",
-      flushDescription:
-        locale.labels?.flushDescription || "Removes all cached data",
+      host: locale.labels?.host,
+      database: locale.labels?.database,
+      status: locale.labels?.status,
+      defaultTTL: locale.labels?.defaultTTL,
+      keyPrefix: locale.labels?.keyPrefix,
+      patternPlaceholder: locale.labels?.patternPlaceholder,
+      wildcardInfo: locale.labels?.wildcardInfo,
+      performanceTesting: locale.labels?.performanceTesting,
+      testDescription: locale.labels?.testDescription,
+      cacheKeys: locale.labels?.cacheKeys,
+      patternExample: locale.labels?.patternExample,
+      realtimeStats: locale.labels?.realtimeStats,
+      flushDescription: locale.labels?.flushDescription,
     },
     actions: {
-      flush: locale.actions?.flush || "Flush All Cache",
-      invalidate: locale.actions?.invalidate || "Pattern Invalidation",
+      flush: locale.actions?.flush,
+      invalidate: locale.actions?.invalidate,
     },
     buttons: {
-      flush: locale.buttons?.flush || "Flush",
-      invalidate: locale.buttons?.invalidate || "Invalidate",
-      benchmark: locale.buttons?.benchmark || "Run Benchmark",
-      refresh: locale.buttons?.refresh || "Refresh",
-      cancel: locale.buttons?.cancel || "Cancel",
-      confirm: locale.buttons?.confirm || "Confirm",
+      flush: locale.buttons?.flush,
+      invalidate: locale.buttons?.invalidate,
+      benchmark: locale.buttons?.benchmark,
+      refresh: locale.buttons?.refresh,
+      cancel: locale.buttons?.cancel,
+      confirm: locale.buttons?.confirm,
     },
     test: {
-      title: locale.test?.title || "Cache Performance Test",
-      benchmark: locale.test?.benchmark || "Run Benchmark",
-      result: locale.test?.result || "Test Results",
+      title: locale.test?.title,
+      benchmark: locale.test?.benchmark,
+      result: locale.test?.result,
     },
     messages: {
-      redisUnavailable:
-        locale.messages?.redisUnavailable ||
-        "Redis is not available. Using database fallback.",
-      cacheStatsUnavailable:
-        locale.messages?.cacheStatsUnavailable ||
-        "Cache statistics unavailable",
-      keysWillAppear:
-        locale.messages?.keysWillAppear || "Cache keys will appear here",
-      clickRefresh:
-        locale.messages?.clickRefresh ||
-        "Click refresh to load existing cache keys",
-      realtimeReady:
-        locale.messages?.realtimeReady || "Real-time statistics ready",
-      clickRefreshStats:
-        locale.messages?.clickRefreshStats ||
-        "Click refresh button to load current cache statistics",
+      redisUnavailable: locale.messages?.redisUnavailable,
+      cacheStatsUnavailable: locale.messages?.cacheStatsUnavailable,
+      keysWillAppear: locale.messages?.keysWillAppear,
+      clickRefresh: locale.messages?.clickRefresh,
+      realtimeReady: locale.messages?.realtimeReady,
+      clickRefreshStats: locale.messages?.clickRefreshStats,
     },
     modals: {
-      confirmAction: locale.modals?.confirmAction || "Confirm Action",
-      confirmMessage:
-        locale.modals?.confirmMessage || "Are you sure you want to proceed?",
+      confirmAction: locale.modals?.confirmAction,
+      confirmMessage: locale.modals?.confirmMessage,
     },
   });
 });

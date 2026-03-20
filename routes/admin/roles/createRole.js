@@ -14,7 +14,7 @@ const createRole = asyncHandler(async (req, res) => {
   const { role_name, description } = req.body;
 
   if (!role_name) {
-    throw new ValidationError("Role name is required");
+    throw new ValidationError(res.locals.t("common.errors.roleNameRequired"));
   }
 
   const [existingRole] = await db.query(
@@ -22,7 +22,7 @@ const createRole = asyncHandler(async (req, res) => {
     [role_name]
   );
   if (existingRole.length > 0) {
-    throw new ValidationError("Role with this name already exists");
+    throw new ValidationError(res.locals.t("common.errors.roleExists"));
   }
 
   const [result] = await db.query(
@@ -44,7 +44,7 @@ const createRole = asyncHandler(async (req, res) => {
 
   await invalidateCache("permissions:*", true);
 
-  req.flash("success", `Role '${role_name}' created successfully.`);
+  req.flash("success", "common.messages.roleCreated");
   res.redirect("/admin/roles");
 });
 

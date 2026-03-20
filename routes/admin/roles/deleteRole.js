@@ -18,7 +18,7 @@ const deleteRole = asyncHandler(async (req, res) => {
     [roleId]
   );
   if (!role) {
-    throw new ValidationError("Role not found");
+    throw new ValidationError(res.locals.t("common.errors.roleNotFound"));
   }
 
   // Soft delete the role
@@ -39,7 +39,7 @@ const deleteRole = asyncHandler(async (req, res) => {
 
   await invalidateCache("permissions:*", true);
 
-  req.flash("success", `Role '${role.role_name}' deleted successfully.`);
+  req.flash("success", "common.messages.roleDeleted");
   res.redirect("/admin/roles");
 });
 

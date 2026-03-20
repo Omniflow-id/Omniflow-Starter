@@ -60,16 +60,13 @@ const sendTestJob = asyncHandler(async (req, res) => {
   });
 
   if (success) {
-    req.flash("success_msg", "Test job sent successfully!");
+    req.flash("success_msg", "common.messages.queueTestJobSent");
     // Invalidate queue cache since stats might change
     await invalidateCache("queue:*", true);
     await invalidateCache("datatable:jobs:*", true); // DataTable cache
     await invalidateCache("datatable:failed-jobs:*", true); // Failed jobs DataTable cache
   } else {
-    req.flash(
-      "error_msg",
-      "Failed to send test job. Check RabbitMQ connection."
-    );
+    req.flash("error_msg", "common.errors.queueTestJobFailed");
   }
 
   res.redirect("/admin/queue");

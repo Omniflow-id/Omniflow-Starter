@@ -155,16 +155,16 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
       user.id,
       user.username,
       user.email,
-      user.role_name || "No Role",
+      user.role_name || "-",
       user.is_active
-        ? '<span class="badge bg-success">Active</span>'
-        : '<span class="badge bg-secondary">Inactive</span>',
+        ? `<span class="badge bg-success">${res.locals.t("common.status.active")}</span>`
+        : `<span class="badge bg-secondary">${res.locals.t("common.status.inactive")}</span>`,
       `
         <div class="btn-group" role="group">
           <a href="/user/edit/${user.id}" class="btn btn-sm btn-primary">
             <i class="fas fa-edit"></i>
           </a>
-          <a href="/admin/user/${user.id}/permissions" class="btn btn-sm btn-info" title="Manage User Permissions">
+          <a href="/admin/user/${user.id}/permissions" class="btn btn-sm btn-info" title="${res.locals.t("users.modals.permissions")}">
             <i class="fas fa-key"></i>
           </a>
           ${
@@ -176,7 +176,7 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
                 ${user.is_active ? '<i class="fas fa-user-slash"></i>' : '<i class="fas fa-user-check"></i>'}
               </button>
             </form>
-            <button class="btn btn-sm btn-danger btn-delete-user" data-id="${user.id}" data-username="${user.username}" title="Delete User">
+            <button class="btn btn-sm btn-danger btn-delete-user" data-id="${user.id}" data-username="${user.username}" title="${res.locals.t("common.actions.delete")}">
               <i class="fas fa-trash"></i>
             </button>
           `
@@ -204,7 +204,7 @@ const getUsersDataTable = asyncHandler(async (req, res) => {
       recordsTotal: 0,
       recordsFiltered: 0,
       data: [],
-      error: "Failed to load data",
+      error: res.locals.t("common.messages.operationFailed"),
     });
   }
 });

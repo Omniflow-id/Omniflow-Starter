@@ -22,7 +22,7 @@ const uploadNewUser = async (req, res) => {
   const userAgentData = getUserAgent(req);
 
   if (!req.file) {
-    req.flash("error", "File upload is required");
+    req.flash("error", "messages.uploadFileRequired");
     return res.redirect("/admin/user/index");
   }
 
@@ -33,7 +33,7 @@ const uploadNewUser = async (req, res) => {
     const worksheet = workbook.getWorksheet(1);
 
     if (!worksheet) {
-      req.flash("error", "Invalid file format. Worksheet not found.");
+      req.flash("error", "messages.invalidWorksheet");
       return res.redirect("/admin/user/index");
     }
 
@@ -75,6 +75,7 @@ const uploadNewUser = async (req, res) => {
                 email,
                 full_name,
                 role_id: roleMap[roleName],
+                role_name: roleName,
                 password: generatedPassword,
               });
             }
@@ -84,7 +85,7 @@ const uploadNewUser = async (req, res) => {
     });
 
     if (users.length === 0) {
-      req.flash("error", "No valid data found in the uploaded file.");
+      req.flash("error", "messages.noValidUploadedData");
       return res.redirect("/admin/user/index");
     }
 
@@ -123,6 +124,7 @@ const uploadNewUser = async (req, res) => {
         email: user.email,
         full_name: user.full_name,
         role_id: user.role_id,
+        role_name: user.role_name,
         generatedPassword: user.password,
       });
 
@@ -205,16 +207,17 @@ const uploadNewUser = async (req, res) => {
       if (duplicateEmails.length > 0) {
         req.flash(
           "success",
-          `${
-            successfulUsers.length
-          } users created successfully! Some duplicate emails were skipped: ${duplicateEmails.join(
-            ", "
-          )}`
+          res.locals.t("messages.bulkCreateSuccessWithDuplicates", {
+            count: successfulUsers.length,
+            emails: duplicateEmails.join(", "),
+          })
         );
       } else {
         req.flash(
           "success",
-          `${successfulUsers.length} users created successfully! Generated passwords are shown below.`
+          res.locals.t("messages.bulkCreateSuccessShownBelow", {
+            count: successfulUsers.length,
+          })
         );
       }
 
@@ -321,10 +324,10 @@ const uploadNewUser = async (req, res) => {
       req.flash(
         "error",
         duplicateEmails.length > 0
-          ? `All users skipped due to duplicate emails: ${duplicateEmails.join(
-              ", "
-            )}`
-          : "No users were created"
+          ? res.locals.t("messages.bulkCreateAllSkippedDuplicates", {
+              emails: duplicateEmails.join(", "),
+            })
+          : res.locals.t("messages.bulkCreateNoneCreated")
       );
     }
 
@@ -363,7 +366,9 @@ const uploadNewUser = async (req, res) => {
 
     req.flash(
       "error",
-      `An error occurred while processing the file: ${err.message}`
+      res.locals.t("messages.bulkUploadProcessingError", {
+        error: err.message,
+      })
     );
     return res.redirect("/admin/user/index");
   }

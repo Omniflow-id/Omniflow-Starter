@@ -187,21 +187,21 @@ const getLogsDataTable = asyncHandler(async (req, res) => {
       return [
         log.id,
         log.activity_type === "user"
-          ? '<span class="badge bg-primary">User</span>'
-          : '<span class="badge bg-secondary">System</span>',
+          ? `<span class="badge bg-primary">${res.locals.t("filters.user")}</span>`
+          : `<span class="badge bg-secondary">${res.locals.t("modals.systemInfo")}</span>`,
         log.action_type
           ? `<span class="badge bg-info">${log.action_type.toUpperCase()}</span>`
           : "-",
         (() => {
           switch (log.status) {
             case "success":
-              return '<span class="badge bg-success">Success</span>';
+              return `<span class="badge bg-success">${res.locals.t("status.success")}</span>`;
             case "failure":
-              return '<span class="badge bg-danger">Failure</span>';
+              return `<span class="badge bg-danger">${res.locals.t("status.failure")}</span>`;
             case "warning":
-              return '<span class="badge bg-warning text-dark">Warning</span>';
+              return `<span class="badge bg-warning text-dark">${res.locals.t("status.warning")}</span>`;
             case "info":
-              return '<span class="badge bg-info">Info</span>';
+              return `<span class="badge bg-info">${res.locals.t("status.info")}</span>`;
             default:
               return `<span class="badge bg-light text-dark">${log.status || "-"}</span>`;
           }
@@ -258,7 +258,7 @@ const getLogsDataTable = asyncHandler(async (req, res) => {
       recordsTotal: 0,
       recordsFiltered: 0,
       data: [],
-      error: "Failed to load data",
+      error: res.locals.t("common.messages.operationFailed"),
     });
   }
 });

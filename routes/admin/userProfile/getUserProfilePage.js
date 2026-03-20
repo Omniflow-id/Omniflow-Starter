@@ -12,7 +12,7 @@ const getUserProfilePage = asyncHandler(async (req, res) => {
   const userID = req.session?.user?.id;
 
   if (!userID) {
-    throw new ValidationError("User session not found");
+    throw new ValidationError(res.locals.t("common.errors.userSessionNotFound"));
   }
 
   // Cache user profile data for 5 minutes
@@ -26,7 +26,7 @@ const getUserProfilePage = asyncHandler(async (req, res) => {
       );
 
       if (users.length === 0) {
-        throw new ValidationError("User profile not found");
+        throw new ValidationError(res.locals.t("common.errors.userProfileNotFound"));
       }
 
       return users[0];

@@ -24,7 +24,7 @@ const sendMessageStream = asyncHandler(async (req, res) => {
   const { conversation_id, message } = req.body;
 
   if (!conversation_id || !message) {
-    throw new ValidationError("Conversation ID and message are required");
+    throw new ValidationError(res.locals.t("common.errors.aiConversationMessageRequired"));
   }
 
   const userId = req.session.user.id;
@@ -41,7 +41,7 @@ const sendMessageStream = asyncHandler(async (req, res) => {
   );
 
   if (conversation.length === 0) {
-    throw new ValidationError("Conversation not found");
+    throw new ValidationError(res.locals.t("common.errors.aiConversationNotFound"));
   }
 
   const conv = conversation[0];
@@ -52,7 +52,7 @@ const sendMessageStream = asyncHandler(async (req, res) => {
     modelConfig = await aiAnalysisService.getAIModelConfig();
   } catch (_error) {
     throw new ValidationError(
-      "No AI model available. Please configure AI Analysis Settings."
+      res.locals.t("common.errors.aiAnalysisSettingsNotConfigured")
     );
   }
 
@@ -198,7 +198,9 @@ const sendMessageStream = asyncHandler(async (req, res) => {
     openai = clientData.openai;
   } catch (error) {
     throw new ValidationError(
-      `Failed to initialize AI client: ${error.message}`
+      res.locals.t("common.errors.aiClientInitializationFailed", {
+        details: error.message,
+      })
     );
   }
 
@@ -355,7 +357,7 @@ const sendMessageStream = asyncHandler(async (req, res) => {
       res.write(
         `data: ${JSON.stringify({
           type: "error",
-          error: `AI service error: ${streamError.message}`,
+          error: res.locals.t("ai.chat.messages.serverError"),
         })}\n\n`
       );
     }

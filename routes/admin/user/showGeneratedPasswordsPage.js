@@ -2,7 +2,7 @@ const showGeneratedPasswordsPage = (req, res) => {
   const generatedPasswords = req.session.generatedPasswords;
 
   if (!generatedPasswords || generatedPasswords.length === 0) {
-    req.flash("error", "No generated passwords to display");
+    req.flash("error", "messages.noGeneratedPasswords");
     return res.redirect("/admin/user/index");
   }
 
@@ -11,7 +11,7 @@ const showGeneratedPasswordsPage = (req, res) => {
 
   res.render("pages/admin/user/passwords", {
     generatedPasswords,
-    title: "Generated Passwords",
+    title: res.locals.t("labels.generatedPasswordsTitle"),
   });
 };
 

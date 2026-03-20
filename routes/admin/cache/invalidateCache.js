@@ -42,7 +42,7 @@ const invalidateCacheController = asyncHandler(async (req, res) => {
         method: req.method,
         url: req.originalUrl,
       },
-      errorMessage: "Cache pattern is required",
+      errorMessage: res.locals.t("common.errors.cachePatternRequired"),
       errorCode: "MISSING_CACHE_PATTERN",
       metadata: {
         operation: "cache_invalidate",
@@ -55,10 +55,10 @@ const invalidateCacheController = asyncHandler(async (req, res) => {
     if (req.xhr || req.headers.accept?.includes("application/json")) {
       return res.status(400).json({
         success: false,
-        error: "Pattern is required",
+        error: res.locals.t("common.errors.cachePatternRequired"),
       });
     } else {
-      req.flash("error_msg", "Cache pattern is required");
+      req.flash("error_msg", "common.errors.cachePatternRequired");
       return res.redirect("/admin/cache/stats");
     }
   }
@@ -103,15 +103,12 @@ const invalidateCacheController = asyncHandler(async (req, res) => {
   if (req.xhr || req.headers.accept?.includes("application/json")) {
     res.json({
       success: true,
-      message: `Invalidated ${deletedCount} cache entries matching pattern: ${pattern}`,
+      message: res.locals.t("common.messages.cacheInvalidated"),
       deleted_count: deletedCount,
       pattern,
     });
   } else {
-    req.flash(
-      "success_msg",
-      `Invalidated ${deletedCount} cache entries matching pattern: ${pattern}`
-    );
+    req.flash("success_msg", "common.messages.cacheInvalidated");
     res.redirect("/admin/cache/stats");
   }
 });

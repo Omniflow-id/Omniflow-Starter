@@ -31,7 +31,7 @@ const checkActiveUser = async (req, res, next) => {
         }
       });
 
-      req.flash("error", "User account not found. Please login again.");
+      req.flash("error", "messages.accountNotFoundLoginAgain");
       return res.redirect("/admin/login");
     }
 
@@ -57,10 +57,7 @@ const checkActiveUser = async (req, res, next) => {
         }
       });
 
-      req.flash(
-        "error",
-        "Your account has been deactivated. Please contact administrator."
-      );
+      req.flash("error", "messages.accountDeactivatedContactAdmin");
       return res.redirect("/admin/login");
     }
 
