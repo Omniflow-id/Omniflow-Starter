@@ -21,11 +21,35 @@ function normalizePath(str) {
 }
 
 /**
+ * Normalizes a language code to a base language.
+ * Examples: "id-ID" -> "id", "en_US" -> "en"
+ * @param {string} lang
+ * @returns {string}
+ */
+function normalizeLang(lang) {
+  if (!lang) {
+    return "en";
+  }
+
+  return String(lang)
+    .toLowerCase()
+    .split(/[-_]/)[0]
+    .replace(/[^a-z]/g, "") || "en";
+}
+
+function buildKnowledgeLanguageFallbacks(lang) {
+  const requested = normalizeLang(lang);
+  const ordered = [requested, "id", "en"];
+  return [...new Set(ordered.filter(Boolean))];
+}
+
+/**
  * Resolves the knowledge context for a specific page, role, and language.
  *
  * Strategy:
  * 1. Look for specific context: `knowledge/{role}/{pageId}/{lang}.md`
- * 2. Return generic fallback or empty string.
+ * 2. Fallback to role-level context: `knowledge/{role}/{lang}.md`
+ * 3. Return empty string when nothing is found.
  *
  * @param {string} roleName - The user role name (e.g., 'Admin', 'Manager', 'User').
  * @param {string} pageId - The ID of the current page.
@@ -38,42 +62,42 @@ async function getKnowledgeContext(roleName, pageId, lang = "en") {
 
     const safeRole = normalizePath(roleName);
     const safePage = normalizePath(pageId);
-    const safeLang = normalizePath(lang);
 
-    // i18n structure: knowledge/admin/index/id.md
-    const filePath = path.join(
-      KNOWLEDGE_ROOT,
-      safeRole,
-      safePage,
-      `${safeLang}.md`
+    for (const candidateLang of buildKnowledgeLanguageFallbacks(lang)) {
+      const safeLang = normalizePath(candidateLang);
+      const candidatePaths = [
+        path.join(KNOWLEDGE_ROOT, safeRole, safePage, `${safeLang}.md`),
+        path.join(KNOWLEDGE_ROOT, safeRole, `${safeLang}.md`),
+      ];
+
+      for (const filePath of candidatePaths) {
+        // Security check: ensure the resolved path is still within KNOWLEDGE_ROOT
+        if (!filePath.startsWith(KNOWLEDGE_ROOT)) {
+          console.warn(
+            `[ContextLoader] Potential path traversal attempt: ${filePath}`
+          );
+          continue;
+        }
+
+        const cacheKey = `${safeRole}:${safePage}:${safeLang}:${filePath}`;
+        if (existenceCache.has(cacheKey) && !existenceCache.get(cacheKey)) {
+          continue;
+        }
+
+        try {
+          await fs.access(filePath);
+          existenceCache.set(cacheKey, true);
+          return await fs.readFile(filePath, "utf-8");
+        } catch (_error) {
+          existenceCache.set(cacheKey, false);
+        }
+      }
+    }
+
+    console.warn(
+      `[ContextLoader] Knowledge not found for role="${safeRole}", page="${safePage}", lang="${lang}"`
     );
-
-    // Security check: ensure the resolved path is still within KNOWLEDGE_ROOT
-    if (!filePath.startsWith(KNOWLEDGE_ROOT)) {
-      console.warn(
-        `[ContextLoader] Potential path traversal attempt: ${filePath}`
-      );
-      return "";
-    }
-
-    // Check cache first
-    const cacheKey = `${safeRole}:${safePage}:${safeLang}`;
-    if (existenceCache.has(cacheKey) && !existenceCache.get(cacheKey)) {
-      return ""; // Negative cache hit
-    }
-
-    // Check file existence
-    try {
-      await fs.access(filePath);
-      existenceCache.set(cacheKey, true);
-    } catch (_error) {
-      console.warn(`[ContextLoader] Knowledge not found: ${filePath}`);
-      existenceCache.set(cacheKey, false);
-      return "";
-    }
-
-    const content = await fs.readFile(filePath, "utf-8");
-    return content;
+    return "";
   } catch (error) {
     console.error("[ContextLoader] Content loading error:", error);
     return "";
@@ -82,4 +106,5 @@ async function getKnowledgeContext(roleName, pageId, lang = "en") {
 
 module.exports = {
   getKnowledgeContext,
+  normalizeLang,
 };

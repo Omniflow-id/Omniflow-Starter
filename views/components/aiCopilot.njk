@@ -455,6 +455,7 @@
       this.typingQueue = [];
       this.isTyping = false;
       this.currentContent = '';
+      this.sseBuffer = '';
       this.i18n = {
         analyzing: '{{ t("ai.copilot.analyzing") }}',
         loading: '{{ t("ai.copilot.loading") }}',
@@ -646,6 +647,7 @@
       this.typingQueue = [];
       this.currentContent = '';
       this.isTyping = false;
+      this.sseBuffer = '';
       this.updateUIState(true);
 
       const query = this.elements.queryInput?.value?.trim() || '';
@@ -662,12 +664,18 @@
       this.abortController = new AbortController();
 
       try {
-        const response = await fetch('/api/ai-copilot/analyze', {
+      const currentLang = document.documentElement.lang || 'id';
+      const currentPageId =
+        window.location.pathname.split('/').filter(Boolean).pop() || 'index';
+
+      const response = await fetch(`/api/ai-copilot/analyze?lang=${encodeURIComponent(currentLang)}`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             userQuery: query,
-            screenContext: formattedContent
+            screenContext: formattedContent,
+            currentPageId,
+            lang: currentLang
           }),
           signal: this.abortController.signal
         });
@@ -688,15 +696,21 @@
           const { done, value } = await reader.read();
           if (done) break;
 
-          const chunk = decoder.decode(value, { stream: true });
-          const lines = chunk.split('\n');
+          this.sseBuffer += decoder.decode(value, { stream: true });
 
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
+          let eventSeparatorIndex = this.sseBuffer.indexOf('\n\n');
+          while (eventSeparatorIndex !== -1) {
+            const eventBlock = this.sseBuffer.slice(0, eventSeparatorIndex);
+            this.sseBuffer = this.sseBuffer.slice(eventSeparatorIndex + 2);
+
+            const dataLines = eventBlock
+              .split('\n')
+              .filter((line) => line.startsWith('data: '));
+
+            for (const line of dataLines) {
               try {
                 const data = JSON.parse(line.slice(6));
                 if (data.content) {
-                  // Add to typing queue for typewriter effect
                   this.typingQueue.push(...data.content.split(''));
                   if (!this.isTyping) {
                     this.processTypingQueue(contentContainer);
@@ -707,8 +721,34 @@
                   return;
                 }
               } catch (e) {
-                // Ignore parse errors for non-JSON lines
+                // Ignore parse errors for malformed SSE payloads
               }
+            }
+
+            eventSeparatorIndex = this.sseBuffer.indexOf('\n\n');
+          }
+        }
+
+        if (this.sseBuffer.trim()) {
+          const dataLines = this.sseBuffer
+            .split('\n')
+            .filter((line) => line.startsWith('data: '));
+
+          for (const line of dataLines) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (data.content) {
+                this.typingQueue.push(...data.content.split(''));
+                if (!this.isTyping) {
+                  this.processTypingQueue(contentContainer);
+                }
+              }
+              if (data.error) {
+                this.showError(data.error);
+                return;
+              }
+            } catch (e) {
+              // Ignore parse errors for trailing SSE fragments
             }
           }
         }

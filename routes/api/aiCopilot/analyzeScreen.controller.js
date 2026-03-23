@@ -9,6 +9,10 @@ const { Langfuse } = require("langfuse");
 const _OpenAI = require("openai");
 const aiAnalysisService = require("@services/aiAnalysisService");
 const { getOpenAIClient } = require("@services/aiChatService");
+const {
+  getKnowledgeContext,
+  normalizeLang,
+} = require("@helpers/contextLoader");
 
 const langfuse = new Langfuse({
   secretKey: process.env.LANGFUSE_SECRET_KEY,
@@ -55,8 +59,15 @@ const logScreenAnalysis = async (
 const analyzeScreen = async (req, res) => {
   req.setMaxListeners(15);
 
-  const { screenContext, userQuery } = req.body;
+  const { screenContext, userQuery, currentPageId } = req.body;
   const pageUrl = req.get("Referer") || "unknown";
+  const currentLang = normalizeLang(
+    req.query.lang ||
+      req.body.lang ||
+      req.headers["accept-language"] ||
+      req.cookies?.omniflow_lang ||
+      "id"
+  );
 
   try {
     if (!screenContext) {
@@ -81,20 +92,52 @@ const analyzeScreen = async (req, res) => {
       ? await aiAnalysisService.getActivityContext(req.session.user.id)
       : {};
 
+    const copilotKnowledge = await getKnowledgeContext(
+      "admin",
+      "copilot",
+      currentLang
+    );
+    const pageKnowledge = await getKnowledgeContext(
+      "admin",
+      currentPageId || "index",
+      currentLang
+    );
+
     // Generate prompts
     const systemPrompt = aiAnalysisService.generateSystemPrompt(
       userContext,
       companyContext,
-      activityContext
+      activityContext,
+      currentLang
     );
     const userMessage = aiAnalysisService.generateUserMessage(
       screenContext,
       userQuery,
-      pageUrl
+      pageUrl,
+      currentLang
     );
 
+    const knowledgeSections = [copilotKnowledge, pageKnowledge]
+      .filter(Boolean)
+      .join("\n\n");
+    const knowledgeHeader =
+      currentLang === "id"
+        ? "## BASIS PENGETAHUAN"
+        : currentLang === "zh"
+          ? "## 知识库"
+          : "## KNOWLEDGE BASE";
+    const knowledgeFallback =
+      currentLang === "id"
+        ? "Tidak ada basis pengetahuan tambahan untuk bahasa ini."
+        : currentLang === "zh"
+          ? "此语言没有额外的知识库内容。"
+          : "No additional knowledge base is available for this language.";
+    const finalSystemPrompt = knowledgeSections
+      ? `${systemPrompt}\n\n${knowledgeHeader}\n${knowledgeSections}`
+      : `${systemPrompt}\n\n${knowledgeHeader}\n${knowledgeFallback}`;
+
     const aiMessages = [
-      { role: "system", content: systemPrompt },
+      { role: "system", content: finalSystemPrompt },
       { role: "user", content: userMessage },
     ];
 
@@ -105,7 +148,12 @@ const analyzeScreen = async (req, res) => {
       Connection: "keep-alive",
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Headers": "Cache-Control",
+      "X-Accel-Buffering": "no",
     });
+
+    if (typeof res.flushHeaders === "function") {
+      res.flushHeaders();
+    }
 
     const abortController = new AbortController();
     let clientAborted = false;
@@ -138,17 +186,19 @@ const analyzeScreen = async (req, res) => {
       sessionId: `omni-copilot-${req.session.user.id}-${Date.now()}`,
       userId: req.session.user.id.toString(),
       tags: ["omni", "copilot", "screen-analysis", modelConfig.model_variant],
-      metadata: {
-        user: req.session.user.username,
-        userId: req.session.user.id,
-        userEmail: req.session.user.email,
-        userRole: req.session.user.role_name,
-        modelId: modelConfig.id,
-        contextLength: screenContext.length,
-        hasUserQuery: !!userQuery,
-        url: pageUrl,
-      },
-    });
+        metadata: {
+          user: req.session.user.username,
+          userId: req.session.user.id,
+          userEmail: req.session.user.email,
+          userRole: req.session.user.role_name,
+          modelId: modelConfig.id,
+          language: currentLang,
+          contextLength: screenContext.length,
+          hasUserQuery: !!userQuery,
+          url: pageUrl,
+          pageId: currentPageId || "index",
+        },
+      });
 
     const generation = trace.generation({
       name: "omni-copilot-analysis",
@@ -160,12 +210,14 @@ const analyzeScreen = async (req, res) => {
         temperature: systemSettings.temperature,
         stream: true,
       },
-      metadata: {
-        analysisType: "screen-content",
-        contextLength: screenContext.length,
-        userQuery: userQuery || null,
-      },
-    });
+        metadata: {
+          analysisType: "screen-content",
+          contextLength: screenContext.length,
+          userQuery: userQuery || null,
+          language: currentLang,
+          pageId: currentPageId || "index",
+        },
+      });
 
     let fullResponse = "";
     let tokenCount = 0;

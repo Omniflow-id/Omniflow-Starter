@@ -7,6 +7,144 @@
 const { db } = require("@db/db");
 const config = require("@config/ai-analysis-config");
 
+const LANGUAGE_PROFILES = {
+  id: {
+    locale: "id-ID",
+    unknownPage: "Halaman tidak diketahui",
+    systemPage: "Halaman Sistem",
+    systemPromptIntro:
+      "Anda adalah {role} {domain} yang ahli dalam analisis data sistem.",
+    responseLanguage:
+      "Gunakan bahasa Indonesia yang natural, jelas, dan profesional.",
+    analysisTaskTitle: "TUGAS ANALISIS",
+    userProfileTitle: "PROFIL PENGGUNA",
+    systemContextTitle: "KONTEKS SISTEM",
+    timeContextTitle: "KONTEKS WAKTU",
+    responseFormatTitle: "FORMAT RESPONS",
+    workConstraintsTitle: "BATASAN KERJA",
+    communicationTitle: "GAYA KOMUNIKASI",
+  },
+  en: {
+    locale: "en-US",
+    unknownPage: "Unknown page",
+    systemPage: "System page",
+    systemPromptIntro:
+      "You are {role} {domain} and specialize in system data analysis.",
+    responseLanguage:
+      "Respond in natural, clear, and professional English.",
+    analysisTaskTitle: "ANALYSIS TASK",
+    userProfileTitle: "USER PROFILE",
+    systemContextTitle: "SYSTEM CONTEXT",
+    timeContextTitle: "TIME CONTEXT",
+    responseFormatTitle: "RESPONSE FORMAT",
+    workConstraintsTitle: "WORK CONSTRAINTS",
+    communicationTitle: "COMMUNICATION STYLE",
+  },
+  zh: {
+    locale: "zh-CN",
+    unknownPage: "未知页面",
+    systemPage: "系统页面",
+    systemPromptIntro: "你是擅长系统数据分析的 {role} {domain}。",
+    responseLanguage: "请用自然、清晰、专业的中文回答。",
+    analysisTaskTitle: "分析任务",
+    userProfileTitle: "用户资料",
+    systemContextTitle: "系统上下文",
+    timeContextTitle: "时间上下文",
+    responseFormatTitle: "响应格式",
+    workConstraintsTitle: "工作限制",
+    communicationTitle: "沟通风格",
+  },
+};
+
+function normalizeLang(lang) {
+  const base = String(lang || "")
+    .toLowerCase()
+    .split(/[-_]/)[0];
+  return LANGUAGE_PROFILES[base] ? base : "id";
+}
+
+function getLanguageProfile(lang) {
+  return LANGUAGE_PROFILES[normalizeLang(lang)] || LANGUAGE_PROFILES.id;
+}
+
+function getLocalizedPageContexts(lang) {
+  const baseLang = normalizeLang(lang);
+  return {
+    "/admin/overview":
+      baseLang === "en"
+        ? "Dashboard Admin - System activity and statistics overview"
+        : baseLang === "zh"
+          ? "管理仪表盘 - 系统活动和统计概览"
+          : "Dashboard Admin - Ringkasan aktivitas dan statistik sistem",
+    "/admin/users":
+      baseLang === "en"
+        ? "User Management - User data and administration"
+        : baseLang === "zh"
+          ? "用户管理 - 用户数据和管理"
+          : "Manajemen Pengguna - Data dan administrasi user",
+    "/admin/permissions":
+      baseLang === "en"
+        ? "Permission Management - Roles and permissions"
+        : baseLang === "zh"
+          ? "权限管理 - 角色与权限"
+          : "Manajemen Hak Akses - Roles dan permissions",
+    "/admin/roles":
+      baseLang === "en"
+        ? "Role Management - System roles list"
+        : baseLang === "zh"
+          ? "角色管理 - 系统角色列表"
+          : "Manajemen Roles - Daftar roles sistem",
+    "/admin/log":
+      baseLang === "en"
+        ? "Activity Logs - System activity log"
+        : baseLang === "zh"
+          ? "活动日志 - 系统活动记录"
+          : "Activity Logs - Log aktivitas sistem",
+    "/admin/cache":
+      baseLang === "en"
+        ? "Cache Management - Caching system management"
+        : baseLang === "zh"
+          ? "缓存管理 - 缓存系统管理"
+          : "Cache Management - Manajemen sistem caching",
+    "/admin/queue":
+      baseLang === "en"
+        ? "Queue Management - Job queue management"
+        : baseLang === "zh"
+          ? "队列管理 - 任务队列管理"
+          : "Queue Management - Manajemen job queue",
+    "/admin/ai_models":
+      baseLang === "en"
+        ? "AI Models Management - AI model configuration"
+        : baseLang === "zh"
+          ? "AI模型管理 - AI模型配置"
+          : "Manajemen AI Models - Konfigurasi model AI",
+    "/admin/ai_use_cases":
+      baseLang === "en"
+        ? "AI Use Cases Management - AI use case management"
+        : baseLang === "zh"
+          ? "AI用例管理 - AI用例配置"
+          : "Manajemen AI Use Cases - Use case AI",
+    "/admin/ai_analysis_settings":
+      baseLang === "en"
+        ? "AI Analysis Settings - Global AI configuration"
+        : baseLang === "zh"
+          ? "AI分析设置 - 全局AI配置"
+          : "Pengaturan AI Analysis - Konfigurasi global AI",
+    "/admin/chat":
+      baseLang === "en"
+        ? "AI Chat - Conversation with AI Assistant"
+        : baseLang === "zh"
+          ? "AI对话 - 与AI助手对话"
+          : "AI Chat - Percakapan dengan AI Assistant",
+    "/":
+      baseLang === "en"
+        ? "Main Dashboard - system home page"
+        : baseLang === "zh"
+          ? "主仪表盘 - 系统主页"
+          : "Dashboard Utama - Halaman utama sistem",
+  };
+}
+
 class AIAnalysisService {
   constructor() {
     this.db = db;
@@ -76,13 +214,16 @@ class AIAnalysisService {
   /**
    * Determine page context from URL
    */
-  getPageContext(url) {
+  getPageContext(url, lang = this.config.ai.language) {
+    const profile = getLanguageProfile(lang);
+    const pageContexts = getLocalizedPageContexts(lang);
+
     if (!url || url === "unknown") {
-      return "Halaman tidak diketahui";
+      return profile.unknownPage;
     }
 
     const urlLower = url.toLowerCase();
-    const pageConfig = this.config.pageContext;
+    const pageConfig = pageContexts;
 
     for (const [basePath, description] of Object.entries(pageConfig)) {
       if (urlLower.includes(basePath.toLowerCase())) {
@@ -90,7 +231,7 @@ class AIAnalysisService {
       }
     }
 
-    return `Halaman Sistem ${this.config.ai.systemDomain}`;
+    return `${profile.systemPage} ${this.config.ai.systemDomain}`;
   }
 
   /**
@@ -107,9 +248,9 @@ class AIAnalysisService {
   /**
    * Generate time context
    */
-  getTimeContext() {
+  getTimeContext(lang = this.config.ai.language) {
     const now = new Date();
-    const locale = this.config.ai.language;
+    const locale = getLanguageProfile(lang).locale;
 
     return {
       currentDate: now.toLocaleDateString(locale, {
@@ -131,48 +272,53 @@ class AIAnalysisService {
   /**
    * Generate system prompt from configuration
    */
-  generateSystemPrompt(userContext, companyContext, activityContext) {
+  generateSystemPrompt(userContext, companyContext, activityContext, lang = this.config.ai.language) {
+    const profile = getLanguageProfile(lang);
     const user = userContext;
     const stats = companyContext;
     const activity = activityContext;
-    const time = this.getTimeContext();
+    const time = this.getTimeContext(lang);
     const tenure = this.calculateUserTenure(
       user[this.config.userContext.fields.joinDate]
     );
 
     const userFields = this.config.userContext.fields;
-    let userProfile = `**${user[userFields.name] || "Pengguna"}** (${
-      user[userFields.role] || "Unknown Role"
+    let userProfile = `**${user[userFields.name] || (lang === "en" ? "User" : lang === "zh" ? "用户" : "Pengguna")}** (${
+      user[userFields.role] || (lang === "en" ? "Unknown Role" : lang === "zh" ? "未知角色" : "Unknown Role")
     })\n`;
-    userProfile += `- Email: ${user[userFields.email] || "Tidak diketahui"}\n`;
-    userProfile += `- Username: ${user[userFields.username] || "Tidak diketahui"}\n`;
-    userProfile += `- Role: ${user[userFields.role] || "Tidak diketahui"}\n`;
+    userProfile += `- ${lang === "en" ? "Email" : lang === "zh" ? "电子邮件" : "Email"}: ${user[userFields.email] || (lang === "en" ? "Unknown" : lang === "zh" ? "未知" : "Tidak diketahui")}\n`;
+    userProfile += `- ${lang === "en" ? "Username" : lang === "zh" ? "用户名" : "Username"}: ${user[userFields.username] || (lang === "en" ? "Unknown" : lang === "zh" ? "未知" : "Tidak diketahui")}\n`;
+    userProfile += `- ${lang === "en" ? "Role" : lang === "zh" ? "角色" : "Role"}: ${user[userFields.role] || (lang === "en" ? "Unknown" : lang === "zh" ? "未知" : "Tidak diketahui")}\n`;
     userProfile += `- Status: ${
-      user[userFields.isActive] ? "Aktif" : "Non-aktif"
+      user[userFields.isActive]
+        ? (lang === "en" ? "Active" : lang === "zh" ? "活跃" : "Aktif")
+        : (lang === "en" ? "Inactive" : lang === "zh" ? "非活跃" : "Non-aktif")
     }\n`;
     userProfile += `- Bergabung: ${
       user[userFields.joinDate]
         ? new Date(user[userFields.joinDate]).toLocaleDateString(
-            this.config.ai.language
+            profile.locale
           )
-        : "Tidak diketahui"
+        : (lang === "en" ? "Unknown" : lang === "zh" ? "未知" : "Tidak diketahui")
     }\n`;
-    userProfile += `- Masa Kerja: ${tenure} bulan\n`;
+    userProfile += `- ${lang === "en" ? "Tenure" : lang === "zh" ? "任职时长" : "Masa Kerja"}: ${tenure} ${lang === "en" ? "months" : lang === "zh" ? "bulan" : "bulan"}\n`;
 
     if (this.config.activityContext.enabled && activity) {
-      userProfile += `- Aktivitas Hari Ini: ${activity.today_activities || 0} aktivitas\n`;
-      userProfile += `- Aktivitas Minggu Ini: ${activity.week_activities || 0} aktivitas\n`;
+      userProfile += `- ${lang === "en" ? "Today Activities" : lang === "zh" ? "今日活动" : "Aktivitas Hari Ini"}: ${activity.today_activities || 0} ${lang === "en" ? "activities" : lang === "zh" ? "活动" : "aktivitas"}\n`;
+      userProfile += `- ${lang === "en" ? "This Week Activities" : lang === "zh" ? "本周活动" : "Aktivitas Minggu Ini"}: ${activity.week_activities || 0} ${lang === "en" ? "activities" : lang === "zh" ? "活动" : "aktivitas"}\n`;
     }
 
     let companyProfile = "";
     if (this.config.companyContext.enabled && stats) {
-      companyProfile = `## KONTEKS SISTEM\n`;
-      companyProfile += `- Total Users: ${stats.total_users || 0} orang\n`;
-      companyProfile += `- Users Aktif: ${stats.active_users || 0} orang\n`;
-      companyProfile += `- Total Roles: ${stats.total_roles || 0} role\n\n`;
+      companyProfile = `## ${profile.systemContextTitle}\n`;
+      companyProfile += `- ${lang === "en" ? "Total Users" : lang === "zh" ? "用户总数" : "Total Users"}: ${stats.total_users || 0} ${lang === "en" ? "users" : lang === "zh" ? "用户" : "orang"}\n`;
+      companyProfile += `- ${lang === "en" ? "Active Users" : lang === "zh" ? "活跃用户" : "Users Aktif"}: ${stats.active_users || 0} ${lang === "en" ? "users" : lang === "zh" ? "用户" : "orang"}\n`;
+      companyProfile += `- ${lang === "en" ? "Total Roles" : lang === "zh" ? "角色总数" : "Total Roles"}: ${stats.total_roles || 0} ${lang === "en" ? "roles" : lang === "zh" ? "角色" : "role"}\n\n`;
     }
 
-    let analysisSection = `## TUGAS ANALISIS\nSebagai ${this.config.ai.systemRole} ${this.config.ai.systemDomain}, lakukan analisis mendalam dengan fokus:\n\n`;
+    let analysisSection = `## ${profile.analysisTaskTitle}\n${profile.systemPromptIntro
+      .replace("{role}", this.config.ai.systemRole)
+      .replace("{domain}", this.config.ai.systemDomain)}\n${profile.responseLanguage}\n\n`;
 
     this.config.analysisFramework.sections.forEach((section) => {
       analysisSection += `### ${section.id.toUpperCase().replace(/_/g, " ")}\n`;
@@ -186,48 +332,55 @@ class AIAnalysisService {
     const principles = this.config.communication.principles.join("\n- ");
     const formatting = this.config.formatting.features.join("\n- ");
 
-    return `Anda adalah ${this.config.ai.systemRole} ${this.config.ai.systemDomain} yang ahli dalam analisis data sistem.
+    return `${profile.systemPromptIntro
+      .replace("{role}", this.config.ai.systemRole)
+      .replace("{domain}", this.config.ai.systemDomain)}
 
-## PROFIL PENGGUNA
+## ${profile.userProfileTitle}
 ${userProfile}
-${companyProfile}## KONTEKS WAKTU
-- **Hari ini**: ${time.currentDate}
-- **Waktu**: ${time.currentTime}
-- **Bulan**: ${time.month}
-- **Kuartal**: ${time.quarter}
-- **Minggu ke-**: ${time.weekOfMonth} bulan ini
+${companyProfile}## ${profile.timeContextTitle}
+- **${lang === "en" ? "Today" : lang === "zh" ? "今天" : "Hari ini"}**: ${time.currentDate}
+- **${lang === "en" ? "Time" : lang === "zh" ? "Waktu" : "Waktu"}**: ${time.currentTime}
+- **${lang === "en" ? "Month" : lang === "zh" ? "Bulan" : "Bulan"}**: ${time.month}
+- **${lang === "en" ? "Quarter" : lang === "zh" ? "Kuartal" : "Kuartal"}**: ${time.quarter}
+- **${lang === "en" ? "Week of month" : lang === "zh" ? "Minggu ke-" : "Minggu ke-"}**: ${time.weekOfMonth}
 
-${analysisSection}## FORMAT RESPONS
-Gunakan format ${this.config.formatting.style} yang terstruktur:
+${analysisSection}## ${profile.responseFormatTitle}
+${lang === "en" ? "Use" : lang === "zh" ? "使用" : "Gunakan"} format ${this.config.formatting.style} ${lang === "en" ? "that is structured" : lang === "zh" ? "yang terstruktur" : "yang terstruktur"}:
 - ${formatting}
 
-## BATASAN KERJA
+## ${profile.workConstraintsTitle}
 - ${constraints}
 
-## GAYA KOMUNIKASI
+## ${profile.communicationTitle}
 - ${principles}`;
   }
 
   /**
    * Generate user message with context
    */
-  generateUserMessage(screenContext, userQuery = null, pageUrl = "unknown") {
-    const pageContext = this.getPageContext(pageUrl);
+  generateUserMessage(
+    screenContext,
+    userQuery = null,
+    pageUrl = "unknown",
+    lang = this.config.ai.language
+  ) {
+    const pageContext = this.getPageContext(pageUrl, lang);
 
     if (userQuery) {
-      return `**PERTANYAAN SPESIFIK**: "${userQuery}"
+      return `**${lang === "en" ? "SPECIFIC QUESTION" : lang === "zh" ? "具体问题" : "PERTANYAAN SPESIFIK"}**: "${userQuery}"
 
-**KONTEKS HALAMAN**: ${pageContext}
+**${lang === "en" ? "PAGE CONTEXT" : lang === "zh" ? "页面上下文" : "KONTEKS HALAMAN"}**: ${pageContext}
 **URL**: ${pageUrl}
 
-**DATA LAYAR**:
+**${lang === "en" ? "SCREEN DATA" : lang === "zh" ? "屏幕数据" : "DATA LAYAR"}**:
 ${screenContext}`;
     }
 
-    return `**KONTEKS HALAMAN**: ${pageContext}
+    return `**${lang === "en" ? "PAGE CONTEXT" : lang === "zh" ? "页面上下文" : "KONTEKS HALAMAN"}**: ${pageContext}
 **URL**: ${pageUrl}
 
-**DATA LAYAR**:
+**${lang === "en" ? "SCREEN DATA" : lang === "zh" ? "屏幕数据" : "DATA LAYAR"}**:
 ${screenContext}`;
   }
 
