@@ -83,7 +83,7 @@ if (process.env.NODE_ENV === "development") {
 const env = nunjucks.configure("views", {
   autoescape: true,
   express: app,
-  watch: true,
+  watch: process.env.NODE_ENV !== "production", // Disable watch in production for multi-node deployment
 });
 
 // Update date filter configuration

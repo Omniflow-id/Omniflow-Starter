@@ -37,7 +37,9 @@ git diff 9af582e^ 9af582e  # Show exact diff
 
 ## ✅ Fixes yang Sudah Diterapkan
 
-### 1. Session Fixation Vulnerability (HIGH PRIORITY)
+### Core Security Fixes (Commit: 9af582e)
+
+#### 1. Session Fixation Vulnerability (HIGH PRIORITY)
 
 **Problem**: Login sukses tidak melakukan `session.regenerate()`, membuka celah session fixation attack.
 
@@ -103,7 +105,7 @@ req.session.regenerate((err) => {
 });
 ```
 
-### 2. CSRF_SECRET Fallback Inconsistency (HIGH PRIORITY)
+#### 2. CSRF_SECRET Fallback Inconsistency (HIGH PRIORITY)
 
 **Problem**: `config/validation.js` mengandalkan fallback ke `SESSION_KEY` tapi `config/index.js` tidak implement fallback.
 
@@ -122,7 +124,7 @@ csrf: {
 },
 ```
 
-### 3. Client IP Detection Fix (HIGH PRIORITY)
+#### 3. Client IP Detection Fix (HIGH PRIORITY)
 
 **Problem**: `getClientIP` helper salah mengambil elemen terakhir dari `X-Forwarded-For` (proxy IP) bukan client IP yang sebenarnya (leftmost).
 
@@ -146,7 +148,7 @@ const getClientIP = (req) => {
 };
 ```
 
-### 4. Worker Separation Feature Flag (HIGH PRIORITY)
+#### 4. Worker Separation Feature Flag (HIGH PRIORITY)
 
 **Problem**: Web node dan worker RabbitMQ menyatu, sehingga scaling web ikut scaling consumer queue.
 
@@ -179,7 +181,7 @@ if (config.rabbitmq.enabled && config.rabbitmq.runWorkers) {
 }
 ```
 
-### 5. Redis-Down Graceful Handling (MEDIUM PRIORITY)
+#### 5. Redis-Down Graceful Handling (MEDIUM PRIORITY)
 
 **Problem**: Rate limiter mengalami TypeError saat Redis client null, tidak graceful fallback ke memory store.
 
@@ -213,6 +215,77 @@ const createStore = (prefix) => {
   });
 };
 ```
+
+### Production Hardening Fixes (Latest Commit)
+
+#### 6. Nunjucks Watch Mode Production Guard (MEDIUM PRIORITY)
+
+**Problem**: `app.js:83` menggunakan `watch: true` untuk Nunjucks tanpa guard production, menyebabkan file watchers aktif di semua nodes yang tidak ideal untuk deployment multi-node.
+
+**Fix Applied**: 
+
+**File: `app.js`**
+```javascript
+const env = nunjucks.configure("views", {
+  autoescape: true,
+  express: app,
+  watch: process.env.NODE_ENV !== "production", // Disable watch in production for multi-node deployment
+});
+```
+
+**Impact**: File watchers dimatikan di production, menghemat resources dan menghindari race condition pada shared filesystem.
+
+#### 7. Enhanced Readiness Check for Mandatory Services (MEDIUM PRIORITY)
+
+**Problem**: `/api/health/readyz` endpoint hanya check database, padahal Redis/RabbitMQ yang enabled juga mandatory untuk aplikasi berfungsi normal.
+
+**Fix Applied**: 
+
+**File: `routes/api/health/health.api.controller.js`**
+```javascript
+// Ready if all mandatory services are healthy
+// Database is always mandatory, Redis and RabbitMQ depend on configuration
+const isReady = dbHealthy && 
+  (config.redis.enabled ? redisHealthy : true) && 
+  (config.rabbitmq.enabled ? rabbitHealthy : true);
+
+if (isReady) {
+  res.status(200).json({
+    ready: true,
+    checks: {
+      database: { status: dbHealthy, mandatory: true },
+      redis: { status: redisHealthy, mandatory: config.redis.enabled },
+      rabbitmq: { status: rabbitHealthy, mandatory: config.rabbitmq.enabled },
+    },
+  });
+} else {
+  res.status(503).json({
+    ready: false,
+    checks: {
+      database: { status: dbHealthy, mandatory: true },
+      redis: { status: redisHealthy, mandatory: config.redis.enabled },
+      rabbitmq: { status: rabbitHealthy, mandatory: config.rabbitmq.enabled },
+    },
+    message: res.locals.t("common.messages.operationFailed"),
+  });
+}
+```
+
+**Impact**: Load balancer hanya route traffic ke nodes dengan semua mandatory services healthy.
+
+#### 8. Redis Rate Limiting Strategy Decision (ARCHITECTURAL)
+
+**Problem**: Rate limiter fallback ke memory store saat Redis down, menyebabkan rate limit per-node yang bisa dibypass dengan multiple nodes.
+
+**Decision**: **Maintain fail-open approach** (current behavior)
+
+**Rationale**:
+- **Availability > Strict Rate Limiting**: Redis outage tidak mematikan aplikasi
+- **Graceful Degradation**: Memory store fallback tetap provide protection per-node  
+- **Production Resilience**: Aplikasi tetap functional saat infrastructure issue
+- **Monitor-First**: Better to monitor Redis health dan alert vs hard failure
+
+**Alternative Considered**: Fail-closed (503 error saat Redis down) - rejected karena terlalu aggressive untuk production availability.
 
 ## 🚀 Deployment Configuration
 
@@ -648,11 +721,40 @@ networks:
    docker start redis
    ```
 
-4. **Load Balancer Health Check**:
+4. **Enhanced Load Balancer Health Check**:
    ```bash
-   # Test health endpoint
+   # Test enhanced readiness endpoint
    curl http://nginx/api/health/readyz
-   # Should return: {"status":"ok","timestamp":"...","services":{"database":"ok","redis":"ok"}}
+   # Should return detailed service status:
+   # {
+   #   "ready": true,
+   #   "checks": {
+   #     "database": { "status": true, "mandatory": true },
+   #     "redis": { "status": true, "mandatory": true },
+   #     "rabbitmq": { "status": true, "mandatory": true }
+   #   }
+   # }
+   ```
+
+5. **Production Hardening Validation**:
+   ```bash
+   # Test Nunjucks watch is disabled in production
+   NODE_ENV=production node -e "
+   const nunjucks = require('nunjucks');
+   const env = nunjucks.configure('views', {
+     autoescape: true,
+     watch: process.env.NODE_ENV !== 'production'
+   });
+   console.log('Watch disabled:', env.opts.watch === false);
+   "
+   
+   # Test mandatory service readiness
+   curl -s http://nginx/api/health/readyz | jq '.checks'
+   
+   # Test service-specific failures
+   docker stop redis
+   curl -s http://nginx/api/health/readyz | jq '.ready'  # Should be false
+   docker start redis
    ```
 
 ### Performance Monitoring

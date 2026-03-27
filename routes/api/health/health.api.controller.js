@@ -320,25 +320,28 @@ const getHealthReadyzAPI = asyncHandler(async (_req, res) => {
   const rabbitStatus = getRabbitMQStatus();
   const rabbitHealthy = rabbitStatus?.connected || false;
 
-  // Only ready if database is healthy (core dependency)
-  const isReady = dbHealthy;
+  // Ready if all mandatory services are healthy
+  // Database is always mandatory, Redis and RabbitMQ depend on configuration
+  const isReady = dbHealthy && 
+    (config.redis.enabled ? redisHealthy : true) && 
+    (config.rabbitmq.enabled ? rabbitHealthy : true);
 
   if (isReady) {
     res.status(200).json({
       ready: true,
       checks: {
-        database: dbHealthy,
-        redis: redisHealthy,
-        rabbitmq: rabbitHealthy,
+        database: { status: dbHealthy, mandatory: true },
+        redis: { status: redisHealthy, mandatory: config.redis.enabled },
+        rabbitmq: { status: rabbitHealthy, mandatory: config.rabbitmq.enabled },
       },
     });
   } else {
     res.status(503).json({
       ready: false,
       checks: {
-        database: dbHealthy,
-        redis: redisHealthy,
-        rabbitmq: rabbitHealthy,
+        database: { status: dbHealthy, mandatory: true },
+        redis: { status: redisHealthy, mandatory: config.redis.enabled },
+        rabbitmq: { status: rabbitHealthy, mandatory: config.rabbitmq.enabled },
       },
       message: res.locals.t("common.messages.operationFailed"),
     });
