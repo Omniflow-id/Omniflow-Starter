@@ -1,5 +1,30 @@
 # Multi-Node Deployment Guide
 
+> **📍 Repository Reference**: This documentation is for the **Omniflow-Starter** project.  
+> **🔍 Implementation Details**: All fixes documented here were implemented in git commit `9af582e` (feat: enhance multi-node deployment security and scalability).  
+> **📂 Typical Location**: Most users have this repo at `/Documents/GitHub/Omniflow-Starter/` (adjust path as needed for your setup).  
+> **🤖 For AI Assistants**: You can reference this specific commit to see the exact implementation of all security fixes mentioned below.
+
+## Implementation Commit Reference
+
+**Commit Hash**: `9af582e`  
+**Commit Message**: `feat: enhance multi-node deployment security and scalability`
+
+**Files Modified**:
+- `config/index.js` - CSRF fallback fix
+- `helpers/getClientIP.js` - X-Forwarded-For IP detection fix  
+- `middlewares/rateLimiter.js` - Redis graceful fallback
+- `routes/admin/auth/login.js` - Session regeneration on login
+- `routes/admin/auth/verifyOTP.js` - Session regeneration on OTP success
+- `server.js` - Worker separation feature flag
+- `multi_node_deployment.md` - This documentation
+
+**Git Command to View Changes**:
+```bash
+git show 9af582e
+git diff 9af582e^ 9af582e  # Show exact diff
+```
+
 ## Ringkasan Arsitektur
 
 **Omniflow-Starter** telah dirancang untuk mendukung deployment multi-node dengan beberapa komponen yang shared by design:
