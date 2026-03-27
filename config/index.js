@@ -227,7 +227,7 @@ const config = {
   },
 
   csrf: {
-    secret: process.env.CSRF_SECRET,
+    secret: process.env.CSRF_SECRET || process.env.SESSION_KEY,
     cookieName: "csrf-token",
     cookieOptions: {
       httpOnly: true,
@@ -310,6 +310,8 @@ const config = {
     defaultMessageOptions: {
       persistent: process.env.RABBITMQ_MESSAGE_PERSISTENT !== "false", // Default: true
     },
+    // Worker management
+    runWorkers: process.env.RUN_WORKERS !== "false", // Default: true (workers run by default)
   },
 
   llm: {

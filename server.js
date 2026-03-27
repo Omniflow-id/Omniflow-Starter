@@ -17,8 +17,8 @@ const start = () => {
     server.listen(PORT, "0.0.0.0", async () => {
       console.log(`🚀 [SERVER] Application running on http://0.0.0.0:${PORT}`);
 
-      // Start workers after server is ready
-      if (config.rabbitmq.enabled) {
+      // Start workers after server is ready (if enabled)
+      if (config.rabbitmq.enabled && config.rabbitmq.runWorkers) {
         try {
           const workerManager = require("./workers");
           await workerManager.start();
@@ -26,6 +26,8 @@ const start = () => {
         } catch (error) {
           console.error("❌ [WORKERS] Failed to start:", error.message);
         }
+      } else if (config.rabbitmq.enabled && !config.rabbitmq.runWorkers) {
+        console.log("🔧 [WORKERS] Workers disabled via RUN_WORKERS=false");
       }
 
       // Send startup success notification

@@ -188,22 +188,34 @@ const login = asyncHandler(async (req, res) => {
     // Load user permissions and complete login directly
     const userPermissions = await loadUserPermissions(user);
 
-    // Set session with permissions
-    req.session.user = {
-      id: user.id,
-      username: user.username,
-      full_name: user.full_name,
-      email: user.email,
-      role_id: user.role_id,
-      role_name: user.role_name,
-    };
-    req.session.permissions = userPermissions;
+    // Regenerate session ID to prevent session fixation
+    req.session.regenerate((err) => {
+      if (err) {
+        console.error("❌ [SESSION] Failed to regenerate session:", err.message);
+        throw new AuthenticationError("Session regeneration failed");
+      }
 
-    // Log successful login
-    await logSuccessfulLogin(user, req);
+      // Set session with permissions after regeneration
+      req.session.user = {
+        id: user.id,
+        username: user.username,
+        full_name: user.full_name,
+        email: user.email,
+        role_id: user.role_id,
+        role_name: user.role_name,
+      };
+      req.session.permissions = userPermissions;
 
-    req.flash("success", t("messages.loginSuccessDev"));
-    return res.redirect("/admin");
+      // Log successful login and redirect after session regeneration
+      logSuccessfulLogin(user, req).then(() => {
+        req.flash("success", t("messages.loginSuccessDev"));
+        res.redirect("/admin");
+      }).catch((logError) => {
+        console.error("❌ [LOGIN] Failed to log successful login:", logError.message);
+        req.flash("success", t("messages.loginSuccessDev"));
+        res.redirect("/admin");
+      });
+    });
   }
 
   // 2FA Flow: Generate and send OTP

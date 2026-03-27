@@ -19,15 +19,17 @@ const createStore = (prefix) => {
       const client = getRedis();
       if (!client) {
         console.error(
-          "❌ [RATE-LIMIT] Redis client is null but redis is enabled!"
+          "❌ [RATE-LIMIT] Redis client is null but redis is enabled! Falling back to memory store."
         );
-        return null; // This causes the TypeError
+        // Throw error to trigger express-rate-limit fallback to memory store
+        throw new Error("Redis client not available");
       }
       try {
         const result = await client.call(...args);
         return result;
       } catch (err) {
-        console.error("❌ [RATE-LIMIT] Redis call error:", err);
+        console.error("❌ [RATE-LIMIT] Redis call error:", err.message);
+        // Re-throw to trigger fallback to memory store
         throw err;
       }
     },

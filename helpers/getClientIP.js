@@ -1,7 +1,9 @@
 const getClientIP = (req) => {
   // Get IP from various headers and sources
+  // X-Forwarded-For format: client_ip, proxy1_ip, proxy2_ip
+  // We want the leftmost (first) IP which is the original client
   const rawIP =
-    (req.headers["x-forwarded-for"] || "").split(",").pop().trim() ||
+    (req.headers["x-forwarded-for"] || "").split(",")[0].trim() ||
     req.headers["x-real-ip"] ||
     req.headers["x-client-ip"] ||
     req.ip ||
