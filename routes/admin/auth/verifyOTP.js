@@ -76,7 +76,7 @@ const postVerifyOTP = asyncHandler(async (req, res) => {
     const userPermissions = await loadUserPermissions(user);
 
     // Regenerate session ID to prevent session fixation
-    req.session.regenerate((err) => {
+    return req.session.regenerate((err) => {
       if (err) {
         console.error("❌ [SESSION] Failed to regenerate session:", err.message);
         throw new AuthenticationError("Session regeneration failed");
@@ -88,20 +88,28 @@ const postVerifyOTP = asyncHandler(async (req, res) => {
         username: user.username,
         email: user.email,
         role_id: user.role_id,
+        role_name: user.role_name,
       };
       req.session.permissions = userPermissions;
 
       // Clean up pending 2FA (note: no longer in session after regenerate)
       // (pending2FA is automatically cleared on regenerate)
 
-      // Log successful login and redirect after session regeneration
-      logSuccessfulLogin(user, req, "2fa_dev_bypass").then(() => {
-        req.flash("success", "messages.loginSuccessOtpBypass");
-        res.redirect("/admin");
-      }).catch((logError) => {
-        console.error("❌ [2FA] Failed to log successful login:", logError.message);
-        req.flash("success", "messages.loginSuccessOtpBypass");
-        res.redirect("/admin");
+      req.session.save((saveErr) => {
+        if (saveErr) {
+          console.error("❌ [SESSION] Failed to save session:", saveErr.message);
+          throw new AuthenticationError("Session save failed");
+        }
+
+        // Log successful login and redirect after session regeneration
+        logSuccessfulLogin(user, req, "2fa_dev_bypass").then(() => {
+          req.flash("success", "messages.loginSuccessOtpBypass");
+          res.redirect("/admin");
+        }).catch((logError) => {
+          console.error("❌ [2FA] Failed to log successful login:", logError.message);
+          req.flash("success", "messages.loginSuccessOtpBypass");
+          res.redirect("/admin");
+        });
       });
     });
   }
@@ -189,7 +197,7 @@ const postVerifyOTP = asyncHandler(async (req, res) => {
     const userPermissions = await loadUserPermissions(user);
 
     // Regenerate session ID to prevent session fixation
-    req.session.regenerate((err) => {
+    return req.session.regenerate((err) => {
       if (err) {
         console.error("❌ [SESSION] Failed to regenerate session:", err.message);
         throw new AuthenticationError("Session regeneration failed");
@@ -201,20 +209,28 @@ const postVerifyOTP = asyncHandler(async (req, res) => {
         username: user.username,
         email: user.email,
         role_id: user.role_id,
+        role_name: user.role_name,
       };
       req.session.permissions = userPermissions;
 
       // Clean up pending 2FA session (note: automatically cleared on regenerate)
       // (pending2FA is automatically cleared on regenerate)
 
-      // Log successful 2FA completion and redirect
-      logSuccessfulLogin(user, req, "2fa_complete").then(() => {
-        req.flash("success", "messages.otpVerifiedWelcome");
-        res.redirect("/admin");
-      }).catch((logError) => {
-        console.error("❌ [2FA] Failed to log successful login:", logError.message);
-        req.flash("success", "messages.otpVerifiedWelcome");
-        res.redirect("/admin");
+      req.session.save((saveErr) => {
+        if (saveErr) {
+          console.error("❌ [SESSION] Failed to save session:", saveErr.message);
+          throw new AuthenticationError("Session save failed");
+        }
+
+        // Log successful 2FA completion and redirect
+        logSuccessfulLogin(user, req, "2fa_complete").then(() => {
+          req.flash("success", "messages.otpVerifiedWelcome");
+          res.redirect("/admin");
+        }).catch((logError) => {
+          console.error("❌ [2FA] Failed to log successful login:", logError.message);
+          req.flash("success", "messages.otpVerifiedWelcome");
+          res.redirect("/admin");
+        });
       });
     });
   } catch (error) {

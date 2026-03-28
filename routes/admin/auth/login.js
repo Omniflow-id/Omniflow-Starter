@@ -189,7 +189,7 @@ const login = asyncHandler(async (req, res) => {
     const userPermissions = await loadUserPermissions(user);
 
     // Regenerate session ID to prevent session fixation
-    req.session.regenerate((err) => {
+    return req.session.regenerate((err) => {
       if (err) {
         console.error("❌ [SESSION] Failed to regenerate session:", err.message);
         throw new AuthenticationError("Session regeneration failed");
@@ -206,14 +206,21 @@ const login = asyncHandler(async (req, res) => {
       };
       req.session.permissions = userPermissions;
 
-      // Log successful login and redirect after session regeneration
-      logSuccessfulLogin(user, req).then(() => {
-        req.flash("success", t("messages.loginSuccessDev"));
-        res.redirect("/admin");
-      }).catch((logError) => {
-        console.error("❌ [LOGIN] Failed to log successful login:", logError.message);
-        req.flash("success", t("messages.loginSuccessDev"));
-        res.redirect("/admin");
+      req.session.save((saveErr) => {
+        if (saveErr) {
+          console.error("❌ [SESSION] Failed to save session:", saveErr.message);
+          throw new AuthenticationError("Session save failed");
+        }
+
+        // Log successful login and redirect after session regeneration
+        logSuccessfulLogin(user, req).then(() => {
+          req.flash("success", t("messages.loginSuccessDev"));
+          res.redirect("/admin");
+        }).catch((logError) => {
+          console.error("❌ [LOGIN] Failed to log successful login:", logError.message);
+          req.flash("success", t("messages.loginSuccessDev"));
+          res.redirect("/admin");
+        });
       });
     });
   }
