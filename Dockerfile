@@ -44,11 +44,11 @@ RUN mkdir -p logs uploads && \
 USER node
 
 # Expose port
-EXPOSE 1234
+EXPOSE 50001
 
 # Development health check (less strict)
 HEALTHCHECK --interval=10s --timeout=5s --start-period=30s --retries=2 \
-    CMD curl -f http://localhost:1234/health || exit 1
+    CMD curl -f http://localhost:50001/health || exit 1
 
 # Set entrypoint for database initialization
 ENTRYPOINT ["docker-entrypoint.sh"]
@@ -97,11 +97,11 @@ RUN mkdir -p logs uploads && \
 USER node
 
 # Expose port
-EXPOSE 1234
+EXPOSE 50001
 
 # Production health check (more robust)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:1234/health || exit 1
+    CMD curl -f http://localhost:50001/health || exit 1
 
 # Set entrypoint for database initialization
 ENTRYPOINT ["docker-entrypoint.sh"]

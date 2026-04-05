@@ -290,7 +290,7 @@ All services include health checks:
 - **MySQL**: `mysqladmin ping`
 - **Redis**: `redis-cli ping`
 - **RabbitMQ**: `rabbitmq-diagnostics ping`
-- **App**: `curl -f http://localhost:1234/health`
+- **App**: `curl -f http://localhost:50001/health`
 
 ## 🚨 Troubleshooting
 
@@ -414,9 +414,9 @@ The application will automatically run migrations and seeders on first startup. 
 
 ### 4. Access Application
 
-- **Web Interface**: http://localhost:1234
+- **Web Interface**: http://localhost:50001
 - **RabbitMQ Management**: http://localhost:15672 (admin/admin123)
-- **MySQL**: localhost:3306 (omniflow/omniflow123)
+- **MySQL**: localhost:33060 (omniflow/omniflow123)
 - **Redis**: localhost:6379
 
 ## Services Overview
@@ -429,7 +429,7 @@ The application will automatically run migrations and seeders on first startup. 
 
 ### MySQL Database
 - **Container**: `omniflow_mysql`
-- **Port**: 3306
+- **Port**: 33060
 - **Database**: `omniflow_starter`
 - **User**: `omniflow` / `omniflow123`
 - **Volume**: `mysql_data`
@@ -458,7 +458,7 @@ SESSION_KEY=your-super-secret-session-key-change-this-in-production
 CSRF_SECRET=your-csrf-secret-key-change-this
 
 # Application
-APP_URL=http://localhost:1234
+APP_URL=http://localhost:50001
 NODE_ENV=production
 ```
 
@@ -585,7 +585,7 @@ docker run --rm -v omniflow-starter_redis_data:/data -v $(pwd):/backup alpine ta
    # Remove port mappings for internal services
    # mysql:
    #   ports:
-   #     - "3306:3306"  # Remove this line
+   #     - "33060:3306"  # Remove this line
    ```
 
 ### Performance Optimization
@@ -656,7 +656,7 @@ docker-compose up -d
 docker stats
 
 # Check application health
-curl http://localhost:1234/health
+curl http://localhost:50001/health
 
 # View detailed logs
 docker-compose logs -f app | grep ERROR

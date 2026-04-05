@@ -9,7 +9,7 @@ const config = {
   app: {
     name: process.env.APP_NAME || "Omniflow Starter",
     url: process.env.APP_URL || "http://localhost",
-    port: process.env.PORT || 1234,
+    port: process.env.PORT || 50001,
     env: process.env.NODE_ENV || "development",
     // Dynamic URL generator for emails and links
     getFullUrl: function () {
@@ -67,7 +67,7 @@ const config = {
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
-    port: parseInt(process.env.DB_PORT, 10) || 3306,
+    port: parseInt(process.env.DB_PORT, 10) || 33060,
     // Connection Pool Configuration (MySQL2 compatible)
     connectionLimit:
       parseInt(process.env.DB_CONNECTION_LIMIT, 10) ||
@@ -97,7 +97,7 @@ const config = {
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      port: parseInt(process.env.DB_PORT, 10) || 3306,
+      port: parseInt(process.env.DB_PORT, 10) || 33060,
     },
     migrations: {
       directory: "./db/migrations",

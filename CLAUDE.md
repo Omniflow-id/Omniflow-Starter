@@ -24,10 +24,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **No build process** - static files served directly from public/
 
 ### **Docker Services**
-- **MySQL**: localhost:3306 (omniflow/omniflow123)
+- **MySQL**: localhost:33060 (omniflow/omniflow123)
 - **Redis**: localhost:6379 (caching)
 - **RabbitMQ**: localhost:5672 (jobs), localhost:15672 (management UI)
-- **App**: localhost:1234 (main application)
+- **App**: localhost:50001 (main application)
 
 ## Module Aliases
 
@@ -1927,7 +1927,7 @@ await invalidateCache(`user:${userId}:*`, true);        // User-specific cache
 
 - `NODE_ENV` - Environment (default: "development")
 - `APP_URL` - Application base URL for emails and links (default: "http://localhost")
-  - **Development**: Port automatically added (e.g., `http://localhost:1234`)
+  - **Development**: Port automatically added (e.g., `http://localhost:50001`)
   - **Production**: Use full HTTPS URL without port (e.g., `https://yourdomain.com`)
 - `PORT` - Server port (default: 1234)
 - `CSRF_SECRET` - CSRF token secret (falls back to SESSION_KEY)

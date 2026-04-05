@@ -2,14 +2,14 @@ services:
   # MySQL Database (same as production)
   mysql:
     image: mysql:8.0
-    container_name: omniflow_mysql_dev
+    container_name: omniflow_starter_mysql_dev
     environment:
       MYSQL_ROOT_PASSWORD: root123
       MYSQL_DATABASE: omniflow_starter
       MYSQL_USER: omniflow
       MYSQL_PASSWORD: omniflow123
     ports:
-      - "3306:3306"
+      - "33060:3306"
     volumes:
       - mysql_dev_data:/var/lib/mysql
       - ./db/init:/docker-entrypoint-initdb.d
@@ -25,7 +25,7 @@ services:
   # Redis Cache (same as production)
   redis:
     image: redis:7-alpine
-    container_name: omniflow_redis_dev
+    container_name: omniflow_starter_redis_dev
     ports:
       - "6379:6379"
     volumes:
@@ -41,7 +41,7 @@ services:
   # RabbitMQ Message Queue (same as production)
   rabbitmq:
     image: rabbitmq:3-management-alpine
-    container_name: omniflow_rabbitmq_dev
+    container_name: omniflow_starter_rabbitmq_dev
     environment:
       RABBITMQ_DEFAULT_USER: admin
       RABBITMQ_DEFAULT_PASS: admin123
@@ -65,14 +65,14 @@ services:
       context: .
       dockerfile: Dockerfile
       target: development  # Use development stage
-    container_name: omniflow-express-starter-dev
+    container_name: omniflow-starter-dev
     environment:
       NODE_ENV: development
-      PORT: 1234
+      PORT: 50001
       
       # Database Configuration
       DB_HOST: mysql
-      DB_PORT: 3306
+      DB_PORT: 33060
       DB_USER: omniflow
       DB_PASSWORD: omniflow123
       DB_NAME: omniflow_starter
@@ -95,7 +95,7 @@ services:
       CSRF_SECRET: dev-csrf-secret-change-in-production
       
       # Application Settings
-      APP_URL: http://localhost:1234
+      APP_URL: http://localhost:50001
       SESSION_TIMEOUT_HOURS: 24
       TIMEZONE: Asia/Jakarta
       
@@ -116,8 +116,8 @@ services:
       LOG_LEVEL: debug
       
     ports:
-      - "1234:1234"
-      - "9096:9096"
+      - "50001:50001"
+      - "19501:9096"
     depends_on:
       mysql:
         condition: service_healthy
@@ -136,7 +136,7 @@ services:
     restart: unless-stopped
     # Development health check (less strict)
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:1234/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:50001/health"]
       timeout: 5s
       retries: 2
       interval: 10s

@@ -34,7 +34,7 @@ npm run dev                 # Run app with nodemon (native)
 ```
 
 ### **Access Points & Default Users**
-- **App**: http://localhost:1234
+- **App**: http://localhost:50001
 - **RabbitMQ Management**: http://localhost:15672 (admin/admin123)
 
 **🔐 Default Users** (auto-created by Docker):
