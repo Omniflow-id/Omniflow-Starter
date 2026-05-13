@@ -71,7 +71,7 @@ services:
       PORT: 50001
       
       # Database Configuration
-      DB_HOST: mysql
+.127.148.109
       DB_PORT: 33060
       DB_USER: omniflow
       DB_PASSWORD: omniflow123
